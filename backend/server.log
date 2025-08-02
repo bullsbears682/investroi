@@ -1,0 +1,8 @@
+nohup: ignoring input
+INFO:     Started server process [24214]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+🚀 Starting InvestWise Pro ROI Calculator...
+INFO:     127.0.0.1:41396 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41410 - "POST /api/roi/calculate HTTP/1.1" 200 OK
