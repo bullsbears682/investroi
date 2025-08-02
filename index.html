@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROI Calculator - Smart Investment Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>ROI Calculator</h1>
+            </div>
+            <p class="subtitle">Smart Investment Analysis Tool</p>
+        </header>
+
+        <main class="main-content">
+            <div class="calculator-section">
+                <div class="input-panel">
+                    <h2><i class="fas fa-calculator"></i> Investment Details</h2>
+                    
+                    <div class="input-group">
+                        <label for="initialInvestment">Initial Investment ($)</label>
+                        <input type="number" id="initialInvestment" placeholder="Enter initial investment amount" min="0" step="0.01">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="finalValue">Final Value ($)</label>
+                        <input type="number" id="finalValue" placeholder="Enter final value" min="0" step="0.01">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="timePeriod">Time Period</label>
+                        <div class="time-input">
+                            <input type="number" id="timePeriod" placeholder="Enter time period" min="0" step="0.01">
+                            <select id="timeUnit">
+                                <option value="years">Years</option>
+                                <option value="months">Months</option>
+                                <option value="days">Days</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="additionalCosts">Additional Costs ($)</label>
+                        <input type="number" id="additionalCosts" placeholder="Enter additional costs (optional)" min="0" step="0.01" value="0">
+                    </div>
+
+                    <button id="calculateBtn" class="calculate-btn">
+                        <i class="fas fa-calculator"></i>
+                        Calculate ROI
+                    </button>
+                </div>
+
+                <div class="results-panel">
+                    <h2><i class="fas fa-chart-pie"></i> Results</h2>
+                    
+                    <div class="result-cards">
+                        <div class="result-card primary">
+                            <div class="result-icon">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="result-content">
+                                <h3>ROI Percentage</h3>
+                                <div class="result-value" id="roiPercentage">-</div>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="result-content">
+                                <h3>Net Profit</h3>
+                                <div class="result-value" id="netProfit">-</div>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="result-content">
+                                <h3>Annualized ROI</h3>
+                                <div class="result-value" id="annualizedRoi">-</div>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div class="result-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="result-content">
+                                <h3>Total Investment</h3>
+                                <div class="result-value" id="totalInvestment">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="roi-chart">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> What is ROI?</h3>
+                    <p>Return on Investment (ROI) is a financial metric used to evaluate the efficiency of an investment. It measures the return relative to the cost of the investment.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-lightbulb"></i> How to Use</h3>
+                    <ul>
+                        <li>Enter your initial investment amount</li>
+                        <li>Input the final value of your investment</li>
+                        <li>Specify the time period</li>
+                        <li>Add any additional costs if applicable</li>
+                        <li>Click "Calculate ROI" to see your results</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-chart-line"></i> ROI Interpretation</h3>
+                    <div class="roi-interpretation">
+                        <div class="interpretation-item positive">
+                            <span class="interpretation-label">Positive ROI:</span>
+                            <span class="interpretation-desc">Profitable investment</span>
+                        </div>
+                        <div class="interpretation-item negative">
+                            <span class="interpretation-label">Negative ROI:</span>
+                            <span class="interpretation-desc">Loss on investment</span>
+                        </div>
+                        <div class="interpretation-item neutral">
+                            <span class="interpretation-label">0% ROI:</span>
+                            <span class="interpretation-desc">Break-even point</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 ROI Calculator. Built with ❤️ for smart investing.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
