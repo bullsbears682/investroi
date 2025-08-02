@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 
 interface PDFExportProps {
   sessionId: string;
-  calculationData: any;
 }
 
 interface ExportOptions {
@@ -18,8 +17,7 @@ interface ExportOptions {
 }
 
 const PDFExport: React.FC<PDFExportProps> = ({
-  sessionId,
-  calculationData
+  sessionId
 }) => {
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     includeCharts: true,
