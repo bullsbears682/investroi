@@ -52,6 +52,32 @@ BUSINESS_SCENARIOS = [
             {"name": "Translation", "description": "Language translation services", "recommended_investment": "3000-12000", "typical_roi": "40-80"},
             {"name": "Virtual Assistant", "description": "Remote administrative support", "recommended_investment": "2000-8000", "typical_roi": "60-120"}
         ]
+    },
+    {
+        "name": "Agency",
+        "description": "Marketing and creative agencies",
+        "mini_scenarios": [
+            {"name": "Digital Marketing Agency", "description": "Online marketing services", "recommended_investment": "20000-100000", "typical_roi": "25-45"},
+            {"name": "Web Design Agency", "description": "Website design and development", "recommended_investment": "15000-80000", "typical_roi": "30-50"},
+            {"name": "Content Marketing Agency", "description": "Content creation and strategy", "recommended_investment": "10000-60000", "typical_roi": "35-55"},
+            {"name": "SEO Agency", "description": "Search engine optimization", "recommended_investment": "12000-70000", "typical_roi": "30-50"},
+            {"name": "Social Media Agency", "description": "Social media management", "recommended_investment": "8000-50000", "typical_roi": "25-45"},
+            {"name": "PR Agency", "description": "Public relations services", "recommended_investment": "25000-120000", "typical_roi": "20-40"},
+            {"name": "Branding Agency", "description": "Brand identity and design", "recommended_investment": "30000-150000", "typical_roi": "25-45"}
+        ]
+    },
+    {
+        "name": "Startup",
+        "description": "Innovative new business ventures",
+        "mini_scenarios": [
+            {"name": "Tech Startup", "description": "Technology-based innovation", "recommended_investment": "50000-500000", "typical_roi": "15-35"},
+            {"name": "HealthTech Startup", "description": "Healthcare technology", "recommended_investment": "100000-1000000", "typical_roi": "20-40"},
+            {"name": "FinTech Startup", "description": "Financial technology", "recommended_investment": "75000-750000", "typical_roi": "25-45"},
+            {"name": "EdTech Startup", "description": "Educational technology", "recommended_investment": "40000-400000", "typical_roi": "20-35"},
+            {"name": "GreenTech Startup", "description": "Environmental technology", "recommended_investment": "60000-600000", "typical_roi": "15-30"},
+            {"name": "FoodTech Startup", "description": "Food technology innovation", "recommended_investment": "30000-300000", "typical_roi": "25-40"},
+            {"name": "AI Startup", "description": "Artificial intelligence solutions", "recommended_investment": "80000-800000", "typical_roi": "30-50"}
+        ]
     }
 ]
 

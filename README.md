@@ -1,154 +1,34 @@
-# 🚀 InvestWise Pro - Advanced ROI Calculator
+# InvestWise Pro - Advanced ROI Calculator
 
-A comprehensive ROI calculator with **35 business scenarios**, **real-world data**, and **glassmorphism UI design**. Built with Python FastAPI backend and React TypeScript frontend.
+A comprehensive ROI calculator with real-world business scenarios, market analysis, and professional reporting tools. Built with Python (FastAPI) backend and React (TypeScript) frontend.
 
-## ✨ Features
+## 🌟 Features
 
-### 🎯 Core Functionality
-- **35 Business Investment Scenarios** with 7 mini-scenarios each (245 total)
-- **Real Tax Data** from 25 countries with current rates
-- **Advanced ROI Calculations** including taxes, inflation, and market factors
-- **Risk Assessment** with comprehensive scoring
-- **Market Analysis** with real-world data
-- **PDF Export** with professional reports
+### Core Functionality
+- **Advanced ROI Calculator** with real-world business scenarios
+- **35 Business Scenarios** with 7 mini-scenarios each (245 total)
+- **25 Countries** with real tax data and rates
+- **Market Analysis** with competitive insights
+- **Risk Assessment** with detailed analysis
+- **Professional PDF Reports** with charts and recommendations
+- **Glassmorphism UI** with smooth animations
 
-### 🎨 Design & UX
-- **Glassmorphism UI** with beautiful blur effects and transparency
-- **Responsive Design** works perfectly on all devices
-- **Smooth Animations** with Framer Motion
-- **Loading Screen** with engaging 3D animations
-- **Dark Theme** with gradient backgrounds
+### Business Scenarios
+- E-commerce, SaaS, Freelancer, Agency, Non-profit
+- Startup, SMB, Enterprise, Consulting, Restaurant
+- Retail, Manufacturing, Healthcare, Education, Real Estate
+- Hospitality, Fitness, Media, Entertainment, Logistics
+- FinTech, HealthTech, EdTech, GreenTech, Food & Beverage
+- Fashion, Beauty, Gaming, Travel, Automotive
+- Construction, Agriculture, Pet Services, Event Planning, Creative Services
 
-### 💼 Business Scenarios
-1. **E-commerce Business** (Dropshipping, Private Label, Marketplace, etc.)
-2. **SaaS Business** (B2B, Freemium, White-label, API-as-a-Service)
-3. **Freelancer Business** (Digital Marketing, Web Development, Consulting)
-4. **Agency Business** (Digital Marketing, Web Development, Creative)
-5. **Non-profit Organization** (Educational, Healthcare, Environmental)
-6. **Startup Business** (Tech, HealthTech, FinTech, EdTech)
-7. **SMB Business** (Local Retail, Service Business, Manufacturing)
-8. **Enterprise Business** (Technology, Manufacturing, Financial Services)
-9. **Consulting Business** (Management, IT, Financial, Marketing)
-10. **Restaurant Business** (Fine Dining, Fast Casual, Food Truck)
-11. **Retail Business** (Brick-and-Mortar, E-commerce, Specialty)
-12. **Manufacturing Business** (Custom, Contract, Food, Electronics)
-13. **Healthcare Business** (Medical Practice, Dental, Pharmacy)
-14. **Education Business** (Private School, Tutoring, Online Learning)
-15. **Real Estate Business** (Property Management, Development, Investment)
-16. **Hospitality Business** (Hotels, Restaurants, Tourism)
-17. **Fitness Business** (Gym, Personal Training, Yoga Studio)
-18. **Media Business** (Digital Media, Podcast, Video Production)
-19. **Entertainment Business** (Gaming, Events, Live Entertainment)
-20. **Logistics Business** (Freight, Warehousing, Delivery)
-21. **FinTech Business** (Payment Processing, Lending, Investment)
-22. **HealthTech Business** (Telemedicine, Medical Devices, AI)
-23. **EdTech Business** (Learning Management, Online Tutoring, VR)
-24. **GreenTech Business** (Solar, Wind, Energy Storage)
-25. **Food & Beverage Business** (Restaurant Chain, Manufacturing, Delivery)
-26. **Fashion Business** (Clothing Brand, Luxury, Sustainable)
-27. **Beauty Business** (Cosmetics, Salon, Spa)
-28. **Gaming Business** (Game Development, Platform, Esports)
-29. **Travel Business** (Travel Agency, Tour Operator, Accommodation)
-30. **Automotive Business** (Dealership, Repair, Car Wash)
-31. **Legal & Professional Services** (Law Firm, Accounting, Consulting)
-32. **Childcare & Education** (Daycare, Private School, Tutoring)
-33. **Construction & Contracting** (Residential, Commercial, Renovation)
-34. **Agriculture & Farming** (Crop Farming, Livestock, Organic)
-35. **Energy & Utilities** (Solar, Wind, Energy Storage)
-
-### 🌍 Tax Countries (25)
-- **United States** - Federal & State tax rates
-- **United Kingdom** - Income tax, Capital gains, VAT
-- **Germany** - Corporate tax, Personal tax, Social security
-- **France** - Income tax, Wealth tax, Corporate tax
-- **Canada** - Federal & Provincial tax rates
-- **Australia** - Income tax, Capital gains, GST
-- **Japan** - Income tax, Corporate tax, Local tax
-- **Singapore** - Personal tax, Corporate tax, No capital gains
-- **Switzerland** - Federal & Cantonal tax rates
-- **Netherlands** - Income tax, Corporate tax, Dividend tax
-- **Sweden** - Income tax, Corporate tax, Municipal tax
-- **Norway** - Income tax, Corporate tax, Wealth tax
-- **Denmark** - Income tax, Corporate tax, AM-bidrag
-- **Finland** - Income tax, Corporate tax, Municipal tax
-- **Italy** - Income tax, Corporate tax, Regional tax
-- **Spain** - Income tax, Corporate tax, Wealth tax
-- **Portugal** - Income tax, Corporate tax, Solidarity tax
-- **Ireland** - Income tax, Corporate tax, USC
-- **Belgium** - Income tax, Corporate tax, Municipal tax
-- **Austria** - Income tax, Corporate tax, Church tax
-- **New Zealand** - Income tax, Corporate tax, GST
-- **South Korea** - Income tax, Corporate tax, Local tax
-- **Hong Kong** - Personal tax, Corporate tax, No capital gains
-- **UAE** - No personal income tax, Corporate tax from 2023
-- **Brazil** - Income tax, Corporate tax, Social security
-
-## 🛠️ Tech Stack
-
-### Backend (Python)
-- **FastAPI** - High-performance API framework
-- **PostgreSQL** - Database for scenarios and calculations
-- **Redis** - Caching and session management
-- **SQLAlchemy** - ORM for database operations
-- **Pydantic** - Data validation and serialization
-- **ReportLab** - PDF generation
-- **Pandas/NumPy** - Data analysis and calculations
-
-### Frontend (React + TypeScript)
-- **React 18** - Latest React features
-- **TypeScript** - Type safety and better DX
-- **Vite** - Fast build tool
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Advanced animations
-- **React Query** - Server state management
-- **React Hook Form** - Form handling
-- **Recharts** - Data visualizations
-- **Lucide React** - Beautiful icons
-
-## 📁 Project Structure
-
-```
-investwise-pro/
-├── backend/
-│   ├── app/
-│   │   ├── routers/
-│   │   │   ├── roi_calculator.py
-│   │   │   ├── business_scenarios.py
-│   │   │   ├── tax_data.py
-│   │   │   └── pdf_export.py
-│   │   ├── services/
-│   │   │   ├── calculator.py
-│   │   │   ├── market_data.py
-│   │   │   └── pdf_generator.py
-│   │   ├── schemas/
-│   │   │   └── roi.py
-│   │   ├── database.py
-│   │   └── cache.py
-│   ├── main.py
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── LoadingScreen.tsx
-│   │   │   ├── Header.tsx
-│   │   │   ├── ROICalculator.tsx
-│   │   │   ├── ResultsDisplay.tsx
-│   │   │   └── ...
-│   │   ├── pages/
-│   │   │   ├── HomePage.tsx
-│   │   │   ├── CalculatorPage.tsx
-│   │   │   └── AboutPage.tsx
-│   │   ├── services/
-│   │   │   └── api.ts
-│   │   ├── store/
-│   │   │   └── appStore.ts
-│   │   └── styles/
-│   │       └── globals.css
-│   ├── package.json
-│   └── vite.config.ts
-├── docker-compose.yml
-└── README.md
-```
+### Technical Features
+- **GDPR Compliant** with cookie consent management
+- **Real-time Data** integration with market APIs
+- **Responsive Design** for all devices
+- **Professional Reporting** with PDF export
+- **Advanced Analytics** and visualization
+- **Secure API** with comprehensive validation
 
 ## 🚀 Quick Start
 
@@ -156,135 +36,232 @@ investwise-pro/
 - Python 3.8+
 - Node.js 16+
 - PostgreSQL
-- Redis
+- Redis (optional, for caching)
 
-### Backend Setup
+### Automated Setup
 
-1. **Clone the repository**
+1. **Clone and Setup**
 ```bash
-git clone https://github.com/yourusername/investwise-pro.git
+git clone <repository-url>
 cd investwise-pro
+python setup.py
 ```
 
-2. **Set up Python environment**
+2. **Configure Environment**
+```bash
+cd backend
+# Edit .env file with your database and API keys
+```
+
+3. **Start the Application**
+```bash
+# Backend
+cd backend
+source venv/bin/activate
+uvicorn main:app --reload
+
+# Frontend (in new terminal)
+cd frontend
+npm run dev
+```
+
+4. **Open Application**
+Navigate to `http://localhost:5173`
+
+### Manual Setup
+
+#### Backend Setup
 ```bash
 cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
 
-3. **Environment variables**
-```bash
-cp .env.example .env
-# Edit .env with your database and Redis credentials
-```
-
-4. **Database setup**
-```bash
-# Create PostgreSQL database
-createdb investwise
+# Configure database
+createdb investwise_pro
 
 # Run migrations
 alembic upgrade head
+
+# Seed database
+python seed_database.py
+
+# Start server
+uvicorn main:app --reload
 ```
 
-5. **Start the backend**
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend Setup
-
-1. **Install dependencies**
+#### Frontend Setup
 ```bash
 cd frontend
 npm install
-```
-
-2. **Environment variables**
-```bash
-cp .env.example .env
-# Set VITE_API_URL=http://localhost:8000
-```
-
-3. **Start the frontend**
-```bash
 npm run dev
 ```
 
-### Docker Setup (Alternative)
+## 📁 Project Structure
 
-```bash
-docker-compose up -d
 ```
+investwise-pro/
+├── backend/
+│   ├── app/
+│   │   ├── routers/             # API endpoints
+│   │   │   ├── roi_calculator.py
+│   │   │   ├── business_scenarios.py
+│   │   │   ├── tax_data.py
+│   │   │   └── pdf_export.py
+│   │   ├── services/            # Business logic
+│   │   │   ├── calculator.py
+│   │   │   └── pdf_generator.py
+│   │   ├── schemas/             # Data validation
+│   │   │   └── roi.py
+│   │   ├── database.py          # Database models
+│   │   └── cache.py             # Redis caching
+│   ├── alembic/                 # Database migrations
+│   ├── main.py                  # FastAPI app
+│   ├── requirements.txt         # Python dependencies
+│   └── seed_database.py        # Database seeding
+├── frontend/
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── LoadingScreen.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── ROICalculator.tsx
+│   │   │   ├── ResultsDisplay.tsx
+│   │   │   ├── RiskAssessment.tsx
+│   │   │   ├── MarketAnalysis.tsx
+│   │   │   ├── PDFExport.tsx
+│   │   │   └── CookieConsent.tsx
+│   │   ├── pages/              # Page components
+│   │   │   ├── HomePage.tsx
+│   │   │   ├── CalculatorPage.tsx
+│   │   │   ├── AboutPage.tsx
+│   │   │   └── PrivacyPage.tsx
+│   │   ├── services/           # API services
+│   │   │   └── api.ts
+│   │   └── App.tsx            # Main app
+│   └── package.json           # Node dependencies
+├── setup.py                   # Automated setup
+└── README.md
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file in the backend directory:
+
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost/investwise_pro
+
+# Redis (optional)
+REDIS_URL=redis://localhost:6379
+
+# API Keys
+YAHOO_FINANCE_API_KEY=your_key_here
+ALPHA_VANTAGE_API_KEY=your_key_here
+COINGECKO_API_KEY=your_key_here
+
+# Security
+SECRET_KEY=your_secret_key_here
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=8000
+DEBUG=true
+```
+
+### Database Schema
+
+The application uses PostgreSQL with the following main tables:
+- `business_scenarios` - Main business categories
+- `mini_scenarios` - Specific business types
+- `tax_countries` - Country tax information
+- `roi_calculations` - Calculation history
+- `market_data` - Market information
 
 ## 📊 API Endpoints
 
 ### ROI Calculator
 - `GET /api/roi/scenarios` - Get all business scenarios
-- `GET /api/roi/scenarios/{id}/mini-scenarios` - Get mini scenarios
+- `GET /api/roi/scenarios/{id}/mini-scenarios` - Get mini-scenarios
 - `POST /api/roi/calculate` - Calculate ROI
-- `GET /api/roi/calculation/{session_id}` - Get stored calculation
-- `GET /api/roi/compare` - Compare multiple scenarios
+- `GET /api/roi/calculation/{session_id}` - Get calculation result
+- `GET /api/roi/compare` - Compare scenarios
 - `GET /api/roi/market-analysis/{scenario_id}` - Get market analysis
 - `GET /api/roi/risk-assessment/{scenario_id}` - Get risk assessment
 
 ### Tax Data
 - `GET /api/tax/countries` - Get all countries
-- `GET /api/tax/countries/{code}` - Get specific country data
+- `GET /api/tax/countries/{code}` - Get country tax data
+- `GET /api/tax/comparison` - Compare tax rates
+- `GET /api/tax/regions/overview` - Get regional overview
 
 ### PDF Export
 - `POST /api/pdf/export` - Generate PDF report
+- `GET /api/pdf/templates` - Get available templates
+- `GET /api/pdf/preview/{session_id}` - Preview report
 
-## 🎨 Design Features
+### Business Scenarios
+- `GET /api/business-scenarios` - Get all scenarios
+- `GET /api/business-scenarios/{id}` - Get specific scenario
+- `GET /api/business-scenarios/{id}/mini-scenarios` - Get mini-scenarios
+- `GET /api/business-scenarios/popular/scenarios` - Get popular scenarios
 
-### Glassmorphism Elements
-- **Backdrop blur** effects on cards and modals
-- **Transparent backgrounds** with subtle borders
-- **Layered depth** with multiple glass panels
-- **Gradient overlays** for visual appeal
+## 🎨 UI/UX Features
 
-### Color Scheme
-- **Primary**: Indigo to Purple to Pink gradient
-- **Success**: Green (#10B981)
-- **Warning**: Yellow (#F59E0B)
-- **Error**: Red (#EF4444)
-- **Info**: Blue (#3B82F6)
+### Design System
+- **Glassmorphism** design with blur effects
+- **Dark theme** with gradient backgrounds
+- **Smooth animations** using Framer Motion
+- **Responsive layout** for all screen sizes
+- **Professional typography** and spacing
 
-### Typography
-- **Font**: Inter (Google Fonts)
-- **Weights**: 300, 400, 500, 600, 700
-- **Sizes**: Responsive scale from 12px to 48px
+### Components
+- **Loading Screen** with engaging animations
+- **Scenario Selector** with search and filtering
+- **ROI Calculator** with real-time validation
+- **Results Display** with interactive charts
+- **Risk Assessment** with detailed analysis
+- **Market Analysis** with competitive insights
+- **PDF Export** with professional reports
 
-## 🔒 Privacy & GDPR
-
-### Cookie Management
-- **Essential cookies** for functionality
-- **Analytics cookies** for usage tracking
-- **Preference cookies** for user settings
-- **Marketing cookies** for personalization
+## 🔒 Security & Privacy
 
 ### GDPR Compliance
-- **Data consent** management
-- **Right to deletion** implementation
-- **Data portability** features
-- **Privacy policy** integration
-- **Cookie consent** banner
+- **Cookie Consent** management
+- **Data Protection** measures
+- **User Rights** implementation
+- **Privacy Policy** and transparency
+- **Data Retention** policies
 
-## 📈 Analytics & Tracking
+### Security Features
+- **Input Validation** with Pydantic
+- **SQL Injection** protection
+- **XSS Protection** with proper escaping
+- **CORS Configuration** for API
+- **Rate Limiting** and throttling
 
-### User Analytics
-- **Calculation tracking** for insights
-- **Scenario popularity** analysis
-- **Country usage** statistics
-- **User behavior** patterns
+## 🚀 Deployment
 
-### Performance Metrics
-- **Page load times** optimization
-- **API response times** monitoring
-- **Error tracking** and reporting
-- **User engagement** metrics
+### Backend Deployment
+```bash
+# Using Docker
+docker build -t investwise-backend .
+docker run -p 8000:8000 investwise-backend
+
+# Using Heroku
+heroku create investwise-pro-backend
+git push heroku main
+```
+
+### Frontend Deployment
+```bash
+# Build for production
+npm run build
+
+# Deploy to Vercel/Netlify
+vercel --prod
+```
 
 ## 🤝 Contributing
 
@@ -294,26 +271,24 @@ docker-compose up -d
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- **FastAPI** for the excellent web framework
-- **React** for the powerful frontend library
-- **Tailwind CSS** for the utility-first styling
-- **Framer Motion** for the smooth animations
-- **Lucide** for the beautiful icons
+- **Real-world data** from financial APIs
+- **Tax information** from government sources
+- **Market data** from financial institutions
+- **UI/UX inspiration** from modern design trends
 
 ## 📞 Support
 
-- **Documentation**: [Wiki](https://github.com/yourusername/investwise-pro/wiki)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/investwise-pro/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/investwise-pro/discussions)
+For support and questions:
+- Email: contact@investwisepro.com
+- Documentation: [docs.investwisepro.com](https://docs.investwisepro.com)
+- Issues: [GitHub Issues](https://github.com/investwisepro/issues)
 
 ---
 
-**Built with ❤️ for smart investing**
-
-*Make informed investment decisions with InvestWise Pro!*
+**InvestWise Pro** - Making investment analysis accessible to everyone.
