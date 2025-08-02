@@ -1,298 +1,565 @@
 import math
-from typing import Dict, Any, Optional
-from datetime import datetime
+from typing import Dict, Any, Optional, List
+from datetime import datetime, timedelta
 import random
 
 class ROICalculatorService:
+    """Service for calculating ROI with real-world business factors"""
+    
     def __init__(self):
-        self.inflation_rate = 0.02  # 2% annual inflation
-        self.risk_free_rate = 0.03  # 3% risk-free rate
+        # Market condition factors (would be fetched from real APIs in production)
+        self.market_conditions = {
+            'bull_market': 1.15,  # 15% boost in bull market
+            'bear_market': 0.85,  # 15% reduction in bear market
+            'stable_market': 1.0,  # No change in stable market
+        }
         
+        # Industry-specific multipliers
+        self.industry_multipliers = {
+            'E-commerce': 1.2,
+            'SaaS': 1.3,
+            'Freelancer': 1.1,
+            'Agency': 1.15,
+            'Startup': 1.25,
+            'SMB': 1.05,
+            'Enterprise': 1.1,
+            'Consulting': 1.12,
+            'Restaurant': 0.95,
+            'Retail': 1.0,
+            'Manufacturing': 1.08,
+            'Healthcare': 1.15,
+            'Education': 1.1,
+            'Real Estate': 1.2,
+            'Hospitality': 0.9,
+            'Fitness': 1.05,
+            'Media': 1.18,
+            'Entertainment': 1.22,
+            'Logistics': 1.1,
+            'FinTech': 1.35,
+            'HealthTech': 1.3,
+            'EdTech': 1.25,
+            'GreenTech': 1.2,
+            'Food & Beverage': 1.0,
+            'Fashion': 1.15,
+            'Beauty': 1.12,
+            'Gaming': 1.28,
+            'Travel': 0.85,
+            'Automotive': 1.1,
+            'Construction': 1.05,
+            'Agriculture': 1.08,
+            'Pet Services': 1.1,
+            'Event Planning': 1.05,
+            'Creative Services': 1.15,
+            'Non-profit': 0.8,
+        }
+    
     def calculate_roi(
         self,
         initial_investment: float,
         additional_costs: float,
-        time_period: float,
+        time_period: int,
         time_unit: str,
-        business_scenario,
-        mini_scenario,
-        country
+        business_scenario_id: int,
+        mini_scenario_id: int,
+        country_code: str,
+        business_scenario_name: str,
+        mini_scenario_name: str
     ) -> Dict[str, Any]:
-        """
-        Calculate comprehensive ROI including taxes, inflation, and market factors
-        """
+        """Calculate comprehensive ROI with real-world factors"""
         
-        # Convert time period to years
+        # Convert time to years for calculations
         time_in_years = self._convert_to_years(time_period, time_unit)
         
-        # Calculate total investment
-        total_investment = initial_investment + additional_costs
+        # Get base ROI rate for the scenario
+        base_roi_rate = self._get_scenario_factors(business_scenario_name, mini_scenario_name)
         
-        # Get scenario-specific factors
-        scenario_factors = self._get_scenario_factors(business_scenario, mini_scenario)
+        # Apply market conditions
+        market_factor = self._apply_market_conditions(business_scenario_name)
         
         # Calculate base ROI
-        base_roi_rate = self._calculate_base_roi_rate(scenario_factors, country)
-        
-        # Apply market conditions and volatility
-        market_adjusted_rate = self._apply_market_conditions(base_roi_rate, scenario_factors)
-        
-        # Calculate final value with compound growth
-        final_value = total_investment * (1 + market_adjusted_rate) ** time_in_years
+        total_investment = initial_investment + additional_costs
+        base_roi = base_roi_rate * market_factor
         
         # Calculate net profit
-        net_profit = final_value - total_investment
-        
-        # Calculate ROI percentage
-        roi_percentage = (net_profit / total_investment) * 100
+        net_profit = total_investment * (base_roi / 100)
         
         # Calculate annualized ROI
-        annualized_roi = ((final_value / total_investment) ** (1 / time_in_years) - 1) * 100
+        annualized_roi = self._calculate_annualized_roi(base_roi, time_in_years)
         
         # Calculate taxes
-        tax_calculations = self._calculate_taxes(net_profit, country, scenario_factors)
-        
-        # Calculate after-tax returns
-        after_tax_profit = net_profit - tax_calculations["total_tax"]
-        after_tax_roi = (after_tax_profit / total_investment) * 100
+        tax_amount, after_tax_profit = self._calculate_taxes(
+            net_profit, country_code, business_scenario_name
+        )
         
         # Calculate risk score
-        risk_score = self._calculate_risk_score(scenario_factors, country, total_investment)
+        risk_score = self._calculate_risk_score(
+            business_scenario_name, country_code, total_investment
+        )
         
         # Generate market analysis
-        market_analysis = self._generate_market_analysis(business_scenario, mini_scenario, country)
+        market_analysis = self._generate_market_analysis(business_scenario_name, country_code)
         
         # Generate recommendations
         recommendations = self._generate_recommendations(
-            roi_percentage, risk_score, scenario_factors, country
+            base_roi, risk_score, after_tax_profit, total_investment, country_code
         )
         
         return {
-            "final_value": round(final_value, 2),
-            "net_profit": round(net_profit, 2),
-            "roi_percentage": round(roi_percentage, 2),
-            "annualized_roi": round(annualized_roi, 2),
-            "total_investment": round(total_investment, 2),
-            "tax_amount": round(tax_calculations["total_tax"], 2),
-            "after_tax_profit": round(after_tax_profit, 2),
-            "after_tax_roi": round(after_tax_roi, 2),
-            "risk_score": round(risk_score, 3),
-            "market_analysis": market_analysis,
-            "recommendations": recommendations,
-            "scenario_name": business_scenario.name,
-            "mini_scenario_name": mini_scenario.name,
-            "country_name": country.country_name,
-            "tax_breakdown": tax_calculations
+            'roi_percentage': round(base_roi, 2),
+            'net_profit': round(net_profit, 2),
+            'annualized_roi': round(annualized_roi, 2),
+            'total_investment': round(total_investment, 2),
+            'tax_amount': round(tax_amount, 2),
+            'after_tax_profit': round(after_tax_profit, 2),
+            'risk_score': round(risk_score, 2),
+            'market_analysis': market_analysis,
+            'recommendations': recommendations,
+            'calculation_factors': {
+                'base_roi_rate': base_roi_rate,
+                'market_factor': market_factor,
+                'time_in_years': time_in_years,
+                'industry_multiplier': self.industry_multipliers.get(business_scenario_name, 1.0)
+            }
         }
     
-    def _convert_to_years(self, time_period: float, time_unit: str) -> float:
+    def _convert_to_years(self, time_period: int, time_unit: str) -> float:
         """Convert time period to years"""
-        if time_unit == "years":
-            return time_period
-        elif time_unit == "months":
-            return time_period / 12
-        elif time_unit == "days":
-            return time_period / 365
+        if time_unit.lower() == 'years':
+            return float(time_period)
+        elif time_unit.lower() == 'months':
+            return time_period / 12.0
+        elif time_unit.lower() == 'weeks':
+            return time_period / 52.0
+        elif time_unit.lower() == 'days':
+            return time_period / 365.0
         else:
-            return time_period
+            return float(time_period)  # Default to years
     
-    def _get_scenario_factors(self, business_scenario, mini_scenario) -> Dict[str, Any]:
-        """Get scenario-specific factors for calculations"""
+    def _get_scenario_factors(self, business_scenario: str, mini_scenario: str) -> float:
+        """Get base ROI rate for the specific scenario"""
+        
+        # Base rates for different business scenarios
+        base_rates = {
+            'E-commerce': {
+                'Dropshipping Store': 25.0,
+                'Amazon FBA': 30.0,
+                'Shopify Store': 22.0,
+                'Digital Products': 40.0,
+                'Subscription Box': 18.0,
+                'Print on Demand': 20.0,
+                'Affiliate Marketing': 35.0,
+            },
+            'SaaS': {
+                'B2B SaaS': 28.0,
+                'Mobile App': 35.0,
+                'API Service': 40.0,
+                'Browser Extension': 25.0,
+                'Desktop Software': 22.0,
+                'Cloud Platform': 20.0,
+                'Developer Tools': 30.0,
+            },
+            'Freelancer': {
+                'Web Development': 45.0,
+                'Graphic Design': 40.0,
+                'Content Writing': 50.0,
+                'Digital Marketing': 35.0,
+                'Consulting': 30.0,
+                'Translation': 35.0,
+                'Virtual Assistant': 60.0,
+            },
+            'Startup': {
+                'Tech Startup': 25.0,
+                'HealthTech Startup': 30.0,
+                'FinTech Startup': 35.0,
+                'EdTech Startup': 28.0,
+                'GreenTech Startup': 22.0,
+                'FoodTech Startup': 32.0,
+                'AI Startup': 40.0,
+            },
+            'Agency': {
+                'Digital Marketing Agency': 30.0,
+                'Web Design Agency': 35.0,
+                'Content Marketing Agency': 40.0,
+                'SEO Agency': 35.0,
+                'Social Media Agency': 30.0,
+                'PR Agency': 25.0,
+                'Branding Agency': 30.0,
+            }
+        }
+        
+        # Get base rate for the scenario
+        scenario_rates = base_rates.get(business_scenario, {})
+        base_rate = scenario_rates.get(mini_scenario, 20.0)  # Default 20%
+        
+        # Apply industry multiplier
+        industry_multiplier = self.industry_multipliers.get(business_scenario, 1.0)
+        adjusted_rate = base_rate * industry_multiplier
+        
+        return adjusted_rate
+    
+    def _apply_market_conditions(self, business_scenario: str) -> float:
+        """Apply current market conditions to ROI calculation"""
+        
+        # Simulate market conditions (in production, this would be real market data)
+        market_indicators = {
+            'E-commerce': 'bull_market',  # Strong growth in e-commerce
+            'SaaS': 'bull_market',        # Tech sector performing well
+            'FinTech': 'bull_market',     # Financial tech booming
+            'HealthTech': 'bull_market',  # Healthcare tech growing
+            'Travel': 'bear_market',      # Travel industry recovering
+            'Restaurant': 'stable_market', # Food service stable
+            'Real Estate': 'stable_market', # Real estate stable
+        }
+        
+        market_condition = market_indicators.get(business_scenario, 'stable_market')
+        return self.market_conditions[market_condition]
+    
+    def _calculate_annualized_roi(self, roi_percentage: float, time_in_years: float) -> float:
+        """Calculate annualized ROI"""
+        if time_in_years <= 0:
+            return roi_percentage
+        
+        # Use compound annual growth rate formula
+        total_return = 1 + (roi_percentage / 100)
+        annualized_return = math.pow(total_return, 1 / time_in_years) - 1
+        return annualized_return * 100
+    
+    def _calculate_taxes(self, net_profit: float, country_code: str, business_scenario: str) -> tuple:
+        """Calculate taxes based on country and business type"""
+        
+        # Tax rates by country (simplified - in production, this would be real tax data)
+        tax_rates = {
+            'US': {'corporate': 21.0, 'capital_gains': 15.0, 'dividend': 15.0},
+            'GB': {'corporate': 19.0, 'capital_gains': 20.0, 'dividend': 7.5},
+            'DE': {'corporate': 29.9, 'capital_gains': 25.0, 'dividend': 26.4},
+            'FR': {'corporate': 28.4, 'capital_gains': 30.0, 'dividend': 30.0},
+            'CA': {'corporate': 26.5, 'capital_gains': 16.5, 'dividend': 15.0},
+            'AU': {'corporate': 30.0, 'capital_gains': 23.5, 'dividend': 23.5},
+            'JP': {'corporate': 29.7, 'capital_gains': 20.3, 'dividend': 20.3},
+            'SG': {'corporate': 17.0, 'capital_gains': 0.0, 'dividend': 0.0},
+            'NL': {'corporate': 25.8, 'capital_gains': 30.0, 'dividend': 15.0},
+            'CH': {'corporate': 18.0, 'capital_gains': 0.0, 'dividend': 35.0},
+            'SE': {'corporate': 20.6, 'capital_gains': 30.0, 'dividend': 30.0},
+            'NO': {'corporate': 22.0, 'capital_gains': 22.0, 'dividend': 22.0},
+            'DK': {'corporate': 22.0, 'capital_gains': 27.0, 'dividend': 27.0},
+            'FI': {'corporate': 20.0, 'capital_gains': 30.0, 'dividend': 30.0},
+            'IE': {'corporate': 12.5, 'capital_gains': 33.0, 'dividend': 25.0},
+            'ES': {'corporate': 25.0, 'capital_gains': 23.0, 'dividend': 23.0},
+            'IT': {'corporate': 24.0, 'capital_gains': 26.0, 'dividend': 26.0},
+            'BE': {'corporate': 25.0, 'capital_gains': 0.0, 'dividend': 30.0},
+            'AT': {'corporate': 25.0, 'capital_gains': 27.5, 'dividend': 27.5},
+            'PL': {'corporate': 19.0, 'capital_gains': 19.0, 'dividend': 19.0},
+            'CZ': {'corporate': 19.0, 'capital_gains': 15.0, 'dividend': 15.0},
+            'HU': {'corporate': 9.0, 'capital_gains': 15.0, 'dividend': 15.0},
+            'SK': {'corporate': 21.0, 'capital_gains': 19.0, 'dividend': 19.0},
+            'SI': {'corporate': 19.0, 'capital_gains': 27.5, 'dividend': 27.5},
+            'EE': {'corporate': 20.0, 'capital_gains': 20.0, 'dividend': 20.0},
+        }
+        
+        # Get tax rates for the country
+        country_taxes = tax_rates.get(country_code, {'corporate': 25.0, 'capital_gains': 20.0, 'dividend': 20.0})
+        
+        # Determine applicable tax rate based on business type
+        if business_scenario in ['SaaS', 'FinTech', 'HealthTech', 'EdTech']:
+            # Tech companies often have different tax considerations
+            effective_tax_rate = country_taxes['corporate'] * 0.8  # 20% reduction for tech
+        elif business_scenario in ['E-commerce', 'Retail']:
+            # Retail businesses
+            effective_tax_rate = country_taxes['corporate']
+        elif business_scenario in ['Freelancer', 'Consulting']:
+            # Service businesses
+            effective_tax_rate = country_taxes['corporate'] * 1.1  # 10% increase for services
+        else:
+            # Default to corporate tax rate
+            effective_tax_rate = country_taxes['corporate']
+        
+        # Calculate tax amount
+        tax_amount = net_profit * (effective_tax_rate / 100)
+        after_tax_profit = net_profit - tax_amount
+        
+        return tax_amount, after_tax_profit
+    
+    def _calculate_risk_score(self, business_scenario: str, country_code: str, investment_amount: float) -> float:
+        """Calculate risk score (0-10) based on various factors"""
+        
+        # Base risk scores for different scenarios
+        scenario_risks = {
+            'E-commerce': 4.0,
+            'SaaS': 5.0,
+            'Freelancer': 3.0,
+            'Agency': 4.5,
+            'Startup': 7.0,
+            'SMB': 4.0,
+            'Enterprise': 3.5,
+            'Consulting': 3.5,
+            'Restaurant': 6.0,
+            'Retail': 5.0,
+            'Manufacturing': 5.5,
+            'Healthcare': 4.0,
+            'Education': 3.5,
+            'Real Estate': 6.5,
+            'Hospitality': 6.5,
+            'Fitness': 5.0,
+            'Media': 5.5,
+            'Entertainment': 6.0,
+            'Logistics': 4.5,
+            'FinTech': 6.5,
+            'HealthTech': 6.0,
+            'EdTech': 5.5,
+            'GreenTech': 5.0,
+            'Food & Beverage': 5.5,
+            'Fashion': 5.5,
+            'Beauty': 4.5,
+            'Gaming': 6.0,
+            'Travel': 7.0,
+            'Automotive': 5.0,
+            'Construction': 5.5,
+            'Agriculture': 6.0,
+            'Pet Services': 4.0,
+            'Event Planning': 5.0,
+            'Creative Services': 4.5,
+            'Non-profit': 3.0,
+        }
+        
+        base_risk = scenario_risks.get(business_scenario, 5.0)
+        
+        # Country risk factors
+        country_risks = {
+            'US': 0.0, 'GB': 0.5, 'DE': 0.0, 'FR': 0.5, 'CA': 0.0,
+            'AU': 0.0, 'JP': 0.0, 'SG': -0.5, 'NL': 0.0, 'CH': -0.5,
+            'SE': 0.0, 'NO': 0.0, 'DK': 0.0, 'FI': 0.0, 'IE': 0.5,
+            'ES': 1.0, 'IT': 1.0, 'BE': 0.5, 'AT': 0.0, 'PL': 1.0,
+            'CZ': 1.0, 'HU': 1.5, 'SK': 1.0, 'SI': 1.0, 'EE': 1.0,
+        }
+        
+        country_risk = country_risks.get(country_code, 1.0)
+        
+        # Investment amount risk factor
+        if investment_amount > 100000:
+            amount_risk = 1.0  # Higher risk for large investments
+        elif investment_amount > 50000:
+            amount_risk = 0.5
+        else:
+            amount_risk = 0.0
+        
+        # Calculate final risk score
+        final_risk = base_risk + country_risk + amount_risk
+        
+        # Ensure risk score is between 0 and 10
+        return max(0.0, min(10.0, final_risk))
+    
+    def _generate_market_analysis(self, business_scenario: str, country_code: str) -> Dict[str, Any]:
+        """Generate market analysis for the business scenario"""
+        
+        # Market size estimates (in billions USD)
+        market_sizes = {
+            'E-commerce': 5000,
+            'SaaS': 1500,
+            'FinTech': 800,
+            'HealthTech': 600,
+            'EdTech': 400,
+            'GreenTech': 300,
+            'Gaming': 200,
+            'Real Estate': 3000,
+            'Healthcare': 4000,
+            'Education': 2000,
+            'Travel': 800,
+            'Automotive': 2500,
+            'Fashion': 1500,
+            'Food & Beverage': 3000,
+        }
+        
+        market_size = market_sizes.get(business_scenario, 500)
+        
+        # Growth rates
+        growth_rates = {
+            'E-commerce': 15.0,
+            'SaaS': 20.0,
+            'FinTech': 25.0,
+            'HealthTech': 22.0,
+            'EdTech': 18.0,
+            'GreenTech': 12.0,
+            'Gaming': 16.0,
+            'Real Estate': 8.0,
+            'Healthcare': 10.0,
+            'Education': 12.0,
+            'Travel': 5.0,
+            'Automotive': 6.0,
+            'Fashion': 8.0,
+            'Food & Beverage': 6.0,
+        }
+        
+        growth_rate = growth_rates.get(business_scenario, 10.0)
+        
+        # Competition levels
+        competition_levels = {
+            'E-commerce': 'High',
+            'SaaS': 'Medium',
+            'FinTech': 'Medium',
+            'HealthTech': 'Medium',
+            'EdTech': 'Medium',
+            'GreenTech': 'Low',
+            'Gaming': 'High',
+            'Real Estate': 'High',
+            'Healthcare': 'Medium',
+            'Education': 'Medium',
+            'Travel': 'High',
+            'Automotive': 'High',
+            'Fashion': 'High',
+            'Food & Beverage': 'High',
+        }
+        
+        competition_level = competition_levels.get(business_scenario, 'Medium')
+        
         return {
-            "base_roi_range": (mini_scenario.typical_roi_min, mini_scenario.typical_roi_max),
-            "risk_level": mini_scenario.risk_level,
-            "market_size": business_scenario.market_size,
-            "competition_level": business_scenario.competition_level,
-            "scalability": business_scenario.scalability,
-            "regulatory_complexity": business_scenario.regulatory_complexity,
-            "time_to_profitability": business_scenario.time_to_profitability,
-            "revenue_model": mini_scenario.revenue_model,
-            "cost_structure": mini_scenario.cost_structure
+            'market_size': market_size,
+            'growth_rate': growth_rate,
+            'competition_level': competition_level,
+            'market_trends': self._generate_market_trends(business_scenario),
+            'key_players': self._generate_key_players(business_scenario),
+            'opportunities': self._generate_opportunities(business_scenario),
+            'threats': self._generate_threats(business_scenario),
         }
     
-    def _calculate_base_roi_rate(self, scenario_factors: Dict, country) -> float:
-        """Calculate base ROI rate based on scenario and country factors"""
-        min_roi, max_roi = scenario_factors["base_roi_range"]
+    def _generate_market_trends(self, business_scenario: str) -> List[Dict[str, Any]]:
+        """Generate market trends data"""
+        trends = []
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
         
-        # Start with average ROI
-        base_rate = (min_roi + max_roi) / 2 / 100
+        for i, month in enumerate(months):
+            base_value = 100 + (i * 5)  # Simulate growth
+            trends.append({
+                'period': month,
+                'value': base_value,
+                'direction': 'up' if i > 0 else 'stable'
+            })
         
-        # Adjust for country economic factors
-        if country.gdp_per_capita > 50000:
-            base_rate *= 1.1  # High-income countries
-        elif country.gdp_per_capita < 10000:
-            base_rate *= 0.8  # Low-income countries
-        
-        # Adjust for ease of business
-        if country.ease_of_business_rank < 50:
-            base_rate *= 1.05  # Easy to do business
-        elif country.ease_of_business_rank > 100:
-            base_rate *= 0.9  # Difficult to do business
-        
-        return base_rate
+        return trends
     
-    def _apply_market_conditions(self, base_rate: float, scenario_factors: Dict) -> float:
-        """Apply market conditions and volatility to base rate"""
-        adjusted_rate = base_rate
+    def _generate_key_players(self, business_scenario: str) -> List[Dict[str, Any]]:
+        """Generate key players in the market"""
+        players = []
         
-        # Market size adjustment
-        if scenario_factors["market_size"] == "Large":
-            adjusted_rate *= 1.05
-        elif scenario_factors["market_size"] == "Small":
-            adjusted_rate *= 0.9
-        
-        # Competition adjustment
-        if scenario_factors["competition_level"] == "High":
-            adjusted_rate *= 0.85
-        elif scenario_factors["competition_level"] == "Low":
-            adjusted_rate *= 1.15
-        
-        # Scalability adjustment
-        if scenario_factors["scalability"] == "High":
-            adjusted_rate *= 1.1
-        elif scenario_factors["scalability"] == "Low":
-            adjusted_rate *= 0.9
-        
-        # Add market volatility (random factor)
-        volatility = random.uniform(-0.05, 0.05)
-        adjusted_rate += volatility
-        
-        return max(adjusted_rate, -0.5)  # Cap at -50% return
-    
-    def _calculate_taxes(self, net_profit: float, country, scenario_factors: Dict) -> Dict[str, float]:
-        """Calculate comprehensive tax burden"""
-        taxes = {}
-        
-        # Corporate tax
-        if net_profit > 0:
-            taxes["corporate_tax"] = net_profit * (country.corporate_tax_rate / 100)
+        if business_scenario == 'E-commerce':
+            players = [
+                {'name': 'Amazon', 'market_share': 40, 'strength_score': 9.5},
+                {'name': 'Alibaba', 'market_share': 25, 'strength_score': 8.5},
+                {'name': 'eBay', 'market_share': 8, 'strength_score': 7.0},
+                {'name': 'Shopify', 'market_share': 5, 'strength_score': 8.0},
+            ]
+        elif business_scenario == 'SaaS':
+            players = [
+                {'name': 'Microsoft', 'market_share': 20, 'strength_score': 9.0},
+                {'name': 'Salesforce', 'market_share': 15, 'strength_score': 8.5},
+                {'name': 'Adobe', 'market_share': 12, 'strength_score': 8.0},
+                {'name': 'Oracle', 'market_share': 10, 'strength_score': 7.5},
+            ]
         else:
-            taxes["corporate_tax"] = 0
+            players = [
+                {'name': 'Market Leader', 'market_share': 30, 'strength_score': 8.0},
+                {'name': 'Established Player', 'market_share': 20, 'strength_score': 7.5},
+                {'name': 'Emerging Company', 'market_share': 10, 'strength_score': 7.0},
+            ]
         
-        # Capital gains tax (if applicable)
-        taxes["capital_gains_tax"] = net_profit * (country.capital_gains_tax_rate / 100)
+        return players
+    
+    def _generate_opportunities(self, business_scenario: str) -> List[Dict[str, str]]:
+        """Generate market opportunities"""
+        opportunities = []
         
-        # Dividend tax (if distributing profits)
-        dividend_portion = net_profit * 0.3  # Assume 30% distributed as dividends
-        taxes["dividend_tax"] = dividend_portion * (country.dividend_tax_rate / 100)
-        
-        # VAT impact on costs (simplified)
-        taxes["vat_impact"] = net_profit * 0.05  # Simplified VAT calculation
-        
-        # Regulatory compliance costs
-        if scenario_factors["regulatory_complexity"] == "High":
-            taxes["compliance_costs"] = net_profit * 0.1
-        elif scenario_factors["regulatory_complexity"] == "Medium":
-            taxes["compliance_costs"] = net_profit * 0.05
+        if business_scenario == 'E-commerce':
+            opportunities = [
+                {'description': 'Growing online shopping adoption'},
+                {'description': 'Mobile commerce expansion'},
+                {'description': 'Cross-border e-commerce growth'},
+                {'description': 'Social commerce integration'},
+            ]
+        elif business_scenario == 'SaaS':
+            opportunities = [
+                {'description': 'Cloud adoption acceleration'},
+                {'description': 'Remote work tools demand'},
+                {'description': 'AI/ML integration opportunities'},
+                {'description': 'Industry-specific solutions'},
+            ]
         else:
-            taxes["compliance_costs"] = net_profit * 0.02
+            opportunities = [
+                {'description': 'Digital transformation opportunities'},
+                {'description': 'Market expansion potential'},
+                {'description': 'Technology integration benefits'},
+                {'description': 'Customer experience improvements'},
+            ]
         
-        # Total tax burden
-        taxes["total_tax"] = sum(taxes.values())
-        
-        return taxes
+        return opportunities
     
-    def _calculate_risk_score(self, scenario_factors: Dict, country, investment_amount: float) -> float:
-        """Calculate comprehensive risk score"""
-        risk_score = 0.5  # Base risk score
+    def _generate_threats(self, business_scenario: str) -> List[Dict[str, str]]:
+        """Generate market threats"""
+        threats = []
         
-        # Risk level adjustment
-        if scenario_factors["risk_level"] == "High":
-            risk_score += 0.3
-        elif scenario_factors["risk_level"] == "Low":
-            risk_score -= 0.2
+        if business_scenario == 'E-commerce':
+            threats = [
+                {'description': 'Intense price competition'},
+                {'description': 'Regulatory changes'},
+                {'description': 'Supply chain disruptions'},
+                {'description': 'Cybersecurity risks'},
+            ]
+        elif business_scenario == 'SaaS':
+            threats = [
+                {'description': 'Data privacy regulations'},
+                {'description': 'Cloud security concerns'},
+                {'description': 'Subscription fatigue'},
+                {'description': 'Integration complexity'},
+            ]
+        else:
+            threats = [
+                {'description': 'Economic uncertainty'},
+                {'description': 'Regulatory changes'},
+                {'description': 'Competitive pressure'},
+                {'description': 'Technology disruption'},
+            ]
         
-        # Market size risk
-        if scenario_factors["market_size"] == "Small":
-            risk_score += 0.1
-        elif scenario_factors["market_size"] == "Large":
-            risk_score -= 0.1
-        
-        # Competition risk
-        if scenario_factors["competition_level"] == "High":
-            risk_score += 0.2
-        elif scenario_factors["competition_level"] == "Low":
-            risk_score -= 0.1
-        
-        # Regulatory risk
-        if scenario_factors["regulatory_complexity"] == "High":
-            risk_score += 0.2
-        elif scenario_factors["regulatory_complexity"] == "Low":
-            risk_score -= 0.1
-        
-        # Country risk
-        if country.ease_of_business_rank > 100:
-            risk_score += 0.2
-        elif country.ease_of_business_rank < 50:
-            risk_score -= 0.1
-        
-        if country.corruption_perception_index < 50:
-            risk_score += 0.2
-        elif country.corruption_perception_index > 80:
-            risk_score -= 0.1
-        
-        return max(min(risk_score, 1.0), 0.0)  # Clamp between 0 and 1
-    
-    def _generate_market_analysis(self, business_scenario, mini_scenario, country) -> str:
-        """Generate market analysis text"""
-        analysis = f"Market Analysis for {business_scenario.name} - {mini_scenario.name}\n\n"
-        
-        analysis += f"Market Size: {business_scenario.market_size}\n"
-        analysis += f"Competition Level: {business_scenario.competition_level}\n"
-        analysis += f"Scalability: {business_scenario.scalability}\n"
-        analysis += f"Regulatory Environment: {business_scenario.regulatory_complexity}\n"
-        analysis += f"Time to Profitability: {business_scenario.time_to_profitability}\n\n"
-        
-        analysis += f"Revenue Model: {mini_scenario.revenue_model}\n"
-        analysis += f"Cost Structure: {mini_scenario.cost_structure}\n"
-        analysis += f"Key Success Factors: {mini_scenario.key_success_factors}\n\n"
-        
-        analysis += f"Country Context: {country.country_name}\n"
-        analysis += f"GDP per Capita: ${country.gdp_per_capita:,.0f}\n"
-        analysis += f"Ease of Business Rank: {country.ease_of_business_rank}\n"
-        analysis += f"Corporate Tax Rate: {country.corporate_tax_rate}%\n"
-        
-        return analysis
+        return threats
     
     def _generate_recommendations(
-        self, roi_percentage: float, risk_score: float, scenario_factors: Dict, country
-    ) -> str:
+        self, 
+        roi_percentage: float, 
+        risk_score: float, 
+        after_tax_profit: float, 
+        total_investment: float,
+        country_code: str
+    ) -> List[str]:
         """Generate investment recommendations"""
-        recommendations = "Investment Recommendations:\n\n"
+        recommendations = []
         
         # ROI-based recommendations
         if roi_percentage > 25:
-            recommendations += "✅ Excellent ROI potential - Consider increasing investment\n"
+            recommendations.append("Excellent ROI potential - consider scaling up investment")
         elif roi_percentage > 15:
-            recommendations += "✅ Good ROI potential - Proceed with planned investment\n"
-        elif roi_percentage > 5:
-            recommendations += "⚠️ Moderate ROI - Consider risk mitigation strategies\n"
+            recommendations.append("Strong ROI - proceed with recommended investment amount")
+        elif roi_percentage > 10:
+            recommendations.append("Moderate ROI - consider optimization strategies")
         else:
-            recommendations += "❌ Low ROI - Consider alternative investments\n"
+            recommendations.append("Low ROI - evaluate alternative investment opportunities")
         
         # Risk-based recommendations
-        if risk_score > 0.7:
-            recommendations += "⚠️ High risk investment - Diversify portfolio\n"
-        elif risk_score > 0.4:
-            recommendations += "⚖️ Moderate risk - Standard due diligence recommended\n"
+        if risk_score > 7:
+            recommendations.append("High risk profile - implement comprehensive risk mitigation")
+        elif risk_score > 5:
+            recommendations.append("Moderate risk - consider diversification strategies")
         else:
-            recommendations += "✅ Low risk profile - Suitable for conservative investors\n"
+            recommendations.append("Low risk profile - suitable for conservative investors")
         
-        # Market-specific recommendations
-        if scenario_factors["market_size"] == "Small":
-            recommendations += "📈 Consider niche market strategies\n"
-        
-        if scenario_factors["competition_level"] == "High":
-            recommendations += "🎯 Focus on competitive advantages and differentiation\n"
-        
-        if scenario_factors["regulatory_complexity"] == "High":
-            recommendations += "📋 Ensure compliance and legal consultation\n"
+        # Profit-based recommendations
+        if after_tax_profit > total_investment * 0.2:
+            recommendations.append("Strong after-tax returns - attractive for long-term investment")
+        elif after_tax_profit > total_investment * 0.1:
+            recommendations.append("Decent after-tax returns - monitor performance closely")
+        else:
+            recommendations.append("Low after-tax returns - evaluate tax optimization strategies")
         
         # Country-specific recommendations
-        if country.ease_of_business_rank > 100:
-            recommendations += "🌍 Consider regulatory challenges in this market\n"
-        
-        if country.gdp_per_capita < 10000:
-            recommendations += "💰 Lower purchasing power - adjust pricing strategy\n"
+        if country_code in ['SG', 'HK', 'AE']:
+            recommendations.append("Consider tax advantages in the selected jurisdiction")
+        elif country_code in ['US', 'GB', 'DE']:
+            recommendations.append("Stable regulatory environment - favorable for business growth")
         
         return recommendations
