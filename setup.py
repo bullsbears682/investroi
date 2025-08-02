@@ -86,7 +86,11 @@ def setup_backend():
     # Install dependencies
     print("📦 Installing Python dependencies...")
     try:
-        subprocess.run([str(pip_path), "install", "-r", "requirements.txt"], cwd=backend_dir, check=True)
+        # Try pip3 first, then pip
+        pip_cmd = str(pip_path)
+        if not Path(pip_cmd).exists():
+            pip_cmd = str(backend_dir / "venv" / "bin" / "pip3")
+        subprocess.run([pip_cmd, "install", "-r", "requirements.txt"], cwd=backend_dir, check=True)
         print("✅ Python dependencies installed")
     except subprocess.CalledProcessError:
         print("❌ Failed to install Python dependencies")
