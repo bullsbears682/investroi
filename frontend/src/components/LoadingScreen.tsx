@@ -145,7 +145,7 @@ const LoadingScreen: React.FC = () => {
           className="flex items-center justify-center space-x-3"
         >
           <div className={`${steps[currentStep].color}`}>
-            <steps[currentStep].icon className="w-5 h-5" />
+            {React.createElement(steps[currentStep].icon, { className: "w-5 h-5" })}
           </div>
           <span className="text-white/80 text-sm">
             {steps[currentStep].text}

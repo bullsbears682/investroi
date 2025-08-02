@@ -178,7 +178,10 @@ const CalculatorPage: React.FC = () => {
                 Market Analysis
               </h2>
               
-              <MarketAnalysis scenarioId={selectedScenario} />
+              <MarketAnalysis 
+                scenarioId={selectedScenario} 
+                countryCode={calculationResult?.country_code || 'US'}
+              />
             </div>
           )}
 
@@ -190,10 +193,7 @@ const CalculatorPage: React.FC = () => {
                 Export Report
               </h2>
               
-              <PDFExport
-                sessionId={sessionId}
-                calculationResult={calculationResult}
-              />
+              <PDFExport sessionId={sessionId} />
             </div>
           )}
         </motion.div>

@@ -120,8 +120,8 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({
               <span className="text-white/80 text-sm font-medium capitalize">
                 {factor.replace('_', ' ')}
               </span>
-              <span className={`text-sm font-bold ${score > 0.6 ? 'text-red-400' : score > 0.3 ? 'text-yellow-400' : 'text-green-400'}`}>
-                {(score * 100).toFixed(0)}%
+              <span className={`text-sm font-bold ${(score as number) > 0.6 ? 'text-red-400' : (score as number) > 0.3 ? 'text-yellow-400' : 'text-green-400'}`}>
+                {((score as number) * 100).toFixed(0)}%
               </span>
             </div>
             
@@ -129,10 +129,10 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({
             <div className="w-full bg-white/20 rounded-full h-2">
               <motion.div
                 className={`h-2 rounded-full ${
-                  score > 0.6 ? 'bg-red-400' : score > 0.3 ? 'bg-yellow-400' : 'bg-green-400'
+                  (score as number) > 0.6 ? 'bg-red-400' : (score as number) > 0.3 ? 'bg-yellow-400' : 'bg-green-400'
                 }`}
                 initial={{ width: 0 }}
-                animate={{ width: `${score * 100}%` }}
+                animate={{ width: `${(score as number) * 100}%` }}
                 transition={{ delay: 0.2 + index * 0.05, duration: 0.8 }}
               />
             </div>
