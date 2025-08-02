@@ -1,62 +1,85 @@
+import tempfile
 import os
-import io
 from datetime import datetime
 from typing import Dict, Any, Optional
 from reportlab.lib.pagesizes import letter, A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from reportlab.pdfgen import canvas
-from reportlab.lib.colors import HexColor
-import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
-import numpy as np
+from reportlab.lib.units import inch
+import json
 
 class PDFGenerator:
+    """Service for generating professional PDF reports"""
+    
     def __init__(self):
         self.styles = getSampleStyleSheet()
-        self.setup_custom_styles()
+        self._setup_custom_styles()
     
-    def setup_custom_styles(self):
+    def _setup_custom_styles(self):
         """Setup custom paragraph styles"""
-        self.styles.add(ParagraphStyle(
-            name='CustomTitle',
+        self.title_style = ParagraphStyle(
+            'CustomTitle',
             parent=self.styles['Heading1'],
             fontSize=24,
             spaceAfter=30,
             alignment=TA_CENTER,
-            textColor=HexColor('#3B82F6')
-        ))
+            textColor=colors.darkblue,
+            fontName='Helvetica-Bold'
+        )
         
-        self.styles.add(ParagraphStyle(
-            name='CustomHeading',
+        self.heading_style = ParagraphStyle(
+            'CustomHeading',
             parent=self.styles['Heading2'],
             fontSize=16,
             spaceAfter=12,
-            textColor=HexColor('#1F2937')
-        ))
+            spaceBefore=20,
+            textColor=colors.darkblue,
+            fontName='Helvetica-Bold'
+        )
         
-        self.styles.add(ParagraphStyle(
-            name='CustomBody',
+        self.subheading_style = ParagraphStyle(
+            'CustomSubheading',
+            parent=self.styles['Heading3'],
+            fontSize=14,
+            spaceAfter=8,
+            spaceBefore=16,
+            textColor=colors.darkblue,
+            fontName='Helvetica-Bold'
+        )
+        
+        self.normal_style = ParagraphStyle(
+            'CustomNormal',
             parent=self.styles['Normal'],
             fontSize=11,
             spaceAfter=6,
-            textColor=HexColor('#374151')
-        ))
-    
-    def generate_report(
-        self,
-        calculation_data: Any,
-        export_options: Dict[str, Any],
-        output_path: str
-    ):
-        """Generate a comprehensive PDF report"""
+            alignment=TA_JUSTIFY,
+            fontName='Helvetica'
+        )
         
+        self.caption_style = ParagraphStyle(
+            'CustomCaption',
+            parent=self.styles['Normal'],
+            fontSize=9,
+            spaceAfter=12,
+            alignment=TA_CENTER,
+            textColor=colors.grey,
+            fontName='Helvetica'
+        )
+    
+    def generate_roi_report(self, calculation_data: Dict[str, Any], template: str = "standard") -> str:
+        """Generate ROI analysis report"""
+        
+        # Create temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_file.close()
+        
+        # Create PDF document
         doc = SimpleDocTemplate(
-            output_path,
+            temp_file.name,
             pagesize=A4,
             rightMargin=72,
             leftMargin=72,
@@ -64,348 +87,286 @@ class PDFGenerator:
             bottomMargin=72
         )
         
+        # Build story (content)
         story = []
         
-        # Add title page
-        story.extend(self.create_title_page(calculation_data))
-        story.append(PageBreak())
+        # Add header
+        story.extend(self._create_header(calculation_data))
         
-        # Add executive summary
-        story.extend(self.create_executive_summary(calculation_data))
-        story.append(PageBreak())
+        # Add content based on template
+        if template == "executive":
+            story.extend(self._create_executive_summary(calculation_data))
+        elif template == "detailed":
+            story.extend(self._create_detailed_report(calculation_data))
+        else:  # standard
+            story.extend(self._create_standard_report(calculation_data))
         
-        # Add ROI analysis
-        story.extend(self.create_roi_analysis(calculation_data))
-        
-        if export_options.get('include_charts', True):
-            story.append(PageBreak())
-            story.extend(self.create_charts_section(calculation_data))
-        
-        if export_options.get('include_analysis', True):
-            story.append(PageBreak())
-            story.extend(self.create_market_analysis(calculation_data))
-        
-        if export_options.get('include_recommendations', True):
-            story.append(PageBreak())
-            story.extend(self.create_recommendations(calculation_data))
+        # Add footer
+        story.extend(self._create_footer())
         
         # Build PDF
         doc.build(story)
+        
+        return temp_file.name
     
-    def create_title_page(self, calculation_data: Any) -> list:
-        """Create the title page"""
-        elements = []
+    def _create_header(self, data: Dict[str, Any]) -> list:
+        """Create report header"""
+        story = []
         
         # Title
-        title = Paragraph(
-            "InvestWise Pro ROI Analysis Report",
-            self.styles['CustomTitle']
-        )
-        elements.append(title)
-        elements.append(Spacer(1, 30))
+        story.append(Paragraph("ROI Investment Analysis Report", self.title_style))
+        story.append(Spacer(1, 20))
         
-        # Subtitle
-        subtitle = Paragraph(
-            f"Business Scenario: {calculation_data.business_scenario_name}",
-            self.styles['CustomHeading']
-        )
-        elements.append(subtitle)
-        elements.append(Spacer(1, 20))
-        
-        # Report details
-        details_data = [
-            ['Report Generated:', datetime.now().strftime('%B %d, %Y at %I:%M %p')],
-            ['Session ID:', calculation_data.session_id],
-            ['Business Scenario:', calculation_data.business_scenario_name],
-            ['Mini Scenario:', calculation_data.mini_scenario_name],
-            ['Country:', calculation_data.country_code],
-            ['Initial Investment:', f"${calculation_data.initial_investment:,.2f}"],
-            ['ROI Percentage:', f"{calculation_data.roi_percentage:.2f}%"],
+        # Report info
+        info_data = [
+            ['Report Generated', datetime.now().strftime('%B %d, %Y at %I:%M %p')],
+            ['Business Scenario', data.get('business_scenario_name', 'N/A')],
+            ['Mini Scenario', data.get('mini_scenario_name', 'N/A')],
+            ['Country', data.get('country_code', 'N/A')],
+            ['Analysis Period', f"{data.get('time_period', 0)} {data.get('time_unit', 'months')}"]
         ]
         
-        details_table = Table(details_data, colWidths=[2*inch, 3*inch])
-        details_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (0, -1), HexColor('#F3F4F6')),
-            ('TEXTCOLOR', (0, 0), (0, -1), HexColor('#374151')),
+        info_table = Table(info_data, colWidths=[2*inch, 3*inch])
+        info_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 1, HexColor('#E5E7EB'))
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (0, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (0, -1), 12),
+            ('BACKGROUND', (1, 0), (1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
         
-        elements.append(details_table)
-        elements.append(Spacer(1, 30))
+        story.append(info_table)
+        story.append(Spacer(1, 30))
         
-        # Disclaimer
-        disclaimer = Paragraph(
-            "This report is generated for informational purposes only. "
-            "Please consult with financial professionals for investment decisions.",
-            self.styles['CustomBody']
-        )
-        elements.append(disclaimer)
-        
-        return elements
+        return story
     
-    def create_executive_summary(self, calculation_data: Any) -> list:
-        """Create executive summary section"""
-        elements = []
+    def _create_executive_summary(self, data: Dict[str, Any]) -> list:
+        """Create executive summary report"""
+        story = []
         
-        # Section title
-        title = Paragraph("Executive Summary", self.styles['CustomHeading'])
-        elements.append(title)
-        elements.append(Spacer(1, 12))
+        # Executive Summary
+        story.append(Paragraph("Executive Summary", self.heading_style))
+        story.append(Paragraph(
+            f"This report provides a high-level analysis of the Return on Investment (ROI) for a "
+            f"{data.get('business_scenario_name', 'business')} investment in the "
+            f"{data.get('mini_scenario_name', 'sector')} sector. The analysis covers a "
+            f"{data.get('time_period', 0)} {data.get('time_unit', 'month')} period with a total investment of "
+            f"${data.get('total_investment', 0):,.2f}.",
+            self.normal_style
+        ))
+        story.append(Spacer(1, 12))
         
-        # Key metrics
+        # Key Metrics
+        story.append(Paragraph("Key Metrics", self.subheading_style))
+        
         metrics_data = [
-            ['Metric', 'Value'],
-            ['Initial Investment', f"${calculation_data.initial_investment:,.2f}"],
-            ['Net Profit', f"${calculation_data.net_profit:,.2f}"],
-            ['ROI Percentage', f"{calculation_data.roi_percentage:.2f}%"],
-            ['Annualized ROI', f"{calculation_data.annualized_roi:.2f}%"],
-            ['Time Period', f"{calculation_data.time_period} {calculation_data.time_unit}"],
-            ['Risk Score', f"{calculation_data.risk_score:.1f}/10"]
+            ['Metric', 'Value', 'Assessment'],
+            ['ROI Percentage', f"{data.get('roi_percentage', 0):.2f}%", self._get_roi_assessment(data.get('roi_percentage', 0))],
+            ['Net Profit', f"${data.get('net_profit', 0):,.2f}", 'Positive' if data.get('net_profit', 0) > 0 else 'Negative'],
+            ['Annualized ROI', f"{data.get('annualized_roi', 0):.2f}%", self._get_roi_assessment(data.get('annualized_roi', 0))],
+            ['Risk Score', f"{data.get('risk_score', 0):.2f}/10", self._get_risk_assessment(data.get('risk_score', 0))],
+            ['After-Tax Profit', f"${data.get('after_tax_profit', 0):,.2f}", 'Attractive' if data.get('after_tax_profit', 0) > data.get('total_investment', 0) * 0.15 else 'Moderate']
         ]
         
-        metrics_table = Table(metrics_data, colWidths=[2*inch, 2*inch])
+        metrics_table = Table(metrics_data, colWidths=[1.5*inch, 1.5*inch, 1.5*inch])
         metrics_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), HexColor('#3B82F6')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 1, HexColor('#E5E7EB'))
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
         
-        elements.append(metrics_table)
-        elements.append(Spacer(1, 20))
-        
-        # Summary text
-        summary_text = f"""
-        This investment analysis shows a {calculation_data.roi_percentage:.2f}% return on investment 
-        over {calculation_data.time_period} {calculation_data.time_unit}. The initial investment of 
-        ${calculation_data.initial_investment:,.2f} is projected to generate a net profit of 
-        ${calculation_data.net_profit:,.2f}.
-        
-        The {calculation_data.business_scenario_name} scenario in {calculation_data.country_code} 
-        presents a {self.get_risk_level(calculation_data.risk_score)} risk profile with 
-        {self.get_roi_performance(calculation_data.roi_percentage)} performance potential.
-        """
-        
-        summary = Paragraph(summary_text, self.styles['CustomBody'])
-        elements.append(summary)
-        
-        return elements
-    
-    def create_roi_analysis(self, calculation_data: Any) -> list:
-        """Create ROI analysis section"""
-        elements = []
-        
-        # Section title
-        title = Paragraph("ROI Analysis", self.styles['CustomHeading'])
-        elements.append(title)
-        elements.append(Spacer(1, 12))
-        
-        # Investment breakdown
-        breakdown_data = [
-            ['Component', 'Amount', 'Percentage'],
-            ['Initial Investment', f"${calculation_data.initial_investment:,.2f}", "100%"],
-            ['Additional Costs', f"${calculation_data.additional_costs:,.2f}", 
-             f"{(calculation_data.additional_costs/calculation_data.initial_investment*100):.1f}%"],
-            ['Total Investment', f"${calculation_data.total_investment:,.2f}", 
-             f"{(calculation_data.total_investment/calculation_data.initial_investment*100):.1f}%"]
-        ]
-        
-        breakdown_table = Table(breakdown_data, colWidths=[2*inch, 1.5*inch, 1.5*inch])
-        breakdown_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), HexColor('#10B981')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 1, HexColor('#E5E7EB'))
-        ]))
-        
-        elements.append(breakdown_table)
-        elements.append(Spacer(1, 20))
-        
-        # Analysis text
-        analysis_text = f"""
-        The ROI calculation incorporates real-world factors including:
-        
-        • Tax implications for {calculation_data.country_code}
-        • Market conditions and economic factors
-        • Industry-specific risk assessments
-        • Time value of money considerations
-        
-        The {calculation_data.business_scenario_name} scenario shows strong potential with 
-        a {calculation_data.roi_percentage:.2f}% return, which is 
-        {self.get_roi_comparison(calculation_data.roi_percentage)} the industry average.
-        """
-        
-        analysis = Paragraph(analysis_text, self.styles['CustomBody'])
-        elements.append(analysis)
-        
-        return elements
-    
-    def create_charts_section(self, calculation_data: Any) -> list:
-        """Create charts section"""
-        elements = []
-        
-        # Section title
-        title = Paragraph("Investment Analysis Charts", self.styles['CustomHeading'])
-        elements.append(title)
-        elements.append(Spacer(1, 12))
-        
-        # Create sample chart (in a real implementation, you'd generate actual charts)
-        chart_description = """
-        The following charts provide visual representation of the investment analysis:
-        
-        • Investment Breakdown Pie Chart
-        • ROI Timeline Chart  
-        • Risk Factors Bar Chart
-        • Market Comparison Chart
-        
-        Note: In a production environment, these would be actual generated charts
-        based on the calculation data and market analysis.
-        """
-        
-        chart_desc = Paragraph(chart_description, self.styles['CustomBody'])
-        elements.append(chart_desc)
-        
-        return elements
-    
-    def create_market_analysis(self, calculation_data: Any) -> list:
-        """Create market analysis section"""
-        elements = []
-        
-        # Section title
-        title = Paragraph("Market Analysis", self.styles['CustomHeading'])
-        elements.append(title)
-        elements.append(Spacer(1, 12))
-        
-        # Market factors
-        market_data = [
-            ['Factor', 'Impact', 'Description'],
-            ['Market Growth', 'Positive', f"Strong growth in {calculation_data.business_scenario_name} sector"],
-            ['Competition', 'Medium', "Moderate competitive landscape"],
-            ['Regulatory', 'Low', "Favorable regulatory environment"],
-            ['Technology', 'High', "Technology adoption driving growth"],
-            ['Economic', 'Positive', "Stable economic conditions"]
-        ]
-        
-        market_table = Table(market_data, colWidths=[1.5*inch, 1*inch, 3.5*inch])
-        market_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), HexColor('#8B5CF6')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 1, HexColor('#E5E7EB'))
-        ]))
-        
-        elements.append(market_table)
-        elements.append(Spacer(1, 20))
-        
-        # Analysis text
-        analysis_text = """
-        The market analysis indicates favorable conditions for this investment:
-        
-        • Growing market demand in the target sector
-        • Stable regulatory environment with clear guidelines
-        • Strong technology adoption driving efficiency gains
-        • Positive economic indicators supporting growth
-        
-        These factors contribute to the projected ROI and risk assessment.
-        """
-        
-        analysis = Paragraph(analysis_text, self.styles['CustomBody'])
-        elements.append(analysis)
-        
-        return elements
-    
-    def create_recommendations(self, calculation_data: Any) -> list:
-        """Create recommendations section"""
-        elements = []
-        
-        # Section title
-        title = Paragraph("Strategic Recommendations", self.styles['CustomHeading'])
-        elements.append(title)
-        elements.append(Spacer(1, 12))
+        story.append(metrics_table)
+        story.append(Spacer(1, 20))
         
         # Recommendations
-        recommendations_data = [
-            ['Recommendation', 'Priority', 'Timeline'],
-            ['Proceed with investment', 'High', 'Immediate'],
-            ['Monitor market conditions', 'Medium', 'Ongoing'],
-            ['Diversify portfolio', 'Medium', '3-6 months'],
-            ['Review quarterly', 'High', 'Quarterly'],
-            ['Consider scaling up', 'Low', '6-12 months']
+        story.append(Paragraph("Recommendations", self.subheading_style))
+        recommendations = self._generate_recommendations(data)
+        for rec in recommendations:
+            story.append(Paragraph(f"• {rec}", self.normal_style))
+        
+        return story
+    
+    def _create_standard_report(self, data: Dict[str, Any]) -> list:
+        """Create standard detailed report"""
+        story = []
+        
+        # Executive Summary
+        story.extend(self._create_executive_summary(data))
+        story.append(PageBreak())
+        
+        # Investment Overview
+        story.append(Paragraph("Investment Overview", self.heading_style))
+        
+        investment_data = [
+            ['Component', 'Amount', 'Percentage'],
+            ['Initial Investment', f"${data.get('initial_investment', 0):,.2f}", f"{(data.get('initial_investment', 0) / data.get('total_investment', 1) * 100):.1f}%"],
+            ['Additional Costs', f"${data.get('additional_costs', 0):,.2f}", f"{(data.get('additional_costs', 0) / data.get('total_investment', 1) * 100):.1f}%"],
+            ['Total Investment', f"${data.get('total_investment', 0):,.2f}", "100%"],
+            ['Time Period', f"{data.get('time_period', 0)} {data.get('time_unit', 'months')}", 'N/A'],
+            ['Country', data.get('country_code', 'N/A'), 'N/A']
         ]
         
-        rec_table = Table(recommendations_data, colWidths=[2.5*inch, 1*inch, 1.5*inch])
-        rec_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), HexColor('#F59E0B')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        investment_table = Table(investment_data, colWidths=[2*inch, 2*inch, 1*inch])
+        investment_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 1, HexColor('#E5E7EB'))
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
         ]))
         
-        elements.append(rec_table)
-        elements.append(Spacer(1, 20))
+        story.append(investment_table)
+        story.append(Spacer(1, 20))
         
-        # Recommendations text
-        rec_text = f"""
-        Based on the analysis, we recommend proceeding with this investment in 
-        {calculation_data.business_scenario_name}. The {calculation_data.roi_percentage:.2f}% 
-        projected return with a {self.get_risk_level(calculation_data.risk_score)} risk profile 
-        presents an attractive opportunity.
+        # ROI Analysis
+        story.append(Paragraph("ROI Analysis", self.heading_style))
+        story.append(Paragraph(
+            f"The investment shows a {data.get('roi_percentage', 0):.2f}% return on investment, "
+            f"resulting in a net profit of ${data.get('net_profit', 0):,.2f}. When annualized, "
+            f"this represents a {data.get('annualized_roi', 0):.2f}% annual return on investment.",
+            self.normal_style
+        ))
+        story.append(Spacer(1, 12))
         
-        Key action items:
-        • Begin implementation within 30 days
-        • Establish monitoring and reporting systems
-        • Prepare contingency plans for market changes
-        • Schedule quarterly review meetings
-        """
+        # Risk Assessment
+        story.append(Paragraph("Risk Assessment", self.heading_style))
+        risk_level = self._get_risk_level(data.get('risk_score', 0))
+        story.append(Paragraph(
+            f"The investment carries a {risk_level.lower()} risk profile with a risk score of "
+            f"{data.get('risk_score', 0):.2f}/10. This assessment considers market volatility, "
+            f"regulatory factors, and competitive landscape.",
+            self.normal_style
+        ))
+        story.append(Spacer(1, 12))
         
-        rec_para = Paragraph(rec_text, self.styles['CustomBody'])
-        elements.append(rec_para)
+        # Tax Implications
+        story.append(Paragraph("Tax Implications", self.heading_style))
+        story.append(Paragraph(
+            f"Tax considerations reduce the net profit by ${data.get('tax_amount', 0):,.2f}, "
+            f"resulting in an after-tax profit of ${data.get('after_tax_profit', 0):,.2f}. "
+            f"This analysis includes corporate tax, capital gains tax, and other applicable taxes "
+            f"for {data.get('country_code', 'the selected country')}.",
+            self.normal_style
+        ))
         
-        return elements
+        return story
     
-    def get_risk_level(self, risk_score: float) -> str:
-        """Convert risk score to risk level"""
-        if risk_score <= 3:
-            return "low"
-        elif risk_score <= 7:
-            return "medium"
-        else:
-            return "high"
+    def _create_detailed_report(self, data: Dict[str, Any]) -> list:
+        """Create comprehensive detailed report"""
+        story = []
+        
+        # Include standard report content
+        story.extend(self._create_standard_report(data))
+        story.append(PageBreak())
+        
+        # Market Analysis
+        story.append(Paragraph("Market Analysis", self.heading_style))
+        story.append(Paragraph(
+            "This section provides detailed market insights and competitive analysis for the selected business scenario.",
+            self.normal_style
+        ))
+        story.append(Spacer(1, 12))
+        
+        # Add market analysis content here
+        story.append(Paragraph("Market analysis data would be included here based on the selected scenario.", self.normal_style))
+        
+        story.append(PageBreak())
+        
+        # Financial Projections
+        story.append(Paragraph("Financial Projections", self.heading_style))
+        story.append(Paragraph(
+            "Detailed financial projections and cash flow analysis for the investment period.",
+            self.normal_style
+        ))
+        story.append(Spacer(1, 12))
+        
+        # Add financial projections content here
+        story.append(Paragraph("Financial projections would be included here.", self.normal_style))
+        
+        return story
     
-    def get_roi_performance(self, roi_percentage: float) -> str:
-        """Get ROI performance description"""
-        if roi_percentage >= 30:
-            return "exceptional"
-        elif roi_percentage >= 20:
-            return "strong"
-        elif roi_percentage >= 10:
-            return "moderate"
-        else:
-            return "conservative"
+    def _create_footer(self) -> list:
+        """Create report footer"""
+        story = []
+        
+        story.append(Spacer(1, 30))
+        story.append(Paragraph(
+            "This report is generated by InvestWise Pro - Advanced ROI Calculator. "
+            "For detailed analysis and professional advice, consult with financial advisors.",
+            ParagraphStyle('Footer', parent=self.normal_style, fontSize=8, textColor=colors.grey)
+        ))
+        
+        return story
     
-    def get_roi_comparison(self, roi_percentage: float) -> str:
-        """Get ROI comparison to industry average"""
-        if roi_percentage >= 25:
-            return "significantly above"
-        elif roi_percentage >= 15:
-            return "above"
-        elif roi_percentage >= 10:
-            return "in line with"
+    def _get_roi_assessment(self, roi: float) -> str:
+        """Get ROI assessment based on percentage"""
+        if roi > 20:
+            return "Excellent"
+        elif roi > 15:
+            return "Very Good"
+        elif roi > 10:
+            return "Good"
+        elif roi > 5:
+            return "Moderate"
         else:
-            return "below"
+            return "Low"
+    
+    def _get_risk_assessment(self, risk_score: float) -> str:
+        """Get risk assessment based on score"""
+        if risk_score < 3:
+            return "Low"
+        elif risk_score < 7:
+            return "Medium"
+        else:
+            return "High"
+    
+    def _get_risk_level(self, risk_score: float) -> str:
+        """Get risk level description"""
+        if risk_score < 3:
+            return "Low"
+        elif risk_score < 7:
+            return "Medium"
+        else:
+            return "High"
+    
+    def _generate_recommendations(self, data: Dict[str, Any]) -> list:
+        """Generate investment recommendations"""
+        recommendations = []
+        
+        roi = data.get('roi_percentage', 0)
+        risk_score = data.get('risk_score', 0)
+        after_tax_profit = data.get('after_tax_profit', 0)
+        total_investment = data.get('total_investment', 0)
+        
+        if roi > 20:
+            recommendations.append("Strong investment opportunity with excellent return potential")
+        elif roi > 10:
+            recommendations.append("Good investment opportunity with solid returns")
+        else:
+            recommendations.append("Consider alternative investments or optimization strategies")
+        
+        if risk_score < 5:
+            recommendations.append("Risk profile is acceptable for most investors")
+        else:
+            recommendations.append("Consider risk mitigation strategies or diversification")
+        
+        if after_tax_profit > total_investment * 0.15:
+            recommendations.append("After-tax returns are attractive for long-term investment")
+        else:
+            recommendations.append("Evaluate tax optimization strategies")
+        
+        if data.get('country_code') in ['SG', 'HK', 'AE']:
+            recommendations.append("Consider tax advantages in the selected jurisdiction")
+        
+        return recommendations
