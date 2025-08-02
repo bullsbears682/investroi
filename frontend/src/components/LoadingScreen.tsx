@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Calculator, Globe, Shield, Zap } from 'lucide-react';
+import { useAppStore } from '../store/appStore';
 
 const LoadingScreen: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
+  const { setLoading } = useAppStore();
 
   const steps = [
     { icon: Globe, text: 'Loading market data...', color: 'text-blue-400' },
@@ -19,6 +21,10 @@ const LoadingScreen: React.FC = () => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
+          // Add a small delay before hiding the loading screen
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
           return 100;
         }
         return prev + 2;
@@ -39,7 +45,7 @@ const LoadingScreen: React.FC = () => {
       clearInterval(timer);
       clearInterval(stepTimer);
     };
-  }, []);
+  }, [setLoading]);
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center z-50">
