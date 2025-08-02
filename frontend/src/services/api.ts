@@ -2,20 +2,17 @@ import axios from 'axios';
 
 // Create axios instance with default configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000',
-  timeout: 10000,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to add auth token if available
+// Request interceptor for adding auth tokens
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Add any auth tokens here if needed
     return config;
   },
   (error) => {
@@ -23,31 +20,26 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle common errors
+// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    // Handle common error cases
+    // Handle common errors
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem('authToken');
-      window.location.href = '/';
-    } else if (error.response?.status === 403) {
-      // Forbidden
-      console.error('Access forbidden');
+      // Handle unauthorized
+      console.error('Unauthorized access');
     } else if (error.response?.status === 500) {
-      // Server error
+      // Handle server errors
       console.error('Server error occurred');
     }
-    
     return Promise.reject(error);
   }
 );
 
 // API endpoints
-export const endpoints = {
+export const apiEndpoints = {
   // ROI Calculator
   scenarios: '/api/roi/scenarios',
   miniScenarios: (scenarioId: number) => `/api/roi/scenarios/${scenarioId}/mini-scenarios`,
@@ -56,47 +48,59 @@ export const endpoints = {
   compare: '/api/roi/compare',
   marketAnalysis: (scenarioId: number) => `/api/roi/market-analysis/${scenarioId}`,
   riskAssessment: (scenarioId: number) => `/api/roi/risk-assessment/${scenarioId}`,
-  
+
   // Tax Data
   countries: '/api/tax/countries',
-  country: (countryCode: string) => `/api/tax/countries/${countryCode}`,
-  
+  countryTax: (code: string) => `/api/tax/countries/${code}`,
+  taxComparison: '/api/tax/comparison',
+  regionsOverview: '/api/tax/regions/overview',
+
   // PDF Export
-  exportPdf: '/api/pdf/export',
+  pdfExport: '/api/pdf/export',
   pdfTemplates: '/api/pdf/templates',
-  
+  pdfPreview: (sessionId: string) => `/api/pdf/preview/${sessionId}`,
+
   // Business Scenarios
   businessScenarios: '/api/business-scenarios',
   businessScenario: (id: number) => `/api/business-scenarios/${id}`,
+  businessScenarioMiniScenarios: (id: number) => `/api/business-scenarios/${id}/mini-scenarios`,
+  popularScenarios: '/api/business-scenarios/popular/scenarios',
 };
 
 // API service functions
 export const apiService = {
   // ROI Calculator
-  getScenarios: () => api.get(endpoints.scenarios),
-  getMiniScenarios: (scenarioId: number) => api.get(endpoints.miniScenarios(scenarioId)),
-  calculateROI: (data: any) => api.post(endpoints.calculate, data),
-  getCalculation: (sessionId: string) => api.get(endpoints.calculation(sessionId)),
-  compareScenarios: (params: any) => api.get(endpoints.compare, { params }),
-  getMarketAnalysis: (scenarioId: number, params?: any) => 
-    api.get(endpoints.marketAnalysis(scenarioId), { params }),
-  getRiskAssessment: (scenarioId: number, params?: any) => 
-    api.get(endpoints.riskAssessment(scenarioId), { params }),
-  
+  getScenarios: () => api.get(apiEndpoints.scenarios),
+  getMiniScenarios: (scenarioId: number) => api.get(apiEndpoints.miniScenarios(scenarioId)),
+  calculateROI: (data: any) => api.post(apiEndpoints.calculate, data),
+  getCalculation: (sessionId: string) => api.get(apiEndpoints.calculation(sessionId)),
+  compareScenarios: (data: any) => api.get(apiEndpoints.compare, { params: data }),
+  getMarketAnalysis: (scenarioId: number, countryCode: string) => 
+    api.get(apiEndpoints.marketAnalysis(scenarioId), { params: { country_code: countryCode } }),
+  getRiskAssessment: (scenarioId: number, investmentAmount: number, countryCode: string) => 
+    api.get(apiEndpoints.riskAssessment(scenarioId), { 
+      params: { 
+        investment_amount: investmentAmount, 
+        country_code: countryCode 
+      } 
+    }),
+
   // Tax Data
-  getCountries: () => api.get(endpoints.countries),
-  getCountry: (countryCode: string) => api.get(endpoints.country(countryCode)),
-  
+  getCountries: () => api.get(apiEndpoints.countries),
+  getCountryTax: (code: string) => api.get(apiEndpoints.countryTax(code)),
+  getTaxComparison: () => api.get(apiEndpoints.taxComparison),
+  getRegionsOverview: () => api.get(apiEndpoints.regionsOverview),
+
   // PDF Export
-  exportPdf: (data: any) => api.post(endpoints.exportPdf, data, {
-    responseType: 'blob'
-  }),
-  getPdfTemplates: () => api.get(endpoints.pdfTemplates),
-  
+  exportPDF: (data: any) => api.post(apiEndpoints.pdfExport, data, { responseType: 'blob' }),
+  getPDFTemplates: () => api.get(apiEndpoints.pdfTemplates),
+  getPDFPreview: (sessionId: string) => api.get(apiEndpoints.pdfPreview(sessionId)),
+
   // Business Scenarios
-  getBusinessScenarios: () => api.get(endpoints.businessScenarios),
-  getBusinessScenario: (id: number) => api.get(endpoints.businessScenario(id)),
+  getBusinessScenarios: () => api.get(apiEndpoints.businessScenarios),
+  getBusinessScenario: (id: number) => api.get(apiEndpoints.businessScenario(id)),
+  getBusinessScenarioMiniScenarios: (id: number) => api.get(apiEndpoints.businessScenarioMiniScenarios(id)),
+  getPopularScenarios: () => api.get(apiEndpoints.popularScenarios),
 };
 
 export { api };
-export default api;

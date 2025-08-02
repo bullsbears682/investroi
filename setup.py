@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Setup script for InvestWise Pro
-Helps users install dependencies and configure the application
+InvestWise Pro - Automated Setup Script
+This script sets up the complete InvestWise Pro application including backend and frontend.
 """
 
 import os
@@ -10,40 +10,53 @@ import subprocess
 import shutil
 from pathlib import Path
 
-def run_command(command, description):
-    """Run a command and handle errors"""
-    print(f"🔄 {description}...")
-    try:
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        print(f"✅ {description} completed successfully")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"❌ {description} failed: {e}")
-        print(f"Error output: {e.stderr}")
-        return False
+def print_banner():
+    """Print the application banner"""
+    print("""
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         InvestWise Pro - Setup Script                       ║
+║                                                                              ║
+║  Advanced ROI Calculator with Real-World Business Scenarios                 ║
+║  Built with Python FastAPI + React TypeScript                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+    """)
 
-def check_python_version():
-    """Check if Python version is compatible"""
+def check_prerequisites():
+    """Check if required software is installed"""
+    print("🔍 Checking prerequisites...")
+    
+    # Check Python version
     if sys.version_info < (3, 8):
-        print("❌ Python 3.8 or higher is required")
-        print(f"Current version: {sys.version}")
+        print("❌ Python 3.8+ is required")
         return False
-    print(f"✅ Python version: {sys.version}")
-    return True
-
-def check_node_version():
-    """Check if Node.js is installed"""
+    
+    # Check Node.js
     try:
         result = subprocess.run(['node', '--version'], capture_output=True, text=True)
-        print(f"✅ Node.js version: {result.stdout.strip()}")
-        return True
+        if result.returncode != 0:
+            print("❌ Node.js is required but not found")
+            return False
+        print(f"✅ Node.js {result.stdout.strip()}")
     except FileNotFoundError:
-        print("❌ Node.js is not installed")
-        print("Please install Node.js from https://nodejs.org/")
+        print("❌ Node.js is required but not found")
         return False
+    
+    # Check npm
+    try:
+        result = subprocess.run(['npm', '--version'], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("❌ npm is required but not found")
+            return False
+        print(f"✅ npm {result.stdout.strip()}")
+    except FileNotFoundError:
+        print("❌ npm is required but not found")
+        return False
+    
+    print("✅ All prerequisites met!")
+    return True
 
 def setup_backend():
-    """Setup the Python backend"""
+    """Set up the Python backend"""
     print("\n🐍 Setting up Python backend...")
     
     backend_dir = Path("backend")
@@ -52,11 +65,31 @@ def setup_backend():
         return False
     
     # Create virtual environment
-    if not run_command("cd backend && python -m venv venv", "Creating virtual environment"):
+    print("📦 Creating virtual environment...")
+    try:
+        subprocess.run([sys.executable, "-m", "venv", "venv"], cwd=backend_dir, check=True)
+        print("✅ Virtual environment created")
+    except subprocess.CalledProcessError:
+        print("❌ Failed to create virtual environment")
         return False
     
+    # Determine activation script
+    if os.name == 'nt':  # Windows
+        activate_script = backend_dir / "venv" / "Scripts" / "activate.bat"
+        python_path = backend_dir / "venv" / "Scripts" / "python.exe"
+        pip_path = backend_dir / "venv" / "Scripts" / "pip.exe"
+    else:  # Unix/Linux/macOS
+        activate_script = backend_dir / "venv" / "bin" / "activate"
+        python_path = backend_dir / "venv" / "bin" / "python"
+        pip_path = backend_dir / "venv" / "bin" / "pip"
+    
     # Install dependencies
-    if not run_command("cd backend && source venv/bin/activate && pip install -r requirements.txt", "Installing Python dependencies"):
+    print("📦 Installing Python dependencies...")
+    try:
+        subprocess.run([str(pip_path), "install", "-r", "requirements.txt"], cwd=backend_dir, check=True)
+        print("✅ Python dependencies installed")
+    except subprocess.CalledProcessError:
+        print("❌ Failed to install Python dependencies")
         return False
     
     # Create .env file if it doesn't exist
@@ -84,13 +117,14 @@ DEBUG=true
 """
         with open(env_file, 'w') as f:
             f.write(env_content)
-        print("✅ Created .env file")
+        print("✅ .env file created")
     
+    print("✅ Backend setup completed!")
     return True
 
 def setup_frontend():
-    """Setup the React frontend"""
-    print("\n⚛️ Setting up React frontend...")
+    """Set up the React frontend"""
+    print("\n⚛️  Setting up React frontend...")
     
     frontend_dir = Path("frontend")
     if not frontend_dir.exists():
@@ -98,112 +132,187 @@ def setup_frontend():
         return False
     
     # Install Node.js dependencies
-    if not run_command("cd frontend && npm install", "Installing Node.js dependencies"):
+    print("📦 Installing Node.js dependencies...")
+    try:
+        subprocess.run(['npm', 'install'], cwd=frontend_dir, check=True)
+        print("✅ Node.js dependencies installed")
+    except subprocess.CalledProcessError:
+        print("❌ Failed to install Node.js dependencies")
         return False
     
-    return True
+    # Create .env file if it doesn't exist
+    env_file = frontend_dir / ".env"
+    if not env_file.exists():
+        print("📝 Creating frontend .env file...")
+        env_content = """# API Configuration
+VITE_API_URL=http://localhost:8000
 
-def create_directories():
-    """Create necessary directories"""
-    print("\n📁 Creating directories...")
+# Analytics (optional)
+VITE_GA_TRACKING_ID=your_ga_tracking_id_here
+
+# App Configuration
+VITE_APP_NAME=InvestWise Pro
+VITE_APP_VERSION=1.0.0
+"""
+        with open(env_file, 'w') as f:
+            f.write(env_content)
+        print("✅ Frontend .env file created")
     
-    directories = [
-        "backend/temp",
-        "backend/logs",
-        "frontend/public"
-    ]
-    
-    for directory in directories:
-        Path(directory).mkdir(parents=True, exist_ok=True)
-        print(f"✅ Created {directory}")
+    print("✅ Frontend setup completed!")
+    return True
 
 def setup_database():
-    """Setup the database"""
-    print("\n🗄️ Setting up database...")
+    """Set up the database"""
+    print("\n🗄️  Setting up database...")
     
-    # Check if PostgreSQL is installed
+    backend_dir = Path("backend")
+    
+    # Check if PostgreSQL is available
     try:
         result = subprocess.run(['psql', '--version'], capture_output=True, text=True)
-        print(f"✅ PostgreSQL: {result.stdout.strip()}")
+        if result.returncode == 0:
+            print("✅ PostgreSQL found")
+        else:
+            print("⚠️  PostgreSQL not found - you'll need to install it manually")
     except FileNotFoundError:
-        print("❌ PostgreSQL is not installed")
-        print("Please install PostgreSQL from https://www.postgresql.org/")
-        return False
+        print("⚠️  PostgreSQL not found - you'll need to install it manually")
     
-    # Create database
-    if not run_command("createdb investwise_pro", "Creating database"):
-        print("⚠️ Database creation failed. You may need to create it manually:")
-        print("   createdb investwise_pro")
+    # Create database migration
+    print("📊 Setting up database migrations...")
+    try:
+        # Run Alembic upgrade
+        if os.name == 'nt':  # Windows
+            python_path = backend_dir / "venv" / "Scripts" / "python.exe"
+        else:  # Unix/Linux/macOS
+            python_path = backend_dir / "venv" / "bin" / "python"
+        
+        subprocess.run([str(python_path), "-m", "alembic", "upgrade", "head"], cwd=backend_dir, check=True)
+        print("✅ Database migrations applied")
+    except subprocess.CalledProcessError:
+        print("⚠️  Database migrations failed - you may need to set up PostgreSQL first")
     
+    # Seed database
+    print("🌱 Seeding database...")
+    try:
+        subprocess.run([str(python_path), "seed_database.py"], cwd=backend_dir, check=True)
+        print("✅ Database seeded with initial data")
+    except subprocess.CalledProcessError:
+        print("⚠️  Database seeding failed - you may need to set up PostgreSQL first")
+    
+    print("✅ Database setup completed!")
     return True
 
-def run_migrations():
-    """Run database migrations"""
-    print("\n🔄 Running database migrations...")
+def create_startup_scripts():
+    """Create startup scripts for easy development"""
+    print("\n🚀 Creating startup scripts...")
     
-    if not run_command("cd backend && source venv/bin/activate && alembic upgrade head", "Running migrations"):
-        print("⚠️ Migrations failed. You may need to run them manually:")
-        print("   cd backend && source venv/bin/activate && alembic upgrade head")
-        return False
+    # Create start_backend.sh/bat
+    if os.name == 'nt':  # Windows
+        backend_script = """@echo off
+cd backend
+call venv\\Scripts\\activate.bat
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+pause
+"""
+        with open("start_backend.bat", 'w') as f:
+            f.write(backend_script)
+    else:  # Unix/Linux/macOS
+        backend_script = """#!/bin/bash
+cd backend
+source venv/bin/activate
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+"""
+        with open("start_backend.sh", 'w') as f:
+            f.write(backend_script)
+        os.chmod("start_backend.sh", 0o755)
     
-    return True
+    # Create start_frontend.sh/bat
+    if os.name == 'nt':  # Windows
+        frontend_script = """@echo off
+cd frontend
+npm run dev
+pause
+"""
+        with open("start_frontend.bat", 'w') as f:
+            f.write(frontend_script)
+    else:  # Unix/Linux/macOS
+        frontend_script = """#!/bin/bash
+cd frontend
+npm run dev
+"""
+        with open("start_frontend.sh", 'w') as f:
+            f.write(frontend_script)
+        os.chmod("start_frontend.sh", 0o755)
+    
+    print("✅ Startup scripts created!")
 
-def seed_database():
-    """Seed the database with initial data"""
-    print("\n🌱 Seeding database...")
-    
-    if not run_command("cd backend && source venv/bin/activate && python seed_database.py", "Seeding database"):
-        print("⚠️ Database seeding failed. You may need to run it manually:")
-        print("   cd backend && source venv/bin/activate && python seed_database.py")
-        return False
-    
-    return True
+def print_next_steps():
+    """Print next steps for the user"""
+    print("""
+🎉 Setup completed successfully!
+
+📋 Next Steps:
+1. Configure your database connection in backend/.env
+2. Set up PostgreSQL database (if not already done)
+3. Get API keys for market data services (optional)
+4. Start the application:
+
+   Backend:  python setup.py start-backend
+   Frontend: python setup.py start-frontend
+
+   Or use the created scripts:
+   - start_backend.sh/bat
+   - start_frontend.sh/bat
+
+🌐 Access the application:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
+
+📚 Documentation:
+   - README.md - Complete setup and usage guide
+   - Backend API docs at http://localhost:8000/docs
+
+🔧 Configuration:
+   - Backend settings: backend/.env
+   - Frontend settings: frontend/.env
+
+💡 Tips:
+   - Make sure PostgreSQL is running before starting the backend
+   - The application includes 35 business scenarios with real tax data
+   - All features are GDPR compliant with cookie consent
+   - Professional PDF reports are available for download
+
+Happy investing! 🚀
+    """)
 
 def main():
     """Main setup function"""
-    print("🚀 Welcome to InvestWise Pro Setup!")
-    print("=" * 50)
+    print_banner()
     
     # Check prerequisites
-    if not check_python_version():
+    if not check_prerequisites():
+        print("❌ Prerequisites not met. Please install required software.")
         sys.exit(1)
-    
-    if not check_node_version():
-        sys.exit(1)
-    
-    # Create directories
-    create_directories()
     
     # Setup backend
     if not setup_backend():
-        print("❌ Backend setup failed")
+        print("❌ Backend setup failed.")
         sys.exit(1)
     
     # Setup frontend
     if not setup_frontend():
-        print("❌ Frontend setup failed")
+        print("❌ Frontend setup failed.")
         sys.exit(1)
     
     # Setup database
-    if not setup_database():
-        print("❌ Database setup failed")
-        sys.exit(1)
+    setup_database()
     
-    # Run migrations
-    if not run_migrations():
-        print("⚠️ Migration setup incomplete")
+    # Create startup scripts
+    create_startup_scripts()
     
-    # Seed database
-    if not seed_database():
-        print("⚠️ Database seeding incomplete")
-    
-    print("\n🎉 Setup completed successfully!")
-    print("\n📋 Next steps:")
-    print("1. Configure your .env file in the backend directory")
-    print("2. Start the backend: cd backend && source venv/bin/activate && uvicorn main:app --reload")
-    print("3. Start the frontend: cd frontend && npm run dev")
-    print("4. Open http://localhost:5173 in your browser")
-    print("\n📚 For more information, see the README.md file")
+    # Print next steps
+    print_next_steps()
 
 if __name__ == "__main__":
     main()
