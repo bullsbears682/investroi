@@ -128,7 +128,7 @@ const CalculatorPage: React.FC = () => {
             
             <ROICalculator
               onCalculate={handleCalculate}
-              isLoading={calculateMutation.isLoading}
+              isLoading={calculateMutation.isPending}
               selectedScenario={selectedScenario}
               selectedMiniScenario={selectedMiniScenario}
             />

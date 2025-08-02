@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
   DollarSign, 
-  Percent, 
+ 
   Clock, 
   Shield,
   TrendingDown,

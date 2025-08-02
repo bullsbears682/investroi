@@ -3,12 +3,11 @@ import { motion } from 'framer-motion';
 import { 
   Users, 
   Target, 
-  Award, 
+ 
   Heart, 
   Globe, 
   Shield, 
-  Zap, 
-  TrendingUp,
+  
   Calculator,
   BarChart3,
   FileText,

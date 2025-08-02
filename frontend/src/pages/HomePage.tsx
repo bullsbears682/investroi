@@ -11,7 +11,7 @@ import {
   Users, 
   Zap,
   ArrowRight,
-  CheckCircle,
+
   Star
 } from 'lucide-react';
 

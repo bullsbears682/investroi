@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cookie, X, Settings, CheckCircle, AlertCircle } from 'lucide-react';
+import { Cookie, X, Settings } from 'lucide-react';
 import { useCookies } from 'react-cookie';
 
 const CookieConsent: React.FC = () => {

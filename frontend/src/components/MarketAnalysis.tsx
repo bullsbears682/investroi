@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart, LineChart, PieChart, TrendingUp, TrendingDown, Activity, Globe, Users, DollarSign } from 'lucide-react';
+import { BarChart, LineChart, TrendingUp, TrendingDown, Activity, Globe, Users, DollarSign } from 'lucide-react';
 import { api } from '../services/api';
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as RechartsLineChart, Line } from 'recharts';
 
 interface MarketAnalysisProps {
   scenarioId: number;
@@ -23,21 +23,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  const getTrendIcon = (trend: string) => {
-    switch (trend.toLowerCase()) {
-      case 'up': return TrendingUp;
-      case 'down': return TrendingDown;
-      default: return Activity;
-    }
-  };
 
-  const getTrendColor = (trend: string) => {
-    switch (trend.toLowerCase()) {
-      case 'up': return 'text-green-400';
-      case 'down': return 'text-red-400';
-      default: return 'text-blue-400';
-    }
-  };
 
   if (isLoading) {
     return (
@@ -61,7 +47,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
   const { market_size, growth_rate, competition_level, market_trends, key_players, opportunities, threats } = marketData.data;
 
   // Prepare chart data
-  const marketTrendsData = market_trends?.map((trend: any, index: number) => ({
+  const marketTrendsData = market_trends?.map((trend: any) => ({
     month: trend.period,
     value: trend.value,
     trend: trend.direction
@@ -73,7 +59,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
     strength: player.strength_score
   })) || [];
 
-  const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444'];
+
 
   return (
     <div className="space-y-6">

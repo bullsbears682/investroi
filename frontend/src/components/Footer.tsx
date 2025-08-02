@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Calculator, BarChart3, FileText, Info, Shield, Mail, Twitter, Linkedin, Github } from 'lucide-react';
+import { Calculator, Mail, Twitter, Linkedin, Github } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();

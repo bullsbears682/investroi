@@ -6,7 +6,7 @@ import {
   Calendar, 
   Globe, 
   Calculator, 
-  TrendingUp,
+
   AlertCircle,
   Info
 } from 'lucide-react';

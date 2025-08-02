@@ -7,9 +7,9 @@ interface AppState {
   setSessionId: (id: string) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>((set: any) => ({
   isLoading: true,
   sessionId: '',
-  setLoading: (loading) => set({ isLoading: loading }),
-  setSessionId: (id) => set({ sessionId: id }),
+  setLoading: (loading: boolean) => set({ isLoading: loading }),
+  setSessionId: (id: string) => set({ sessionId: id }),
 }));
