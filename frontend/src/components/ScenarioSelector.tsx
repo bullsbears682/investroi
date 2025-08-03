@@ -120,8 +120,8 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 : 'bg-white/10 border-white/20'
             }`}
           >
-            <div className="flex items-center space-x-3">
-              <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
+            <div className="flex items-center space-x-4">
+              <div className={`p-2.5 rounded-lg transition-all duration-300 flex-shrink-0 ${
                 selectedScenario 
                   ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
                   : 'bg-white/10'
@@ -131,7 +131,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 }`} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center space-x-2 mb-1">
+                <div className="flex items-center space-x-3 mb-1">
                   <span className={`text-lg font-semibold transition-colors truncate ${
                     selectedScenario ? 'text-blue-200' : 'text-white'
                   }`}>
@@ -144,7 +144,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex-shrink-0"
+                      className="px-2.5 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex-shrink-0"
                     >
                       SELECTED
                     </motion.div>
@@ -154,7 +154,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   <motion.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-blue-200/90 text-sm font-medium truncate"
+                    className="text-blue-200/90 text-sm font-medium truncate leading-relaxed"
                   >
                     {scenarios.find(s => s.id === selectedScenario)?.description}
                   </motion.div>
@@ -166,7 +166,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="flex items-center space-x-1 bg-green-500/20 px-2 py-1 rounded-full"
+                  className="flex items-center space-x-1.5 bg-green-500/20 px-2.5 py-1.5 rounded-full"
                 >
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-green-300 text-xs font-bold">ACTIVE</span>
@@ -226,8 +226,8 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                           }`}
                         >
                           <div className="flex items-start justify-between">
-                            <div className="flex items-start space-x-3 flex-1">
-                              <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
+                            <div className="flex items-start space-x-4 flex-1">
+                              <div className={`p-2.5 rounded-lg transition-all duration-300 flex-shrink-0 ${
                                 isSelected 
                                   ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
                                   : 'bg-white/10'
@@ -237,7 +237,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                 }`} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center space-x-2 mb-2">
+                                <div className="flex items-center space-x-3 mb-2">
                                   <h3 className={`text-lg font-semibold transition-colors truncate ${
                                     isSelected 
                                       ? 'text-blue-200' 
@@ -249,24 +249,24 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                     <motion.div
                                       initial={{ scale: 0 }}
                                       animate={{ scale: 1 }}
-                                      className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex-shrink-0"
+                                      className="px-2.5 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex-shrink-0"
                                     >
                                       SELECTED
                                     </motion.div>
                                   )}
                                 </div>
-                                <p className={`text-sm transition-colors mb-3 ${
+                                <p className={`text-sm leading-relaxed transition-colors mb-3 ${
                                   isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
                                 }`}>
                                   {scenario.description}
                                 </p>
-                                <div className="flex items-center space-x-2">
-                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(scenario.risk_level)} ${
+                                <div className="flex items-center space-x-3">
+                                  <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${getRiskColor(scenario.risk_level)} ${
                                     isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
                                   }`}>
                                     {scenario.risk_level} Risk
                                   </span>
-                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${getMarketSizeColor(scenario.market_size)} ${
+                                  <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${getMarketSizeColor(scenario.market_size)} ${
                                     isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
                                   }`}>
                                     {scenario.market_size} Market
@@ -274,8 +274,8 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right ml-4 flex-shrink-0">
-                              <div className={`text-sm font-medium transition-colors mb-1 ${
+                            <div className="text-right ml-6 flex-shrink-0">
+                              <div className={`text-sm font-medium transition-colors mb-2 ${
                                 isSelected ? 'text-blue-200/90' : 'text-white/70'
                               }`}>
                                 {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
@@ -289,7 +289,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                 <motion.div
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  className="flex items-center justify-end space-x-1 mt-2"
+                                  className="flex items-center justify-end space-x-1.5 mt-2"
                                 >
                                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                                   <span className="text-green-300 text-xs font-bold">ACTIVE</span>
