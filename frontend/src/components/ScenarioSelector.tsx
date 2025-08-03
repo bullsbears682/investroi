@@ -131,7 +131,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
+                className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden z-50 max-h-[500px] overflow-y-auto"
               >
                 {/* Search */}
                 <div className="p-3 border-b border-white/10">
@@ -149,44 +149,50 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
 
                 {/* Scenarios List */}
                 <div className="p-2">
-                  {filteredScenarios.map((scenario) => (
-                    <motion.button
-                      key={scenario.id}
-                      onClick={() => {
-                        onScenarioSelect(scenario.id);
-                        setIsScenarioOpen(false);
-                        setSearchTerm('');
-                      }}
-                      className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors group"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="text-white font-medium group-hover:text-blue-300 transition-colors">
-                            {scenario.name}
-                          </h3>
-                          <p className="text-white/60 text-sm mt-1">
-                            {scenario.description}
-                          </p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(scenario.risk_level)}`}>
-                              {scenario.risk_level} Risk
-                            </span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMarketSizeColor(scenario.market_size)}`}>
-                              {scenario.market_size} Market
-                            </span>
+                  {filteredScenarios.length === 0 ? (
+                    <div className="p-4 text-center text-white/60">
+                      No scenarios found matching your search.
+                    </div>
+                  ) : (
+                    filteredScenarios.map((scenario) => (
+                      <motion.button
+                        key={scenario.id}
+                        onClick={() => {
+                          onScenarioSelect(scenario.id);
+                          setIsScenarioOpen(false);
+                          setSearchTerm('');
+                        }}
+                        className="w-full text-left p-3 rounded-lg hover:bg-white/10 transition-colors group"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="text-white font-medium group-hover:text-blue-300 transition-colors">
+                              {scenario.name}
+                            </h3>
+                            <p className="text-white/60 text-sm mt-1">
+                              {scenario.description}
+                            </p>
+                            <div className="flex items-center space-x-2 mt-2">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(scenario.risk_level)}`}>
+                                {scenario.risk_level} Risk
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMarketSizeColor(scenario.market_size)}`}>
+                                {scenario.market_size} Market
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right ml-4">
+                            <div className="text-white/70 text-sm">
+                              {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
+                            </div>
+                            <div className="text-green-400 text-sm font-medium">
+                              {scenario.typical_roi_min}% - {scenario.typical_roi_max}% ROI
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right ml-4">
-                          <div className="text-white/70 text-sm">
-                            {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
-                          </div>
-                          <div className="text-green-400 text-sm font-medium">
-                            {scenario.typical_roi_min}% - {scenario.typical_roi_max}% ROI
-                          </div>
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
+                      </motion.button>
+                    ))
+                  )}
                 </div>
               </motion.div>
             )}
