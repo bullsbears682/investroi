@@ -9,6 +9,7 @@ import {
   Globe, 
   Shield,
   BarChart3,
+  Download,
   Target,
   AlertTriangle,
   CheckCircle
@@ -20,6 +21,7 @@ import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
+import PDFExport from '../components/PDFExport';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -285,6 +287,18 @@ const CalculatorPage: React.FC = () => {
                 scenarioId={selectedScenario} 
                 countryCode={calculationResult?.data?.country_code || 'US'}
               />
+            </div>
+          )}
+
+          {/* PDF Export */}
+          {calculationResult && (
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <Download className="w-5 h-5 mr-2" />
+                Export Report
+              </h2>
+              
+              <PDFExport sessionId="test-session" />
             </div>
           )}
 
