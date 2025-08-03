@@ -88,6 +88,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
   };
 
   const onSubmit = (data: FormData) => {
+    console.log('ROICalculator onSubmit called with data:', data);
     onCalculate(data);
   };
 

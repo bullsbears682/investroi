@@ -79,7 +79,9 @@ const CalculatorPage: React.FC = () => {
     },
     onSuccess: (data) => {
       console.log('Calculation successful:', data);
-      setCalculationResult(data);
+      // Ensure the result has the correct structure
+      const result = data.data || data;
+      setCalculationResult({ data: result });
       toast.success('ROI calculation completed!');
     },
     onError: (error: any) => {
@@ -93,6 +95,10 @@ const CalculatorPage: React.FC = () => {
   });
 
   const handleCalculate = (formData: any) => {
+    console.log('Calculate button pressed with formData:', formData);
+    console.log('Selected scenario:', selectedScenario);
+    console.log('Selected mini scenario:', selectedMiniScenario);
+    
     if (!selectedScenario || !selectedMiniScenario) {
       toast.error('Please select a business scenario and mini scenario');
       return;
