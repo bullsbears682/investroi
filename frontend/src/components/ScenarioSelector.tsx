@@ -158,9 +158,9 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="flex items-center space-x-1 bg-green-500/20 px-2 py-0.5 rounded-full"
+                      className="flex items-center space-x-0.5 bg-green-500/20 px-1.5 py-0.5 rounded-full"
                     >
-                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                      <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-green-300 text-xs font-bold">ACTIVE</span>
                     </motion.div>
                   )}
@@ -269,9 +269,9 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                       <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="flex items-center space-x-1 bg-green-500/20 px-2 py-0.5 rounded-full"
+                                        className="flex items-center space-x-0.5 bg-green-500/20 px-1.5 py-0.5 rounded-full"
                                       >
-                                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                                        <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
                                         <span className="text-green-300 text-xs font-bold">ACTIVE</span>
                                       </motion.div>
                                     )}
