@@ -228,9 +228,10 @@ const CalculatorPage: React.FC = () => {
               selectedMiniScenario={selectedMiniScenario}
             />
             
-            {/* Test Button */}
+            {/* Test Button - Bypass Form */}
             <button
               onClick={() => {
+                console.log('Test button clicked');
                 const testData = {
                   initial_investment: 10000,
                   additional_costs: 0,
@@ -238,11 +239,12 @@ const CalculatorPage: React.FC = () => {
                   time_unit: 'years',
                   country_code: 'US'
                 };
+                console.log('Calling handleCalculate with test data');
                 handleCalculate(testData);
               }}
-              className="mt-4 w-full py-2 px-4 bg-green-500 text-white rounded-lg"
+              className="mt-4 w-full py-3 px-6 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors"
             >
-              Test Calculation
+              🧪 Test Calculation (Bypass Form)
             </button>
           </motion.div>
         </motion.div>
