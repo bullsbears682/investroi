@@ -368,7 +368,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
                 className="flex items-start space-x-2"
               >
                 <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-white/80 text-sm">{opportunity.description}</span>
+                <span className="text-white/80 text-sm">{opportunity}</span>
               </motion.div>
             ))}
           </div>
@@ -391,7 +391,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
                 className="flex items-start space-x-2"
               >
                 <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
-                <span className="text-white/80 text-sm">{threat.description}</span>
+                <span className="text-white/80 text-sm">{threat}</span>
               </motion.div>
             ))}
           </div>
