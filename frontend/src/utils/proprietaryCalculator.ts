@@ -40,14 +40,14 @@ export class ProprietaryROICalculator {
     const baseROI = (expectedRevenue - operatingCosts - initialInvestment) / initialInvestment;
     
     // Risk adjustment factors (proprietary)
-    const riskFactors = {
+    const riskFactors: Record<'Low' | 'Medium' | 'High', number> = {
       Low: 0.95,
       Medium: 0.85,
       High: 0.70
     };
     
     // Market condition adjustments (proprietary)
-    const marketFactors = {
+    const marketFactors: Record<'Bull' | 'Bear' | 'Neutral', number> = {
       Bull: 1.15,
       Bear: 0.80,
       Neutral: 1.00
@@ -79,18 +79,18 @@ export class ProprietaryROICalculator {
    * Our unique risk assessment methodology
    */
   private calculateRiskScore(
-    riskLevel: string,
-    marketConditions: string,
+    riskLevel: 'Low' | 'Medium' | 'High',
+    marketConditions: 'Bull' | 'Bear' | 'Neutral',
     timePeriod: number
   ): number {
     // PROPRIETARY RISK SCORING ALGORITHM
-    const riskWeights = {
+    const riskWeights: Record<'Low' | 'Medium' | 'High', number> = {
       Low: 0.2,
       Medium: 0.5,
       High: 0.8
     };
     
-    const marketWeights = {
+    const marketWeights: Record<'Bull' | 'Bear' | 'Neutral', number> = {
       Bull: 0.3,
       Bear: 0.8,
       Neutral: 0.5
@@ -117,7 +117,7 @@ export class ProprietaryROICalculator {
     marketTrends: string[];
   } {
     // PROPRIETARY MARKET ANALYSIS ALGORITHM
-    const industryFactors = {
+    const industryFactors: Record<string, number> = {
       'Technology': 1.3,
       'Healthcare': 1.2,
       'Finance': 1.1,
@@ -125,7 +125,7 @@ export class ProprietaryROICalculator {
       'Manufacturing': 0.8
     };
     
-    const competitionFactors = {
+    const competitionFactors: Record<string, number> = {
       'Low': 1.4,
       'Medium': 1.0,
       'High': 0.6
@@ -140,17 +140,17 @@ export class ProprietaryROICalculator {
     return {
       marketScore,
       opportunityLevel,
-      competitiveAdvantage: this.calculateCompetitiveAdvantage(industry, region),
-      marketTrends: this.generateMarketTrends(industry, region)
+      competitiveAdvantage: this.calculateCompetitiveAdvantage(region),
+      marketTrends: this.generateMarketTrends()
     };
   }
 
   /**
    * PROPRIETARY METHOD: Competitive advantage calculation
    */
-  private calculateCompetitiveAdvantage(industry: string, region: string): number {
+  private calculateCompetitiveAdvantage(region: string): number {
     // PROPRIETARY COMPETITIVE ANALYSIS ALGORITHM
-    const regionalAdvantages = {
+    const regionalAdvantages: Record<string, number> = {
       'US': 1.2,
       'EU': 1.1,
       'Asia': 1.3,
@@ -163,7 +163,7 @@ export class ProprietaryROICalculator {
   /**
    * PROPRIETARY METHOD: Market trend generation
    */
-  private generateMarketTrends(industry: string, region: string): string[] {
+  private generateMarketTrends(): string[] {
     // PROPRIETARY TREND ANALYSIS ALGORITHM
     const trends = [
       'Digital transformation accelerating',

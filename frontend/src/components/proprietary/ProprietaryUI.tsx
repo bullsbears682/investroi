@@ -6,7 +6,7 @@
  * that are unique to our platform and provide competitive advantage.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // PROPRIETARY ANIMATION SYSTEM
 export class ProprietaryAnimationEngine {
@@ -61,13 +61,12 @@ export class ProprietaryAnimationEngine {
     gradient.addColorStop(1, 'rgba(59, 130, 246, 0.1)');
     
     // PROPRIETARY ANIMATION
-    this.animateChart(ctx, data, labels, gradient);
+    this.animateChart(ctx, data, gradient);
   }
 
   private animateChart(
     ctx: CanvasRenderingContext2D,
     data: number[],
-    labels: string[],
     gradient: CanvasGradient
   ): void {
     // PROPRIETARY ANIMATION ALGORITHM
@@ -76,12 +75,12 @@ export class ProprietaryAnimationEngine {
       progress += 0.02;
       
       if (progress >= 1) {
-        this.drawFinalChart(ctx, data, labels, gradient);
+        this.drawFinalChart(ctx, data, gradient);
         return;
       }
       
       const animatedData = data.map(d => d * progress);
-      this.drawChart(ctx, animatedData, labels, gradient);
+      this.drawChart(ctx, animatedData, gradient);
       requestAnimationFrame(animate);
     };
     
@@ -91,7 +90,6 @@ export class ProprietaryAnimationEngine {
   private drawChart(
     ctx: CanvasRenderingContext2D,
     data: number[],
-    labels: string[],
     gradient: CanvasGradient
   ): void {
     // PROPRIETARY CHART DRAWING ALGORITHM
@@ -113,10 +111,9 @@ export class ProprietaryAnimationEngine {
   private drawFinalChart(
     ctx: CanvasRenderingContext2D,
     data: number[],
-    labels: string[],
     gradient: CanvasGradient
   ): void {
-    this.drawChart(ctx, data, labels, gradient);
+    this.drawChart(ctx, data, gradient);
   }
 }
 
