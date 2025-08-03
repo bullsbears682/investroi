@@ -89,6 +89,10 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
 
   const onSubmit = (data: FormData) => {
     console.log('Form submitted with data:', data);
+    console.log('Form is valid:', isValid);
+    console.log('Selected scenario:', selectedScenario);
+    console.log('Selected mini scenario:', selectedMiniScenario);
+    console.log('Is loading:', isLoading);
     onCalculate(data);
   };
 

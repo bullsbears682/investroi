@@ -95,7 +95,12 @@ const CalculatorPage: React.FC = () => {
   });
 
     const handleCalculate = (formData: any) => {
+    console.log('handleCalculate called with formData:', formData);
+    console.log('selectedScenario:', selectedScenario);
+    console.log('selectedMiniScenario:', selectedMiniScenario);
+    
     if (!selectedScenario || !selectedMiniScenario) {
+      console.log('Missing scenario or mini scenario');
       toast.error('Please select a business scenario and mini scenario');
       return;
     }
