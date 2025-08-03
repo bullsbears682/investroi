@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, LineChart, TrendingUp, TrendingDown, Activity, Globe, Users, DollarSign } from 'lucide-react';
 import { api } from '../services/api';
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as RechartsLineChart, Line } from 'recharts';
+
 
 interface MarketAnalysisProps {
   scenarioId: number;
@@ -14,14 +14,130 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
   scenarioId,
   countryCode
 }) => {
-  const { data: marketData, isLoading } = useQuery({
-    queryKey: ['market-analysis', scenarioId, countryCode],
-    queryFn: () => api.get(`/api/roi/market-analysis/${scenarioId}`, {
-      params: { country_code: countryCode }
-    }),
-    enabled: scenarioId > 0,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
+  // Mock market analysis data based on scenario
+  const getMarketData = () => {
+    const marketData = {
+      1: { // E-commerce
+        market_size: 4.2,
+        growth_rate: 12.5,
+        competition_level: 'High',
+        market_trends: [
+          { period: 'Q1', value: 100, direction: 'up' },
+          { period: 'Q2', value: 115, direction: 'up' },
+          { period: 'Q3', value: 130, direction: 'up' },
+          { period: 'Q4', value: 145, direction: 'up' }
+        ],
+        key_players: [
+          { name: 'Amazon', market_share: 45, strength_score: 0.9 },
+          { name: 'Shopify', market_share: 25, strength_score: 0.8 },
+          { name: 'WooCommerce', market_share: 15, strength_score: 0.7 },
+          { name: 'Others', market_share: 15, strength_score: 0.5 }
+        ],
+        opportunities: ['Mobile Commerce Growth', 'AI-Powered Personalization', 'Cross-Border Expansion'],
+        threats: ['Platform Dependencies', 'Regulatory Changes', 'Cybersecurity Risks']
+      },
+      2: { // SaaS
+        market_size: 195.2,
+        growth_rate: 18.7,
+        competition_level: 'Medium',
+        market_trends: [
+          { period: 'Q1', value: 100, direction: 'up' },
+          { period: 'Q2', value: 120, direction: 'up' },
+          { period: 'Q3', value: 140, direction: 'up' },
+          { period: 'Q4', value: 165, direction: 'up' }
+        ],
+        key_players: [
+          { name: 'Microsoft', market_share: 35, strength_score: 0.9 },
+          { name: 'Salesforce', market_share: 20, strength_score: 0.8 },
+          { name: 'Adobe', market_share: 15, strength_score: 0.8 },
+          { name: 'Others', market_share: 30, strength_score: 0.6 }
+        ],
+        opportunities: ['Cloud Migration', 'AI Integration', 'Industry-Specific Solutions'],
+        threats: ['Data Privacy Regulations', 'Open Source Competition', 'Economic Downturns']
+      },
+      3: { // Freelancer
+        market_size: 1.2,
+        growth_rate: 8.3,
+        competition_level: 'Medium',
+        market_trends: [
+          { period: 'Q1', value: 100, direction: 'up' },
+          { period: 'Q2', value: 108, direction: 'up' },
+          { period: 'Q3', value: 115, direction: 'up' },
+          { period: 'Q4', value: 122, direction: 'up' }
+        ],
+        key_players: [
+          { name: 'Upwork', market_share: 40, strength_score: 0.8 },
+          { name: 'Fiverr', market_share: 25, strength_score: 0.7 },
+          { name: 'Freelancer.com', market_share: 15, strength_score: 0.6 },
+          { name: 'Others', market_share: 20, strength_score: 0.5 }
+        ],
+        opportunities: ['Remote Work Growth', 'Specialized Skills Demand', 'Global Market Access'],
+        threats: ['Platform Fees', 'Competition from Agencies', 'Economic Uncertainty']
+      },
+      4: { // Agency
+        market_size: 63.1,
+        growth_rate: 6.8,
+        competition_level: 'High',
+        market_trends: [
+          { period: 'Q1', value: 100, direction: 'up' },
+          { period: 'Q2', value: 105, direction: 'up' },
+          { period: 'Q3', value: 110, direction: 'up' },
+          { period: 'Q4', value: 115, direction: 'up' }
+        ],
+        key_players: [
+          { name: 'WPP Group', market_share: 15, strength_score: 0.9 },
+          { name: 'Omnicom', market_share: 12, strength_score: 0.8 },
+          { name: 'Publicis', market_share: 10, strength_score: 0.8 },
+          { name: 'Others', market_share: 63, strength_score: 0.6 }
+        ],
+        opportunities: ['Digital Transformation', 'Data-Driven Marketing', 'Creative Technology'],
+        threats: ['In-House Competition', 'Economic Downturns', 'Talent Shortage']
+      },
+      5: { // Startup
+        market_size: 3.8,
+        growth_rate: 22.1,
+        competition_level: 'Medium',
+        market_trends: [
+          { period: 'Q1', value: 100, direction: 'up' },
+          { period: 'Q2', value: 125, direction: 'up' },
+          { period: 'Q3', value: 150, direction: 'up' },
+          { period: 'Q4', value: 175, direction: 'up' }
+        ],
+        key_players: [
+          { name: 'Tech Giants', market_share: 30, strength_score: 0.9 },
+          { name: 'VC-Backed', market_share: 40, strength_score: 0.8 },
+          { name: 'Bootstrap', market_share: 20, strength_score: 0.6 },
+          { name: 'Others', market_share: 10, strength_score: 0.5 }
+        ],
+        opportunities: ['Innovation Funding', 'Market Disruption', 'Global Expansion'],
+        threats: ['Funding Challenges', 'Market Saturation', 'Regulatory Hurdles']
+      }
+    };
+    
+    const defaultMarket = {
+      market_size: 10.0,
+      growth_rate: 10.0,
+      competition_level: 'Medium',
+      market_trends: [
+        { period: 'Q1', value: 100, direction: 'up' },
+        { period: 'Q2', value: 110, direction: 'up' },
+        { period: 'Q3', value: 120, direction: 'up' },
+        { period: 'Q4', value: 130, direction: 'up' }
+      ],
+      key_players: [
+        { name: 'Market Leaders', market_share: 40, strength_score: 0.8 },
+        { name: 'Established Players', market_share: 35, strength_score: 0.7 },
+        { name: 'Emerging Companies', market_share: 25, strength_score: 0.6 }
+      ],
+      opportunities: ['Market Growth', 'Technology Adoption', 'Global Expansion'],
+      threats: ['Economic Uncertainty', 'Regulatory Changes', 'Competition']
+    };
+    
+    return marketData[scenarioId as keyof typeof marketData] || defaultMarket;
+  };
+
+  const marketData = { data: getMarketData() };
+  const isLoading = false;
 
 
 

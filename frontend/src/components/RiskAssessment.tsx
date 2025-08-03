@@ -18,14 +18,74 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({
   // Mock risk assessment data based on scenario
   const getRiskData = () => {
     const riskLevels = {
-      1: { level: 'Medium', score: 0.45, factors: ['Market Competition', 'Initial Setup Costs', 'Customer Acquisition'] },
-      2: { level: 'High', score: 0.75, factors: ['Technology Dependencies', 'Market Saturation', 'High Development Costs'] },
-      3: { level: 'Low', score: 0.25, factors: ['Low Barrier to Entry', 'Flexible Schedule', 'Minimal Overhead'] },
-      4: { level: 'Medium', score: 0.55, factors: ['Client Dependencies', 'Service Quality Standards', 'Team Management'] },
-      5: { level: 'High', score: 0.80, factors: ['Market Validation', 'Funding Requirements', 'Competitive Landscape'] }
+      1: { 
+        level: 'Medium', 
+        score: 0.45, 
+        factors: {
+          'Market Competition': 0.6,
+          'Initial Setup Costs': 0.4,
+          'Customer Acquisition': 0.5,
+          'Technology Dependencies': 0.3,
+          'Regulatory Compliance': 0.4
+        }
+      },
+      2: { 
+        level: 'High', 
+        score: 0.75, 
+        factors: {
+          'Technology Dependencies': 0.8,
+          'Market Saturation': 0.7,
+          'High Development Costs': 0.9,
+          'Competitive Pressure': 0.8,
+          'Market Validation': 0.6
+        }
+      },
+      3: { 
+        level: 'Low', 
+        score: 0.25, 
+        factors: {
+          'Low Barrier to Entry': 0.2,
+          'Flexible Schedule': 0.1,
+          'Minimal Overhead': 0.3,
+          'Market Demand': 0.4,
+          'Skill Requirements': 0.2
+        }
+      },
+      4: { 
+        level: 'Medium', 
+        score: 0.55, 
+        factors: {
+          'Client Dependencies': 0.6,
+          'Service Quality Standards': 0.5,
+          'Team Management': 0.4,
+          'Market Competition': 0.7,
+          'Project Timeline': 0.5
+        }
+      },
+      5: { 
+        level: 'High', 
+        score: 0.80, 
+        factors: {
+          'Market Validation': 0.9,
+          'Funding Requirements': 0.8,
+          'Competitive Landscape': 0.7,
+          'Technology Risk': 0.8,
+          'Market Timing': 0.6
+        }
+      }
     };
     
-    const defaultRisk = { level: 'Medium', score: 0.50, factors: ['Market Conditions', 'Investment Size', 'Industry Trends'] };
+    const defaultRisk = { 
+      level: 'Medium', 
+      score: 0.50, 
+      factors: {
+        'Market Conditions': 0.5,
+        'Investment Size': 0.4,
+        'Industry Trends': 0.6,
+        'Economic Factors': 0.3,
+        'Regulatory Environment': 0.4
+      }
+    };
     return riskLevels[scenarioId as keyof typeof riskLevels] || defaultRisk;
   };
 
@@ -77,7 +137,10 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({
     );
   }
 
-  const { risk_factors, overall_risk_score, risk_level } = riskData.data;
+  const { factors, score, level } = riskData.data;
+  const risk_factors = factors;
+  const overall_risk_score = score;
+  const risk_level = level;
 
   return (
     <div className="space-y-6">
