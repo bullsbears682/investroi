@@ -242,7 +242,7 @@ const CalculatorPage: React.FC = () => {
                 Results
               </h2>
               
-              <ResultsDisplay result={calculationResult} />
+              <ResultsDisplay result={calculationResult?.data || calculationResult} />
             </div>
           )}
 
@@ -256,8 +256,8 @@ const CalculatorPage: React.FC = () => {
               
               <RiskAssessment
                 scenarioId={selectedScenario}
-                investmentAmount={calculationResult?.initial_investment || 0}
-                countryCode={calculationResult?.country_code || 'US'}
+                investmentAmount={calculationResult?.data?.initial_investment || 0}
+                countryCode={calculationResult?.data?.country_code || 'US'}
               />
             </div>
           )}
@@ -272,7 +272,7 @@ const CalculatorPage: React.FC = () => {
               
               <MarketAnalysis 
                 scenarioId={selectedScenario} 
-                countryCode={calculationResult?.country_code || 'US'}
+                countryCode={calculationResult?.data?.country_code || 'US'}
               />
             </div>
           )}
