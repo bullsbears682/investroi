@@ -8,6 +8,7 @@ import {
   DollarSign, 
   Globe, 
   Shield, 
+  BarChart3,
   Target,
   AlertTriangle,
   CheckCircle
@@ -19,6 +20,7 @@ import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
+import MarketAnalysis from '../components/MarketAnalysis';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -98,15 +100,24 @@ const CalculatorPage: React.FC = () => {
         return;
       }
 
-      // Simple calculation without complex data structures
+      // Realistic calculation using actual scenario data
+      const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
+      const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
+      
+      if (!selectedScenarioData || !selectedMiniScenarioData) {
+        toast.error('Unable to calculate ROI - missing scenario data');
+        return;
+      }
+      
       const initialInvestment = Number(formData.initial_investment) || 0;
       const additionalCosts = Number(formData.additional_costs) || 0;
       const totalInvestment = initialInvestment + additionalCosts;
       
-      // Use a simple ROI calculation
-      const roiPercentage = 25; // Fixed 25% ROI for testing
-      const expectedReturn = totalInvestment * (roiPercentage / 100);
+      // Use realistic ROI calculation from scenario data
+      const avgROI = (selectedMiniScenarioData.typical_roi_min + selectedMiniScenarioData.typical_roi_max) / 2;
+      const expectedReturn = totalInvestment * (avgROI / 100);
       const netProfit = expectedReturn - totalInvestment;
+      const roiPercentage = (netProfit / totalInvestment) * 100;
       
       const result = {
         data: {
@@ -117,9 +128,9 @@ const CalculatorPage: React.FC = () => {
           initial_investment: initialInvestment,
           additional_costs: additionalCosts,
           annualized_roi: roiPercentage,
-          scenario_name: 'Test Scenario',
-          mini_scenario_name: 'Test Mini Scenario',
-          calculation_method: 'simple'
+          scenario_name: selectedScenarioData.name,
+          mini_scenario_name: selectedMiniScenarioData.name,
+          calculation_method: 'realistic'
         }
       };
       
@@ -243,17 +254,34 @@ const CalculatorPage: React.FC = () => {
             </div>
           )}
 
-          {/* Simple Results Only */}
-          {calculationResult && (
+          {/* Risk Assessment */}
+          {selectedScenario && (
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2" />
                 Risk Assessment
               </h2>
               
-              <div className="text-white">
-                <p>Risk assessment would go here</p>
-              </div>
+              <RiskAssessment
+                scenarioId={selectedScenario}
+                investmentAmount={calculationResult?.data?.initial_investment || 0}
+                countryCode={calculationResult?.data?.country_code || 'US'}
+              />
+            </div>
+          )}
+
+          {/* Market Analysis */}
+          {selectedScenario && (
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2" />
+                Market Analysis
+              </h2>
+              
+              <MarketAnalysis 
+                scenarioId={selectedScenario} 
+                countryCode={calculationResult?.data?.country_code || 'US'}
+              />
             </div>
           )}
         </motion.div>
