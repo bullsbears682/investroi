@@ -3,9 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
   DollarSign, 
- 
   Clock, 
-  Shield,
   TrendingDown,
   CheckCircle,
   AlertTriangle,
@@ -38,34 +36,24 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     return 'text-red-400';
   };
 
-  const getRiskColor = (riskScore: number) => {
-    if (riskScore < 0.3) return 'text-green-400';
-    if (riskScore < 0.6) return 'text-yellow-400';
-    return 'text-red-400';
-  };
 
-  const getRiskLevel = (riskScore: number) => {
-    if (riskScore < 0.3) return 'Low';
-    if (riskScore < 0.6) return 'Medium';
-    return 'High';
-  };
 
   // Chart data for investment breakdown
   const chartData = [
     {
       name: 'Initial Investment',
-      value: result.initial_investment,
+      value: result.initial_investment || 0,
       color: '#3B82F6'
     },
     {
       name: 'Additional Costs',
-      value: result.additional_costs,
+      value: result.additional_costs || 0,
       color: '#8B5CF6'
     },
     {
       name: 'Net Profit',
-      value: Math.max(0, result.net_profit),
-      color: result.net_profit >= 0 ? '#10B981' : '#EF4444'
+      value: Math.max(0, result.net_profit || 0),
+      color: (result.net_profit || 0) >= 0 ? '#10B981' : '#EF4444'
     }
   ];
 
@@ -94,11 +82,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <TrendingUp className="w-5 h-5 mr-2" />
             <span className="text-white/70 text-sm font-medium">ROI Percentage</span>
           </div>
-          <div className={`text-2xl font-bold ${getROIColor(result.roi_percentage)}`}>
-            {formatPercentage(result.roi_percentage)}
+          <div className={`text-2xl font-bold ${getROIColor(result.roi_percentage || 0)}`}>
+            {formatPercentage(result.roi_percentage || 0)}
           </div>
           <div className="text-white/60 text-xs mt-1">
-            {result.roi_percentage >= 0 ? 'Positive Return' : 'Negative Return'}
+            {(result.roi_percentage || 0) >= 0 ? 'Positive Return' : 'Negative Return'}
           </div>
         </motion.div>
 
@@ -112,11 +100,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <DollarSign className="w-5 h-5 mr-2" />
             <span className="text-white/70 text-sm font-medium">Net Profit</span>
           </div>
-          <div className={`text-2xl font-bold ${result.net_profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            {formatCurrency(result.net_profit)}
+          <div className={`text-2xl font-bold ${(result.net_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            {formatCurrency(result.net_profit || 0)}
           </div>
           <div className="text-white/60 text-xs mt-1">
-            {result.net_profit >= 0 ? 'Profit' : 'Loss'}
+            {(result.net_profit || 0) >= 0 ? 'Profit' : 'Loss'}
           </div>
         </motion.div>
 
@@ -130,8 +118,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <Clock className="w-5 h-5 mr-2" />
             <span className="text-white/70 text-sm font-medium">Annualized ROI</span>
           </div>
-          <div className={`text-xl font-bold ${getROIColor(result.annualized_roi)}`}>
-            {formatPercentage(result.annualized_roi)}
+          <div className={`text-xl font-bold ${getROIColor(result.annualized_roi || 0)}`}>
+            {formatPercentage(result.annualized_roi || 0)}
           </div>
           <div className="text-white/60 text-xs mt-1">
             Per Year
@@ -145,14 +133,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 text-center"
         >
           <div className="flex items-center justify-center mb-2">
-            <Shield className="w-5 h-5 mr-2" />
-            <span className="text-white/70 text-sm font-medium">Risk Score</span>
+            <DollarSign className="w-5 h-5 mr-2" />
+            <span className="text-white/70 text-sm font-medium">Total Investment</span>
           </div>
-          <div className={`text-xl font-bold ${getRiskColor(result.risk_score)}`}>
-            {getRiskLevel(result.risk_score)}
+          <div className="text-xl font-bold text-blue-400">
+            {formatCurrency(result.total_investment || 0)}
           </div>
           <div className="text-white/60 text-xs mt-1">
-            {(result.risk_score * 100).toFixed(0)}% Risk
+            Initial + Additional Costs
           </div>
         </motion.div>
       </div>
