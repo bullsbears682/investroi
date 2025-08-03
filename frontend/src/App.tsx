@@ -35,7 +35,10 @@ const queryClient = new QueryClient({
 function App() {
   const { isLoading } = useAppStore();
 
+  console.log('App rendering, isLoading:', isLoading);
+
   if (isLoading) {
+    console.log('Showing loading screen');
     return <LoadingScreen />;
   }
 
