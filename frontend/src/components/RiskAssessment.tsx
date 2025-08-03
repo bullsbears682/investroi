@@ -15,17 +15,22 @@ const RiskAssessment: React.FC<RiskAssessmentProps> = ({
   investmentAmount,
   countryCode
 }) => {
-  const { data: riskData, isLoading } = useQuery({
-    queryKey: ['risk-assessment', scenarioId, investmentAmount, countryCode],
-    queryFn: () => api.get(`/api/roi/risk-assessment/${scenarioId}`, {
-      params: {
-        investment_amount: investmentAmount,
-        country_code: countryCode
-      }
-    }),
-    enabled: scenarioId > 0 && investmentAmount > 0,
-    staleTime: 5 * 60 * 1000,
-  });
+  // Mock risk assessment data based on scenario
+  const getRiskData = () => {
+    const riskLevels = {
+      1: { level: 'Medium', score: 0.45, factors: ['Market Competition', 'Initial Setup Costs', 'Customer Acquisition'] },
+      2: { level: 'High', score: 0.75, factors: ['Technology Dependencies', 'Market Saturation', 'High Development Costs'] },
+      3: { level: 'Low', score: 0.25, factors: ['Low Barrier to Entry', 'Flexible Schedule', 'Minimal Overhead'] },
+      4: { level: 'Medium', score: 0.55, factors: ['Client Dependencies', 'Service Quality Standards', 'Team Management'] },
+      5: { level: 'High', score: 0.80, factors: ['Market Validation', 'Funding Requirements', 'Competitive Landscape'] }
+    };
+    
+    const defaultRisk = { level: 'Medium', score: 0.50, factors: ['Market Conditions', 'Investment Size', 'Industry Trends'] };
+    return riskLevels[scenarioId as keyof typeof riskLevels] || defaultRisk;
+  };
+
+  const riskData = { data: getRiskData() };
+  const isLoading = false;
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
