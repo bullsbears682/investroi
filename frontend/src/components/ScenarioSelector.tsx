@@ -116,7 +116,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
             onClick={() => setIsScenarioOpen(!isScenarioOpen)}
             className={`w-full backdrop-blur-lg border-2 rounded-xl px-4 py-4 text-left text-white flex items-center justify-between hover:bg-white/15 transition-all duration-300 ${
               selectedScenario 
-                ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-400 shadow-xl shadow-blue-500/30 ring-2 ring-blue-400/20' 
+                ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-400 shadow-xl shadow-blue-500/30' 
                 : 'bg-white/10 border-white/20'
             }`}
           >
@@ -226,7 +226,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                           }}
                           className={`w-full text-left p-3 rounded-xl transition-all duration-300 group border-2 ${
                             isSelected 
-                              ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-400 shadow-xl shadow-blue-500/30 ring-2 ring-blue-400/20' 
+                              ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-400 shadow-xl shadow-blue-500/30' 
                               : 'hover:bg-white/15 border-transparent hover:border-white/20'
                           }`}
                         >
@@ -235,7 +235,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                               <div className="flex items-start space-x-3">
                                 <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
                                   isSelected 
-                                    ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
+                                    ? 'bg-blue-500/20' 
                                     : 'bg-white/10'
                                 }`}>
                                   <Building2 className={`w-4 h-4 transition-colors ${
@@ -273,12 +273,12 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                   </p>
                                   <div className="flex items-center space-x-2">
                                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${getRiskColor(scenario.risk_level)} ${
-                                      isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
+                                      isSelected ? 'shadow-lg' : ''
                                     }`}>
                                       {scenario.risk_level} Risk
                                     </span>
                                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${getMarketSizeColor(scenario.market_size)} ${
-                                      isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
+                                      isSelected ? 'shadow-lg' : ''
                                     }`}>
                                       {scenario.market_size} Market
                                     </span>
