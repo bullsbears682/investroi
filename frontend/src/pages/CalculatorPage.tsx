@@ -100,14 +100,7 @@ const CalculatorPage: React.FC = () => {
       return;
     }
 
-    const calculationData = {
-      ...formData,
-      business_scenario_id: selectedScenario,
-      mini_scenario_id: selectedMiniScenario,
-      session_id: sessionId,
-    };
-
-    // Use immediate fallback calculation for now
+    // Use immediate local calculation
     const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
     const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
     
