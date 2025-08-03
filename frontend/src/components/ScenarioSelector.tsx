@@ -141,7 +141,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                     }
                   </span>
                   {selectedScenario && (
-                    <span className="text-xs font-medium text-white/60">
+                    <span className="text-xs font-medium text-white/60 flex-shrink-0">
                       {formatCurrency(scenarios.find(s => s.id === selectedScenario)?.recommended_investment_min || 0)} - {formatCurrency(scenarios.find(s => s.id === selectedScenario)?.recommended_investment_max || 0)}
                     </span>
                   )}
@@ -159,7 +159,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   <motion.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-blue-200/90 text-xs font-medium truncate leading-relaxed text-white/80"
+                    className="text-blue-200/90 text-xs font-medium leading-relaxed"
                   >
                     {scenarios.find(s => s.id === selectedScenario)?.description}
                   </motion.div>
@@ -251,7 +251,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                     }`}>
                                       {scenario.name}
                                     </h3>
-                                    <span className={`text-xs font-medium transition-colors ${
+                                    <span className={`text-xs font-medium transition-colors flex-shrink-0 ${
                                       isSelected ? 'text-blue-200/80' : 'text-white/60'
                                     }`}>
                                       {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
