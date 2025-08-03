@@ -121,14 +121,20 @@ const CalculatorPage: React.FC = () => {
           expected_return: expectedReturn,
           net_profit: netProfit,
           total_investment: totalInvestment,
+          initial_investment: initialInvestment,
+          additional_costs: additionalCosts,
+          annualized_roi: roiPercentage, // Use same as ROI for now
           scenario_name: selectedScenarioData.name,
           mini_scenario_name: selectedMiniScenarioData.name,
           calculation_method: 'local'
         }
       };
       
+      console.log('Setting calculation result:', result);
       setCalculationResult(result);
+      console.log('Calculation result set, showing toast');
       toast.success('ROI calculation completed!');
+      console.log('Toast shown');
     } else {
       toast.error('Unable to calculate ROI - missing scenario data');
     }
