@@ -23,6 +23,7 @@ import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
 import PDFExport from '../components/PDFExport';
+import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
 const CalculatorPage: React.FC = () => {
   const { sessionId } = useAppStore();
@@ -30,17 +31,33 @@ const CalculatorPage: React.FC = () => {
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
 
-  // Fetch business scenarios
+  // Fetch business scenarios with fallback to mock data
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
     queryKey: ['scenarios'],
-    queryFn: () => api.get('/api/roi/scenarios'),
+    queryFn: async () => {
+      try {
+        const response = await api.get('/api/roi/scenarios');
+        return response;
+      } catch (error) {
+        console.log('Using mock scenarios due to API error');
+        return { data: mockScenarios };
+      }
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch mini scenarios when a scenario is selected
+  // Fetch mini scenarios when a scenario is selected with fallback to mock data
   const { data: miniScenarios, isLoading: miniScenariosLoading } = useQuery({
     queryKey: ['mini-scenarios', selectedScenario],
-    queryFn: () => api.get(`/api/roi/scenarios/${selectedScenario}/mini-scenarios`),
+    queryFn: async () => {
+      try {
+        const response = await api.get(`/api/roi/scenarios/${selectedScenario}/mini-scenarios`);
+        return response;
+      } catch (error) {
+        console.log('Using mock mini scenarios due to API error');
+        return { data: mockMiniScenarios[selectedScenario!] || [] };
+      }
+    },
     enabled: !!selectedScenario,
     staleTime: 5 * 60 * 1000,
   });
@@ -72,6 +89,10 @@ const CalculatorPage: React.FC = () => {
 
     calculateMutation.mutate(calculationData);
   };
+
+  // Use scenarios data with fallback
+  const scenariosData = scenarios?.data || mockScenarios;
+  const miniScenariosData = miniScenarios?.data || [];
 
   return (
     <div className="min-h-screen">
@@ -109,8 +130,8 @@ const CalculatorPage: React.FC = () => {
             </h2>
             
             <ScenarioSelector
-              scenarios={scenarios?.data || []}
-              miniScenarios={miniScenarios?.data || []}
+              scenarios={scenariosData}
+              miniScenarios={miniScenariosData}
               selectedScenario={selectedScenario}
               selectedMiniScenario={selectedMiniScenario}
               onScenarioSelect={setSelectedScenario}
