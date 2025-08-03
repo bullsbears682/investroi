@@ -3,9 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+# Optional dotenv import to prevent deployment failures
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("Warning: python-dotenv not installed, using system environment variables")
+    def load_dotenv():
+        pass
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
