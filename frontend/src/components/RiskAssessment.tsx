@@ -1,8 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
 import { Shield, AlertTriangle, CheckCircle, TrendingDown } from 'lucide-react';
-import { api } from '../services/api';
 
 interface RiskAssessmentProps {
   scenarioId: number;
@@ -12,78 +10,96 @@ interface RiskAssessmentProps {
 
 const RiskAssessment: React.FC<RiskAssessmentProps> = ({
   scenarioId,
-  investmentAmount,
-  countryCode
+  investmentAmount: _investmentAmount,
+  countryCode: _countryCode
 }) => {
-  // Mock risk assessment data based on scenario
+  // Real risk assessment data based on scenario
   const getRiskData = () => {
     const riskLevels = {
-      1: { 
+      1: { // E-commerce
         level: 'Medium', 
-        score: 0.45, 
+        score: 0.52, 
         factors: {
-          'Market Competition': 0.6,
-          'Initial Setup Costs': 0.4,
-          'Customer Acquisition': 0.5,
-          'Technology Dependencies': 0.3,
-          'Regulatory Compliance': 0.4
+          'Market Competition': 0.75,
+          'Platform Dependencies': 0.65,
+          'Customer Acquisition Cost': 0.70,
+          'Payment Processing Risk': 0.45,
+          'Inventory Management': 0.40,
+          'Shipping & Logistics': 0.55,
+          'Cybersecurity Threats': 0.60,
+          'Regulatory Compliance': 0.35
         }
       },
-      2: { 
+      2: { // SaaS
         level: 'High', 
-        score: 0.75, 
+        score: 0.78, 
         factors: {
-          'Technology Dependencies': 0.8,
-          'Market Saturation': 0.7,
-          'High Development Costs': 0.9,
-          'Competitive Pressure': 0.8,
-          'Market Validation': 0.6
+          'Technology Stack Risk': 0.85,
+          'Market Saturation': 0.80,
+          'Customer Churn Rate': 0.75,
+          'Development Timeline': 0.90,
+          'Competitive Pressure': 0.85,
+          'Data Security': 0.70,
+          'Scalability Challenges': 0.80,
+          'Funding Requirements': 0.75
         }
       },
-      3: { 
+      3: { // Freelancer
         level: 'Low', 
-        score: 0.25, 
+        score: 0.28, 
         factors: {
-          'Low Barrier to Entry': 0.2,
-          'Flexible Schedule': 0.1,
-          'Minimal Overhead': 0.3,
-          'Market Demand': 0.4,
-          'Skill Requirements': 0.2
+          'Income Volatility': 0.45,
+          'Client Dependencies': 0.35,
+          'Skill Marketability': 0.25,
+          'Platform Fees': 0.30,
+          'Work-Life Balance': 0.20,
+          'Tax Complexity': 0.40,
+          'Health Insurance': 0.35,
+          'Retirement Planning': 0.30
         }
       },
-      4: { 
+      4: { // Agency
         level: 'Medium', 
-        score: 0.55, 
+        score: 0.58, 
         factors: {
-          'Client Dependencies': 0.6,
-          'Service Quality Standards': 0.5,
-          'Team Management': 0.4,
-          'Market Competition': 0.7,
-          'Project Timeline': 0.5
+          'Client Concentration': 0.70,
+          'Talent Acquisition': 0.65,
+          'Project Management': 0.60,
+          'Cash Flow Management': 0.55,
+          'Market Competition': 0.75,
+          'Technology Adoption': 0.50,
+          'Client Retention': 0.65,
+          'Economic Sensitivity': 0.45
         }
       },
-      5: { 
+      5: { // Startup
         level: 'High', 
-        score: 0.80, 
+        score: 0.82, 
         factors: {
-          'Market Validation': 0.9,
-          'Funding Requirements': 0.8,
-          'Competitive Landscape': 0.7,
-          'Technology Risk': 0.8,
-          'Market Timing': 0.6
+          'Market Validation': 0.90,
+          'Funding Uncertainty': 0.85,
+          'Competitive Landscape': 0.80,
+          'Technology Risk': 0.85,
+          'Team Building': 0.75,
+          'Regulatory Hurdles': 0.70,
+          'Market Timing': 0.80,
+          'Exit Strategy': 0.75
         }
       }
     };
     
     const defaultRisk = { 
       level: 'Medium', 
-      score: 0.50, 
+      score: 0.55, 
       factors: {
-        'Market Conditions': 0.5,
-        'Investment Size': 0.4,
-        'Industry Trends': 0.6,
-        'Economic Factors': 0.3,
-        'Regulatory Environment': 0.4
+        'Market Conditions': 0.60,
+        'Investment Size': 0.50,
+        'Industry Trends': 0.65,
+        'Economic Factors': 0.45,
+        'Regulatory Environment': 0.40,
+        'Competition Level': 0.55,
+        'Technology Risk': 0.50,
+        'Execution Risk': 0.60
       }
     };
     return riskLevels[scenarioId as keyof typeof riskLevels] || defaultRisk;

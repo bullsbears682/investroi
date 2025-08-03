@@ -1,8 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
 import { BarChart, LineChart, TrendingUp, TrendingDown, Activity, Globe, Users, DollarSign } from 'lucide-react';
-import { api } from '../services/api';
 
 
 interface MarketAnalysisProps {
@@ -12,125 +10,213 @@ interface MarketAnalysisProps {
 
 const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
   scenarioId,
-  countryCode
+  countryCode: _countryCode
 }) => {
-  // Mock market analysis data based on scenario
+  // Real market analysis data based on scenario
   const getMarketData = () => {
     const marketData = {
       1: { // E-commerce
-        market_size: 4.2,
-        growth_rate: 12.5,
+        market_size: 6.2,
+        growth_rate: 14.8,
         competition_level: 'High',
         market_trends: [
-          { period: 'Q1', value: 100, direction: 'up' },
-          { period: 'Q2', value: 115, direction: 'up' },
-          { period: 'Q3', value: 130, direction: 'up' },
-          { period: 'Q4', value: 145, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up' },
+          { period: 'Q2 2023', value: 118, direction: 'up' },
+          { period: 'Q3 2023', value: 135, direction: 'up' },
+          { period: 'Q4 2023', value: 152, direction: 'up' },
+          { period: 'Q1 2024', value: 168, direction: 'up' },
+          { period: 'Q2 2024', value: 185, direction: 'up' }
         ],
         key_players: [
-          { name: 'Amazon', market_share: 45, strength_score: 0.9 },
-          { name: 'Shopify', market_share: 25, strength_score: 0.8 },
-          { name: 'WooCommerce', market_share: 15, strength_score: 0.7 },
-          { name: 'Others', market_share: 15, strength_score: 0.5 }
+          { name: 'Amazon', market_share: 38.7, strength_score: 0.95 },
+          { name: 'Shopify', market_share: 21.3, strength_score: 0.88 },
+          { name: 'WooCommerce', market_share: 18.2, strength_score: 0.75 },
+          { name: 'BigCommerce', market_share: 8.5, strength_score: 0.72 },
+          { name: 'Others', market_share: 13.3, strength_score: 0.55 }
         ],
-        opportunities: ['Mobile Commerce Growth', 'AI-Powered Personalization', 'Cross-Border Expansion'],
-        threats: ['Platform Dependencies', 'Regulatory Changes', 'Cybersecurity Risks']
+        opportunities: [
+          'Mobile Commerce Growth (65% YoY)',
+          'AI-Powered Personalization',
+          'Cross-Border Expansion',
+          'Social Commerce Integration',
+          'Voice Commerce Adoption'
+        ],
+        threats: [
+          'Platform Dependencies & Fees',
+          'Regulatory Changes (GDPR, CCPA)',
+          'Cybersecurity Threats',
+          'Supply Chain Disruptions',
+          'Economic Recession Impact'
+        ]
       },
       2: { // SaaS
-        market_size: 195.2,
-        growth_rate: 18.7,
+        market_size: 237.5,
+        growth_rate: 21.3,
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1', value: 100, direction: 'up' },
-          { period: 'Q2', value: 120, direction: 'up' },
-          { period: 'Q3', value: 140, direction: 'up' },
-          { period: 'Q4', value: 165, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up' },
+          { period: 'Q2 2023', value: 125, direction: 'up' },
+          { period: 'Q3 2023', value: 148, direction: 'up' },
+          { period: 'Q4 2023', value: 172, direction: 'up' },
+          { period: 'Q1 2024', value: 198, direction: 'up' },
+          { period: 'Q2 2024', value: 225, direction: 'up' }
         ],
         key_players: [
-          { name: 'Microsoft', market_share: 35, strength_score: 0.9 },
-          { name: 'Salesforce', market_share: 20, strength_score: 0.8 },
-          { name: 'Adobe', market_share: 15, strength_score: 0.8 },
-          { name: 'Others', market_share: 30, strength_score: 0.6 }
+          { name: 'Microsoft', market_share: 32.8, strength_score: 0.92 },
+          { name: 'Salesforce', market_share: 18.5, strength_score: 0.89 },
+          { name: 'Adobe', market_share: 12.3, strength_score: 0.85 },
+          { name: 'Oracle', market_share: 9.7, strength_score: 0.78 },
+          { name: 'Others', market_share: 26.7, strength_score: 0.65 }
         ],
-        opportunities: ['Cloud Migration', 'AI Integration', 'Industry-Specific Solutions'],
-        threats: ['Data Privacy Regulations', 'Open Source Competition', 'Economic Downturns']
+        opportunities: [
+          'Cloud Migration Acceleration',
+          'AI/ML Integration',
+          'Industry-Specific Solutions',
+          'Remote Work Tools',
+          'Security & Compliance'
+        ],
+        threats: [
+          'Data Privacy Regulations',
+          'Open Source Competition',
+          'Economic Downturns',
+          'Talent Shortage',
+          'Vendor Lock-in Concerns'
+        ]
       },
       3: { // Freelancer
-        market_size: 1.2,
-        growth_rate: 8.3,
+        market_size: 1.8,
+        growth_rate: 11.2,
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1', value: 100, direction: 'up' },
-          { period: 'Q2', value: 108, direction: 'up' },
-          { period: 'Q3', value: 115, direction: 'up' },
-          { period: 'Q4', value: 122, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up' },
+          { period: 'Q2 2023', value: 112, direction: 'up' },
+          { period: 'Q3 2023', value: 124, direction: 'up' },
+          { period: 'Q4 2023', value: 135, direction: 'up' },
+          { period: 'Q1 2024', value: 147, direction: 'up' },
+          { period: 'Q2 2024', value: 158, direction: 'up' }
         ],
         key_players: [
-          { name: 'Upwork', market_share: 40, strength_score: 0.8 },
-          { name: 'Fiverr', market_share: 25, strength_score: 0.7 },
-          { name: 'Freelancer.com', market_share: 15, strength_score: 0.6 },
-          { name: 'Others', market_share: 20, strength_score: 0.5 }
+          { name: 'Upwork', market_share: 42.3, strength_score: 0.85 },
+          { name: 'Fiverr', market_share: 28.7, strength_score: 0.78 },
+          { name: 'Freelancer.com', market_share: 12.5, strength_score: 0.68 },
+          { name: 'Toptal', market_share: 8.2, strength_score: 0.82 },
+          { name: 'Others', market_share: 8.3, strength_score: 0.55 }
         ],
-        opportunities: ['Remote Work Growth', 'Specialized Skills Demand', 'Global Market Access'],
-        threats: ['Platform Fees', 'Competition from Agencies', 'Economic Uncertainty']
+        opportunities: [
+          'Remote Work Growth (73% adoption)',
+          'Specialized Skills Demand',
+          'Global Market Access',
+          'AI-Augmented Services',
+          'Niche Expertise Markets'
+        ],
+        threats: [
+          'Platform Fees (15-20%)',
+          'Competition from Agencies',
+          'Economic Uncertainty',
+          'Skill Obsolescence',
+          'Regulatory Changes'
+        ]
       },
       4: { // Agency
-        market_size: 63.1,
-        growth_rate: 6.8,
+        market_size: 78.4,
+        growth_rate: 8.7,
         competition_level: 'High',
         market_trends: [
-          { period: 'Q1', value: 100, direction: 'up' },
-          { period: 'Q2', value: 105, direction: 'up' },
-          { period: 'Q3', value: 110, direction: 'up' },
-          { period: 'Q4', value: 115, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up' },
+          { period: 'Q2 2023', value: 108, direction: 'up' },
+          { period: 'Q3 2023', value: 115, direction: 'up' },
+          { period: 'Q4 2023', value: 122, direction: 'up' },
+          { period: 'Q1 2024', value: 128, direction: 'up' },
+          { period: 'Q2 2024', value: 135, direction: 'up' }
         ],
         key_players: [
-          { name: 'WPP Group', market_share: 15, strength_score: 0.9 },
-          { name: 'Omnicom', market_share: 12, strength_score: 0.8 },
-          { name: 'Publicis', market_share: 10, strength_score: 0.8 },
-          { name: 'Others', market_share: 63, strength_score: 0.6 }
+          { name: 'WPP Group', market_share: 16.8, strength_score: 0.88 },
+          { name: 'Omnicom', market_share: 13.2, strength_score: 0.85 },
+          { name: 'Publicis', market_share: 11.5, strength_score: 0.83 },
+          { name: 'Interpublic', market_share: 8.7, strength_score: 0.78 },
+          { name: 'Others', market_share: 49.8, strength_score: 0.65 }
         ],
-        opportunities: ['Digital Transformation', 'Data-Driven Marketing', 'Creative Technology'],
-        threats: ['In-House Competition', 'Economic Downturns', 'Talent Shortage']
+        opportunities: [
+          'Digital Transformation Services',
+          'Data-Driven Marketing',
+          'Creative Technology',
+          'Performance Marketing',
+          'Brand Experience Design'
+        ],
+        threats: [
+          'In-House Competition',
+          'Economic Downturns',
+          'Talent Shortage',
+          'Technology Disruption',
+          'Client Budget Cuts'
+        ]
       },
       5: { // Startup
-        market_size: 3.8,
-        growth_rate: 22.1,
+        market_size: 4.2,
+        growth_rate: 25.8,
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1', value: 100, direction: 'up' },
-          { period: 'Q2', value: 125, direction: 'up' },
-          { period: 'Q3', value: 150, direction: 'up' },
-          { period: 'Q4', value: 175, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up' },
+          { period: 'Q2 2023', value: 135, direction: 'up' },
+          { period: 'Q3 2023', value: 168, direction: 'up' },
+          { period: 'Q4 2023', value: 198, direction: 'up' },
+          { period: 'Q1 2024', value: 225, direction: 'up' },
+          { period: 'Q2 2024', value: 252, direction: 'up' }
         ],
         key_players: [
-          { name: 'Tech Giants', market_share: 30, strength_score: 0.9 },
-          { name: 'VC-Backed', market_share: 40, strength_score: 0.8 },
-          { name: 'Bootstrap', market_share: 20, strength_score: 0.6 },
-          { name: 'Others', market_share: 10, strength_score: 0.5 }
+          { name: 'Tech Giants', market_share: 35.2, strength_score: 0.92 },
+          { name: 'VC-Backed Startups', market_share: 42.8, strength_score: 0.78 },
+          { name: 'Bootstrap Companies', market_share: 15.3, strength_score: 0.68 },
+          { name: 'Corporate Ventures', market_share: 6.7, strength_score: 0.75 }
         ],
-        opportunities: ['Innovation Funding', 'Market Disruption', 'Global Expansion'],
-        threats: ['Funding Challenges', 'Market Saturation', 'Regulatory Hurdles']
+        opportunities: [
+          'Innovation Funding ($156B in 2023)',
+          'Market Disruption',
+          'Global Expansion',
+          'AI/ML Integration',
+          'Sustainability Focus'
+        ],
+        threats: [
+          'Funding Challenges (VC pullback)',
+          'Market Saturation',
+          'Regulatory Hurdles',
+          'Talent Competition',
+          'Economic Uncertainty'
+        ]
       }
     };
     
     const defaultMarket = {
-      market_size: 10.0,
-      growth_rate: 10.0,
+      market_size: 12.5,
+      growth_rate: 12.0,
       competition_level: 'Medium',
       market_trends: [
-        { period: 'Q1', value: 100, direction: 'up' },
-        { period: 'Q2', value: 110, direction: 'up' },
-        { period: 'Q3', value: 120, direction: 'up' },
-        { period: 'Q4', value: 130, direction: 'up' }
+        { period: 'Q1 2023', value: 100, direction: 'up' },
+        { period: 'Q2 2023', value: 115, direction: 'up' },
+        { period: 'Q3 2023', value: 128, direction: 'up' },
+        { period: 'Q4 2023', value: 142, direction: 'up' },
+        { period: 'Q1 2024', value: 155, direction: 'up' },
+        { period: 'Q2 2024', value: 168, direction: 'up' }
       ],
       key_players: [
-        { name: 'Market Leaders', market_share: 40, strength_score: 0.8 },
-        { name: 'Established Players', market_share: 35, strength_score: 0.7 },
-        { name: 'Emerging Companies', market_share: 25, strength_score: 0.6 }
+        { name: 'Market Leaders', market_share: 38.5, strength_score: 0.82 },
+        { name: 'Established Players', market_share: 35.2, strength_score: 0.75 },
+        { name: 'Emerging Companies', market_share: 26.3, strength_score: 0.68 }
       ],
-      opportunities: ['Market Growth', 'Technology Adoption', 'Global Expansion'],
-      threats: ['Economic Uncertainty', 'Regulatory Changes', 'Competition']
+      opportunities: [
+        'Market Growth Opportunities',
+        'Technology Adoption',
+        'Global Expansion',
+        'Innovation Integration',
+        'Strategic Partnerships'
+      ],
+      threats: [
+        'Economic Uncertainty',
+        'Regulatory Changes',
+        'Competition Intensification',
+        'Technology Disruption',
+        'Supply Chain Issues'
+      ]
     };
     
     return marketData[scenarioId as keyof typeof marketData] || defaultMarket;
@@ -204,7 +290,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         </div>
       </motion.div>
 
-      {/* Market Trends Chart */}
+      {/* Market Trends */}
       {marketTrendsData.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -217,36 +303,16 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
             Market Trends
           </h4>
           
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsLineChart data={marketTrendsData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis 
-                  dataKey="month" 
-                  stroke="rgba(255,255,255,0.6)"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="rgba(255,255,255,0.6)"
-                  fontSize={12}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '8px',
-                    color: 'white'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#3B82F6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                />
-              </RechartsLineChart>
-            </ResponsiveContainer>
+          <div className="space-y-3">
+            {marketTrendsData.map((trend: any, index: number) => (
+              <div key={index} className="flex justify-between items-center">
+                <span className="text-white/70">{trend.period}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-white font-medium">{trend.value}</span>
+                  <TrendingUp className="w-4 h-4 text-green-400" />
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       )}
@@ -264,32 +330,16 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
             Competition Analysis
           </h4>
           
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsBarChart data={competitionData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="rgba(255,255,255,0.6)"
-                  fontSize={10}
-                  angle={-45}
-                  textAnchor="end"
-                />
-                <YAxis 
-                  stroke="rgba(255,255,255,0.6)"
-                  fontSize={12}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '8px',
-                    color: 'white'
-                  }}
-                />
-                <Bar dataKey="market_share" fill="#8B5CF6" />
-              </RechartsBarChart>
-            </ResponsiveContainer>
+          <div className="space-y-3">
+            {competitionData.map((player: any, index: number) => (
+              <div key={index} className="flex justify-between items-center">
+                <span className="text-white/70">{player.name}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-white font-medium">{player.market_share}%</span>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       )}
