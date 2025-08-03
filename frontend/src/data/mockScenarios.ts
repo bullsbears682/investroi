@@ -264,11 +264,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Bulk sales",
       cost_structure: "Inventory management",
       key_success_factors: "Supplier relationships, volume"
+    },
+    {
+      id: 4,
+      name: "Marketplace",
+      description: "Multi-vendor e-commerce platform",
+      recommended_investment_min: 25000,
+      recommended_investment_max: 100000,
+      typical_roi_min: 35,
+      typical_roi_max: 70,
+      risk_level: "High",
+      revenue_model: "Commission + fees",
+      cost_structure: "Platform development",
+      key_success_factors: "Vendor acquisition, user base"
+    },
+    {
+      id: 5,
+      name: "Subscription Commerce",
+      description: "Recurring product delivery service",
+      recommended_investment_min: 8000,
+      recommended_investment_max: 40000,
+      typical_roi_min: 25,
+      typical_roi_max: 50,
+      risk_level: "Medium",
+      revenue_model: "Monthly subscriptions",
+      cost_structure: "Product sourcing + logistics",
+      key_success_factors: "Product curation, retention"
     }
   ],
   2: [ // SaaS
     {
-      id: 4,
+      id: 6,
       name: "B2B SaaS",
       description: "Business-to-business software solution",
       recommended_investment_min: 25000,
@@ -281,7 +307,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Product-market fit, sales"
     },
     {
-      id: 5,
+      id: 7,
       name: "B2C SaaS",
       description: "Consumer-focused software application",
       recommended_investment_min: 15000,
@@ -294,7 +320,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "User acquisition, retention"
     },
     {
-      id: 6,
+      id: 8,
       name: "API Service",
       description: "Backend API and infrastructure service",
       recommended_investment_min: 20000,
@@ -305,11 +331,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Usage-based pricing",
       cost_structure: "Infrastructure costs",
       key_success_factors: "Reliability, scalability"
+    },
+    {
+      id: 9,
+      name: "Enterprise SaaS",
+      description: "Large-scale enterprise software solution",
+      recommended_investment_min: 50000,
+      recommended_investment_max: 200000,
+      typical_roi_min: 50,
+      typical_roi_max: 100,
+      risk_level: "Very High",
+      revenue_model: "Enterprise licensing",
+      cost_structure: "Development + sales",
+      key_success_factors: "Enterprise sales, compliance"
+    },
+    {
+      id: 10,
+      name: "Vertical SaaS",
+      description: "Industry-specific software solution",
+      recommended_investment_min: 30000,
+      recommended_investment_max: 120000,
+      typical_roi_min: 45,
+      typical_roi_max: 90,
+      risk_level: "High",
+      revenue_model: "Industry-specific pricing",
+      cost_structure: "Domain expertise + development",
+      key_success_factors: "Industry knowledge, relationships"
     }
   ],
   3: [ // Freelancer
     {
-      id: 7,
+      id: 11,
       name: "Digital Marketing",
       description: "SEO, PPC, and social media services",
       recommended_investment_min: 1000,
@@ -322,7 +374,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Client relationships, results"
     },
     {
-      id: 8,
+      id: 12,
       name: "Web Development",
       description: "Custom website and application development",
       recommended_investment_min: 2000,
@@ -335,7 +387,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Technical skills, portfolio"
     },
     {
-      id: 9,
+      id: 13,
       name: "Content Creation",
       description: "Writing, design, and multimedia content",
       recommended_investment_min: 500,
@@ -346,11 +398,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Per-project fees",
       cost_structure: "Creative tools",
       key_success_factors: "Portfolio, client network"
+    },
+    {
+      id: 14,
+      name: "Virtual Assistant",
+      description: "Remote administrative and support services",
+      recommended_investment_min: 300,
+      recommended_investment_max: 3000,
+      typical_roi_min: 15,
+      typical_roi_max: 35,
+      risk_level: "Low",
+      revenue_model: "Hourly rates",
+      cost_structure: "Time + tools",
+      key_success_factors: "Reliability, communication"
+    },
+    {
+      id: 15,
+      name: "Consulting",
+      description: "Specialized business consulting services",
+      recommended_investment_min: 2000,
+      recommended_investment_max: 20000,
+      typical_roi_min: 35,
+      typical_roi_max: 65,
+      risk_level: "Low",
+      revenue_model: "Hourly + project fees",
+      cost_structure: "Expertise + travel",
+      key_success_factors: "Expertise, reputation"
     }
   ],
   4: [ // Agency
     {
-      id: 10,
+      id: 16,
       name: "Full-Service Agency",
       description: "Complete marketing and creative services",
       recommended_investment_min: 25000,
@@ -363,7 +441,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Client retention, service quality"
     },
     {
-      id: 11,
+      id: 17,
       name: "Specialized Agency",
       description: "Niche-focused agency services",
       recommended_investment_min: 15000,
@@ -376,7 +454,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Expertise, reputation"
     },
     {
-      id: 12,
+      id: 18,
       name: "Performance Agency",
       description: "Results-driven marketing agency",
       recommended_investment_min: 20000,
@@ -387,11 +465,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Performance-based fees",
       cost_structure: "Ad spend + overhead",
       key_success_factors: "ROI tracking, optimization"
+    },
+    {
+      id: 19,
+      name: "Creative Agency",
+      description: "Design and creative services agency",
+      recommended_investment_min: 10000,
+      recommended_investment_max: 60000,
+      typical_roi_min: 22,
+      typical_roi_max: 42,
+      risk_level: "Medium",
+      revenue_model: "Project-based fees",
+      cost_structure: "Creative talent + tools",
+      key_success_factors: "Creative quality, portfolio"
+    },
+    {
+      id: 20,
+      name: "Digital Agency",
+      description: "Technology-focused digital agency",
+      recommended_investment_min: 30000,
+      recommended_investment_max: 120000,
+      typical_roi_min: 28,
+      typical_roi_max: 55,
+      risk_level: "Medium",
+      revenue_model: "Technology services",
+      cost_structure: "Technical talent + infrastructure",
+      key_success_factors: "Technical expertise, innovation"
     }
   ],
   5: [ // Startup
     {
-      id: 13,
+      id: 21,
       name: "Tech Startup",
       description: "Innovative technology solution",
       recommended_investment_min: 50000,
@@ -404,7 +508,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Innovation, market timing"
     },
     {
-      id: 14,
+      id: 22,
       name: "Marketplace",
       description: "Platform connecting buyers and sellers",
       recommended_investment_min: 75000,
@@ -417,7 +521,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Network effects, liquidity"
     },
     {
-      id: 15,
+      id: 23,
       name: "FinTech Startup",
       description: "Financial technology innovation",
       recommended_investment_min: 100000,
@@ -428,11 +532,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Transaction fees + subscriptions",
       cost_structure: "Compliance + development",
       key_success_factors: "Regulatory compliance, security"
+    },
+    {
+      id: 24,
+      name: "HealthTech Startup",
+      description: "Healthcare technology innovation",
+      recommended_investment_min: 150000,
+      recommended_investment_max: 1500000,
+      typical_roi_min: 70,
+      typical_roi_max: 250,
+      risk_level: "Very High",
+      revenue_model: "Healthcare services + subscriptions",
+      cost_structure: "Compliance + development",
+      key_success_factors: "Healthcare expertise, compliance"
+    },
+    {
+      id: 25,
+      name: "EdTech Startup",
+      description: "Educational technology platform",
+      recommended_investment_min: 50000,
+      recommended_investment_max: 300000,
+      typical_roi_min: 40,
+      typical_roi_max: 120,
+      risk_level: "High",
+      revenue_model: "Educational services + subscriptions",
+      cost_structure: "Content + platform development",
+      key_success_factors: "Educational expertise, content quality"
     }
   ],
   6: [ // Restaurant
     {
-      id: 16,
+      id: 26,
       name: "Fine Dining",
       description: "Upscale restaurant with premium dining experience",
       recommended_investment_min: 150000,
@@ -445,7 +575,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Chef reputation, location"
     },
     {
-      id: 17,
+      id: 27,
       name: "Fast Casual",
       description: "Quick-service restaurant with quality food",
       recommended_investment_min: 75000,
@@ -458,7 +588,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Speed, consistency, location"
     },
     {
-      id: 18,
+      id: 28,
       name: "Food Truck",
       description: "Mobile food service business",
       recommended_investment_min: 25000,
@@ -469,11 +599,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Event-based sales",
       cost_structure: "Mobile overhead",
       key_success_factors: "Location strategy, unique menu"
+    },
+    {
+      id: 29,
+      name: "Catering Service",
+      description: "Event and corporate catering business",
+      recommended_investment_min: 50000,
+      recommended_investment_max: 200000,
+      typical_roi_min: 18,
+      typical_roi_max: 35,
+      risk_level: "Medium",
+      revenue_model: "Event-based pricing",
+      cost_structure: "Kitchen + equipment",
+      key_success_factors: "Event relationships, quality"
+    },
+    {
+      id: 30,
+      name: "Ghost Kitchen",
+      description: "Virtual restaurant for delivery only",
+      recommended_investment_min: 40000,
+      recommended_investment_max: 150000,
+      typical_roi_min: 22,
+      typical_roi_max: 45,
+      risk_level: "Medium",
+      revenue_model: "Delivery platform sales",
+      cost_structure: "Kitchen + delivery fees",
+      key_success_factors: "Delivery optimization, branding"
     }
   ],
   7: [ // Real Estate
     {
-      id: 19,
+      id: 31,
       name: "Rental Properties",
       description: "Residential rental property investment",
       recommended_investment_min: 100000,
@@ -486,7 +642,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Location, property condition"
     },
     {
-      id: 20,
+      id: 32,
       name: "Commercial Real Estate",
       description: "Office and retail space investment",
       recommended_investment_min: 500000,
@@ -499,7 +655,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Location, tenant quality"
     },
     {
-      id: 21,
+      id: 33,
       name: "Real Estate Flipping",
       description: "Buy, renovate, and sell properties",
       recommended_investment_min: 200000,
@@ -510,11 +666,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "One-time sales",
       cost_structure: "Renovation costs",
       key_success_factors: "Market timing, renovation skills"
+    },
+    {
+      id: 34,
+      name: "Real Estate Development",
+      description: "New construction and development projects",
+      recommended_investment_min: 1000000,
+      recommended_investment_max: 10000000,
+      typical_roi_min: 20,
+      typical_roi_max: 40,
+      risk_level: "Very High",
+      revenue_model: "Property sales",
+      cost_structure: "Construction + land",
+      key_success_factors: "Development expertise, market timing"
+    },
+    {
+      id: 35,
+      name: "Real Estate Syndication",
+      description: "Group investment in large properties",
+      recommended_investment_min: 50000,
+      recommended_investment_max: 500000,
+      typical_roi_min: 12,
+      typical_roi_max: 25,
+      risk_level: "Medium",
+      revenue_model: "Shared rental income",
+      cost_structure: "Property management fees",
+      key_success_factors: "Syndicator reputation, property selection"
     }
   ],
   8: [ // Manufacturing
     {
-      id: 22,
+      id: 36,
       name: "Custom Manufacturing",
       description: "Specialized product manufacturing",
       recommended_investment_min: 100000,
@@ -527,7 +709,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Quality control, efficiency"
     },
     {
-      id: 23,
+      id: 37,
       name: "Contract Manufacturing",
       description: "Manufacturing for other companies",
       recommended_investment_min: 200000,
@@ -540,7 +722,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Client relationships, capacity"
     },
     {
-      id: 24,
+      id: 38,
       name: "3D Printing",
       description: "Additive manufacturing services",
       recommended_investment_min: 25000,
@@ -551,11 +733,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Print services",
       cost_structure: "Equipment + materials",
       key_success_factors: "Technology, design skills"
+    },
+    {
+      id: 39,
+      name: "Electronics Manufacturing",
+      description: "Electronic component and device manufacturing",
+      recommended_investment_min: 300000,
+      recommended_investment_max: 2000000,
+      typical_roi_min: 18,
+      typical_roi_max: 30,
+      risk_level: "High",
+      revenue_model: "Electronics sales",
+      cost_structure: "Equipment + components",
+      key_success_factors: "Technical expertise, quality control"
+    },
+    {
+      id: 40,
+      name: "Food Manufacturing",
+      description: "Food product manufacturing and packaging",
+      recommended_investment_min: 150000,
+      recommended_investment_max: 800000,
+      typical_roi_min: 15,
+      typical_roi_max: 28,
+      risk_level: "Medium",
+      revenue_model: "Food product sales",
+      cost_structure: "Ingredients + packaging",
+      key_success_factors: "Food safety, distribution"
     }
   ],
   9: [ // Consulting
     {
-      id: 25,
+      id: 41,
       name: "Management Consulting",
       description: "Business strategy and operations consulting",
       recommended_investment_min: 10000,
@@ -568,7 +776,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Expertise, client relationships"
     },
     {
-      id: 26,
+      id: 42,
       name: "IT Consulting",
       description: "Technology implementation and strategy",
       recommended_investment_min: 15000,
@@ -581,7 +789,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Technical skills, certifications"
     },
     {
-      id: 27,
+      id: 43,
       name: "Financial Consulting",
       description: "Financial planning and advisory services",
       recommended_investment_min: 20000,
@@ -592,11 +800,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Commission + fees",
       cost_structure: "Licensing + compliance",
       key_success_factors: "Licenses, client trust"
+    },
+    {
+      id: 44,
+      name: "HR Consulting",
+      description: "Human resources and organizational consulting",
+      recommended_investment_min: 8000,
+      recommended_investment_max: 60000,
+      typical_roi_min: 28,
+      typical_roi_max: 55,
+      risk_level: "Low",
+      revenue_model: "Project-based fees",
+      cost_structure: "HR expertise + tools",
+      key_success_factors: "HR expertise, compliance knowledge"
+    },
+    {
+      id: 45,
+      name: "Marketing Consulting",
+      description: "Marketing strategy and implementation consulting",
+      recommended_investment_min: 5000,
+      recommended_investment_max: 40000,
+      typical_roi_min: 32,
+      typical_roi_max: 65,
+      risk_level: "Low",
+      revenue_model: "Strategy + implementation fees",
+      cost_structure: "Marketing expertise + tools",
+      key_success_factors: "Marketing expertise, results tracking"
     }
   ],
   10: [ // Franchise
     {
-      id: 28,
+      id: 46,
       name: "Food Franchise",
       description: "Established restaurant franchise opportunity",
       recommended_investment_min: 50000,
@@ -609,7 +843,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Location, brand strength"
     },
     {
-      id: 29,
+      id: 47,
       name: "Service Franchise",
       description: "Service-based franchise business",
       recommended_investment_min: 25000,
@@ -622,7 +856,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Service quality, marketing"
     },
     {
-      id: 30,
+      id: 48,
       name: "Retail Franchise",
       description: "Product retail franchise opportunity",
       recommended_investment_min: 75000,
@@ -633,11 +867,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Product sales",
       cost_structure: "Inventory + operations",
       key_success_factors: "Location, product mix"
+    },
+    {
+      id: 49,
+      name: "Fitness Franchise",
+      description: "Health and fitness franchise business",
+      recommended_investment_min: 100000,
+      recommended_investment_max: 500000,
+      typical_roi_min: 18,
+      typical_roi_max: 35,
+      risk_level: "Medium",
+      revenue_model: "Membership fees",
+      cost_structure: "Equipment + facilities",
+      key_success_factors: "Location, trainer quality"
+    },
+    {
+      id: 50,
+      name: "Education Franchise",
+      description: "Educational services franchise opportunity",
+      recommended_investment_min: 30000,
+      recommended_investment_max: 200000,
+      typical_roi_min: 14,
+      typical_roi_max: 28,
+      risk_level: "Medium",
+      revenue_model: "Educational services",
+      cost_structure: "Curriculum + facilities",
+      key_success_factors: "Educational quality, location"
     }
   ],
   11: [ // Mobile App
     {
-      id: 31,
+      id: 51,
       name: "Gaming App",
       description: "Mobile game development and monetization",
       recommended_investment_min: 25000,
@@ -650,7 +910,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Engagement, monetization"
     },
     {
-      id: 32,
+      id: 52,
       name: "Utility App",
       description: "Problem-solving mobile application",
       recommended_investment_min: 15000,
@@ -663,7 +923,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "User value, retention"
     },
     {
-      id: 33,
+      id: 53,
       name: "Social App",
       description: "Social networking mobile application",
       recommended_investment_min: 50000,
@@ -674,11 +934,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Advertising + premium features",
       cost_structure: "Development + infrastructure",
       key_success_factors: "User growth, engagement"
+    },
+    {
+      id: 54,
+      name: "E-commerce App",
+      description: "Mobile shopping and retail application",
+      recommended_investment_min: 30000,
+      recommended_investment_max: 120000,
+      typical_roi_min: 30,
+      typical_roi_max: 80,
+      risk_level: "High",
+      revenue_model: "Transaction fees + advertising",
+      cost_structure: "Development + payment processing",
+      key_success_factors: "User experience, payment integration"
+    },
+    {
+      id: 55,
+      name: "Productivity App",
+      description: "Business and productivity mobile application",
+      recommended_investment_min: 20000,
+      recommended_investment_max: 100000,
+      typical_roi_min: 35,
+      typical_roi_max: 90,
+      risk_level: "Medium",
+      revenue_model: "Subscription + premium features",
+      cost_structure: "Development + cloud services",
+      key_success_factors: "Productivity value, enterprise adoption"
     }
   ],
   12: [ // Online Course
     {
-      id: 34,
+      id: 56,
       name: "Skill-Based Course",
       description: "Professional skill development courses",
       recommended_investment_min: 5000,
@@ -691,7 +977,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Content quality, marketing"
     },
     {
-      id: 35,
+      id: 57,
       name: "Certification Course",
       description: "Professional certification programs",
       recommended_investment_min: 10000,
@@ -704,7 +990,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Industry recognition, quality"
     },
     {
-      id: 36,
+      id: 58,
       name: "Membership Site",
       description: "Recurring educational content platform",
       recommended_investment_min: 8000,
@@ -715,11 +1001,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Monthly subscriptions",
       cost_structure: "Content + platform",
       key_success_factors: "Content consistency, community"
+    },
+    {
+      id: 59,
+      name: "Live Coaching",
+      description: "Real-time online coaching and mentoring",
+      recommended_investment_min: 3000,
+      recommended_investment_max: 20000,
+      typical_roi_min: 40,
+      typical_roi_max: 90,
+      risk_level: "Low",
+      revenue_model: "Coaching fees",
+      cost_structure: "Expertise + platform",
+      key_success_factors: "Expertise, personal connection"
+    },
+    {
+      id: 60,
+      name: "Corporate Training",
+      description: "Business and corporate training programs",
+      recommended_investment_min: 15000,
+      recommended_investment_max: 75000,
+      typical_roi_min: 45,
+      typical_roi_max: 100,
+      risk_level: "Medium",
+      revenue_model: "Corporate contracts",
+      cost_structure: "Content + sales",
+      key_success_factors: "Corporate relationships, content quality"
     }
   ],
   13: [ // Dropshipping
     {
-      id: 37,
+      id: 61,
       name: "General Store",
       description: "Wide variety of trending products",
       recommended_investment_min: 1000,
@@ -732,7 +1044,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Trend research, marketing"
     },
     {
-      id: 38,
+      id: 62,
       name: "Niche Store",
       description: "Specialized product category focus",
       recommended_investment_min: 500,
@@ -745,7 +1057,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Niche expertise, targeting"
     },
     {
-      id: 39,
+      id: 63,
       name: "Print on Demand",
       description: "Custom design merchandise",
       recommended_investment_min: 500,
@@ -756,11 +1068,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Design sales",
       cost_structure: "Design tools + marketing",
       key_success_factors: "Design skills, trends"
+    },
+    {
+      id: 64,
+      name: "Electronics Store",
+      description: "Technology and gadget dropshipping",
+      recommended_investment_min: 2000,
+      recommended_investment_max: 25000,
+      typical_roi_min: 18,
+      typical_roi_max: 35,
+      risk_level: "Medium",
+      revenue_model: "Electronics sales",
+      cost_structure: "Marketing + supplier relationships",
+      key_success_factors: "Quality suppliers, warranty handling"
+    },
+    {
+      id: 65,
+      name: "Fashion Store",
+      description: "Clothing and fashion accessories",
+      recommended_investment_min: 1500,
+      recommended_investment_max: 20000,
+      typical_roi_min: 22,
+      typical_roi_max: 45,
+      risk_level: "Medium",
+      revenue_model: "Fashion sales",
+      cost_structure: "Marketing + fashion trends",
+      key_success_factors: "Fashion sense, trend awareness"
     }
   ],
   14: [ // Print on Demand
     {
-      id: 40,
+      id: 66,
       name: "T-Shirt Business",
       description: "Custom apparel and clothing",
       recommended_investment_min: 1000,
@@ -773,7 +1111,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Design quality, trends"
     },
     {
-      id: 41,
+      id: 67,
       name: "Home Decor",
       description: "Custom home decoration items",
       recommended_investment_min: 1500,
@@ -786,7 +1124,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Interior design trends"
     },
     {
-      id: 42,
+      id: 68,
       name: "Accessories",
       description: "Custom phone cases, mugs, etc.",
       recommended_investment_min: 800,
@@ -797,11 +1135,37 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Accessory sales",
       cost_structure: "Design + printing",
       key_success_factors: "Trend awareness, design"
+    },
+    {
+      id: 69,
+      name: "Art Prints",
+      description: "Custom artwork and illustrations",
+      recommended_investment_min: 500,
+      recommended_investment_max: 8000,
+      typical_roi_min: 35,
+      typical_roi_max: 70,
+      risk_level: "Low",
+      revenue_model: "Art sales",
+      cost_structure: "Artistic skills + printing",
+      key_success_factors: "Artistic talent, market appeal"
+    },
+    {
+      id: 70,
+      name: "Stationery",
+      description: "Custom notebooks, planners, etc.",
+      recommended_investment_min: 600,
+      recommended_investment_max: 10000,
+      typical_roi_min: 28,
+      typical_roi_max: 52,
+      risk_level: "Low",
+      revenue_model: "Stationery sales",
+      cost_structure: "Design + printing",
+      key_success_factors: "Design skills, functionality"
     }
   ],
   15: [ // Subscription Box
     {
-      id: 43,
+      id: 71,
       name: "Beauty Box",
       description: "Monthly beauty and skincare products",
       recommended_investment_min: 8000,
@@ -814,7 +1178,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Product curation, trends"
     },
     {
-      id: 44,
+      id: 72,
       name: "Food Box",
       description: "Monthly gourmet food and snacks",
       recommended_investment_min: 10000,
@@ -827,7 +1191,7 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       key_success_factors: "Quality control, variety"
     },
     {
-      id: 45,
+      id: 73,
       name: "Lifestyle Box",
       description: "Monthly lifestyle and wellness products",
       recommended_investment_min: 6000,
@@ -838,6 +1202,32 @@ export const mockMiniScenarios: Record<number, MiniScenario[]> = {
       revenue_model: "Monthly subscriptions",
       cost_structure: "Product sourcing + curation",
       key_success_factors: "Lifestyle trends, curation"
+    },
+    {
+      id: 74,
+      name: "Tech Box",
+      description: "Monthly technology and gadget products",
+      recommended_investment_min: 12000,
+      recommended_investment_max: 80000,
+      typical_roi_min: 22,
+      typical_roi_max: 42,
+      risk_level: "Medium",
+      revenue_model: "Monthly subscriptions",
+      cost_structure: "Tech products + shipping",
+      key_success_factors: "Tech trends, product quality"
+    },
+    {
+      id: 75,
+      name: "Pet Box",
+      description: "Monthly pet supplies and treats",
+      recommended_investment_min: 5000,
+      recommended_investment_max: 35000,
+      typical_roi_min: 24,
+      typical_roi_max: 48,
+      risk_level: "Medium",
+      revenue_model: "Monthly subscriptions",
+      cost_structure: "Pet products + shipping",
+      key_success_factors: "Pet owner targeting, product quality"
     }
   ]
 };
