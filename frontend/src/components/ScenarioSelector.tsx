@@ -154,7 +154,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   <motion.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-blue-200/90 text-sm font-medium truncate leading-relaxed"
+                    className="text-blue-200/90 text-sm font-medium truncate leading-relaxed text-white/80"
                   >
                     {scenarios.find(s => s.id === selectedScenario)?.description}
                   </motion.div>
@@ -219,7 +219,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                             setIsScenarioOpen(false);
                             setSearchTerm('');
                           }}
-                          className={`w-full text-left p-4 rounded-xl transition-all duration-300 group border-2 ${
+                          className={`w-full text-left p-5 rounded-xl transition-all duration-300 group border-2 ${
                             isSelected 
                               ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-400 shadow-xl shadow-blue-500/30 ring-2 ring-blue-400/20' 
                               : 'hover:bg-white/15 border-transparent hover:border-white/20'
@@ -255,7 +255,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                     </motion.div>
                                   )}
                                 </div>
-                                <p className={`text-sm leading-relaxed transition-colors mb-3 ${
+                                <p className={`text-sm leading-relaxed transition-colors mb-3 text-white/70 ${
                                   isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
                                 }`}>
                                   {scenario.description}
