@@ -123,7 +123,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
             <div className="flex items-center space-x-3">
               <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
                 selectedScenario 
-                  ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
+                  ? 'bg-blue-500/20' 
                   : 'bg-white/10'
               }`}>
                 <Building2 className={`w-5 h-5 transition-colors ${
