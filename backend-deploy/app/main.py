@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
+from app.routers import pdf_export
 
 # Optional dotenv import to prevent deployment failures
 try:
@@ -43,6 +44,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(pdf_export.router)
 
 # Health check endpoint
 @app.get("/")
