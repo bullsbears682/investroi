@@ -95,12 +95,7 @@ const CalculatorPage: React.FC = () => {
   });
 
     const handleCalculate = (formData: any) => {
-    console.log('handleCalculate called with formData:', formData);
-    console.log('selectedScenario:', selectedScenario);
-    console.log('selectedMiniScenario:', selectedMiniScenario);
-    
     if (!selectedScenario || !selectedMiniScenario) {
-      console.log('Missing scenario or mini scenario');
       toast.error('Please select a business scenario and mini scenario');
       return;
     }
@@ -135,11 +130,8 @@ const CalculatorPage: React.FC = () => {
         }
       };
       
-      console.log('Setting calculation result:', result);
       setCalculationResult(result);
-      console.log('Calculation result set, showing toast');
       toast.success('ROI calculation completed!');
-      console.log('Toast shown');
     } else {
       toast.error('Unable to calculate ROI - missing scenario data');
     }
@@ -235,6 +227,23 @@ const CalculatorPage: React.FC = () => {
               selectedScenario={selectedScenario}
               selectedMiniScenario={selectedMiniScenario}
             />
+            
+            {/* Test Button */}
+            <button
+              onClick={() => {
+                const testData = {
+                  initial_investment: 10000,
+                  additional_costs: 0,
+                  time_period: 2,
+                  time_unit: 'years',
+                  country_code: 'US'
+                };
+                handleCalculate(testData);
+              }}
+              className="mt-4 w-full py-2 px-4 bg-green-500 text-white rounded-lg"
+            >
+              Test Calculation
+            </button>
           </motion.div>
         </motion.div>
 
