@@ -166,7 +166,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               {selectedScenario && (
                 <motion.div
                   initial={{ scale: 0 }}
@@ -296,7 +296,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                 <motion.div
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  className="flex items-center justify-end space-x-1 mt-1"
+                                  className="flex items-center justify-start space-x-1 mt-1"
                                 >
                                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
                                   <span className="text-green-300 text-xs font-bold">ACTIVE</span>
