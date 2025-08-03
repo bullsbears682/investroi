@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   Info
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface ResultsDisplayProps {
   result: any;
@@ -22,11 +21,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(amount || 0);
   };
 
   const formatPercentage = (value: number) => {
-    return `${value.toFixed(2)}%`;
+    return `${(value || 0).toFixed(2)}%`;
   };
 
   const getROIColor = (roi: number) => {
@@ -36,10 +35,21 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     return 'text-red-400';
   };
 
+  // Calculate missing values
+  const totalInvestment = (result.initial_investment || 0) + (result.additional_costs || 0);
+  const netProfit = result.net_profit || 0;
+  const roiPercentage = result.roi_percentage || 0;
+  const expectedReturn = result.expected_return || (totalInvestment * (roiPercentage / 100));
+  
+  // Calculate tax estimates (25% tax rate)
+  const taxAmount = netProfit * 0.25;
+  const afterTaxProfit = netProfit - taxAmount;
+  const afterTaxROI = totalInvestment > 0 ? (afterTaxProfit / totalInvestment) * 100 : 0;
 
 
-  // Chart data for investment breakdown
-  const chartData = [
+
+  // Investment breakdown data
+  const investmentBreakdown = [
     {
       name: 'Initial Investment',
       value: result.initial_investment || 0,
@@ -52,22 +62,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     },
     {
       name: 'Net Profit',
-      value: Math.max(0, result.net_profit || 0),
-      color: (result.net_profit || 0) >= 0 ? '#10B981' : '#EF4444'
+      value: Math.max(0, netProfit),
+      color: netProfit >= 0 ? '#10B981' : '#EF4444'
     }
   ];
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white/20 backdrop-blur-lg border border-white/20 rounded-lg p-3 text-white">
-          <p className="font-medium">{payload[0].name}</p>
-          <p className="text-sm">{formatCurrency(payload[0].value)}</p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="space-y-6">
@@ -82,11 +80,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <TrendingUp className="w-5 h-5 mr-2" />
             <span className="text-white/70 text-sm font-medium">ROI Percentage</span>
           </div>
-          <div className={`text-2xl font-bold ${getROIColor(result.roi_percentage || 0)}`}>
-            {formatPercentage(result.roi_percentage || 0)}
+          <div className={`text-2xl font-bold ${getROIColor(roiPercentage)}`}>
+            {formatPercentage(roiPercentage)}
           </div>
           <div className="text-white/60 text-xs mt-1">
-            {(result.roi_percentage || 0) >= 0 ? 'Positive Return' : 'Negative Return'}
+            {roiPercentage >= 0 ? 'Positive Return' : 'Negative Return'}
           </div>
         </motion.div>
 
@@ -100,11 +98,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <DollarSign className="w-5 h-5 mr-2" />
             <span className="text-white/70 text-sm font-medium">Net Profit</span>
           </div>
-          <div className={`text-2xl font-bold ${(result.net_profit || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-            {formatCurrency(result.net_profit || 0)}
+          <div className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            {formatCurrency(netProfit)}
           </div>
           <div className="text-white/60 text-xs mt-1">
-            {(result.net_profit || 0) >= 0 ? 'Profit' : 'Loss'}
+            {netProfit >= 0 ? 'Profit' : 'Loss'}
           </div>
         </motion.div>
 
@@ -118,8 +116,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <Clock className="w-5 h-5 mr-2" />
             <span className="text-white/70 text-sm font-medium">Annualized ROI</span>
           </div>
-          <div className={`text-xl font-bold ${getROIColor(result.annualized_roi || 0)}`}>
-            {formatPercentage(result.annualized_roi || 0)}
+          <div className={`text-xl font-bold ${getROIColor(roiPercentage)}`}>
+            {formatPercentage(roiPercentage)}
           </div>
           <div className="text-white/60 text-xs mt-1">
             Per Year
@@ -137,7 +135,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
             <span className="text-white/70 text-sm font-medium">Total Investment</span>
           </div>
           <div className="text-xl font-bold text-blue-400">
-            {formatCurrency(result.total_investment || 0)}
+            {formatCurrency(totalInvestment)}
           </div>
           <div className="text-white/60 text-xs mt-1">
             Initial + Additional Costs
@@ -145,7 +143,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </motion.div>
       </div>
 
-      {/* Investment Breakdown Chart */}
+      {/* Investment Breakdown */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -156,34 +154,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           <Info className="w-4 h-4 mr-2" />
           Investment Breakdown
         </h3>
-        <div className="h-48">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="flex justify-center space-x-4 mt-4">
-          {chartData.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: item.color }}
-              ></div>
-              <span className="text-white/70 text-sm">{item.name}</span>
+        <div className="space-y-3">
+          {investmentBreakdown.map((item, index) => (
+            <div key={index} className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: item.color }}
+                ></div>
+                <span className="text-white/70">{item.name}</span>
+              </div>
+              <span className="text-white font-medium">
+                {formatCurrency(item.value)}
+              </span>
             </div>
           ))}
         </div>
@@ -201,19 +184,19 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           <div className="flex justify-between items-center">
             <span className="text-white/70">Total Tax Burden:</span>
             <span className="text-red-400 font-medium">
-              {formatCurrency(result.tax_amount)}
+              {formatCurrency(taxAmount)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-white/70">After-Tax Profit:</span>
-            <span className={`font-medium ${result.after_tax_profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatCurrency(result.after_tax_profit)}
+            <span className={`font-medium ${afterTaxProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {formatCurrency(afterTaxProfit)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-white/70">After-Tax ROI:</span>
-            <span className={`font-medium ${getROIColor(result.after_tax_roi)}`}>
-              {formatPercentage(result.after_tax_roi)}
+            <span className={`font-medium ${getROIColor(afterTaxROI)}`}>
+              {formatPercentage(afterTaxROI)}
             </span>
           </div>
         </div>
@@ -231,25 +214,25 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           <div className="flex justify-between items-center">
             <span className="text-white/70">Total Investment:</span>
             <span className="text-white font-medium">
-              {formatCurrency(result.total_investment)}
+              {formatCurrency(totalInvestment)}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-white/70">Final Value:</span>
+            <span className="text-white/70">Expected Return:</span>
             <span className="text-white font-medium">
-              {formatCurrency(result.final_value)}
+              {formatCurrency(expectedReturn)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-white/70">Scenario:</span>
             <span className="text-white font-medium">
-              {result.scenario_name} - {result.mini_scenario_name}
+              {result.scenario_name || 'Selected Scenario'} - {result.mini_scenario_name || 'Selected Mini Scenario'}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-white/70">Country:</span>
+            <span className="text-white/70">Calculation Method:</span>
             <span className="text-white font-medium">
-              {result.country_name}
+              {result.calculation_method || 'Realistic'}
             </span>
           </div>
         </div>
@@ -262,7 +245,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         transition={{ delay: 0.7 }}
         className="grid grid-cols-1 gap-3"
       >
-        {result.roi_percentage >= 15 && (
+        {roiPercentage >= 15 && (
           <div className="flex items-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
             <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
             <span className="text-green-400 text-sm font-medium">
@@ -271,16 +254,16 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           </div>
         )}
 
-        {result.risk_score > 0.6 && (
+        {roiPercentage < 10 && roiPercentage >= 0 && (
           <div className="flex items-center p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
             <AlertTriangle className="w-5 h-5 text-yellow-400 mr-3" />
             <span className="text-yellow-400 text-sm font-medium">
-              High risk investment. Consider diversification strategies.
+              Moderate ROI. Consider market conditions and investment timing.
             </span>
           </div>
         )}
 
-        {result.roi_percentage < 0 && (
+        {roiPercentage < 0 && (
           <div className="flex items-center p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
             <TrendingDown className="w-5 h-5 text-red-400 mr-3" />
             <span className="text-red-400 text-sm font-medium">
