@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default configuration
 const api = axios.create({
-  baseURL: (import.meta as any).env?.VITE_API_URL || 'http://localhost:8000',
+  baseURL: (import.meta as any).env?.VITE_API_URL || 'https://investwise-29ne.onrender.com',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
