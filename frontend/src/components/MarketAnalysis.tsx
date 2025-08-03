@@ -303,16 +303,78 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
             Market Trends
           </h4>
           
-          <div className="space-y-3">
-            {marketTrendsData.map((trend: any, index: number) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="text-white/70">{trend.period}</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-white font-medium">{trend.value}</span>
-                  <TrendingUp className="w-4 h-4 text-green-400" />
+          <div className="space-y-4">
+            {marketTrendsData.map((trend: any, index: number) => {
+              const prevValue = index > 0 ? marketTrendsData[index - 1].value : trend.value;
+              const growth = ((trend.value - prevValue) / prevValue * 100).toFixed(1);
+              const isPositive = trend.value >= prevValue;
+              
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + index * 0.1 }}
+                  className="space-y-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="text-white/70 font-medium">{trend.period}</span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-white font-bold text-lg">{trend.value}</span>
+                      <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${
+                        isPositive 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                          : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                      }`}>
+                        {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                        <span>{isPositive ? '+' : ''}{growth}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-white/10 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-500 ${
+                        isPositive ? 'bg-gradient-to-r from-green-400 to-green-500' : 'bg-gradient-to-r from-red-400 to-red-500'
+                      }`}
+                      style={{ 
+                        width: `${Math.min((trend.value / Math.max(...marketTrendsData.map(t => t.value))) * 100, 100)}%` 
+                      }}
+                    ></div>
+                  </div>
+                  
+                  {/* Growth Indicator */}
+                  <div className="flex items-center space-x-2 text-xs">
+                    <div className={`w-2 h-2 rounded-full ${
+                      isPositive ? 'bg-green-400' : 'bg-red-400'
+                    }`}></div>
+                    <span className="text-white/60">
+                      {isPositive ? 'Strong Growth' : 'Decline'} • 
+                      {index === 0 ? ' Baseline' : ` ${growth}% ${isPositive ? 'increase' : 'decrease'} from previous quarter`}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+          
+          {/* Summary Stats */}
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="text-center">
+                <div className="text-white/60">Total Growth</div>
+                <div className="text-white font-bold text-lg">
+                  {((marketTrendsData[marketTrendsData.length - 1]?.value - marketTrendsData[0]?.value) / marketTrendsData[0]?.value * 100).toFixed(1)}%
                 </div>
               </div>
-            ))}
+              <div className="text-center">
+                <div className="text-white/60">Avg Quarterly Growth</div>
+                <div className="text-white font-bold text-lg">
+                  {((marketTrendsData[marketTrendsData.length - 1]?.value - marketTrendsData[0]?.value) / marketTrendsData[0]?.value * 100 / (marketTrendsData.length - 1)).toFixed(1)}%
+                </div>
+              </div>
+            </div>
           </div>
         </motion.div>
       )}
