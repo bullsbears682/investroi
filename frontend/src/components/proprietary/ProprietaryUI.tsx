@@ -45,9 +45,7 @@ export class ProprietaryAnimationEngine {
    * Our unique chart rendering system
    */
   public renderFinancialChart(
-    data: number[],
-    labels: string[],
-    container: HTMLElement
+    data: number[]
   ): void {
     // PROPRIETARY CHART RENDERING ALGORITHM
     const canvas = document.createElement('canvas');
