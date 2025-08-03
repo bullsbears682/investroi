@@ -1307,6 +1307,59 @@ async def calculate_roi(request: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# Simple PDF export endpoint
+@app.post("/api/pdf/export")
+async def export_pdf_simple(request: dict):
+    """Simple PDF export that doesn't require database"""
+    try:
+        from reportlab.lib.pagesizes import letter
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import inch
+        import tempfile
+        from datetime import datetime
+        
+        # Create temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        
+        # Create PDF document
+        doc = SimpleDocTemplate(temp_file.name, pagesize=letter)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Add content
+        title = Paragraph("ROI Investment Report", styles['Title'])
+        story.append(title)
+        story.append(Spacer(1, 12))
+        
+        # Add calculation data
+        calc_data = request.get('calculation_data', {})
+        if calc_data:
+            roi_text = f"ROI: {calc_data.get('roi_percentage', 0)}%"
+            profit_text = f"Net Profit: ${calc_data.get('net_profit', 0)}"
+            investment_text = f"Total Investment: ${calc_data.get('total_investment', 0)}"
+            
+            story.append(Paragraph(roi_text, styles['Normal']))
+            story.append(Spacer(1, 6))
+            story.append(Paragraph(profit_text, styles['Normal']))
+            story.append(Spacer(1, 6))
+            story.append(Paragraph(investment_text, styles['Normal']))
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Return file response
+        from fastapi.responses import FileResponse
+        return FileResponse(
+            temp_file.name,
+            media_type='application/pdf',
+            filename=f"roi_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        )
+        
+    except Exception as e:
+        print(f"PDF generation error: {e}")
+        raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(e)}")
+
 # Business scenarios endpoint
 @app.get("/api/scenarios")
 async def get_scenarios():
