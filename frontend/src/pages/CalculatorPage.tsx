@@ -16,7 +16,6 @@ import { api } from '../services/api';
 
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
-import ResultsDisplay from '../components/ResultsDisplay';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -246,7 +245,11 @@ const CalculatorPage: React.FC = () => {
                 Results
               </h2>
               
-              <ResultsDisplay result={calculationResult?.data || calculationResult} />
+              <div className="text-white">
+                <p>Calculation completed!</p>
+                <p>ROI: {calculationResult?.data?.roi_percentage}%</p>
+                <p>Net Profit: ${calculationResult?.data?.net_profit}</p>
+              </div>
             </div>
           )}
 
