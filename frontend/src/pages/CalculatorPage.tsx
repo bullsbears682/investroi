@@ -109,11 +109,11 @@ const CalculatorPage: React.FC = () => {
     
     // Try API first, fallback to local calculation if it fails
     calculateMutation.mutate(calculationData, {
-      onError: (error: any) => {
+      onError: () => {
         console.log('API calculation failed, using fallback calculation');
         // Fallback calculation
-        const selectedScenarioData = scenariosData.find(s => s.id === selectedScenario);
-        const selectedMiniScenarioData = miniScenariosData.find(ms => ms.id === selectedMiniScenario);
+        const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
+        const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
         
         if (selectedScenarioData && selectedMiniScenarioData) {
           const initialInvestment = formData.initial_investment || 0;
