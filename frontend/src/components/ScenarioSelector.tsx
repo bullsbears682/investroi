@@ -251,16 +251,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                     }`}>
                                       {scenario.name}
                                     </h3>
-                                    {isSelected && (
-                                      <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        className="flex items-center space-x-0.5 bg-yellow-500/20 px-2 py-1 rounded-full"
-                                      >
-                                        <div className="w-1 h-1 bg-yellow-400 rounded-full animate-pulse"></div>
-                                        <span className="text-yellow-300 text-sm font-bold">ACTIVE</span>
-                                      </motion.div>
-                                    )}
+
                                     <span className={`text-xs font-medium transition-colors flex-shrink-0 ${
                                       isSelected ? 'text-blue-200/80' : 'text-white/60'
                                     }`}>
