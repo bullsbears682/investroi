@@ -76,8 +76,6 @@ const CalculatorPage: React.FC = () => {
   });
 
   const handleCalculate = (formData: any) => {
-    console.log('Calculate called with:', { formData, selectedScenario, selectedMiniScenario });
-    
     if (!selectedScenario || !selectedMiniScenario) {
       toast.error('Please select a business scenario and mini scenario');
       return;
@@ -90,7 +88,6 @@ const CalculatorPage: React.FC = () => {
       session_id: sessionId,
     };
 
-    console.log('Sending calculation data:', calculationData);
     calculateMutation.mutate(calculationData);
   };
 
