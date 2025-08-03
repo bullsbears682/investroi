@@ -95,28 +95,64 @@ const CalculatorPage: React.FC = () => {
   });
 
   const handleCalculate = (formData: any) => {
-    console.log('Calculate button pressed with formData:', formData);
-    console.log('Selected scenario:', selectedScenario);
-    console.log('Selected mini scenario:', selectedMiniScenario);
-    
-    if (!selectedScenario || !selectedMiniScenario) {
-      toast.error('Please select a business scenario and mini scenario');
-      return;
-    }
+    try {
+      console.log('Calculate button pressed with formData:', formData);
+      console.log('Selected scenario:', selectedScenario);
+      console.log('Selected mini scenario:', selectedMiniScenario);
+      
+      if (!selectedScenario || !selectedMiniScenario) {
+        toast.error('Please select a business scenario and mini scenario');
+        return;
+      }
 
-    const calculationData = {
-      ...formData,
-      business_scenario_id: selectedScenario,
-      mini_scenario_id: selectedMiniScenario,
-      session_id: sessionId,
-    };
+      const calculationData = {
+        ...formData,
+        business_scenario_id: selectedScenario,
+        mini_scenario_id: selectedMiniScenario,
+        session_id: sessionId,
+      };
 
-    console.log('Starting calculation with:', calculationData);
-    
-    // Try API first, fallback to local calculation if it fails
-    calculateMutation.mutate(calculationData, {
-      onError: () => {
+            console.log('Starting calculation with:', calculationData);
+      
+      // Test with immediate fallback first to see if the issue is with the mutation
+      console.log('Testing immediate fallback calculation...');
+      const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
+      const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
+      
+      if (selectedScenarioData && selectedMiniScenarioData) {
+        const initialInvestment = formData.initial_investment || 0;
+        const additionalCosts = formData.additional_costs || 0;
+        const totalInvestment = initialInvestment + additionalCosts;
+        
+        // Simple ROI calculation as fallback
+        const avgROI = (selectedMiniScenarioData.typical_roi_min + selectedMiniScenarioData.typical_roi_max) / 2;
+        const expectedReturn = totalInvestment * (avgROI / 100);
+        const netProfit = expectedReturn - totalInvestment;
+        const roiPercentage = (netProfit / totalInvestment) * 100;
+        
+        const fallbackResult = {
+          data: {
+            roi_percentage: roiPercentage,
+            expected_return: expectedReturn,
+            net_profit: netProfit,
+            total_investment: totalInvestment,
+            scenario_name: selectedScenarioData.name,
+            mini_scenario_name: selectedMiniScenarioData.name,
+            calculation_method: 'fallback'
+          }
+        };
+        
+        console.log('Immediate fallback calculation result:', fallbackResult);
+        setCalculationResult(fallbackResult);
+        toast.success('ROI calculation completed (using fallback)!');
+        return; // Skip the API call for now
+      }
+      
+      // Try API first, fallback to local calculation if it fails
+      calculateMutation.mutate(calculationData, {
+      onError: (error) => {
         console.log('API calculation failed, using fallback calculation');
+        console.log('Error details:', error);
         // Fallback calculation
         const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
         const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
@@ -148,11 +184,15 @@ const CalculatorPage: React.FC = () => {
           setCalculationResult(fallbackResult);
           toast.success('ROI calculation completed (using fallback)!');
         } else {
-          toast.error('Unable to calculate ROI - missing scenario data');
-        }
-      }
-    });
-  };
+                     toast.error('Unable to calculate ROI - missing scenario data');
+         }
+       }
+     });
+   } catch (error) {
+     console.error('Unexpected error in handleCalculate:', error);
+     toast.error('An unexpected error occurred during calculation');
+   }
+ };
 
   // Use scenarios data with fallback
   const scenariosData = scenarios?.data || mockScenarios;
