@@ -7,6 +7,7 @@ import {
   TrendingUp, 
   DollarSign, 
   Globe, 
+  Shield,
   Target,
   AlertTriangle,
   CheckCircle
@@ -16,7 +17,7 @@ import { api } from '../services/api';
 
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
-import ResultsDisplay from '../components/ResultsDisplay';
+import RiskAssessment from '../components/RiskAssessment';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -246,10 +247,29 @@ const CalculatorPage: React.FC = () => {
                 Results
               </h2>
               
-              <ResultsDisplay result={calculationResult?.data || calculationResult} />
+              <div className="text-white">
+                <p>Calculation completed!</p>
+                <p>ROI: {calculationResult?.data?.roi_percentage}%</p>
+                <p>Net Profit: ${calculationResult?.data?.net_profit}</p>
+              </div>
             </div>
           )}
 
+          {/* Risk Assessment */}
+          {selectedScenario && (
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <Shield className="w-5 h-5 mr-2" />
+                Risk Assessment
+              </h2>
+              
+              <RiskAssessment
+                scenarioId={selectedScenario}
+                investmentAmount={calculationResult?.data?.initial_investment || 0}
+                countryCode={calculationResult?.data?.country_code || 'US'}
+              />
+            </div>
+          )}
 
         </motion.div>
       </div>
