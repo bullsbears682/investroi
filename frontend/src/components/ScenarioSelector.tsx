@@ -121,7 +121,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
             }`}
           >
             <div className="flex items-center space-x-3">
-              <div className={`p-2 rounded-lg transition-all duration-300 ${
+              <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
                 selectedScenario 
                   ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
                   : 'bg-white/10'
@@ -130,9 +130,9 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   selectedScenario ? 'text-blue-300' : 'text-white/70'
                 }`} />
               </div>
-              <div className="flex-1 text-left">
-                <div className="flex items-center space-x-2">
-                  <span className={`text-lg font-semibold transition-colors ${
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center space-x-2 mb-1">
+                  <span className={`text-lg font-semibold transition-colors truncate ${
                     selectedScenario ? 'text-blue-200' : 'text-white'
                   }`}>
                     {selectedScenario 
@@ -144,7 +144,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full"
+                      className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex-shrink-0"
                     >
                       SELECTED
                     </motion.div>
@@ -154,7 +154,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   <motion.div
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-blue-200/90 text-sm mt-1 font-medium"
+                    className="text-blue-200/90 text-sm font-medium truncate"
                   >
                     {scenarios.find(s => s.id === selectedScenario)?.description}
                   </motion.div>
@@ -226,58 +226,56 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                           }`}
                         >
                           <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-3">
-                                <div className={`p-2 rounded-lg transition-all duration-300 ${
-                                  isSelected 
-                                    ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
-                                    : 'bg-white/10'
-                                }`}>
-                                  <Building2 className={`w-5 h-5 transition-colors ${
-                                    isSelected ? 'text-blue-300' : 'text-white/70'
-                                  }`} />
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center space-x-2">
-                                    <h3 className={`text-lg font-semibold transition-colors ${
-                                      isSelected 
-                                        ? 'text-blue-200' 
-                                        : 'text-white group-hover:text-blue-300'
-                                    }`}>
-                                      {scenario.name}
-                                    </h3>
-                                    {isSelected && (
-                                      <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full"
-                                      >
-                                        SELECTED
-                                      </motion.div>
-                                    )}
-                                  </div>
-                                  <p className={`text-sm mt-2 transition-colors ${
-                                    isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
+                            <div className="flex items-start space-x-3 flex-1">
+                              <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
+                                isSelected 
+                                  ? 'bg-blue-500/20 ring-2 ring-blue-400/50' 
+                                  : 'bg-white/10'
+                              }`}>
+                                <Building2 className={`w-5 h-5 transition-colors ${
+                                  isSelected ? 'text-blue-300' : 'text-white/70'
+                                }`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <h3 className={`text-lg font-semibold transition-colors truncate ${
+                                    isSelected 
+                                      ? 'text-blue-200' 
+                                      : 'text-white group-hover:text-blue-300'
                                   }`}>
-                                    {scenario.description}
-                                  </p>
-                                  <div className="flex items-center space-x-2 mt-3">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(scenario.risk_level)} ${
-                                      isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
-                                    }`}>
-                                      {scenario.risk_level} Risk
-                                    </span>
-                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${getMarketSizeColor(scenario.market_size)} ${
-                                      isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
-                                    }`}>
-                                      {scenario.market_size} Market
-                                    </span>
-                                  </div>
+                                    {scenario.name}
+                                  </h3>
+                                  {isSelected && (
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex-shrink-0"
+                                    >
+                                      SELECTED
+                                    </motion.div>
+                                  )}
+                                </div>
+                                <p className={`text-sm transition-colors mb-3 ${
+                                  isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
+                                }`}>
+                                  {scenario.description}
+                                </p>
+                                <div className="flex items-center space-x-2">
+                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${getRiskColor(scenario.risk_level)} ${
+                                    isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
+                                  }`}>
+                                    {scenario.risk_level} Risk
+                                  </span>
+                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${getMarketSizeColor(scenario.market_size)} ${
+                                    isSelected ? 'ring-2 ring-blue-400/50 shadow-lg' : ''
+                                  }`}>
+                                    {scenario.market_size} Market
+                                  </span>
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right ml-4">
-                              <div className={`text-sm font-medium transition-colors ${
+                            <div className="text-right ml-4 flex-shrink-0">
+                              <div className={`text-sm font-medium transition-colors mb-1 ${
                                 isSelected ? 'text-blue-200/90' : 'text-white/70'
                               }`}>
                                 {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
