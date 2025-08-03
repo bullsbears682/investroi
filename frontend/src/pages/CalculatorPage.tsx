@@ -8,25 +8,20 @@ import {
   DollarSign, 
   Globe, 
   Shield, 
-  Download,
-  BarChart3,
   Target,
   AlertTriangle,
   CheckCircle
 } from 'lucide-react';
 
 import { api } from '../services/api';
-import { useAppStore } from '../store/appStore';
+
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
-import ResultsDisplay from '../components/ResultsDisplay';
-import RiskAssessment from '../components/RiskAssessment';
-import MarketAnalysis from '../components/MarketAnalysis';
-import PDFExport from '../components/PDFExport';
+
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
 const CalculatorPage: React.FC = () => {
-  const { sessionId } = useAppStore();
+
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
