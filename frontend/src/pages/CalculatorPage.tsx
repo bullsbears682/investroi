@@ -19,8 +19,6 @@ import { api } from '../services/api';
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
-import RiskAssessment from '../components/RiskAssessment';
-import MarketAnalysis from '../components/MarketAnalysis';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
