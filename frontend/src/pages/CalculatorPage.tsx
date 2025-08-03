@@ -76,6 +76,8 @@ const CalculatorPage: React.FC = () => {
   });
 
   const handleCalculate = (formData: any) => {
+    console.log('Calculate called with:', { formData, selectedScenario, selectedMiniScenario });
+    
     if (!selectedScenario || !selectedMiniScenario) {
       toast.error('Please select a business scenario and mini scenario');
       return;
@@ -88,12 +90,24 @@ const CalculatorPage: React.FC = () => {
       session_id: sessionId,
     };
 
+    console.log('Sending calculation data:', calculationData);
     calculateMutation.mutate(calculationData);
   };
 
   // Use scenarios data with fallback
   const scenariosData = scenarios?.data || mockScenarios;
   const miniScenariosData = miniScenarios?.data || [];
+
+  const handleScenarioSelect = (scenarioId: number) => {
+    console.log('Scenario selected:', scenarioId);
+    setSelectedScenario(scenarioId);
+    setSelectedMiniScenario(null); // Reset mini scenario when scenario changes
+  };
+
+  const handleMiniScenarioSelect = (miniScenarioId: number) => {
+    console.log('Mini scenario selected:', miniScenarioId);
+    setSelectedMiniScenario(miniScenarioId);
+  };
 
   return (
     <div className="min-h-screen">
@@ -142,8 +156,8 @@ const CalculatorPage: React.FC = () => {
               miniScenarios={miniScenariosData}
               selectedScenario={selectedScenario}
               selectedMiniScenario={selectedMiniScenario}
-              onScenarioSelect={setSelectedScenario}
-              onMiniScenarioSelect={setSelectedMiniScenario}
+              onScenarioSelect={handleScenarioSelect}
+              onMiniScenarioSelect={handleMiniScenarioSelect}
               onDropdownStateChange={setIsDropdownOpen}
               isLoading={scenariosLoading || miniScenariosLoading}
             />
