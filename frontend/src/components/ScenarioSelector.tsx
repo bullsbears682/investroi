@@ -154,6 +154,16 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                       SELECTED
                     </motion.div>
                   )}
+                  {selectedScenario && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="flex items-center space-x-1 bg-green-500/20 px-2 py-0.5 rounded-full"
+                    >
+                      <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-green-300 text-xs font-bold">ACTIVE</span>
+                    </motion.div>
+                  )}
                 </div>
                 {selectedScenario && (
                   <motion.div
@@ -167,16 +177,6 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              {selectedScenario && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="flex items-center space-x-1.5 bg-green-500/20 px-2.5 py-1.5 rounded-full"
-                >
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-300 text-xs font-bold">ACTIVE</span>
-                </motion.div>
-              )}
               <ChevronDown 
                 className={`w-6 h-6 transition-transform ${
                   isScenarioOpen ? 'rotate-180' : ''
@@ -265,6 +265,16 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                         SELECTED
                                       </motion.div>
                                     )}
+                                    {isSelected && (
+                                      <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="flex items-center space-x-1 bg-green-500/20 px-2 py-0.5 rounded-full"
+                                      >
+                                        <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                                        <span className="text-green-300 text-xs font-bold">ACTIVE</span>
+                                      </motion.div>
+                                    )}
                                   </div>
                                   <p className={`text-xs leading-relaxed transition-colors mb-2 text-white/70 ${
                                     isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
@@ -292,16 +302,6 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                               }`}>
                                 {scenario.typical_roi_min}% - {scenario.typical_roi_max}% ROI
                               </div>
-                              {isSelected && (
-                                <motion.div
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  className="flex items-center justify-start space-x-1 mt-1"
-                                >
-                                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                                  <span className="text-green-300 text-xs font-bold">ACTIVE</span>
-                                </motion.div>
-                              )}
                             </div>
                           </div>
                         </motion.button>
