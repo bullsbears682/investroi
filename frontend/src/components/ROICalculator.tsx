@@ -92,10 +92,17 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
     onCalculate(data);
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    console.log('Form submit event triggered');
+    e.preventDefault();
+    console.log('Default prevented, calling handleSubmit');
+    handleSubmit(onSubmit)(e);
+  };
+
   const totalInvestment = (watchedValues.initial_investment || 0) + (watchedValues.additional_costs || 0);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       {/* Investment Amount */}
       <div className="space-y-4">
         <div>
