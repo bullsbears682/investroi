@@ -30,6 +30,7 @@ const CalculatorPage: React.FC = () => {
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Fetch business scenarios with fallback to mock data
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
@@ -123,7 +124,14 @@ const CalculatorPage: React.FC = () => {
           className="lg:col-span-2 space-y-6"
         >
           {/* Scenario Selection */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+          <motion.div 
+            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+            animate={{ 
+              zIndex: isDropdownOpen ? 50 : 1,
+              position: isDropdownOpen ? 'relative' : 'static'
+            }}
+            transition={{ duration: 0.3 }}
+          >
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Target className="w-5 h-5 mr-2" />
               Select Business Scenario
@@ -136,12 +144,21 @@ const CalculatorPage: React.FC = () => {
               selectedMiniScenario={selectedMiniScenario}
               onScenarioSelect={setSelectedScenario}
               onMiniScenarioSelect={setSelectedMiniScenario}
+              onDropdownStateChange={setIsDropdownOpen}
               isLoading={scenariosLoading || miniScenariosLoading}
             />
-          </div>
+          </motion.div>
 
           {/* ROI Calculator */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+          <motion.div 
+            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+            animate={{ 
+              opacity: isDropdownOpen ? 0.3 : 1,
+              transform: isDropdownOpen ? 'translateY(20px)' : 'translateY(0)',
+              pointerEvents: isDropdownOpen ? 'none' : 'auto'
+            }}
+            transition={{ duration: 0.3 }}
+          >
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
               <Calculator className="w-5 h-5 mr-2" />
               Investment Details
@@ -153,7 +170,7 @@ const CalculatorPage: React.FC = () => {
               selectedScenario={selectedScenario}
               selectedMiniScenario={selectedMiniScenario}
             />
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Right Column - Results & Analysis */}

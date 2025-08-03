@@ -37,6 +37,7 @@ interface ScenarioSelectorProps {
   selectedMiniScenario: number | null;
   onScenarioSelect: (id: number) => void;
   onMiniScenarioSelect: (id: number) => void;
+  onDropdownStateChange?: (isOpen: boolean) => void;
   isLoading: boolean;
 }
 
@@ -47,6 +48,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   selectedMiniScenario,
   onScenarioSelect,
   onMiniScenarioSelect,
+  onDropdownStateChange,
   isLoading
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,6 +59,11 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
     scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     scenario.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Notify parent of dropdown state changes
+  React.useEffect(() => {
+    onDropdownStateChange?.(isScenarioOpen || isMiniScenarioOpen);
+  }, [isScenarioOpen, isMiniScenarioOpen, onDropdownStateChange]);
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
