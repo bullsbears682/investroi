@@ -274,11 +274,6 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
       <motion.button
         type="submit"
         disabled={!isValid || isLoading || !selectedScenario || !selectedMiniScenario}
-        onClick={(e) => {
-          console.log('Calculate button clicked');
-          e.preventDefault();
-          e.stopPropagation();
-        }}
         className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center space-x-2 ${
           isValid && selectedScenario && selectedMiniScenario && !isLoading
             ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 shadow-lg'
