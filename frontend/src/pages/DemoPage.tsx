@@ -5,20 +5,15 @@ import {
   Play, 
   Calculator, 
   TrendingUp, 
-  DollarSign, 
   Globe, 
-  Users, 
   BarChart3,
   ArrowRight,
-  Copy,
-  Download,
   Shield,
   Target
 } from 'lucide-react';
 
 const DemoPage: React.FC = () => {
   const [activeDemo, setActiveDemo] = useState<number | null>(null);
-  const [showResults, setShowResults] = useState<number | null>(null);
 
   const demos = [
     {
