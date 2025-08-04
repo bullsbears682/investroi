@@ -102,15 +102,16 @@ const CalculatorPage: React.FC = () => {
   });
 
   // Local calculation fallback
-  const performLocalCalculation = () => {
+  const performLocalCalculation = (formDataOverride?: any) => {
     console.log('Using local calculation fallback...');
     
-    const formData = (window as any).formData;
+    const formData = formDataOverride || (window as any).formData;
     const initialInvestment = Number(formData?.initial_investment) || 0;
     const additionalCosts = Number(formData?.additional_costs) || 0;
     const totalInvestment = initialInvestment + additionalCosts;
     const countryCode = formData?.country_code || 'US';
     
+    console.log('Form data:', formData);
     console.log('Country code from form data:', countryCode);
     
     // Get scenario data for calculation
@@ -208,7 +209,7 @@ const CalculatorPage: React.FC = () => {
           .catch((error) => {
             console.error('API health check failed:', error);
             console.log('Using local fallback immediately...');
-            performLocalCalculation();
+            performLocalCalculation(formData);
           });
       };
 
