@@ -3,33 +3,16 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Calculator, 
-  TrendingUp, 
   DollarSign, 
   Target,
   ArrowRight,
   BarChart3,
-  Users,
-  Globe,
   Building,
-  ShoppingCart,
-  Code,
-  Factory,
-  Zap,
   BookOpen,
   Shield,
   AlertTriangle,
   CheckCircle,
-  Info,
-  Clock,
-  Star,
-  Lightbulb,
-  PieChart,
-  LineChart,
-  Briefcase,
-  Home,
-  Smartphone,
-  Utensils,
-  Store
+  Lightbulb
 } from 'lucide-react';
 
 const InvestmentGuidePage: React.FC = () => {
