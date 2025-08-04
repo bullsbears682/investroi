@@ -1,118 +1,92 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional, Dict, Any
 import math
 import uuid
 from datetime import datetime
 
-from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROICalculation
 from app.cache import cache_manager
-from app.schemas.roi import (
-    ROICalculationRequest,
-    ROICalculationResponse,
-    BusinessScenarioResponse,
-    MiniScenarioResponse
-)
 from app.services.calculator import ROICalculatorService
 from app.services.market_data import MarketDataService
 
 router = APIRouter()
 
-@router.get("/scenarios", response_model=List[BusinessScenarioResponse])
-async def get_business_scenarios(db: Session = Depends(get_db)):
+@router.get("/scenarios")
+async def get_business_scenarios():
     """Get all business scenarios"""
-    scenarios = db.query(BusinessScenario).all()
-    return scenarios
+    return [
+        {"id": 1, "name": "E-commerce", "description": "Online retail business"},
+        {"id": 2, "name": "SaaS", "description": "Software as a Service"},
+        {"id": 3, "name": "Freelancer", "description": "Independent contractor"},
+        {"id": 4, "name": "Agency", "description": "Marketing and creative agency"},
+        {"id": 5, "name": "Startup", "description": "Innovative new business"},
+        {"id": 6, "name": "Restaurant", "description": "Food service business"},
+        {"id": 7, "name": "Consulting", "description": "Business consulting"}
+    ]
 
-@router.get("/scenarios/{scenario_id}/mini-scenarios", response_model=List[MiniScenarioResponse])
-async def get_mini_scenarios(scenario_id: int, db: Session = Depends(get_db)):
+@router.get("/scenarios/{scenario_id}/mini-scenarios")
+async def get_mini_scenarios(scenario_id: int):
     """Get mini scenarios for a specific business scenario"""
-    mini_scenarios = db.query(MiniScenario).filter(
-        MiniScenario.business_scenario_id == scenario_id
-    ).all()
-    return mini_scenarios
+    return [
+        {"id": 1, "name": "General", "description": "Standard approach"},
+        {"id": 2, "name": "Specialized", "description": "Niche focus"},
+        {"id": 3, "name": "Premium", "description": "High-end service"},
+        {"id": 4, "name": "Budget", "description": "Cost-effective option"},
+        {"id": 5, "name": "Enterprise", "description": "Large-scale solution"}
+    ]
 
-@router.post("/calculate", response_model=ROICalculationResponse)
-async def calculate_roi(
-    request: ROICalculationRequest,
-    db: Session = Depends(get_db)
-):
+@router.post("/calculate")
+async def calculate_roi(request: Dict[str, Any]):
     """Calculate ROI for a business investment"""
     
-    # Get business scenario and mini scenario
-    business_scenario = db.query(BusinessScenario).filter(
-        BusinessScenario.id == request.business_scenario_id
-    ).first()
+    # Extract parameters from request
+    initial_investment = request.get("initial_investment", 0)
+    additional_costs = request.get("additional_costs", 0)
+    time_period = request.get("time_period", 1)
+    time_unit = request.get("time_unit", "years")
+    business_scenario_id = request.get("business_scenario_id", 1)
+    mini_scenario_id = request.get("mini_scenario_id", 1)
+    country_code = request.get("country_code", "US")
     
-    if not business_scenario:
-        raise HTTPException(status_code=404, detail="Business scenario not found")
+    # Map scenario IDs to names (simplified)
+    scenario_names = {
+        1: "E-commerce", 2: "SaaS", 3: "Freelancer", 4: "Agency", 
+        5: "Startup", 6: "Restaurant", 7: "Consulting"
+    }
     
-    mini_scenario = db.query(MiniScenario).filter(
-        MiniScenario.id == request.mini_scenario_id
-    ).first()
+    mini_scenario_names = {
+        1: "General", 2: "Specialized", 3: "Premium", 4: "Budget", 5: "Enterprise"
+    }
     
-    if not mini_scenario:
-        raise HTTPException(status_code=404, detail="Mini scenario not found")
-    
-    # Get tax data for the country
-    country = db.query(TaxCountry).filter(
-        TaxCountry.country_code == request.country_code
-    ).first()
-    
-    if not country:
-        raise HTTPException(status_code=404, detail="Country not found")
+    business_scenario_name = scenario_names.get(business_scenario_id, "E-commerce")
+    mini_scenario_name = mini_scenario_names.get(mini_scenario_id, "General")
     
     # Calculate ROI using the service
     calculator_service = ROICalculatorService()
     result = calculator_service.calculate_roi(
-        initial_investment=request.initial_investment,
-        additional_costs=request.additional_costs,
-        time_period=request.time_period,
-        time_unit=request.time_unit,
-        business_scenario_id=request.business_scenario_id,
-        mini_scenario_id=request.mini_scenario_id,
-        country_code=country.country_code,
-        business_scenario_name=business_scenario.name,
-        mini_scenario_name=mini_scenario.name
+        initial_investment=initial_investment,
+        additional_costs=additional_costs,
+        time_period=time_period,
+        time_unit=time_unit,
+        business_scenario_id=business_scenario_id,
+        mini_scenario_id=mini_scenario_id,
+        country_code=country_code,
+        business_scenario_name=business_scenario_name,
+        mini_scenario_name=mini_scenario_name
     )
     
-    # Generate session ID if not provided
-    session_id = request.session_id or str(uuid.uuid4())
+    # Generate session ID
+    session_id = str(uuid.uuid4())
     
     # Store calculation in cache
     cache_manager.set_calculation(session_id, result)
     cache_manager.increment_usage_counter(session_id)
     
-    # Store calculation in database
-    calculation_record = ROICalculation(
-        user_id=session_id,
-        business_scenario_id=request.business_scenario_id,
-        mini_scenario_id=request.mini_scenario_id,
-        country_id=country.id,
-        initial_investment=request.initial_investment,
-        additional_costs=request.additional_costs,
-        time_period=request.time_period,
-        time_unit=request.time_unit,
-        final_value=result["final_value"],
-        net_profit=result["net_profit"],
-        roi_percentage=result["roi_percentage"],
-        annualized_roi=result["annualized_roi"],
-        total_investment=result["total_investment"],
-        tax_amount=result["tax_amount"],
-        after_tax_profit=result["after_tax_profit"],
-        after_tax_roi=result["after_tax_roi"],
-        risk_score=result["risk_score"],
-        market_analysis=result["market_analysis"],
-        recommendations=result["recommendations"]
-    )
-    
-    db.add(calculation_record)
-    db.commit()
-    
-    return ROICalculationResponse(
-        session_id=session_id,
-        **result
-    )
+    return {
+        "data": result,
+        "session_id": session_id,
+        "status": "success"
+    }
+
 
 @router.get("/calculation/{session_id}")
 async def get_calculation(session_id: str):
@@ -128,51 +102,39 @@ async def compare_scenarios(
     investment_amount: float = Query(...),
     time_period: float = Query(...),
     time_unit: str = Query(...),
-    country_code: str = Query(...),
-    db: Session = Depends(get_db)
+    country_code: str = Query(...)
 ):
     """Compare multiple business scenarios"""
-    
-    country = db.query(TaxCountry).filter(
-        TaxCountry.country_code == country_code
-    ).first()
-    
-    if not country:
-        raise HTTPException(status_code=404, detail="Country not found")
     
     calculator_service = ROICalculatorService()
     comparison_results = []
     
+    scenario_names = {
+        1: "E-commerce", 2: "SaaS", 3: "Freelancer", 4: "Agency", 
+        5: "Startup", 6: "Restaurant", 7: "Consulting"
+    }
+    
     for scenario_id in scenario_ids:
-        business_scenario = db.query(BusinessScenario).filter(
-            BusinessScenario.id == scenario_id
-        ).first()
+        business_scenario_name = scenario_names.get(scenario_id, "E-commerce")
         
-        if business_scenario:
-            # Use the first mini scenario for comparison
-            mini_scenario = db.query(MiniScenario).filter(
-                MiniScenario.business_scenario_id == scenario_id
-            ).first()
-            
-            if mini_scenario:
-                result = calculator_service.calculate_roi(
-                    initial_investment=investment_amount,
-                    additional_costs=0,
-                    time_period=time_period,
-                    time_unit=time_unit,
-                    business_scenario_id=scenario_id,
-                    mini_scenario_id=mini_scenario.id,
-                    country_code=country.country_code,
-                    business_scenario_name=business_scenario.name,
-                    mini_scenario_name=mini_scenario.name
-                )
-                
-                comparison_results.append({
-                    "scenario_id": scenario_id,
-                    "scenario_name": business_scenario.name,
-                    "mini_scenario_name": mini_scenario.name,
-                    **result
-                })
+        result = calculator_service.calculate_roi(
+            initial_investment=investment_amount,
+            additional_costs=0,
+            time_period=time_period,
+            time_unit=time_unit,
+            business_scenario_id=scenario_id,
+            mini_scenario_id=1,
+            country_code=country_code,
+            business_scenario_name=business_scenario_name,
+            mini_scenario_name="General"
+        )
+        
+        comparison_results.append({
+            "scenario_id": scenario_id,
+            "scenario_name": business_scenario_name,
+            "mini_scenario_name": "General",
+            **result
+        })
     
     return {
         "comparison_results": comparison_results,
@@ -183,10 +145,7 @@ async def compare_scenarios(
     }
 
 @router.get("/market-analysis/{scenario_id}")
-async def get_market_analysis(
-    scenario_id: int,
-    db: Session = Depends(get_db)
-):
+async def get_market_analysis(scenario_id: int):
     """Get market analysis for a specific scenario"""
     
     # Check cache first
@@ -196,7 +155,12 @@ async def get_market_analysis(
     
     # Get market data from service
     market_service = MarketDataService()
-    market_data = market_service.get_market_analysis(scenario_id)
+    scenario_names = {
+        1: "E-commerce", 2: "SaaS", 3: "Freelancer", 4: "Agency", 
+        5: "Startup", 6: "Restaurant", 7: "Consulting"
+    }
+    business_scenario_name = scenario_names.get(scenario_id, "E-commerce")
+    market_data = market_service.get_market_data(business_scenario_name)
     
     # Cache the result
     cache_manager.set_market_data(scenario_id, market_data)
@@ -207,133 +171,31 @@ async def get_market_analysis(
 async def get_risk_assessment(
     scenario_id: int,
     investment_amount: float,
-    country_code: str,
-    db: Session = Depends(get_db)
+    country_code: str
 ):
     """Get risk assessment for a specific scenario"""
     
-    business_scenario = db.query(BusinessScenario).filter(
-        BusinessScenario.id == scenario_id
-    ).first()
-    
-    if not business_scenario:
-        raise HTTPException(status_code=404, detail="Business scenario not found")
-    
-    country = db.query(TaxCountry).filter(
-        TaxCountry.country_code == country_code
-    ).first()
-    
-    if not country:
-        raise HTTPException(status_code=404, detail="Country not found")
-    
-    # Calculate risk factors
-    risk_factors = {
-        "market_risk": calculate_market_risk(business_scenario, country),
-        "operational_risk": calculate_operational_risk(business_scenario),
-        "financial_risk": calculate_financial_risk(investment_amount, business_scenario),
-        "regulatory_risk": calculate_regulatory_risk(country),
-        "competition_risk": calculate_competition_risk(business_scenario)
+    # Simplified risk calculation
+    base_risk = 5.0  # Medium risk
+    investment_factor = min(investment_amount / 10000, 2.0)  # Higher investment = higher risk
+    scenario_risk = {
+        1: 6.0,  # E-commerce - High competition
+        2: 7.0,  # SaaS - High risk, high reward
+        3: 4.0,  # Freelancer - Lower risk
+        4: 5.0,  # Agency - Medium risk
+        5: 8.0,  # Startup - Very high risk
+        6: 7.0,  # Restaurant - High risk
+        7: 4.0   # Consulting - Lower risk
     }
     
-    overall_risk_score = sum(risk_factors.values()) / len(risk_factors)
+    total_risk = (base_risk + scenario_risk.get(scenario_id, 5.0) + investment_factor) / 3
+    risk_level = "High" if total_risk > 6 else "Medium" if total_risk > 4 else "Low"
     
     return {
         "scenario_id": scenario_id,
         "investment_amount": investment_amount,
         "country_code": country_code,
-        "risk_factors": risk_factors,
-        "overall_risk_score": overall_risk_score,
-        "risk_level": get_risk_level(overall_risk_score)
+        "total_risk_score": round(total_risk, 2),
+        "risk_level": risk_level
     }
 
-def calculate_market_risk(scenario: BusinessScenario, country: TaxCountry) -> float:
-    """Calculate market risk based on scenario and country factors"""
-    base_risk = 0.3
-    
-    # Market size factor
-    if scenario.market_size == "Small":
-        base_risk += 0.2
-    elif scenario.market_size == "Large":
-        base_risk -= 0.1
-    
-    # Competition factor
-    if scenario.competition_level == "High":
-        base_risk += 0.3
-    elif scenario.competition_level == "Low":
-        base_risk -= 0.2
-    
-    # Country economic factor
-    if country.gdp_per_capita < 10000:
-        base_risk += 0.2
-    elif country.gdp_per_capita > 50000:
-        base_risk -= 0.1
-    
-    return min(max(base_risk, 0), 1)
-
-def calculate_operational_risk(scenario: BusinessScenario) -> float:
-    """Calculate operational risk"""
-    base_risk = 0.4
-    
-    # Scalability factor
-    if scenario.scalability == "Low":
-        base_risk += 0.2
-    elif scenario.scalability == "High":
-        base_risk -= 0.1
-    
-    # Regulatory complexity
-    if scenario.regulatory_complexity == "High":
-        base_risk += 0.3
-    elif scenario.regulatory_complexity == "Low":
-        base_risk -= 0.2
-    
-    return min(max(base_risk, 0), 1)
-
-def calculate_financial_risk(investment_amount: float, scenario: BusinessScenario) -> float:
-    """Calculate financial risk"""
-    base_risk = 0.3
-    
-    # Investment size relative to recommended range
-    if investment_amount < scenario.recommended_investment_min:
-        base_risk += 0.3
-    elif investment_amount > scenario.recommended_investment_max:
-        base_risk += 0.2
-    else:
-        base_risk -= 0.1
-    
-    return min(max(base_risk, 0), 1)
-
-def calculate_regulatory_risk(country: TaxCountry) -> float:
-    """Calculate regulatory risk based on country factors"""
-    base_risk = 0.3
-    
-    # Ease of business ranking
-    if country.ease_of_business_rank > 100:
-        base_risk += 0.3
-    elif country.ease_of_business_rank < 50:
-        base_risk -= 0.2
-    
-    # Corruption perception
-    if country.corruption_perception_index < 50:
-        base_risk += 0.2
-    elif country.corruption_perception_index > 80:
-        base_risk -= 0.1
-    
-    return min(max(base_risk, 0), 1)
-
-def calculate_competition_risk(scenario: BusinessScenario) -> float:
-    """Calculate competition risk"""
-    if scenario.competition_level == "High":
-        return 0.7
-    elif scenario.competition_level == "Medium":
-        return 0.5
-    else:
-        return 0.3
-
-def get_risk_level(risk_score: float) -> str:
-    """Convert risk score to risk level"""
-    if risk_score < 0.3:
-        return "Low"
-    elif risk_score < 0.6:
-        return "Medium"
-    else:
-        return "High"
