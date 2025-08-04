@@ -21,6 +21,8 @@ import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
+import PDFExportButton from '../components/PDFExportButton';
+import FloatingExportButton from '../components/FloatingExportButton';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -414,10 +416,17 @@ const CalculatorPage: React.FC = () => {
           {/* Results Display */}
           {calculationResult && (
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2" />
-                Results
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-white flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Results
+                </h2>
+                <PDFExportButton
+                  result={calculationResult?.data || calculationResult}
+                  scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
+                  miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
+                />
+              </div>
               
               <ResultsDisplay result={calculationResult?.data || calculationResult} />
             </div>
@@ -492,6 +501,14 @@ const CalculatorPage: React.FC = () => {
           <p className="text-white/70 text-sm">Risk Analysis</p>
         </div>
       </motion.div>
+
+      {/* Floating Export Button */}
+      <FloatingExportButton
+        result={calculationResult?.data || calculationResult}
+        scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
+        miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
+        isVisible={!!calculationResult}
+      />
     </div>
   );
 };
