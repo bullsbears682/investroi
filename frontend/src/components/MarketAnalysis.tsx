@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BarChart, Activity, Globe, Users, DollarSign } from 'lucide-react';
+import { BarChart, Activity, Globe, Users, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 
 
 interface MarketAnalysisProps {
