@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BarChart, LineChart, TrendingUp, TrendingDown, Activity, Globe, Users, DollarSign } from 'lucide-react';
+import { BarChart, Activity, Globe, Users, DollarSign } from 'lucide-react';
 
 
 interface MarketAnalysisProps {
@@ -19,14 +19,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         market_size: 5.7, // Global e-commerce market in trillions
         growth_rate: 8.9, // More realistic growth rate
         competition_level: 'High',
-        market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Post-pandemic stabilization' },
-          { period: 'Q2 2023', value: 108, direction: 'up', growth: 8, description: 'Moderate growth recovery' },
-          { period: 'Q3 2023', value: 115, direction: 'up', growth: 6.5, description: 'Back-to-school season' },
-          { period: 'Q4 2023', value: 122, direction: 'up', growth: 6.1, description: 'Holiday season boost' },
-          { period: 'Q1 2024', value: 128, direction: 'up', growth: 4.9, description: 'Economic uncertainty impact' },
-          { period: 'Q2 2024', value: 135, direction: 'up', growth: 5.5, description: 'Gradual market recovery' }
-        ],
+
         key_players: [
           { name: 'Amazon', market_share: 37.8, strength_score: 0.92 },
           { name: 'Shopify', market_share: 19.2, strength_score: 0.85 },
@@ -53,14 +46,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         market_size: 195.2, // More realistic SaaS market size
         growth_rate: 13.7, // Conservative but realistic growth
         competition_level: 'Medium',
-        market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Cloud adoption continues' },
-          { period: 'Q2 2023', value: 112, direction: 'up', growth: 12, description: 'AI integration growth' },
-          { period: 'Q3 2023', value: 124, direction: 'up', growth: 10.7, description: 'Remote work solutions' },
-          { period: 'Q4 2023', value: 135, direction: 'up', growth: 8.9, description: 'Enterprise adoption' },
-          { period: 'Q1 2024', value: 145, direction: 'up', growth: 7.4, description: 'Market consolidation' },
-          { period: 'Q2 2024', value: 155, direction: 'up', growth: 6.9, description: 'Stable growth phase' }
-        ],
+
         key_players: [
           { name: 'Microsoft', market_share: 24.3, strength_score: 0.88 },
           { name: 'Salesforce', market_share: 16.8, strength_score: 0.85 },
@@ -87,14 +73,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         market_size: 1.2, // More realistic freelancer market
         growth_rate: 6.8, // Conservative growth rate
         competition_level: 'Medium',
-        market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Remote work stabilization' },
-          { period: 'Q2 2023', value: 106, direction: 'up', growth: 6, description: 'Gig economy growth' },
-          { period: 'Q3 2023', value: 112, direction: 'up', growth: 5.7, description: 'Specialized skills demand' },
-          { period: 'Q4 2023', value: 118, direction: 'up', growth: 5.4, description: 'Project-based work' },
-          { period: 'Q1 2024', value: 124, direction: 'up', growth: 5.1, description: 'Global talent access' },
-          { period: 'Q2 2024', value: 130, direction: 'up', growth: 4.8, description: 'AI-augmented services' }
-        ],
+
         key_players: [
           { name: 'Upwork', market_share: 38.5, strength_score: 0.82 },
           { name: 'Fiverr', market_share: 25.3, strength_score: 0.75 },
@@ -121,14 +100,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         market_size: 68.5, // More realistic agency market
         growth_rate: 5.2, // Conservative growth
         competition_level: 'High',
-        market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Post-pandemic recovery' },
-          { period: 'Q2 2023', value: 104, direction: 'up', growth: 4, description: 'Digital transformation demand' },
-          { period: 'Q3 2023', value: 108, direction: 'up', growth: 3.8, description: 'Performance marketing' },
-          { period: 'Q4 2023', value: 112, direction: 'up', growth: 3.7, description: 'Creative technology' },
-          { period: 'Q1 2024', value: 116, direction: 'up', growth: 3.6, description: 'Data-driven strategies' },
-          { period: 'Q2 2024', value: 120, direction: 'up', growth: 3.4, description: 'Brand experience focus' }
-        ],
+
         key_players: [
           { name: 'WPP Group', market_share: 15.2, strength_score: 0.85 },
           { name: 'Omnicom', market_share: 12.8, strength_score: 0.82 },
@@ -155,14 +127,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         market_size: 3.8, // More realistic startup ecosystem
         growth_rate: 12.5, // Conservative but realistic
         competition_level: 'Medium',
-        market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Innovation ecosystem' },
-          { period: 'Q2 2023', value: 115, direction: 'up', growth: 15, description: 'AI/ML startup growth' },
-          { period: 'Q3 2023', value: 128, direction: 'up', growth: 11.3, description: 'FinTech innovation' },
-          { period: 'Q4 2023', value: 140, direction: 'up', growth: 9.4, description: 'HealthTech focus' },
-          { period: 'Q1 2024', value: 150, direction: 'up', growth: 7.1, description: 'GreenTech acceleration' },
-          { period: 'Q2 2024', value: 160, direction: 'up', growth: 6.7, description: 'EdTech expansion' }
-        ],
+
         key_players: [
           { name: 'Tech Giants', market_share: 32.5, strength_score: 0.88 },
           { name: 'VC-Backed Startups', market_share: 38.7, strength_score: 0.75 },
@@ -190,14 +155,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
       market_size: 8.5, // More realistic default market size
       growth_rate: 6.8, // Conservative default growth rate
       competition_level: 'Medium',
-      market_trends: [
-        { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Market stabilization' },
-        { period: 'Q2 2023', value: 106, direction: 'up', growth: 6, description: 'Moderate growth' },
-        { period: 'Q3 2023', value: 112, direction: 'up', growth: 5.7, description: 'Technology adoption' },
-        { period: 'Q4 2023', value: 118, direction: 'up', growth: 5.4, description: 'Market expansion' },
-        { period: 'Q1 2024', value: 124, direction: 'up', growth: 5.1, description: 'Innovation focus' },
-        { period: 'Q2 2024', value: 130, direction: 'up', growth: 4.8, description: 'Sustainable growth' }
-      ],
+
       key_players: [
         { name: 'Market Leaders', market_share: 35.2, strength_score: 0.78 },
         { name: 'Established Players', market_share: 32.8, strength_score: 0.72 },
@@ -246,15 +204,9 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
     );
   }
 
-  const { market_size, growth_rate, competition_level, market_trends, key_players, opportunities, threats } = marketData.data;
+  const { market_size, growth_rate, competition_level, key_players, opportunities, threats } = marketData.data;
 
   // Prepare chart data
-  const marketTrendsData = market_trends?.map((trend: any) => ({
-    month: trend.period,
-    value: trend.value,
-    trend: trend.direction
-  })) || [];
-
   const competitionData = key_players?.map((player: any) => ({
     name: player.name,
     market_share: player.market_share,
@@ -290,94 +242,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         </div>
       </motion.div>
 
-      {/* Market Trends */}
-      {marketTrendsData.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
-        >
-          <h4 className="text-white font-semibold mb-4 flex items-center">
-            <LineChart className="w-4 h-4 mr-2" />
-            Market Trends
-          </h4>
-          
-          <div className="space-y-4">
-            {marketTrendsData.map((trend: any, index: number) => {
-              const prevValue = index > 0 ? marketTrendsData[index - 1].value : trend.value;
-              const growth = ((trend.value - prevValue) / prevValue * 100).toFixed(1);
-              const isPositive = trend.value >= prevValue;
-              
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + index * 0.1 }}
-                  className="space-y-2"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-white/70 font-medium">{trend.period}</span>
-                    <div className="flex items-center space-x-3">
-                      <span className="text-white font-bold text-lg">{trend.value}</span>
-                      <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        isPositive 
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                          : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                      }`}>
-                        {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        <span>{isPositive ? '+' : ''}{growth}%</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="w-full bg-white/10 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        isPositive ? 'bg-gradient-to-r from-green-400 to-green-500' : 'bg-gradient-to-r from-red-400 to-red-500'
-                      }`}
-                      style={{ 
-                        width: `${Math.min((trend.value / Math.max(...marketTrendsData.map(t => t.value))) * 100, 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                  
-                  {/* Growth Indicator */}
-                  <div className="flex items-center space-x-2 text-xs">
-                    <div className={`w-2 h-2 rounded-full ${
-                      isPositive ? 'bg-green-400' : 'bg-red-400'
-                    }`}></div>
-                    <span className="text-white/60">
-                      {trend.description} • 
-                      {index === 0 ? ' Baseline' : ` ${growth}% ${isPositive ? 'increase' : 'decrease'} from previous quarter`}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-          
-          {/* Summary Stats */}
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="text-center">
-                <div className="text-white/60">Total Growth</div>
-                <div className="text-white font-bold text-lg">
-                  {((marketTrendsData[marketTrendsData.length - 1]?.value - marketTrendsData[0]?.value) / marketTrendsData[0]?.value * 100).toFixed(1)}%
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-white/60">Avg Quarterly Growth</div>
-                <div className="text-white font-bold text-lg">
-                  {((marketTrendsData[marketTrendsData.length - 1]?.value - marketTrendsData[0]?.value) / marketTrendsData[0]?.value * 100 / (marketTrendsData.length - 1)).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
+
 
       {/* Competition Analysis */}
       {competitionData.length > 0 && (
