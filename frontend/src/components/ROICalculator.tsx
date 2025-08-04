@@ -11,6 +11,8 @@ import {
   CheckCircle
 } from 'lucide-react';
 
+import PDFExportButton from './PDFExportButton';
+
 interface ROICalculatorProps {
   onCalculate: (data: any) => void;
   isLoading: boolean;
@@ -18,6 +20,7 @@ interface ROICalculatorProps {
   selectedMiniScenario: number | null;
   scenariosData: any[];
   miniScenariosData: any[];
+  calculationResult?: any;
 }
 
 interface FormData {
@@ -32,7 +35,8 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
   selectedScenario,
   selectedMiniScenario,
   scenariosData,
-  miniScenariosData
+  miniScenariosData,
+  calculationResult
 }) => {
   const {
     register,
@@ -341,6 +345,22 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+        
+        {/* PDF Export Button */}
+        {calculationResult && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-4 flex justify-center"
+          >
+            <PDFExportButton
+              result={calculationResult}
+              scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
+              miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
+            />
           </motion.div>
         )}
       </motion.div>

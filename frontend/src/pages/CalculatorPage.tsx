@@ -22,7 +22,6 @@ import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
 import PDFExportButton from '../components/PDFExportButton';
-import FloatingExportButton from '../components/FloatingExportButton';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -402,6 +401,7 @@ const CalculatorPage: React.FC = () => {
           selectedMiniScenario={selectedMiniScenario}
           scenariosData={scenariosData}
           miniScenariosData={miniScenariosData}
+          calculationResult={calculationResult?.data || calculationResult}
         />
           </motion.div>
         </motion.div>
@@ -502,13 +502,7 @@ const CalculatorPage: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Floating Export Button */}
-      <FloatingExportButton
-        result={calculationResult?.data || calculationResult}
-        scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
-        miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
-        isVisible={!!calculationResult}
-      />
+
     </div>
   );
 };
