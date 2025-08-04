@@ -115,6 +115,10 @@ const CalculatorPage: React.FC = () => {
     console.log('Initial investment:', initialInvestment);
     console.log('Additional costs:', additionalCosts);
     console.log('Total investment:', totalInvestment);
+    
+    // Mobile-friendly debug display
+    const debugInfo2 = `LOCAL: Initial=${initialInvestment}, Total=${totalInvestment}`;
+    toast(debugInfo2, { duration: 5000 });
     const countryCode = formData?.country_code || 'US';
     
     console.log('Form data:', formData);
@@ -258,6 +262,10 @@ const CalculatorPage: React.FC = () => {
         console.log('Processed calculationData:', calculationData);
         console.log('Initial investment (raw):', formData.initial_investment);
         console.log('Initial investment (processed):', calculationData.initial_investment);
+        
+        // Mobile-friendly debug display
+        const debugInfo = `DEBUG: Raw=${formData.initial_investment}, Processed=${calculationData.initial_investment}`;
+        toast(debugInfo, { duration: 5000 });
 
         console.log('Sending calculation request to API...');
         
