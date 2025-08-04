@@ -9,7 +9,8 @@ import {
   Info,
   AlertTriangle,
   CheckCircle,
-  Download
+  Download,
+  Shield
 } from 'lucide-react';
 
 import ExportModal from './ExportModal';
@@ -344,6 +345,50 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
                 </div>
                 <div className="text-xs text-white/60 mt-1">
                   {investmentFit.recommendation}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Investment Recommendations */}
+        {selectedScenario && selectedMiniScenario && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mt-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
+          >
+            <h3 className="text-white font-semibold mb-4 flex items-center">
+              <Shield className="w-4 h-4 mr-2" />
+              Investment Recommendations
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg">
+                <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+                <div>
+                  <div className="text-white font-medium text-sm">Market Entry Strategy</div>
+                  <div className="text-white/60 text-xs mt-1">
+                    Consider a phased approach with initial market testing and gradual expansion
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg">
+                <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
+                <div>
+                  <div className="text-white font-medium text-sm">Competitive Positioning</div>
+                  <div className="text-white/60 text-xs mt-1">
+                    Focus on differentiation through innovation and customer service excellence
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg">
+                <div className="w-2 h-2 bg-orange-400 rounded-full mt-2"></div>
+                <div>
+                  <div className="text-white font-medium text-sm">Risk Mitigation</div>
+                  <div className="text-white/60 text-xs mt-1">
+                    Diversify revenue streams and maintain strong financial reserves
+                  </div>
                 </div>
               </div>
             </div>
