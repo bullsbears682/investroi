@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
     product: [
       { name: 'ROI Calculator', href: '/calculator' },
       { name: 'Business Scenarios', href: '/scenarios' },
-      { name: 'Market Analysis', href: '/calculator' },
+      { name: 'Market Analysis', href: '/scenarios' },
       { name: 'PDF Reports', href: '/calculator' }
     ],
     company: [
@@ -20,9 +20,9 @@ const Footer: React.FC = () => {
       { name: 'Contact', href: '/about' }
     ],
     resources: [
-      { name: 'Investment Guide', href: '/about' },
+      { name: 'Investment Guide', href: '/scenarios' },
       { name: 'Tax Information', href: '/about' },
-      { name: 'Market Research', href: '/about' },
+      { name: 'Market Research', href: '/scenarios' },
       { name: 'Risk Assessment', href: '/calculator' }
     ]
   };
