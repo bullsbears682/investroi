@@ -126,18 +126,18 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(`${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI`, 105, 100, { align: 'center' });
     doc.setFontSize(12);
     doc.setTextColor(255, 255, 255);
-    doc.text(`on $${calculationData.total_investment?.toLocaleString() || 'N/A'} investment`, 105, 115, { align: 'center' });
+    doc.text(`on $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} investment`, 105, 115, { align: 'center' });
 
     // Summary table - improved alignment
     const summaryData = [
-      ['💰 Initial Investment', `$${calculationData.initial_investment?.toLocaleString() || 'N/A'}`],
-      ['💸 Additional Costs', `$${calculationData.additional_costs?.toLocaleString() || 'N/A'}`],
-      ['💵 Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
-      ['📈 Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`],
-      ['🏢 Business Scenario', calculationData.scenario_name || 'N/A'],
-      ['🎯 Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
-      ['🌍 Country', calculationData.country_code || 'N/A'],
-      ['📋 Calculation Method', calculationData.calculation_method || 'Local Fallback']
+      ['Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Business Scenario', calculationData.scenario_name || 'N/A'],
+      ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
+      ['Country', calculationData.country_code || 'N/A'],
+      ['Calculation Method', calculationData.calculation_method || 'Local Fallback']
     ];
     
     autoTable(doc, {
@@ -245,13 +245,13 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Investment Summary Section - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('💰 Investment Summary', 20, 90);
+    doc.text('Investment Summary', 20, 90);
     
     const investmentData = [
-      ['💵 Initial Investment', `$${calculationData.initial_investment?.toLocaleString() || 'N/A'}`],
-      ['💸 Additional Costs', `$${calculationData.additional_costs?.toLocaleString() || 'N/A'}`],
-      ['💰 Total Investment', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`],
-      ['📊 Investment Type', (calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale']
+      ['Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Total Investment', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Investment Type', (calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale']
     ];
     
     autoTable(doc, {
@@ -281,13 +281,13 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // ROI Performance Section - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('📈 ROI Performance', 20, 160);
+    doc.text('ROI Performance', 20, 160);
     
     const roiData = [
-      ['📊 ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
-      ['💵 Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
-      ['🎯 Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`],
-      ['📈 Performance', (calculationData.roi_percentage || 0) >= 20 ? 'Excellent' : (calculationData.roi_percentage || 0) >= 10 ? 'Good' : (calculationData.roi_percentage || 0) >= 0 ? 'Fair' : 'Poor']
+      ['ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
+      ['Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Performance', (calculationData.roi_percentage || 0) >= 20 ? 'Excellent' : (calculationData.roi_percentage || 0) >= 10 ? 'Good' : (calculationData.roi_percentage || 0) >= 0 ? 'Fair' : 'Poor']
     ];
     
     autoTable(doc, {
@@ -317,13 +317,13 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Business Information Section - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('🏢 Business Information', 20, 220);
+    doc.text('Business Information', 20, 220);
     
     const businessData = [
-      ['🏭 Scenario', calculationData.scenario_name || 'N/A'],
-      ['🎯 Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
-      ['🌍 Country', calculationData.country_code || 'N/A'],
-      ['📋 Calculation Method', calculationData.calculation_method || 'Local Fallback']
+      ['Scenario', calculationData.scenario_name || 'N/A'],
+      ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
+      ['Country', calculationData.country_code || 'N/A'],
+      ['Calculation Method', calculationData.calculation_method || 'Local Fallback']
     ];
     
     autoTable(doc, {
@@ -361,13 +361,13 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('💸 Tax Analysis', 20, 30);
+    doc.text('Tax Analysis', 20, 30);
     
     const taxData = [
-      ['📊 Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || '0.0'}%`],
-      ['💸 Tax Amount', `$${calculationData.tax_amount?.toLocaleString() || 'N/A'}`],
-      ['💵 After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`],
-      ['📈 Tax Impact', `${((calculationData.tax_amount / (calculationData.net_profit || 1)) * 100)?.toFixed(1) || '0.0'}% of profit`]
+      ['Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || '0.0'}%`],
+      ['Tax Amount', `$${calculationData.tax_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['After-Tax Profit', `$${calculationData.after_tax_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Tax Impact', `${((calculationData.tax_amount / (calculationData.net_profit || 1)) * 100)?.toFixed(1) || '0.0'}% of profit`]
     ];
     
     autoTable(doc, {
@@ -397,7 +397,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Risk Assessment - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('⚠️ Risk Assessment', 20, 100);
+    doc.text('Risk Assessment', 20, 100);
     
     let riskLevel = '';
     let riskColor = [255, 255, 255];
@@ -423,7 +423,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Market Analysis Section - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('📈 Market Analysis', 20, 140);
+    doc.text('Market Analysis', 20, 140);
     
     const marketInsights = [
       `• Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
@@ -495,19 +495,19 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(`${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI`, 105, 115, { align: 'center' });
     doc.setFontSize(12);
     doc.setTextColor(255, 255, 255);
-    doc.text(`on $${calculationData.total_investment?.toLocaleString() || 'N/A'} investment`, 105, 130, { align: 'center' });
-    doc.text(`Net Profit: $${calculationData.net_profit?.toLocaleString() || 'N/A'}`, 105, 145, { align: 'center' });
+    doc.text(`on $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} investment`, 105, 130, { align: 'center' });
+    doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 145, { align: 'center' });
 
     // Executive Summary Table - improved alignment
     const executiveData = [
-      ['💰 Investment Amount', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`],
-      ['📈 ROI Performance', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
-      ['💵 Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
-      ['🎯 Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`],
-      ['🏢 Business Type', calculationData.scenario_name || 'N/A'],
-      ['🌍 Market', calculationData.country_code || 'N/A'],
-      ['📊 Tax Rate', `${calculationData.effective_tax_rate || '0'}%`],
-      ['💸 After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`]
+      ['Investment Amount', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['ROI Performance', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
+      ['Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+      ['Business Type', calculationData.scenario_name || 'N/A'],
+      ['Market', calculationData.country_code || 'N/A'],
+      ['Tax Rate', `${calculationData.effective_tax_rate || '0'}%`],
+      ['After-Tax Profit', `$${calculationData.after_tax_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`]
     ];
     
     autoTable(doc, {
@@ -557,7 +557,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Investment Assessment - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('📋 Investment Assessment', 20, 60);
+    doc.text('Investment Assessment', 20, 60);
     
     let recommendation = '';
     let recommendationColor = [255, 255, 255];
@@ -602,7 +602,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Market Analysis Section - improved alignment
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text('📈 Market Analysis', 20, 125);
+    doc.text('Market Analysis', 20, 125);
     
     const marketInsights = [
       `• Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
