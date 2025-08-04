@@ -120,10 +120,20 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
         recommendation: 'Consider increasing investment for better results'
       };
     } else if (investment > recommendedMax) {
+      const percentage = ((investment / recommendedMax) * 100).toFixed(1);
+      let recommendation = 'Consider reducing investment or diversifying';
+      
+      // Provide more specific guidance based on how much over the limit
+      if (investment > recommendedMax * 2) {
+        recommendation = 'Consider a different business type or splitting investment across multiple ventures';
+      } else if (investment > recommendedMax * 1.5) {
+        recommendation = 'Consider reducing investment or exploring higher-capital business models';
+      }
+      
       return {
         fit: 'large',
-        message: `Investment is above recommended maximum (${((investment / recommendedMax) * 100).toFixed(1)}% of maximum)`,
-        recommendation: 'Consider reducing investment or diversifying'
+        message: `Investment is above recommended maximum (${percentage}% of maximum)`,
+        recommendation: recommendation
       };
     } else {
       return {
@@ -317,6 +327,31 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
                 </div>
                 <div className="text-xs text-white/60 mt-1">
                   {investmentFit.recommendation}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        {/* Alternative Business Suggestions */}
+        {selectedScenario && selectedMiniScenario && investmentFit.fit === 'large' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg"
+          >
+            <div className="flex items-start space-x-2">
+              <Info className="w-4 h-4 mt-0.5 text-blue-400" />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-blue-400">
+                  Consider These Business Types for Your Investment
+                </div>
+                <div className="text-xs text-white/60 mt-2 space-y-1">
+                  <div>• <strong>Private Label E-commerce:</strong> $10,000 - $50,000 range</div>
+                  <div>• <strong>Wholesale Business:</strong> $15,000 - $75,000 range</div>
+                  <div>• <strong>Digital Agency:</strong> $15,000 - $75,000 range</div>
+                  <div>• <strong>SaaS Startup:</strong> $10,000 - $100,000 range</div>
                 </div>
               </div>
             </div>
