@@ -47,8 +47,8 @@ export const mockScenarios: Scenario[] = [
     description: "Software as a Service subscription business",
     recommended_investment_min: 10000,
     recommended_investment_max: 100000,
-    typical_roi_min: 25,
-    typical_roi_max: 50,
+    typical_roi_min: 20,
+    typical_roi_max: 40,
     risk_level: "High",
     market_size: "Large",
     competition_level: "Medium"
@@ -86,8 +86,8 @@ export const mockScenarios: Scenario[] = [
     description: "Innovative new business venture",
     recommended_investment_min: 25000,
     recommended_investment_max: 200000,
-    typical_roi_min: 30,
-    typical_roi_max: 100,
+    typical_roi_min: 15,
+    typical_roi_max: 45,
     risk_level: "High",
     market_size: "Large",
     competition_level: "Medium"
