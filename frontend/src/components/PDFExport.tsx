@@ -205,8 +205,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
           fillColor: [30, 41, 59] // Dark slate
-        },
-        gridLineColor: [147, 51, 234] // Purple neon lines
+        }
       });
 
       // Neon footer
@@ -295,8 +294,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
           fillColor: [30, 41, 59] // Dark slate
-        },
-        gridLineColor: [147, 51, 234] // Purple neon lines
+        }
       });
 
       // ROI Performance Section with Neon Clay design
@@ -334,8 +332,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
           fillColor: [30, 41, 59] // Dark slate
-        },
-        gridLineColor: [147, 51, 234] // Purple neon lines
+        }
       });
 
       // Business Information Section with Neon Clay design
@@ -373,8 +370,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
           fillColor: [30, 41, 59] // Dark slate
-        },
-        gridLineColor: [147, 51, 234] // Purple neon lines
+        }
       });
 
       // Second page with Neon Clay design
@@ -418,8 +414,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
           fillColor: [30, 41, 59] // Dark slate
-        },
-        gridLineColor: [147, 51, 234] // Purple neon lines
+        }
       });
 
       // Risk Assessment with Neon Clay design
@@ -574,8 +569,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
           fillColor: [30, 41, 59] // Dark slate
-        },
-        gridLineColor: [147, 51, 234] // Purple neon lines
+        }
       });
 
       // Second page with Neon Clay design
