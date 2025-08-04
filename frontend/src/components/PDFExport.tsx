@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, FileText, BarChart3, TrendingUp, Star, Award, Zap, Target, DollarSign, TrendingDown, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Download, FileText, BarChart3, Award } from 'lucide-react';
 import { apiService } from '../services/api';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
