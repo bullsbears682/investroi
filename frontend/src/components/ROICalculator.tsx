@@ -233,6 +233,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
             <option value="SK">🇸🇰 Slovakia</option>
             <option value="SI">🇸🇮 Slovenia</option>
             <option value="EE">🇪🇪 Estonia</option>
+            <option value="AE">🇦🇪 United Arab Emirates</option>
           </select>
           <div className="text-xs text-white/60 mt-1">
             Select your country for accurate tax calculations

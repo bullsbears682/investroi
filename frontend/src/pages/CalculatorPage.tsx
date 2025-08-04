@@ -133,7 +133,7 @@ const CalculatorPage: React.FC = () => {
             'AU': 30.0, 'JP': 29.7, 'SG': 17.0, 'NL': 25.8, 'CH': 18.0,
             'SE': 20.6, 'NO': 22.0, 'DK': 22.0, 'FI': 20.0, 'IE': 12.5,
             'ES': 25.0, 'IT': 24.0, 'BE': 25.0, 'AT': 25.0, 'PL': 19.0,
-            'CZ': 19.0, 'HU': 9.0, 'SK': 21.0, 'SI': 19.0, 'EE': 20.0
+            'CZ': 19.0, 'HU': 9.0, 'SK': 21.0, 'SI': 19.0, 'EE': 20.0, 'AE': 0.0
           };
           
           const baseRate = countryTaxRates[countryCode] || 21.0; // Default to US rate
