@@ -6,7 +6,6 @@ import {
   DollarSign, 
   Target,
   ArrowRight,
-  BarChart3,
   BookOpen,
   Shield,
   AlertTriangle,
@@ -14,9 +13,6 @@ import {
   Lightbulb,
   FileText,
   Building,
-  Users,
-  Home,
-  Briefcase,
   Clock,
   TrendingUp,
   Info
