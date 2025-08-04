@@ -67,7 +67,10 @@ export const apiEndpoints = {
   taxComparison: '/api/tax/comparison',
   regionsOverview: '/api/tax/regions/overview',
 
-
+  // PDF Export
+  pdfExport: '/api/pdf/export',
+  pdfTemplates: '/api/pdf/templates',
+  pdfPreview: (sessionId: string) => `/api/pdf/preview/${sessionId}`,
 
   // Business Scenarios
   businessScenarios: '/api/business-scenarios',
@@ -100,7 +103,10 @@ export const apiService = {
   getTaxComparison: () => api.get(apiEndpoints.taxComparison),
   getRegionsOverview: () => api.get(apiEndpoints.regionsOverview),
 
-
+  // PDF Export
+  exportPDF: (data: any) => api.post(apiEndpoints.pdfExport, data, { responseType: 'blob' }),
+  getPDFTemplates: () => api.get(apiEndpoints.pdfTemplates),
+  getPDFPreview: (sessionId: string) => api.get(apiEndpoints.pdfPreview(sessionId)),
 
   // Business Scenarios
   getBusinessScenarios: () => api.get(apiEndpoints.businessScenarios),
