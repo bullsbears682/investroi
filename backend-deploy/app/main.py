@@ -41,7 +41,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(pdf_export.router)
-app.include_router(roi_calculator.router)
+app.include_router(roi_calculator.router, prefix="/api/roi")
 
 # Health check endpoint
 @app.get("/")
