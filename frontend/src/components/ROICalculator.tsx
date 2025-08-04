@@ -11,7 +11,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-import PDFExportButton from './PDFExportButton';
+import ExportModal from './ExportModal';
 
 interface ROICalculatorProps {
   onCalculate: (data: any) => void;
@@ -38,6 +38,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
   miniScenariosData,
   calculationResult
 }) => {
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const {
     register,
     handleSubmit,
@@ -348,7 +349,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           </motion.div>
         )}
         
-        {/* PDF Export Button */}
+        {/* Export Report Button */}
         {calculationResult && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -356,13 +357,24 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
             transition={{ delay: 0.2 }}
             className="mt-4 flex justify-center"
           >
-            <PDFExportButton
-              result={calculationResult}
-              scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
-              miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
-            />
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Download className="w-4 h-4" />
+              <span>Export Report</span>
+            </button>
           </motion.div>
         )}
+
+        {/* Export Modal */}
+        <ExportModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          result={calculationResult}
+          scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
+          miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
+        />
       </motion.div>
 
       {/* Calculate Button */}
