@@ -109,19 +109,7 @@ const CalculatorPage: React.FC = () => {
     const additionalCosts = Number(formData?.additional_costs) || 0;
     const totalInvestment = initialInvestment + additionalCosts;
     
-    console.log('DEBUG - Investment amounts:');
-    console.log('Form data:', formData);
-    console.log('Initial investment:', initialInvestment);
-    console.log('Additional costs:', additionalCosts);
-    console.log('Total investment:', totalInvestment);
-    
-    // Mobile-friendly debug display
-    const debugInfo2 = `LOCAL: Initial=${initialInvestment}, Total=${totalInvestment}`;
-    toast(debugInfo2, { duration: 5000 });
     const countryCode = formData?.country_code || 'US';
-    
-    console.log('Form data:', formData);
-    console.log('Country code from form data:', countryCode);
     
     // Get scenario data for calculation
     const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
@@ -264,7 +252,7 @@ const CalculatorPage: React.FC = () => {
     };
     
     setCalculationResult(result);
-    toast.success('ROI calculation completed (local fallback)!');
+    toast.success('ROI calculation completed!');
   };
 
         const handleCalculate = (formData: any) => {
@@ -284,16 +272,6 @@ const CalculatorPage: React.FC = () => {
           mini_scenario_id: selectedMiniScenario,
           country_code: formData.country_code || 'US'
         };
-
-        console.log('DEBUG - Form submission:');
-        console.log('Raw formData:', formData);
-        console.log('Processed calculationData:', calculationData);
-        console.log('Initial investment (raw):', formData.initial_investment);
-        console.log('Initial investment (processed):', calculationData.initial_investment);
-        
-        // Mobile-friendly debug display
-        const debugInfo = `TEST: $${formData.initial_investment} | ${formData.country_code} | ${selectedScenario} | ${selectedMiniScenario}`;
-        toast(debugInfo, { duration: 3000 });
 
         console.log('Sending calculation request to API...');
         
