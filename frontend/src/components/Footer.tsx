@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
   const footerLinks = {
     product: [
       { name: 'ROI Calculator', href: '/calculator' },
-      { name: 'Business Scenarios', href: '/calculator' },
+      { name: 'Business Scenarios', href: '/scenarios' },
       { name: 'Market Analysis', href: '/calculator' },
       { name: 'PDF Reports', href: '/calculator' }
     ],
