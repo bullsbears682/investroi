@@ -96,145 +96,130 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         creator: 'InvestWise Pro ROI Calculator'
       });
 
-      // Creative gradient background - cosmic theme
-      doc.setFillColor(8, 8, 32); // Deep space blue
+      // App-style background - dark gradient like the app
+      doc.setFillColor(15, 23, 42); // Dark blue base like app
       doc.rect(0, 0, 210, 297, 'F');
       
-      // Cosmic header with nebula effect
-      doc.setFillColor(75, 0, 130); // Deep purple
-      doc.rect(0, 0, 210, 90, 'F');
+      // App-style header with gradient effect
+      doc.setFillColor(59, 130, 246); // Blue like app header
+      doc.rect(0, 0, 210, 80, 'F');
       
-      // Stellar accent lines
-      doc.setFillColor(255, 215, 0); // Gold
-      doc.rect(0, 85, 210, 3, 'F');
-      doc.rect(0, 88, 210, 2, 'F');
-
-      // Creative header with cosmic typography
-      doc.setFontSize(32);
+      // App-style accent line
+      doc.setFillColor(16, 185, 129); // Green accent like app
+      doc.rect(0, 75, 210, 5, 'F');
+      
+      // App-style header text
+      doc.setFontSize(28);
       doc.setTextColor(255, 255, 255);
-      doc.text('★ InvestWise Pro ★', 105, 35, { align: 'center' });
+      doc.text('InvestWise Pro', 105, 35, { align: 'center' });
       
-      doc.setFontSize(18);
-      doc.setTextColor(255, 215, 0); // Gold
-      doc.text('✨ ROI Investment Report ✨', 105, 55, { align: 'center' });
+      doc.setFontSize(16);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('ROI Investment Report', 105, 55, { align: 'center' });
       
       doc.setFontSize(12);
-      doc.setTextColor(173, 216, 230); // Light blue
-      doc.text('🚀 Your Financial Journey to Success 🚀', 105, 75, { align: 'center' });
+      doc.setTextColor(255, 255, 255);
+      doc.text('Professional Investment Analysis', 105, 70, { align: 'center' });
 
-      // Cosmic ROI Highlight Card
-      doc.setFillColor(25, 25, 112); // Midnight blue
-      doc.rect(15, 110, 180, 80, 'F');
-      doc.setDrawColor(255, 215, 0); // Gold border
-      doc.rect(15, 110, 180, 80, 'S');
+      // App-style ROI Highlight Card (like ResultsDisplay)
+      doc.setFillColor(255, 255, 255, 0.1); // White with transparency like app
+      doc.rect(15, 100, 180, 80, 'F');
+      doc.setDrawColor(255, 255, 255, 0.2); // White border like app
+      doc.rect(15, 100, 180, 80, 'S');
       
-      // Stellar accent on card
-      doc.setFillColor(255, 215, 0); // Gold
-      doc.rect(15, 110, 180, 5, 'F');
+      // App-style accent on card
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(15, 100, 180, 4, 'F');
       
-      // Creative ROI display
-      doc.setFontSize(28);
-      doc.setTextColor(255, 215, 0); // Gold
-      doc.text(`💫 ${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI 💫`, 105, 135, { align: 'center' });
+      // ROI display with app-style colors
+      const roi = calculationData.roi_percentage || 0;
+      let roiColor = [16, 185, 129]; // Green
+      if (roi < 10) roiColor = [59, 130, 246]; // Blue
+      if (roi < 0) roiColor = [239, 68, 68]; // Red
+      
+      doc.setFontSize(26);
+      doc.setTextColor(roiColor[0], roiColor[1], roiColor[2]);
+      doc.text(`${roi.toFixed(2)}% ROI`, 105, 125, { align: 'center' });
+      
       doc.setFontSize(14);
       doc.setTextColor(255, 255, 255);
-      doc.text(`💰 Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} 💰`, 105, 155, { align: 'center' });
-      doc.text(`🎯 Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} 🎯`, 105, 170, { align: 'center' });
+      doc.text(`Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 145, { align: 'center' });
+      doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 160, { align: 'center' });
 
-      // Creative Performance indicator
-      const performanceY = 210;
-      doc.setFillColor(25, 25, 112); // Midnight blue
+      // App-style Performance indicator
+      const performanceY = 200;
+      doc.setFillColor(255, 255, 255, 0.1); // White with transparency
       doc.rect(15, performanceY, 180, 60, 'F');
-      doc.setDrawColor(255, 215, 0); // Gold border
+      doc.setDrawColor(255, 255, 255, 0.2); // White border
       doc.rect(15, performanceY, 180, 60, 'S');
       
       // Performance accent
-      const roi = calculationData.roi_percentage || 0;
-      let performanceColor = [0, 255, 0]; // Bright green
-      let performanceEmoji = '🌟';
+      let performanceColor = [16, 185, 129]; // Green
+      let performanceText = 'Excellent';
       if (roi < 10) {
-        performanceColor = [255, 255, 0]; // Bright yellow
-        performanceEmoji = '⭐';
+        performanceColor = [59, 130, 246]; // Blue
+        performanceText = 'Good';
       }
       if (roi < 0) {
-        performanceColor = [255, 0, 0]; // Bright red
-        performanceEmoji = '💥';
+        performanceColor = [239, 68, 68]; // Red
+        performanceText = 'Needs Improvement';
       }
       
       doc.setFillColor(performanceColor[0], performanceColor[1], performanceColor[2]);
-      doc.rect(15, performanceY, 180, 6, 'F');
-      
-      doc.setFontSize(18);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`${performanceEmoji} Performance Rating ${performanceEmoji}`, 105, performanceY + 25, { align: 'center' });
-      
-      let rating = '';
-      let ratingColor = [255, 255, 255];
-      let ratingEmoji = '';
-      if (roi >= 20) {
-        rating = 'EXCELLENT';
-        ratingColor = [0, 255, 0]; // Bright green
-        ratingEmoji = '🏆';
-      } else if (roi >= 10) {
-        rating = 'GOOD';
-        ratingColor = [0, 191, 255]; // Deep sky blue
-        ratingEmoji = '🎯';
-      } else if (roi >= 0) {
-        rating = 'FAIR';
-        ratingColor = [255, 255, 0]; // Bright yellow
-        ratingEmoji = '📈';
-      } else {
-        rating = 'NEEDS IMPROVEMENT';
-        ratingColor = [255, 0, 0]; // Bright red
-        ratingEmoji = '⚠️';
-      }
+      doc.rect(15, performanceY, 180, 4, 'F');
       
       doc.setFontSize(16);
-      doc.setTextColor(ratingColor[0], ratingColor[1], ratingColor[2]);
-      doc.text(`${ratingEmoji} ${rating} ${ratingEmoji}`, 105, performanceY + 45, { align: 'center' });
+      doc.setTextColor(255, 255, 255);
+      doc.text('Performance Rating', 105, performanceY + 20, { align: 'center' });
+      
+      doc.setFontSize(14);
+      doc.setTextColor(performanceColor[0], performanceColor[1], performanceColor[2]);
+      doc.text(performanceText, 105, performanceY + 40, { align: 'center' });
 
-      // Creative Summary table
+      // App-style Summary table with proper alignment
       const summaryData = [
-        ['💎 Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🔧 Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['📊 Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🎯 Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🏢 Business Scenario', calculationData.scenario_name || 'N/A'],
-        ['🎪 Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
-        ['🌍 Country', calculationData.country_code || 'N/A'],
-        ['⚡ Calculation Method', calculationData.calculation_method || 'Local Fallback']
+        ['Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Business Scenario', calculationData.scenario_name || 'N/A'],
+        ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
+        ['Country', calculationData.country_code || 'N/A'],
+        ['Calculation Method', calculationData.calculation_method || 'Local Fallback']
       ];
       
       autoTable(doc, {
-        startY: 290,
-        head: [['📋 Metric', '💡 Value']],
+        startY: 280,
+        head: [['Metric', 'Value']],
         body: summaryData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [75, 0, 130], // Deep purple
+          fillColor: [59, 130, 246], // Blue like app
           textColor: [255, 255, 255],
           fontSize: 12,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          halign: 'center'
         },
         styles: { 
           fontSize: 11,
           cellPadding: 8,
-          textColor: [255, 255, 255]
+          textColor: [255, 255, 255],
+          halign: 'left'
         },
         margin: { left: 15, right: 15 },
         alternateRowStyles: {
-          fillColor: [25, 25, 112] // Midnight blue
+          fillColor: [30, 41, 59] // Dark slate
         }
       });
 
-      // Creative footer
-      doc.setFillColor(75, 0, 130); // Deep purple
+      // App-style footer
+      doc.setFillColor(59, 130, 246); // Blue like app
       doc.rect(0, 270, 210, 27, 'F');
       
       doc.setFontSize(10);
       doc.setTextColor(255, 255, 255);
-      doc.text('🚀 Generated by InvestWise Pro ROI Calculator 🚀', 105, 280, { align: 'center' });
-      doc.text('✨ Professional Investment Analysis Tool ✨', 105, 287, { align: 'center' });
+      doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
+      doc.text('Professional Investment Analysis Tool', 105, 287, { align: 'center' });
       
       const filename = `investwise_pro_simple_report_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(filename);
@@ -258,254 +243,256 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         creator: 'InvestWise Pro ROI Calculator'
       });
 
-      // Creative gradient background - ocean theme
-      doc.setFillColor(0, 20, 40); // Deep ocean
+      // App-style background
+      doc.setFillColor(15, 23, 42); // Dark blue base
       doc.rect(0, 0, 210, 297, 'F');
       
-      // Ocean header with wave effect
-      doc.setFillColor(0, 100, 150); // Ocean blue
-      doc.rect(0, 0, 210, 100, 'F');
+      // App-style header
+      doc.setFillColor(59, 130, 246); // Blue like app
+      doc.rect(0, 0, 210, 80, 'F');
       
-      // Wave accent lines
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(0, 95, 210, 3, 'F');
-      doc.rect(0, 98, 210, 2, 'F');
+      // App-style accent line
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(0, 75, 210, 5, 'F');
       
-      doc.setFontSize(30);
+      doc.setFontSize(24);
       doc.setTextColor(255, 255, 255);
-      doc.text('🌊 InvestWise Pro 🌊', 105, 40, { align: 'center' });
+      doc.text('InvestWise Pro', 105, 35, { align: 'center' });
       
-      doc.setFontSize(18);
-      doc.setTextColor(0, 255, 255); // Cyan
-      doc.text('📊 Detailed Investment Analysis 📊', 105, 60, { align: 'center' });
+      doc.setFontSize(16);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Detailed Investment Analysis', 105, 55, { align: 'center' });
       
-      doc.setFontSize(14);
-      doc.setTextColor(173, 216, 230); // Light blue
-      doc.text('🐋 Dive Deep into Your Investment Data 🐋', 105, 80, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.text('Comprehensive Investment Report', 105, 70, { align: 'center' });
 
-      // Investment Summary Section with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(0, 255, 255); // Cyan
-      doc.text('💎 Investment Summary 💎', 20, 120);
+      // Investment Summary Section with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Investment Summary', 20, 100);
       
-      // Creative section accent
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(20, 122, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 102, 60, 3, 'F');
       
       const investmentData = [
-        ['💰 Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🔧 Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['💎 Total Investment', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🎯 Investment Type', (calculationData.total_investment || 0) >= 100000 ? '🐋 Large Scale' : (calculationData.total_investment || 0) >= 25000 ? '🐟 Medium Scale' : '🐠 Small Scale']
+        ['Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Total Investment', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Investment Type', (calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale']
       ];
       
       autoTable(doc, {
-        startY: 135,
-        head: [['📋 Item', '💡 Amount']],
+        startY: 115,
+        head: [['Item', 'Amount']],
         body: investmentData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [0, 100, 150], // Ocean blue
+          fillColor: [59, 130, 246], // Blue like app
           textColor: [255, 255, 255],
           fontSize: 12,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          halign: 'center'
         },
         styles: { 
           fontSize: 11,
           cellPadding: 8,
-          textColor: [255, 255, 255]
+          textColor: [255, 255, 255],
+          halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [0, 50, 100] // Deep ocean
+          fillColor: [30, 41, 59] // Dark slate
         }
       });
 
-      // ROI Performance Section with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(0, 255, 255); // Cyan
-      doc.text('📈 ROI Performance 📈', 20, 200);
+      // ROI Performance Section with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('ROI Performance', 20, 180);
       
-      // Creative section accent
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(20, 202, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 182, 60, 3, 'F');
       
       const roiData = [
-        ['🎯 ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
-        ['💰 Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🚀 Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['⭐ Performance', (calculationData.roi_percentage || 0) >= 20 ? '🏆 Excellent' : (calculationData.roi_percentage || 0) >= 10 ? '🎯 Good' : (calculationData.roi_percentage || 0) >= 0 ? '📈 Fair' : '⚠️ Poor']
+        ['ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
+        ['Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Performance', (calculationData.roi_percentage || 0) >= 20 ? 'Excellent' : (calculationData.roi_percentage || 0) >= 10 ? 'Good' : (calculationData.roi_percentage || 0) >= 0 ? 'Fair' : 'Poor']
       ];
       
       autoTable(doc, {
-        startY: 215,
-        head: [['📊 Metric', '💡 Value']],
+        startY: 195,
+        head: [['Metric', 'Value']],
         body: roiData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [0, 100, 150], // Ocean blue
+          fillColor: [59, 130, 246], // Blue like app
           textColor: [255, 255, 255],
           fontSize: 12,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          halign: 'center'
         },
         styles: { 
           fontSize: 11,
           cellPadding: 8,
-          textColor: [255, 255, 255]
+          textColor: [255, 255, 255],
+          halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [0, 50, 100] // Deep ocean
+          fillColor: [30, 41, 59] // Dark slate
         }
       });
 
-      // Business Information Section with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(0, 255, 255); // Cyan
-      doc.text('🏢 Business Information 🏢', 20, 280);
+      // Business Information Section with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Business Information', 20, 260);
       
-      // Creative section accent
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(20, 282, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 262, 60, 3, 'F');
       
       const businessData = [
-        ['🎪 Scenario', calculationData.scenario_name || 'N/A'],
-        ['🎭 Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
-        ['🌍 Country', calculationData.country_code || 'N/A'],
-        ['⚡ Calculation Method', calculationData.calculation_method || 'Local Fallback']
+        ['Scenario', calculationData.scenario_name || 'N/A'],
+        ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
+        ['Country', calculationData.country_code || 'N/A'],
+        ['Calculation Method', calculationData.calculation_method || 'Local Fallback']
       ];
       
       autoTable(doc, {
-        startY: 295,
-        head: [['📋 Detail', '💡 Value']],
+        startY: 275,
+        head: [['Detail', 'Value']],
         body: businessData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [0, 100, 150], // Ocean blue
+          fillColor: [59, 130, 246], // Blue like app
           textColor: [255, 255, 255],
           fontSize: 12,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          halign: 'center'
         },
         styles: { 
           fontSize: 11,
           cellPadding: 8,
-          textColor: [255, 255, 255]
+          textColor: [255, 255, 255],
+          halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [0, 50, 100] // Deep ocean
+          fillColor: [30, 41, 59] // Dark slate
         }
       });
 
-      // Second page with creative design
+      // Second page with app-style design
       doc.addPage();
       
       // Second page header
-      doc.setFillColor(0, 100, 150); // Ocean blue
-      doc.rect(0, 0, 210, 80, 'F');
+      doc.setFillColor(59, 130, 246); // Blue like app
+      doc.rect(0, 0, 210, 60, 'F');
       
-      // Wave accent line
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(0, 75, 210, 5, 'F');
+      // App-style accent line
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(0, 55, 210, 5, 'F');
       
-      doc.setFontSize(20);
+      doc.setFontSize(18);
       doc.setTextColor(255, 255, 255);
-      doc.text('🧮 Tax Analysis 🧮', 20, 40);
+      doc.text('Tax Analysis', 20, 35);
       
       const taxData = [
-        ['📊 Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || '0.0'}%`],
-        ['💰 Tax Amount', `$${calculationData.tax_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['💎 After-Tax Profit', `$${calculationData.after_tax_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['⚖️ Tax Impact', `${((calculationData.tax_amount / (calculationData.net_profit || 1)) * 100)?.toFixed(1) || '0.0'}% of profit`]
+        ['Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || '0.0'}%`],
+        ['Tax Amount', `$${calculationData.tax_amount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['After-Tax Profit', `$${calculationData.after_tax_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Tax Impact', `${((calculationData.tax_amount / (calculationData.net_profit || 1)) * 100)?.toFixed(1) || '0.0'}% of profit`]
       ];
       
       autoTable(doc, {
-        startY: 90,
-        head: [['📋 Tax Item', '💡 Amount']],
+        startY: 70,
+        head: [['Tax Item', 'Amount']],
         body: taxData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [0, 100, 150], // Ocean blue
+          fillColor: [59, 130, 246], // Blue like app
           textColor: [255, 255, 255],
           fontSize: 12,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          halign: 'center'
         },
         styles: { 
           fontSize: 11,
           cellPadding: 8,
-          textColor: [255, 255, 255]
+          textColor: [255, 255, 255],
+          halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [0, 50, 100] // Deep ocean
+          fillColor: [30, 41, 59] // Dark slate
         }
       });
 
-      // Risk Assessment with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(0, 255, 255); // Cyan
-      doc.text('⚠️ Risk Assessment ⚠️', 20, 160);
+      // Risk Assessment with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Risk Assessment', 20, 140);
       
-      // Creative section accent
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(20, 162, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 142, 60, 3, 'F');
       
       const roi = calculationData.roi_percentage || 0;
       let riskLevel = '';
       let riskColor = [255, 255, 255];
-      let riskEmoji = '';
       if (roi >= 20) {
-        riskLevel = '🟢 LOW RISK - Excellent potential';
-        riskColor = [0, 255, 0]; // Bright green
-        riskEmoji = '🟢';
+        riskLevel = 'LOW RISK - Excellent potential';
+        riskColor = [16, 185, 129]; // Green
       } else if (roi >= 10) {
-        riskLevel = '🟡 MODERATE RISK - Good potential';
-        riskColor = [255, 255, 0]; // Bright yellow
-        riskEmoji = '🟡';
+        riskLevel = 'MODERATE RISK - Good potential';
+        riskColor = [59, 130, 246]; // Blue
       } else if (roi >= 0) {
-        riskLevel = '🟠 HIGH RISK - Fair potential';
-        riskColor = [255, 165, 0]; // Orange
-        riskEmoji = '🟠';
+        riskLevel = 'HIGH RISK - Fair potential';
+        riskColor = [251, 191, 36]; // Yellow
       } else {
-        riskLevel = '🔴 VERY HIGH RISK - Poor potential';
-        riskColor = [255, 0, 0]; // Bright red
-        riskEmoji = '🔴';
+        riskLevel = 'VERY HIGH RISK - Poor potential';
+        riskColor = [239, 68, 68]; // Red
       }
       
       doc.setFontSize(14);
       doc.setTextColor(riskColor[0], riskColor[1], riskColor[2]);
-      doc.text(`${riskEmoji} ${riskLevel}`, 20, 180);
+      doc.text(riskLevel, 20, 160);
 
-      // Market Analysis Section with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(0, 255, 255); // Cyan
-      doc.text('📊 Market Analysis 📊', 20, 210);
+      // Market Analysis Section with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Market Analysis', 20, 190);
       
-      // Creative section accent
-      doc.setFillColor(0, 255, 255); // Cyan
-      doc.rect(20, 212, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 192, 60, 3, 'F');
       
       const marketInsights = [
-        `🐋 Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
-        `📈 ROI Performance: ${roi >= 20 ? '🏆 Above Market Average' : roi >= 10 ? '🎯 Market Average' : '📉 Below Market Average'}`,
-        `⚠️ Risk Profile: ${roi >= 20 ? '🟢 Low Risk' : roi >= 10 ? '🟡 Moderate Risk' : '🔴 High Risk'}`,
-        `⚖️ Tax Efficiency: ${(calculationData.effective_tax_rate || 0) <= 20 ? '✅ Tax Efficient' : '📊 Standard Tax Impact'}`
+        `Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
+        `ROI Performance: ${roi >= 20 ? 'Above Market Average' : roi >= 10 ? 'Market Average' : 'Below Market Average'}`,
+        `Risk Profile: ${roi >= 20 ? 'Low Risk' : roi >= 10 ? 'Moderate Risk' : 'High Risk'}`,
+        `Tax Efficiency: ${(calculationData.effective_tax_rate || 0) <= 20 ? 'Tax Efficient' : 'Standard Tax Impact'}`
       ];
       
       doc.setFontSize(12);
       doc.setTextColor(255, 255, 255);
       marketInsights.forEach((insight, index) => {
-        doc.text(insight, 20, 230 + (index * 15));
+        doc.text(insight, 20, 210 + (index * 12));
       });
 
-      // Creative footer
-      doc.setFillColor(0, 100, 150); // Ocean blue
+      // App-style footer
+      doc.setFillColor(59, 130, 246); // Blue like app
       doc.rect(0, 270, 210, 27, 'F');
       
       doc.setFontSize(10);
       doc.setTextColor(255, 255, 255);
-      doc.text('🌊 Generated by InvestWise Pro ROI Calculator 🌊', 105, 280, { align: 'center' });
-      doc.text('🐋 Professional Investment Analysis Tool 🐋', 105, 287, { align: 'center' });
+      doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
+      doc.text('Professional Investment Analysis Tool', 105, 287, { align: 'center' });
 
       const filename = `investwise_pro_detailed_report_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(filename);
@@ -529,189 +516,179 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         creator: 'InvestWise Pro ROI Calculator'
       });
 
-      // Creative gradient background - forest theme
-      doc.setFillColor(0, 40, 0); // Deep forest
+      // App-style background
+      doc.setFillColor(15, 23, 42); // Dark blue base
       doc.rect(0, 0, 210, 297, 'F');
       
-      // Forest header with nature effect
-      doc.setFillColor(34, 139, 34); // Forest green
-      doc.rect(0, 0, 210, 100, 'F');
+      // App-style header
+      doc.setFillColor(59, 130, 246); // Blue like app
+      doc.rect(0, 0, 210, 80, 'F');
       
-      // Nature accent lines
-      doc.setFillColor(50, 205, 50); // Lime green
-      doc.rect(0, 95, 210, 3, 'F');
-      doc.rect(0, 98, 210, 2, 'F');
+      // App-style accent line
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(0, 75, 210, 5, 'F');
       
-      doc.setFontSize(30);
+      doc.setFontSize(24);
       doc.setTextColor(255, 255, 255);
-      doc.text('🌳 InvestWise Pro 🌳', 105, 40, { align: 'center' });
+      doc.text('InvestWise Pro', 105, 35, { align: 'center' });
       
-      doc.setFontSize(18);
-      doc.setTextColor(50, 205, 50); // Lime green
-      doc.text('👑 Executive Summary 👑', 105, 60, { align: 'center' });
+      doc.setFontSize(16);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Executive Summary', 105, 55, { align: 'center' });
       
-      doc.setFontSize(14);
-      doc.setTextColor(144, 238, 144); // Light green
-      doc.text('🌱 Growing Your Investment Success 🌱', 105, 80, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setTextColor(255, 255, 255);
+      doc.text('For Executive Decision Making', 105, 70, { align: 'center' });
 
-      // Executive Summary Card with creative design
-      doc.setFillColor(0, 100, 0); // Dark green
-      doc.rect(15, 120, 180, 90, 'F');
-      doc.setDrawColor(50, 205, 50); // Lime green border
-      doc.rect(15, 120, 180, 90, 'S');
+      // Executive Summary Card with app-style design
+      doc.setFillColor(255, 255, 255, 0.1); // White with transparency
+      doc.rect(15, 100, 180, 80, 'F');
+      doc.setDrawColor(255, 255, 255, 0.2); // White border
+      doc.rect(15, 100, 180, 80, 'S');
       
-      // Nature accent on card
-      doc.setFillColor(50, 205, 50); // Lime green
-      doc.rect(15, 120, 180, 6, 'F');
+      // App-style accent on card
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(15, 100, 180, 4, 'F');
       
-      doc.setFontSize(26);
-      doc.setTextColor(50, 205, 50); // Lime green
-      doc.text(`🌱 ${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI 🌱`, 105, 145, { align: 'center' });
+      doc.setFontSize(24);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text(`${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI`, 105, 125, { align: 'center' });
       doc.setFontSize(14);
       doc.setTextColor(255, 255, 255);
-      doc.text(`💰 Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} 💰`, 105, 165, { align: 'center' });
-      doc.text(`🎯 Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} 🎯`, 105, 180, { align: 'center' });
-      doc.text(`🌿 Expected Return: $${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'} 🌿`, 105, 195, { align: 'center' });
+      doc.text(`Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 145, { align: 'center' });
+      doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 160, { align: 'center' });
 
-      // Executive Summary Table with creative styling
+      // Executive Summary Table with app-style styling
       const executiveData = [
-        ['💎 Investment Amount', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['📈 ROI Performance', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
-        ['💰 Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🚀 Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
-        ['🏢 Business Type', calculationData.scenario_name || 'N/A'],
-        ['🌍 Market', calculationData.country_code || 'N/A'],
-        ['📊 Tax Rate', `${calculationData.effective_tax_rate || '0'}%`],
-        ['💎 After-Tax Profit', `$${calculationData.after_tax_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`]
+        ['Investment Amount', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['ROI Performance', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
+        ['Net Profit', `$${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Expected Return', `$${calculationData.expected_return?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
+        ['Business Type', calculationData.scenario_name || 'N/A'],
+        ['Market', calculationData.country_code || 'N/A'],
+        ['Tax Rate', `${calculationData.effective_tax_rate || '0'}%`],
+        ['After-Tax Profit', `$${calculationData.after_tax_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`]
       ];
       
       autoTable(doc, {
-        startY: 230,
-        head: [['📋 Metric', '💡 Value']],
+        startY: 200,
+        head: [['Metric', 'Value']],
         body: executiveData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [34, 139, 34], // Forest green
+          fillColor: [59, 130, 246], // Blue like app
           textColor: [255, 255, 255],
           fontSize: 12,
-          fontStyle: 'bold'
+          fontStyle: 'bold',
+          halign: 'center'
         },
         styles: { 
           fontSize: 11,
           cellPadding: 8,
-          textColor: [255, 255, 255]
+          textColor: [255, 255, 255],
+          halign: 'left'
         },
         margin: { left: 15, right: 15 },
         alternateRowStyles: {
-          fillColor: [0, 100, 0] // Dark green
+          fillColor: [30, 41, 59] // Dark slate
         }
       });
 
-      // Second page with creative design
+      // Second page with app-style design
       doc.addPage();
       
       // Second page header
-      doc.setFillColor(34, 139, 34); // Forest green
-      doc.rect(0, 0, 210, 80, 'F');
+      doc.setFillColor(59, 130, 246); // Blue like app
+      doc.rect(0, 0, 210, 60, 'F');
       
-      // Nature accent line
-      doc.setFillColor(50, 205, 50); // Lime green
-      doc.rect(0, 75, 210, 5, 'F');
+      // App-style accent line
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(0, 55, 210, 5, 'F');
       
-      doc.setFontSize(20);
+      doc.setFontSize(18);
       doc.setTextColor(255, 255, 255);
-      doc.text('👑 Investment Assessment & Analysis 👑', 105, 40, { align: 'center' });
+      doc.text('Investment Assessment & Analysis', 105, 35, { align: 'center' });
 
-      // Investment Assessment with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(50, 205, 50); // Lime green
-      doc.text('🎯 Investment Assessment 🎯', 20, 100);
+      // Investment Assessment with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Investment Assessment', 20, 80);
       
-      // Creative section accent
-      doc.setFillColor(50, 205, 50); // Lime green
-      doc.rect(20, 102, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 82, 60, 3, 'F');
       
       const roi = calculationData.roi_percentage || 0;
       let recommendation = '';
       let recommendationColor = [255, 255, 255];
       let confidence = '';
       let confidenceColor = [255, 255, 255];
-      let recommendationEmoji = '';
-      let confidenceEmoji = '';
       
       if (roi >= 20) {
-        recommendation = '🏆 EXCELLENT - High potential investment';
-        recommendationColor = [0, 255, 0]; // Bright green
-        confidence = '🌟 Very High Confidence';
-        confidenceColor = [0, 255, 0]; // Bright green
-        recommendationEmoji = '🏆';
-        confidenceEmoji = '🌟';
+        recommendation = 'EXCELLENT - High potential investment';
+        recommendationColor = [16, 185, 129]; // Green
+        confidence = 'Very High Confidence';
+        confidenceColor = [16, 185, 129]; // Green
       } else if (roi >= 10) {
-        recommendation = '🎯 GOOD - Solid investment opportunity';
-        recommendationColor = [0, 191, 255]; // Deep sky blue
-        confidence = '⭐ High Confidence';
-        confidenceColor = [0, 191, 255]; // Deep sky blue
-        recommendationEmoji = '🎯';
-        confidenceEmoji = '⭐';
+        recommendation = 'GOOD - Solid investment opportunity';
+        recommendationColor = [59, 130, 246]; // Blue
+        confidence = 'High Confidence';
+        confidenceColor = [59, 130, 246]; // Blue
       } else if (roi >= 0) {
-        recommendation = '📈 FAIR - Moderate risk/reward';
-        recommendationColor = [255, 255, 0]; // Bright yellow
-        confidence = '📊 Medium Confidence';
-        confidenceColor = [255, 255, 0]; // Bright yellow
-        recommendationEmoji = '📈';
-        confidenceEmoji = '📊';
+        recommendation = 'FAIR - Moderate risk/reward';
+        recommendationColor = [251, 191, 36]; // Yellow
+        confidence = 'Medium Confidence';
+        confidenceColor = [251, 191, 36]; // Yellow
       } else {
-        recommendation = '⚠️ POOR - High risk, low return';
-        recommendationColor = [255, 0, 0]; // Bright red
-        confidence = '💥 Low Confidence';
-        confidenceColor = [255, 0, 0]; // Bright red
-        recommendationEmoji = '⚠️';
-        confidenceEmoji = '💥';
+        recommendation = 'POOR - High risk, low return';
+        recommendationColor = [239, 68, 68]; // Red
+        confidence = 'Low Confidence';
+        confidenceColor = [239, 68, 68]; // Red
       }
       
       doc.setFontSize(14);
       doc.setTextColor(recommendationColor[0], recommendationColor[1], recommendationColor[2]);
-      doc.text(`${recommendationEmoji} ${recommendation}`, 20, 120);
+      doc.text(recommendation, 20, 100);
       
       doc.setFontSize(12);
       doc.setTextColor(confidenceColor[0], confidenceColor[1], confidenceColor[2]);
-      doc.text(`${confidenceEmoji} ${confidence}`, 20, 135);
+      doc.text(`Confidence Level: ${confidence}`, 20, 115);
       
       doc.setFontSize(12);
       doc.setTextColor(255, 255, 255);
-      doc.text(`📊 Based on ${roi.toFixed(2)}% ROI analysis`, 20, 150);
+      doc.text(`Based on ${roi.toFixed(2)}% ROI analysis`, 20, 130);
 
-      // Market Analysis Section with creative design
-      doc.setFontSize(20);
-      doc.setTextColor(50, 205, 50); // Lime green
-      doc.text('📊 Market Analysis 📊', 20, 180);
+      // Market Analysis Section with app-style design
+      doc.setFontSize(18);
+      doc.setTextColor(16, 185, 129); // Green like app
+      doc.text('Market Analysis', 20, 160);
       
-      // Creative section accent
-      doc.setFillColor(50, 205, 50); // Lime green
-      doc.rect(20, 182, 70, 4, 'F');
+      // App-style section accent
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(20, 162, 60, 3, 'F');
       
       const marketInsights = [
-        `🌳 Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? '🐋 Large Scale' : (calculationData.total_investment || 0) >= 25000 ? '🐟 Medium Scale' : '🐠 Small Scale'}`,
-        `📈 ROI Performance: ${roi >= 20 ? '🏆 Above Market Average' : roi >= 10 ? '🎯 Market Average' : '📉 Below Market Average'}`,
-        `⚠️ Risk Profile: ${roi >= 20 ? '🟢 Low Risk' : roi >= 10 ? '🟡 Moderate Risk' : '🔴 High Risk'}`,
-        `⚖️ Tax Efficiency: ${(calculationData.effective_tax_rate || 0) <= 20 ? '✅ Tax Efficient' : '📊 Standard Tax Impact'}`
+        `Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
+        `ROI Performance: ${roi >= 20 ? 'Above Market Average' : roi >= 10 ? 'Market Average' : 'Below Market Average'}`,
+        `Risk Profile: ${roi >= 20 ? 'Low Risk' : roi >= 10 ? 'Moderate Risk' : 'High Risk'}`,
+        `Tax Efficiency: ${(calculationData.effective_tax_rate || 0) <= 20 ? 'Tax Efficient' : 'Standard Tax Impact'}`
       ];
       
       doc.setFontSize(12);
       doc.setTextColor(255, 255, 255);
       marketInsights.forEach((insight, index) => {
-        doc.text(insight, 20, 200 + (index * 15));
+        doc.text(insight, 20, 180 + (index * 12));
       });
 
-      // Creative footer
-      doc.setFillColor(34, 139, 34); // Forest green
+      // App-style footer
+      doc.setFillColor(59, 130, 246); // Blue like app
       doc.rect(0, 270, 210, 27, 'F');
       
       doc.setFontSize(10);
       doc.setTextColor(255, 255, 255);
-      doc.text('🌳 Generated by InvestWise Pro ROI Calculator 🌳', 105, 280, { align: 'center' });
-      doc.text('🌱 Professional Investment Analysis Tool 🌱', 105, 287, { align: 'center' });
-      doc.text('👑 For Executive Decision Making 👑', 105, 294, { align: 'center' });
+      doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
+      doc.text('Professional Investment Analysis Tool', 105, 287, { align: 'center' });
+      doc.text('For Executive Decision Making', 105, 294, { align: 'center' });
 
       const filename = `investwise_pro_executive_report_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(filename);
