@@ -148,7 +148,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       body: summaryData,
       theme: 'plain',
       headStyles: { 
-        fillColor: [255, 255, 255, 0.1], 
+        fillColor: [255, 255, 255], 
         textColor: [255, 255, 255],
         fontSize: 12,
         fontStyle: 'bold'
@@ -159,7 +159,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         textColor: [255, 255, 255]
       },
       alternateRowStyles: {
-        fillColor: [255, 255, 255, 0.05]
+        fillColor: [255, 255, 255]
       },
       margin: { left: 20, right: 20 }
     });
@@ -279,7 +279,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       body: investmentData,
       theme: 'plain',
       headStyles: { 
-        fillColor: [255, 255, 255, 0.1], 
+        fillColor: [255, 255, 255], 
         textColor: [255, 255, 255],
         fontSize: 11,
         fontStyle: 'bold'
@@ -290,7 +290,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         textColor: [255, 255, 255]
       },
       alternateRowStyles: {
-        fillColor: [255, 255, 255, 0.05]
+        fillColor: [255, 255, 255]
       },
       margin: { left: 20, right: 20 }
     });
@@ -313,7 +313,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       body: roiData,
       theme: 'plain',
       headStyles: { 
-        fillColor: [255, 255, 255, 0.1], 
+        fillColor: [255, 255, 255], 
         textColor: [255, 255, 255],
         fontSize: 11,
         fontStyle: 'bold'
@@ -324,7 +324,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         textColor: [255, 255, 255]
       },
       alternateRowStyles: {
-        fillColor: [255, 255, 255, 0.05]
+        fillColor: [255, 255, 255]
       },
       margin: { left: 20, right: 20 }
     });
@@ -347,7 +347,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       body: businessData,
       theme: 'plain',
       headStyles: { 
-        fillColor: [255, 255, 255, 0.1], 
+        fillColor: [255, 255, 255], 
         textColor: [255, 255, 255],
         fontSize: 11,
         fontStyle: 'bold'
@@ -358,7 +358,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         textColor: [255, 255, 255]
       },
       alternateRowStyles: {
-        fillColor: [255, 255, 255, 0.05]
+        fillColor: [255, 255, 255]
       },
       margin: { left: 20, right: 20 }
     });
@@ -401,7 +401,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       body: taxData,
       theme: 'plain',
       headStyles: { 
-        fillColor: [255, 255, 255, 0.1], 
+        fillColor: [255, 255, 255], 
         textColor: [255, 255, 255],
         fontSize: 11,
         fontStyle: 'bold'
@@ -412,7 +412,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         textColor: [255, 255, 255]
       },
       alternateRowStyles: {
-        fillColor: [255, 255, 255, 0.05]
+        fillColor: [255, 255, 255]
       },
       margin: { left: 20, right: 20 }
     });
@@ -534,7 +534,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       body: executiveData,
       theme: 'plain',
       headStyles: { 
-        fillColor: [255, 255, 255, 0.1], 
+        fillColor: [255, 255, 255], 
         textColor: [255, 255, 255],
         fontSize: 12,
         fontStyle: 'bold'
@@ -545,7 +545,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         textColor: [255, 255, 255]
       },
       alternateRowStyles: {
-        fillColor: [255, 255, 255, 0.05]
+        fillColor: [255, 255, 255]
       },
       margin: { left: 20, right: 20 }
     });
