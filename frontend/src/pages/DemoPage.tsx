@@ -145,7 +145,7 @@ const DemoPage: React.FC = () => {
               className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
             >
               {/* Demo Header */}
-              <div className="text-center mb-6">
+              <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Calculator className="w-8 h-8 text-white" />
                 </div>
@@ -158,41 +158,41 @@ const DemoPage: React.FC = () => {
               </div>
 
               {/* Demo Description */}
-              <p className="text-white/80 text-sm mb-6 text-center">
+              <p className="text-white/80 text-sm mb-8 text-center leading-relaxed">
                 {demo.description}
               </p>
 
               {/* Market Features */}
-              <div className="space-y-3 mb-6">
+              <div className="space-y-4 mb-8">
                 {demo.features.map((feature, idx) => (
-                  <div key={idx} className="flex items-center space-x-2 text-sm">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                    <span className="text-white/70">{feature}</span>
+                  <div key={idx} className="flex items-start space-x-3 text-sm">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-white/70 leading-relaxed">{feature}</span>
                   </div>
                 ))}
               </div>
 
               {/* Expected Results */}
-              <div className="bg-white/5 rounded-xl p-4 mb-6">
-                <h4 className="text-white font-semibold mb-3 flex items-center">
+              <div className="bg-white/5 rounded-xl p-5 mb-8">
+                <h4 className="text-white font-semibold mb-4 flex items-center">
                   <TrendingUp className="w-4 h-4 mr-2 text-green-400" />
                   Expected Results
                 </h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-white/60">ROI</div>
+                    <div className="text-white/60 mb-1">ROI</div>
                     <div className="text-green-400 font-bold">{demo.results.roi}%</div>
                   </div>
                   <div>
-                    <div className="text-white/60">Net Profit</div>
+                    <div className="text-white/60 mb-1">Net Profit</div>
                     <div className="text-green-400 font-bold">{formatCurrency(demo.results.netProfit)}</div>
                   </div>
                   <div>
-                    <div className="text-white/60">Total Return</div>
+                    <div className="text-white/60 mb-1">Total Return</div>
                     <div className="text-white font-bold">{formatCurrency(demo.results.totalReturn)}</div>
                   </div>
                   <div>
-                    <div className="text-white/60">Time to Profit</div>
+                    <div className="text-white/60 mb-1">Time to Profit</div>
                     <div className="text-white font-bold">{demo.results.timeToProfit}</div>
                   </div>
                 </div>
@@ -225,28 +225,28 @@ const DemoPage: React.FC = () => {
                   exit={{ opacity: 0, height: 0 }}
                   className="mt-6 pt-6 border-t border-white/10"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {/* Market Analysis Preview */}
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <h4 className="text-white font-semibold mb-3 flex items-center">
+                    <div className="bg-white/5 rounded-lg p-5">
+                      <h4 className="text-white font-semibold mb-4 flex items-center">
                         <BarChart3 className="w-4 h-4 mr-2" />
                         Market Analysis
                       </h4>
-                      <div className="grid grid-cols-3 gap-4 text-center">
+                      <div className="grid grid-cols-3 gap-6 text-center">
                         <div>
-                          <div className="text-2xl font-bold text-blue-400">
+                          <div className="text-xl font-bold text-blue-400 mb-1">
                             {demo.features[0].split(': ')[1]}
                           </div>
                           <div className="text-white/60 text-xs">Market Size</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold text-green-400">
+                          <div className="text-xl font-bold text-green-400 mb-1">
                             {demo.features[1].split(': ')[1]}
                           </div>
                           <div className="text-white/60 text-xs">Growth Rate</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold text-purple-400">
+                          <div className="text-xl font-bold text-purple-400 mb-1">
                             {demo.features[2].split(': ')[1]}
                           </div>
                           <div className="text-white/60 text-xs">Competition</div>
@@ -255,12 +255,12 @@ const DemoPage: React.FC = () => {
                     </div>
 
                     {/* Risk Assessment */}
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <h4 className="text-white font-semibold mb-3 flex items-center">
+                    <div className="bg-white/5 rounded-lg p-5">
+                      <h4 className="text-white font-semibold mb-4 flex items-center">
                         <Shield className="w-4 h-4 mr-2" />
                         Risk Assessment
                       </h4>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="text-white/70 text-sm">Risk Level</span>
                           <span className={`text-sm font-medium px-2 py-1 rounded ${
@@ -279,23 +279,23 @@ const DemoPage: React.FC = () => {
                     </div>
 
                     {/* Investment Recommendations */}
-                    <div className="bg-white/5 rounded-lg p-4">
-                      <h4 className="text-white font-semibold mb-3 flex items-center">
+                    <div className="bg-white/5 rounded-lg p-5">
+                      <h4 className="text-white font-semibold mb-4 flex items-center">
                         <Target className="w-4 h-4 mr-2" />
                         Investment Recommendations
                       </h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-start space-x-2">
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-start space-x-3">
                           <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-white/80">Consider phased approach with initial market testing</span>
+                          <span className="text-white/80 leading-relaxed">Consider phased approach with initial market testing</span>
                         </div>
-                        <div className="flex items-start space-x-2">
+                        <div className="flex items-start space-x-3">
                           <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-white/80">Focus on differentiation through innovation</span>
+                          <span className="text-white/80 leading-relaxed">Focus on differentiation through innovation</span>
                         </div>
-                        <div className="flex items-start space-x-2">
+                        <div className="flex items-start space-x-3">
                           <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-white/80">Diversify revenue streams and maintain reserves</span>
+                          <span className="text-white/80 leading-relaxed">Diversify revenue streams and maintain reserves</span>
                         </div>
                       </div>
                     </div>
