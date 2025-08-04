@@ -52,23 +52,23 @@ const HomePage: React.FC = () => {
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
+      name: 'Alex Thompson',
       role: 'Investment Manager',
-      company: 'Tech Ventures',
+      company: 'Capital Growth Partners',
       content: 'InvestWise Pro has revolutionized our investment analysis process. The real-world scenarios and comprehensive reports are invaluable.',
       rating: 5
     },
     {
-      name: 'Michael Chen',
+      name: 'Jordan Lee',
       role: 'Startup Founder',
-      company: 'InnovateLab',
+      company: 'NextGen Solutions',
       content: 'The market analysis and risk assessment features helped us make informed decisions about our expansion strategy.',
       rating: 5
     },
     {
-      name: 'Emily Rodriguez',
+      name: 'Casey Williams',
       role: 'Financial Advisor',
-      company: 'Wealth Partners',
+      company: 'Strategic Wealth Group',
       content: 'Professional PDF reports with detailed analysis have significantly improved our client presentations and decision-making.',
       rating: 5
     }

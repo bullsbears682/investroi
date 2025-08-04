@@ -46,19 +46,19 @@ const AboutPage: React.FC = () => {
       expertise: ['Financial Technology', 'Investment Analysis', 'Product Strategy']
     },
     {
-      name: 'Dr. Sarah Chen',
+      name: 'Dr. Jordan Lee',
       role: 'Chief Data Scientist',
       bio: 'PhD in Quantitative Finance with expertise in market modeling and risk assessment. Leads our data science and analytics initiatives.',
       expertise: ['Quantitative Finance', 'Risk Modeling', 'Market Analysis']
     },
     {
-      name: 'Marcus Rodriguez',
+      name: 'Casey Williams',
       role: 'Head of Product',
       bio: 'Product leader with experience at top fintech companies. Focuses on creating intuitive, powerful tools for investment professionals.',
       expertise: ['Product Management', 'User Experience', 'Financial Products']
     },
     {
-      name: 'Emily Watson',
+      name: 'Taylor Morgan',
       role: 'Lead Developer',
       bio: 'Full-stack engineer specializing in financial applications. Ensures our platform is robust, secure, and always available.',
       expertise: ['Software Engineering', 'Financial Systems', 'Security']
