@@ -3,29 +3,13 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Calculator, 
-  DollarSign, 
-  Target,
   ArrowRight,
   BarChart3,
-  BookOpen,
-  Shield,
   AlertTriangle,
   CheckCircle,
-  Lightbulb,
-  FileText,
-  Building,
-  Clock,
   TrendingUp,
-  Info,
   Search,
-  Globe,
-  Users,
-  PieChart,
-  LineChart,
-  Activity,
-  Eye,
-  Zap,
-  Target as TargetIcon
+  Globe
 } from 'lucide-react';
 
 const MarketResearchPage: React.FC = () => {
