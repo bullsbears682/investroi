@@ -6,9 +6,10 @@ import {
   Calendar, 
   Globe, 
   Calculator, 
-
   AlertCircle,
-  Info
+  Info,
+  AlertTriangle,
+  CheckCircle
 } from 'lucide-react';
 
 interface ROICalculatorProps {
@@ -92,6 +93,42 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
   };
 
   const totalInvestment = (watchedValues.initial_investment || 0) + (watchedValues.additional_costs || 0);
+  
+  // Investment validation logic
+  const getInvestmentFit = (investment: number, scenario: any, miniScenario: any) => {
+    if (!scenario || !miniScenario) return { fit: 'unknown', message: '', recommendation: '' };
+    
+    const recommendedMin = miniScenario.recommended_investment_min;
+    const recommendedMax = miniScenario.recommended_investment_max;
+    
+    if (investment < recommendedMin * 0.5) {
+      return {
+        fit: 'poor',
+        message: `Investment is very small (${((investment / recommendedMin) * 100).toFixed(1)}% of recommended minimum)`,
+        recommendation: 'Consider increasing investment or choosing a different business type'
+      };
+    } else if (investment < recommendedMin) {
+      return {
+        fit: 'fair',
+        message: `Investment is below recommended minimum (${((investment / recommendedMin) * 100).toFixed(1)}% of minimum)`,
+        recommendation: 'Consider increasing investment for better results'
+      };
+    } else if (investment > recommendedMax) {
+      return {
+        fit: 'large',
+        message: `Investment is above recommended maximum (${((investment / recommendedMax) * 100).toFixed(1)}% of maximum)`,
+        recommendation: 'Consider reducing investment or diversifying'
+      };
+    } else {
+      return {
+        fit: 'good',
+        message: 'Investment is within recommended range',
+        recommendation: 'Optimal investment size for this business type'
+      };
+    }
+  };
+  
+  const investmentFit = getInvestmentFit(totalInvestment, selectedScenario, selectedMiniScenario);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -284,6 +321,66 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
             </span>
           </div>
         </div>
+        
+        {/* Investment Fit Warning */}
+        {selectedScenario && selectedMiniScenario && investmentFit.fit !== 'good' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mt-3 p-3 rounded-lg border ${
+              investmentFit.fit === 'poor' 
+                ? 'bg-red-500/10 border-red-500/20' 
+                : investmentFit.fit === 'fair'
+                ? 'bg-yellow-500/10 border-yellow-500/20'
+                : 'bg-blue-500/10 border-blue-500/20'
+            }`}
+          >
+            <div className="flex items-start space-x-2">
+              <AlertTriangle className={`w-4 h-4 mt-0.5 ${
+                investmentFit.fit === 'poor' 
+                  ? 'text-red-400' 
+                  : investmentFit.fit === 'fair'
+                  ? 'text-yellow-400'
+                  : 'text-blue-400'
+              }`} />
+              <div className="flex-1">
+                <div className={`text-sm font-medium ${
+                  investmentFit.fit === 'poor' 
+                    ? 'text-red-400' 
+                    : investmentFit.fit === 'fair'
+                    ? 'text-yellow-400'
+                    : 'text-blue-400'
+                }`}>
+                  {investmentFit.message}
+                </div>
+                <div className="text-xs text-white/60 mt-1">
+                  {investmentFit.recommendation}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        {/* Investment Fit Success */}
+        {selectedScenario && selectedMiniScenario && investmentFit.fit === 'good' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-3 p-3 bg-green-500/10 border border-green-500/20 rounded-lg"
+          >
+            <div className="flex items-start space-x-2">
+              <CheckCircle className="w-4 h-4 mt-0.5 text-green-400" />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-green-400">
+                  {investmentFit.message}
+                </div>
+                <div className="text-xs text-white/60 mt-1">
+                  {investmentFit.recommendation}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Calculate Button */}
