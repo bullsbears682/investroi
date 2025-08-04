@@ -75,6 +75,9 @@ const CalculatorPage: React.FC = () => {
       } catch (error: any) {
         console.error('Calculation error:', error);
         console.error('Error response:', error.response?.data);
+        console.error('Error status:', error.response?.status);
+        console.error('Error message:', error.message);
+        console.error('Full error:', error);
         throw error;
       }
     },
@@ -87,10 +90,24 @@ const CalculatorPage: React.FC = () => {
     },
     onError: (error: any) => {
       console.error('Calculation failed:', error);
-      const errorMessage = error.response?.data?.detail || 
-                          error.response?.data?.message || 
-                          error.message || 
-                          'Calculation failed';
+      let errorMessage = 'Calculation failed';
+      
+      if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+        errorMessage = 'Network error - please check your connection and try again';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'API endpoint not found - please try again later';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error - please try again later';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Access denied - CORS error';
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage);
     },
   });
