@@ -134,20 +134,25 @@ const DemoPage: React.FC = () => {
       </motion.div>
 
       {/* Demo Scenarios */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-8">
           {demos.map((demo, index) => (
             <motion.div
               key={demo.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300"
+              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 hover:bg-white/15 transition-all duration-300"
             >
               {/* Demo Header */}
               <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Calculator className="w-8 h-8 text-white" />
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-sm">{demo.id}</span>
+                  </div>
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Calculator className="w-8 h-8 text-white" />
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{demo.title}</h3>
                 <p className="text-white/60 text-sm mb-4">{demo.subtitle}</p>
