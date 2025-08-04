@@ -35,7 +35,7 @@ class PDFGeneratorService:
         ))
         
         self.styles.add(ParagraphStyle(
-            name='BodyText',
+            name='CustomBodyText',
             parent=self.styles['Normal'],
             fontSize=11,
             spaceAfter=6,
@@ -131,7 +131,7 @@ class PDFGeneratorService:
         The analysis considers market conditions and tax implications for the selected business scenario.
         """
         
-        elements.append(Paragraph(summary_text, self.styles['BodyText']))
+        elements.append(Paragraph(summary_text, self.styles['CustomBodyText']))
         elements.append(Spacer(1, 12))
         
         return elements
