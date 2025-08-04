@@ -96,13 +96,12 @@ const CalculatorPage: React.FC = () => {
   });
 
     const handleCalculate = (formData: any) => {
-    try {
       if (!selectedScenario || !selectedMiniScenario) {
         toast.error('Please select a business scenario and mini scenario');
         return;
       }
 
-      // Realistic calculation using actual scenario data
+      // Get scenario data for API call
       const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
       const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
       
@@ -110,39 +109,21 @@ const CalculatorPage: React.FC = () => {
         toast.error('Unable to calculate ROI - missing scenario data');
         return;
       }
-      
-      const initialInvestment = Number(formData.initial_investment) || 0;
-      const additionalCosts = Number(formData.additional_costs) || 0;
-      const totalInvestment = initialInvestment + additionalCosts;
-      
-      // Use realistic ROI calculation from scenario data
-      const avgROI = (selectedMiniScenarioData.typical_roi_min + selectedMiniScenarioData.typical_roi_max) / 2;
-      const expectedReturn = totalInvestment * (avgROI / 100);
-      const netProfit = expectedReturn - totalInvestment;
-      const roiPercentage = (netProfit / totalInvestment) * 100;
-      
-      const result = {
-        data: {
-          roi_percentage: roiPercentage,
-          expected_return: expectedReturn,
-          net_profit: netProfit,
-          total_investment: totalInvestment,
-          initial_investment: initialInvestment,
-          additional_costs: additionalCosts,
-          annualized_roi: roiPercentage,
-          scenario_name: selectedScenarioData.name,
-          mini_scenario_name: selectedMiniScenarioData.name,
-          calculation_method: 'realistic'
-        }
+
+      // Prepare data for backend API call
+      const calculationData = {
+        initial_investment: Number(formData.initial_investment) || 0,
+        additional_costs: Number(formData.additional_costs) || 0,
+        time_period: Number(formData.time_period) || 1,
+        time_unit: formData.time_unit || 'years',
+        business_scenario_id: selectedScenario,
+        mini_scenario_id: selectedMiniScenario,
+        country_code: formData.country_code || 'US'
       };
-      
-      setCalculationResult(result);
-      toast.success('ROI calculation completed!');
-    } catch (error) {
-      console.error('Calculation error:', error);
-      toast.error('Calculation failed - please try again');
-    }
-  };
+
+      // Call the backend API
+      calculateMutation.mutate(calculationData);
+    };
 
   // Use scenarios data with fallback
   const scenariosData = scenarios?.data || mockScenarios;
