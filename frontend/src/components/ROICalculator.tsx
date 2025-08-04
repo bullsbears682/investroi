@@ -98,14 +98,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
     onCalculate(data);
   };
 
-  const totalInvestment = (watchedValues.initial_investment || 0) + (watchedValues.additional_costs || 0);
-  
-  // Debug logging
-  console.log('DEBUG - Investment values:');
-  console.log('watchedValues:', watchedValues);
-  console.log('initial_investment:', watchedValues.initial_investment);
-  console.log('additional_costs:', watchedValues.additional_costs);
-  console.log('totalInvestment:', totalInvestment);
+  const totalInvestment = (Number(watchedValues.initial_investment) || 0) + (Number(watchedValues.additional_costs) || 0);
   
   // Investment validation logic
   const getInvestmentFit = (investment: number, scenario: any, miniScenario: any) => {
