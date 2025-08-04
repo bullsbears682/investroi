@@ -109,6 +109,9 @@ const CalculatorPage: React.FC = () => {
     const initialInvestment = Number(formData?.initial_investment) || 0;
     const additionalCosts = Number(formData?.additional_costs) || 0;
     const totalInvestment = initialInvestment + additionalCosts;
+    const countryCode = formData?.country_code || 'US';
+    
+    console.log('Country code from form data:', countryCode);
     
     // Get scenario data for calculation
     const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
@@ -148,7 +151,7 @@ const CalculatorPage: React.FC = () => {
           }
         };
         
-        const effectiveTaxRate = getTaxRate(selectedScenarioData.name, formData.country_code || 'US');
+        const effectiveTaxRate = getTaxRate(selectedScenarioData.name, countryCode);
         const taxAmount = netProfit > 0 ? netProfit * (effectiveTaxRate / 100) : 0;
         const afterTaxProfit = netProfit - taxAmount;
     
