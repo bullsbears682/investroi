@@ -123,9 +123,38 @@ const CalculatorPage: React.FC = () => {
       return;
     }
     
-    // Calculate ROI locally
-    const avgROI = (selectedMiniScenarioData.typical_roi_min + selectedMiniScenarioData.typical_roi_max) / 2;
-    const expectedReturn = totalInvestment * (1 + avgROI / 100);
+    // Calculate ROI locally with realistic adjustments based on investment size
+    const getRealisticROI = (miniScenario: any, investment: number) => {
+      const baseROI = (miniScenario.typical_roi_min + miniScenario.typical_roi_max) / 2;
+      
+      // Adjust ROI based on investment size relative to recommended range
+      const recommendedMin = miniScenario.recommended_investment_min;
+      const recommendedMax = miniScenario.recommended_investment_max;
+      
+      let adjustedROI = baseROI;
+      
+      // If investment is much smaller than recommended, reduce ROI
+      if (investment < recommendedMin * 0.5) {
+        adjustedROI = baseROI * 0.3; // 70% reduction for very small investments
+      } else if (investment < recommendedMin) {
+        adjustedROI = baseROI * 0.6; // 40% reduction for small investments
+      } else if (investment > recommendedMax) {
+        adjustedROI = baseROI * 0.8; // 20% reduction for very large investments
+      }
+      
+      // Additional adjustments for startup scenarios (higher risk)
+      if (selectedScenarioData.name === 'Startup') {
+        adjustedROI = adjustedROI * 0.7; // 30% reduction for startup risk
+      }
+      
+      // Cap ROI at realistic levels
+      adjustedROI = Math.min(adjustedROI, 50); // Maximum 50% ROI
+      
+      return Math.max(adjustedROI, 5); // Minimum 5% ROI
+    };
+    
+    const realisticROI = getRealisticROI(selectedMiniScenarioData, totalInvestment);
+    const expectedReturn = totalInvestment * (1 + realisticROI / 100);
     const netProfit = expectedReturn - totalInvestment;
     const roiPercentage = (netProfit / totalInvestment) * 100;
     
