@@ -3,9 +3,6 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Calculator, 
-  TrendingUp, 
-  DollarSign, 
-  Target,
   ArrowRight,
   BarChart3,
   Users,
@@ -14,7 +11,6 @@ import {
   ShoppingCart,
   Code,
   Factory,
-  Briefcase,
   Zap
 } from 'lucide-react';
 
