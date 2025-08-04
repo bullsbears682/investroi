@@ -28,10 +28,10 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
           { period: 'Q2 2024', value: 185, direction: 'up', growth: 10.1, description: 'Social commerce growth' }
         ],
         key_players: [
-          { name: 'Amazon', market_share: 38.7, strength_score: 0.95 },
-          { name: 'Shopify', market_share: 21.3, strength_score: 0.88 },
-          { name: 'WooCommerce', market_share: 18.2, strength_score: 0.75 },
-          { name: 'BigCommerce', market_share: 8.5, strength_score: 0.72 },
+          { name: 'GlobalMart', market_share: 38.7, strength_score: 0.95 },
+          { name: 'ShopFlow', market_share: 21.3, strength_score: 0.88 },
+          { name: 'WooStore', market_share: 18.2, strength_score: 0.75 },
+          { name: 'BigCart', market_share: 8.5, strength_score: 0.72 },
           { name: 'Others', market_share: 13.3, strength_score: 0.55 }
         ],
         opportunities: [
