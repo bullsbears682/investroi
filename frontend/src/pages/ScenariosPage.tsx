@@ -11,7 +11,16 @@ import {
   ShoppingCart,
   Code,
   Factory,
-  Zap
+  Zap,
+  Utensils,
+  Home,
+  Briefcase,
+  Store,
+  Smartphone,
+  BookOpen,
+  Package,
+  Palette,
+  Gift
 } from 'lucide-react';
 
 const ScenariosPage: React.FC = () => {
@@ -107,6 +116,141 @@ const ScenariosPage: React.FC = () => {
         { name: 'Product Assembly', investment: '$75,000 - $200,000', roi: '15-22%' },
         { name: 'Specialized Production', investment: '$200,000 - $500,000', roi: '20-30%' }
       ]
+    },
+    {
+      id: 'restaurant',
+      name: 'Restaurant',
+      category: 'physical',
+      description: 'Food service and hospitality businesses',
+      investmentRange: '$50,000 - $300,000',
+      typicalROI: '12-25%',
+      icon: Utensils,
+      color: 'from-orange-500 to-red-600',
+      miniScenarios: [
+        { name: 'Fine Dining', investment: '$150,000 - $500,000', roi: '15-30%' },
+        { name: 'Fast Casual', investment: '$75,000 - $250,000', roi: '12-25%' },
+        { name: 'Food Truck', investment: '$25,000 - $75,000', roi: '20-40%' }
+      ]
+    },
+    {
+      id: 'real-estate',
+      name: 'Real Estate',
+      category: 'investment',
+      description: 'Property investment and management',
+      investmentRange: '$100,000 - $1,000,000',
+      typicalROI: '8-15%',
+      icon: Home,
+      color: 'from-blue-600 to-indigo-700',
+      miniScenarios: [
+        { name: 'Rental Properties', investment: '$100,000 - $500,000', roi: '8-12%' },
+        { name: 'Commercial Real Estate', investment: '$500,000 - $5,000,000', roi: '10-18%' },
+        { name: 'Real Estate Flipping', investment: '$200,000 - $1,000,000', roi: '15-30%' }
+      ]
+    },
+    {
+      id: 'consulting',
+      name: 'Consulting',
+      category: 'services',
+      description: 'Professional consulting and advisory services',
+      investmentRange: '$5,000 - $150,000',
+      typicalROI: '25-70%',
+      icon: Briefcase,
+      color: 'from-green-600 to-teal-700',
+      miniScenarios: [
+        { name: 'Management Consulting', investment: '$10,000 - $75,000', roi: '30-60%' },
+        { name: 'IT Consulting', investment: '$15,000 - $100,000', roi: '25-50%' },
+        { name: 'Financial Consulting', investment: '$20,000 - $150,000', roi: '35-70%' }
+      ]
+    },
+    {
+      id: 'franchise',
+      name: 'Franchise',
+      category: 'physical',
+      description: 'Established franchise business opportunities',
+      investmentRange: '$25,000 - $500,000',
+      typicalROI: '10-35%',
+      icon: Store,
+      color: 'from-purple-600 to-violet-700',
+      miniScenarios: [
+        { name: 'Food Franchise', investment: '$50,000 - $300,000', roi: '12-25%' },
+        { name: 'Service Franchise', investment: '$25,000 - $150,000', roi: '15-30%' },
+        { name: 'Retail Franchise', investment: '$75,000 - $400,000', roi: '10-20%' }
+      ]
+    },
+    {
+      id: 'mobile-app',
+      name: 'Mobile App',
+      category: 'tech',
+      description: 'Mobile application development and monetization',
+      investmentRange: '$15,000 - $200,000',
+      typicalROI: '30-150%',
+      icon: Smartphone,
+      color: 'from-cyan-500 to-blue-600',
+      miniScenarios: [
+        { name: 'Gaming App', investment: '$25,000 - $150,000', roi: '40-100%' },
+        { name: 'Utility App', investment: '$15,000 - $75,000', roi: '25-60%' },
+        { name: 'Social App', investment: '$50,000 - $200,000', roi: '50-150%' }
+      ]
+    },
+    {
+      id: 'online-course',
+      name: 'Online Course',
+      category: 'online',
+      description: 'Digital education and online learning platforms',
+      investmentRange: '$3,000 - $75,000',
+      typicalROI: '20-100%',
+      icon: BookOpen,
+      color: 'from-emerald-500 to-green-600',
+      miniScenarios: [
+        { name: 'Skill-Based Course', investment: '$5,000 - $30,000', roi: '25-60%' },
+        { name: 'Certification Course', investment: '$10,000 - $50,000', roi: '30-70%' },
+        { name: 'Membership Site', investment: '$8,000 - $40,000', roi: '35-80%' }
+      ]
+    },
+    {
+      id: 'dropshipping',
+      name: 'Dropshipping',
+      category: 'online',
+      description: 'Online retail without inventory management',
+      investmentRange: '$500 - $25,000',
+      typicalROI: '15-50%',
+      icon: Package,
+      color: 'from-yellow-500 to-orange-600',
+      miniScenarios: [
+        { name: 'General Store', investment: '$1,000 - $15,000', roi: '20-40%' },
+        { name: 'Niche Store', investment: '$500 - $10,000', roi: '25-50%' },
+        { name: 'Print on Demand', investment: '$500 - $8,000', roi: '30-60%' }
+      ]
+    },
+    {
+      id: 'print-on-demand',
+      name: 'Print on Demand',
+      category: 'online',
+      description: 'Custom merchandise and apparel business',
+      investmentRange: '$1,000 - $20,000',
+      typicalROI: '20-70%',
+      icon: Palette,
+      color: 'from-pink-500 to-rose-600',
+      miniScenarios: [
+        { name: 'T-Shirt Business', investment: '$1,000 - $15,000', roi: '25-50%' },
+        { name: 'Home Decor', investment: '$1,500 - $20,000', roi: '30-55%' },
+        { name: 'Accessories', investment: '$800 - $12,000', roi: '20-45%' }
+      ]
+    },
+    {
+      id: 'subscription-box',
+      name: 'Subscription Box',
+      category: 'online',
+      description: 'Curated subscription service business',
+      investmentRange: '$5,000 - $80,000',
+      typicalROI: '18-48%',
+      icon: Gift,
+      color: 'from-indigo-500 to-purple-600',
+      miniScenarios: [
+        { name: 'Beauty Box', investment: '$8,000 - $60,000', roi: '20-40%' },
+        { name: 'Food Box', investment: '$10,000 - $75,000', roi: '18-35%' },
+        { name: 'Lifestyle Box', investment: '$6,000 - $45,000', roi: '25-45%' }
+      ]
     }
   ];
 
@@ -115,7 +259,8 @@ const ScenariosPage: React.FC = () => {
     { id: 'online', name: 'Online Business', icon: ShoppingCart },
     { id: 'tech', name: 'Technology', icon: Code },
     { id: 'services', name: 'Services', icon: Users },
-    { id: 'physical', name: 'Physical Business', icon: Factory }
+    { id: 'physical', name: 'Physical Business', icon: Factory },
+    { id: 'investment', name: 'Investment', icon: Home }
   ];
 
   const filteredScenarios = selectedCategory === 'all' 
