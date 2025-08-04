@@ -128,7 +128,40 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
     }
   };
   
-  const investmentFit = getInvestmentFit(totalInvestment, selectedScenario, selectedMiniScenario);
+  // Get scenario data for validation
+  const scenariosData = [
+    {
+      id: 1, name: "E-commerce", recommended_investment_min: 5000, recommended_investment_max: 50000
+    },
+    {
+      id: 2, name: "SaaS", recommended_investment_min: 10000, recommended_investment_max: 100000
+    },
+    {
+      id: 3, name: "Freelancer", recommended_investment_min: 1000, recommended_investment_max: 10000
+    },
+    {
+      id: 4, name: "Agency", recommended_investment_min: 15000, recommended_investment_max: 75000
+    },
+    {
+      id: 5, name: "Startup", recommended_investment_min: 25000, recommended_investment_max: 200000
+    }
+  ];
+  
+  const miniScenariosData = [
+    // Freelancer mini scenarios
+    { id: 15, name: "Virtual Assistant", recommended_investment_min: 1000, recommended_investment_max: 10000 },
+    { id: 16, name: "Content Writing", recommended_investment_min: 1000, recommended_investment_max: 10000 },
+    { id: 17, name: "Graphic Design", recommended_investment_min: 1000, recommended_investment_max: 10000 },
+    { id: 18, name: "Web Development", recommended_investment_min: 1000, recommended_investment_max: 10000 },
+    { id: 19, name: "Digital Marketing", recommended_investment_min: 1000, recommended_investment_max: 10000 },
+    { id: 20, name: "Translation", recommended_investment_min: 1000, recommended_investment_max: 10000 },
+    { id: 21, name: "Consulting", recommended_investment_min: 1000, recommended_investment_max: 10000 }
+  ];
+  
+  const currentScenario = scenariosData.find(s => s.id === selectedScenario);
+  const currentMiniScenario = miniScenariosData.find(ms => ms.id === selectedMiniScenario);
+  
+  const investmentFit = getInvestmentFit(totalInvestment, currentScenario, currentMiniScenario);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
