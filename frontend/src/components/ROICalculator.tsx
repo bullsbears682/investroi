@@ -197,22 +197,45 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           </div>
         </div>
 
-        {/* Country Selection - Temporarily Disabled */}
+        {/* Country Selection */}
         <div>
           <label className="block text-white/60 text-sm font-medium mb-2 flex items-center">
             <Globe className="w-4 h-4 mr-2" />
-            Country Selection (Temporarily Disabled)
+            Country Selection
           </label>
           <select
             {...register('country_code')}
             defaultValue="US"
-            className="w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 text-white/40 focus:outline-none cursor-not-allowed"
-            disabled
+            className="w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
           >
-            <option value="US">🇺🇸 United States (Default)</option>
+            <option value="US">🇺🇸 United States</option>
+            <option value="GB">🇬🇧 United Kingdom</option>
+            <option value="DE">🇩🇪 Germany</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="AU">🇦🇺 Australia</option>
+            <option value="FR">🇫🇷 France</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="SG">🇸🇬 Singapore</option>
+            <option value="NL">🇳🇱 Netherlands</option>
+            <option value="CH">🇨🇭 Switzerland</option>
+            <option value="SE">🇸🇪 Sweden</option>
+            <option value="NO">🇳🇴 Norway</option>
+            <option value="DK">🇩🇰 Denmark</option>
+            <option value="FI">🇫🇮 Finland</option>
+            <option value="IE">🇮🇪 Ireland</option>
+            <option value="ES">🇪🇸 Spain</option>
+            <option value="IT">🇮🇹 Italy</option>
+            <option value="BE">🇧🇪 Belgium</option>
+            <option value="AT">🇦🇹 Austria</option>
+            <option value="PL">🇵🇱 Poland</option>
+            <option value="CZ">🇨🇿 Czech Republic</option>
+            <option value="HU">🇭🇺 Hungary</option>
+            <option value="SK">🇸🇰 Slovakia</option>
+            <option value="SI">🇸🇮 Slovenia</option>
+            <option value="EE">🇪🇪 Estonia</option>
           </select>
-          <div className="text-xs text-white/40 mt-1">
-            Country selection temporarily disabled - will be re-enabled with tax calculations
+          <div className="text-xs text-white/60 mt-1">
+            Select your country for accurate tax calculations
           </div>
         </div>
       </div>
