@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calculator, BarChart3, Info, Shield } from 'lucide-react';
+import { Menu, X, Calculator, BarChart3, Info, Shield, Target, TrendingUp } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,8 +9,8 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Calculator },
-    { name: 'Business Scenarios', href: '/scenarios', icon: BarChart3 },
-    { name: 'Calculator', href: '/calculator', icon: BarChart3 },
+    { name: 'Business Scenarios', href: '/scenarios', icon: Target },
+    { name: 'ROI Calculator', href: '/calculator', icon: TrendingUp },
     { name: 'About', href: '/about', icon: Info },
     { name: 'Privacy', href: '/privacy', icon: Shield }
   ];
