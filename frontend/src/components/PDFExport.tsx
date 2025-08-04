@@ -120,7 +120,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     const roiColor = roi >= 20 ? [16, 185, 129] : roi >= 10 ? [59, 130, 246] : roi >= 0 ? [245, 158, 11] : [239, 68, 68];
     
     // ROI Highlight Card (app-style) - moved down for better spacing
-    doc.setFillColor(255, 255, 255, 0.1); // White with 10% opacity
+    doc.setFillColor(255, 255, 255); // White
     doc.rect(20, 80, 170, 50, 'F');
     doc.setDrawColor(255, 255, 255);
     doc.rect(20, 80, 170, 50, 'S');
@@ -166,7 +166,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
 
     // Performance indicator (app-style) - moved down with better spacing
     const performanceY = 240;
-    doc.setFillColor(255, 255, 255, 0.1);
+    doc.setFillColor(255, 255, 255);
     doc.rect(20, performanceY - 5, 170, 30, 'F');
     doc.setDrawColor(255, 255, 255);
     doc.rect(20, performanceY - 5, 170, 30, 'S');
@@ -196,7 +196,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(rating, 25, performanceY + 20);
 
     // App-style footer - moved down to avoid overlap
-    doc.setFillColor(255, 255, 255, 0.1);
+    doc.setFillColor(255, 255, 255);
     doc.rect(0, 280, 210, 17, 'F');
     
     doc.setFontSize(10);
@@ -242,7 +242,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text('Detailed Investment Analysis', 105, 50, { align: 'center' });
 
     // Executive Summary Card (app-style glass) - better spacing
-    doc.setFillColor(255, 255, 255, 0.1);
+    doc.setFillColor(255, 255, 255);
     doc.rect(20, 85, 170, 40, 'F');
     doc.setDrawColor(255, 255, 255);
     doc.rect(20, 85, 170, 40, 'S');
@@ -259,7 +259,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(`${roi.toFixed(2)}% ROI`, 105, 100, { align: 'center' });
     
     doc.setFontSize(11);
-    doc.setTextColor(255, 255, 255, 0.8);
+    doc.setTextColor(255, 255, 255);
     doc.text(`Total Investment: $${calculationData.total_investment?.toLocaleString() || 'N/A'}`, 105, 110, { align: 'center' });
 
     // Investment Breakdown Section (app-style) - increased spacing
@@ -443,7 +443,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(riskLevel, 20, 155);
 
     // App-style footer
-    doc.setFillColor(255, 255, 255, 0.1);
+    doc.setFillColor(255, 255, 255);
     doc.rect(0, 280, 210, 17, 'F');
     
     doc.setFontSize(9);
@@ -489,11 +489,11 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text('Executive Summary', 105, 55, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255, 0.8);
+    doc.setTextColor(255, 255, 255);
     doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 105, 70, { align: 'center' });
 
     // Key Performance Indicators Box (app-style glass) - better spacing
-    doc.setFillColor(255, 255, 255, 0.1);
+    doc.setFillColor(255, 255, 255);
     doc.rect(20, 95, 170, 50, 'F');
     doc.setDrawColor(255, 255, 255);
     doc.rect(20, 95, 170, 50, 'S');
@@ -510,7 +510,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(`${roi.toFixed(2)}% ROI`, 105, 125, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255, 0.8);
+    doc.setTextColor(255, 255, 255);
     doc.text(`on $${calculationData.total_investment?.toLocaleString() || 'N/A'} investment`, 105, 135, { align: 'center' });
 
     // Executive Summary Table (app-style) - better spacing
@@ -611,7 +611,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     doc.text(`Confidence Level: ${confidence}`, 20, 90);
     
     doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255, 0.8);
+    doc.setTextColor(255, 255, 255);
     doc.text(`Based on ${roi.toFixed(2)}% ROI analysis`, 20, 100);
 
     // Market Analysis Section (app-style) - better spacing
@@ -627,13 +627,13 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     ];
     
     doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255, 0.8);
+    doc.setTextColor(255, 255, 255);
     marketInsights.forEach((insight, index) => {
       doc.text(insight, 20, 140 + (index * 10));
     });
 
     // App-style footer
-    doc.setFillColor(255, 255, 255, 0.1);
+    doc.setFillColor(255, 255, 255);
     doc.rect(0, 280, 210, 17, 'F');
     
     doc.setFontSize(10);
