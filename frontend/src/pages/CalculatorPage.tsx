@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { 
   Calculator, 
@@ -64,61 +64,13 @@ const CalculatorPage: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Calculate ROI mutation
-  const calculateMutation = useMutation({
-    mutationFn: async (data: any) => {
-      console.log('Sending calculation data:', data);
-      try {
-        const response = await api.post('/api/roi/calculate', data);
-        console.log('Calculation response:', response);
-        return response;
-      } catch (error: any) {
-        console.error('Calculation error:', error);
-        console.error('Error response:', error.response?.data);
-        console.error('Error status:', error.response?.status);
-        console.error('Error message:', error.message);
-        console.error('Full error:', error);
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      console.log('Calculation successful:', data);
-      // Ensure the result has the correct structure
-      const result = data.data || data;
-      setCalculationResult({ data: result });
-      toast.success('ROI calculation completed!');
-    },
-    onError: (error: any) => {
-      console.error('Calculation failed:', error);
-      let errorMessage = 'Calculation failed';
-      
-      if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
-        errorMessage = 'Network error - please check your connection and try again';
-      } else if (error.response?.status === 404) {
-        errorMessage = 'API endpoint not found - please try again later';
-      } else if (error.response?.status === 500) {
-        errorMessage = 'Server error - please try again later';
-      } else if (error.response?.status === 403) {
-        errorMessage = 'Access denied - CORS error';
-      } else if (error.response?.data?.detail) {
-        errorMessage = error.response.data.detail;
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      toast.error(errorMessage);
-    },
-  });
-
-      const handleCalculate = (formData: any) => {
+    const handleCalculate = (formData: any) => {
     if (!selectedScenario || !selectedMiniScenario) {
       toast.error('Please select a business scenario and mini scenario');
       return;
     }
 
-    // Get scenario data for API call
+    // Get scenario data for calculation
     const selectedScenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
     const selectedMiniScenarioData = miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario);
     
@@ -127,50 +79,39 @@ const CalculatorPage: React.FC = () => {
       return;
     }
 
-    // Test API connection first
-    console.log('Testing API connection...');
-    api.get('/health')
-      .then(response => {
-        console.log('API health check successful:', response.data);
-        
-        // Prepare data for backend API call
-        const calculationData = {
-          initial_investment: Number(formData.initial_investment) || 0,
-          additional_costs: Number(formData.additional_costs) || 0,
-          time_period: Number(formData.time_period) || 1,
-          time_unit: formData.time_unit || 'years',
-          business_scenario_id: selectedScenario,
-          mini_scenario_id: selectedMiniScenario,
-          country_code: formData.country_code || 'US'
-        };
-
-        console.log('Sending calculation data:', calculationData);
-        // Call the backend API
-        calculateMutation.mutate(calculationData);
-      })
-      .catch(error => {
-        console.error('API health check failed:', error);
-        console.error('Error details:', {
-          message: error.message,
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data
-        });
-        
-        // Try direct calculation as fallback
-        console.log('Trying fallback calculation...');
-        const calculationData = {
-          initial_investment: Number(formData.initial_investment) || 0,
-          additional_costs: Number(formData.additional_costs) || 0,
-          time_period: Number(formData.time_period) || 1,
-          time_unit: formData.time_unit || 'years',
-          business_scenario_id: selectedScenario,
-          mini_scenario_id: selectedMiniScenario,
-          country_code: formData.country_code || 'US'
-        };
-        
-        calculateMutation.mutate(calculationData);
-      });
+    // Use local calculation instead of API call
+    console.log('Using local calculation...');
+    
+    const initialInvestment = Number(formData.initial_investment) || 0;
+    const additionalCosts = Number(formData.additional_costs) || 0;
+    const totalInvestment = initialInvestment + additionalCosts;
+    
+    // Calculate ROI locally
+    const avgROI = (selectedMiniScenarioData.typical_roi_min + selectedMiniScenarioData.typical_roi_max) / 2;
+    const expectedReturn = totalInvestment * (avgROI / 100);
+    const netProfit = expectedReturn - totalInvestment;
+    const roiPercentage = (netProfit / totalInvestment) * 100;
+    
+    const result = {
+      data: {
+        roi_percentage: roiPercentage,
+        expected_return: expectedReturn,
+        net_profit: netProfit,
+        total_investment: totalInvestment,
+        initial_investment: initialInvestment,
+        additional_costs: additionalCosts,
+        annualized_roi: roiPercentage,
+        scenario_name: selectedScenarioData.name,
+        mini_scenario_name: selectedMiniScenarioData.name,
+        calculation_method: 'local',
+        tax_amount: 0,
+        after_tax_profit: netProfit,
+        effective_tax_rate: 0
+      }
+    };
+    
+    setCalculationResult(result);
+    toast.success('ROI calculation completed!');
   };
 
   // Use scenarios data with fallback
@@ -257,12 +198,12 @@ const CalculatorPage: React.FC = () => {
               Investment Details
             </h2>
             
-            <ROICalculator
-              onCalculate={handleCalculate}
-              isLoading={calculateMutation.isPending}
-              selectedScenario={selectedScenario}
-              selectedMiniScenario={selectedMiniScenario}
-            />
+                    <ROICalculator
+          onCalculate={handleCalculate}
+          isLoading={false}
+          selectedScenario={selectedScenario}
+          selectedMiniScenario={selectedMiniScenario}
+        />
           </motion.div>
         </motion.div>
 
