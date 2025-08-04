@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, FileText, BarChart3, Award, Shield, TrendingUp, Globe, DollarSign, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Download, FileText, BarChart3, Award, Shield, TrendingUp, Globe, DollarSign, CheckCircle } from 'lucide-react';
 import { apiService } from '../services/api';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
