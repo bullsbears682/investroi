@@ -40,6 +40,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   
   // Calculate missing values
   const totalInvestment = (resultData.initial_investment || 0) + (resultData.additional_costs || 0);
+  
+  // Debug logging for mobile
+  console.log('ResultsDisplay DEBUG:');
+  console.log('result:', result);
+  console.log('resultData:', resultData);
+  console.log('initial_investment:', resultData.initial_investment);
+  console.log('additional_costs:', resultData.additional_costs);
+  console.log('totalInvestment calculated:', totalInvestment);
   const netProfit = resultData.net_profit || 0;
   const roiPercentage = resultData.roi_percentage || 0;
   const expectedReturn = resultData.expected_return || (totalInvestment * (roiPercentage / 100));
