@@ -87,7 +87,7 @@ class ROICalculatorService:
         annualized_roi = self._calculate_annualized_roi(base_roi, time_in_years)
         
         # Calculate taxes
-        tax_amount, after_tax_profit = self._calculate_taxes(
+        tax_amount, after_tax_profit, effective_tax_rate = self._calculate_taxes(
             net_profit, country_code, business_scenario_name
         )
         
@@ -111,6 +111,7 @@ class ROICalculatorService:
             'total_investment': round(total_investment, 2),
             'tax_amount': round(tax_amount, 2),
             'after_tax_profit': round(after_tax_profit, 2),
+            'effective_tax_rate': round(effective_tax_rate, 2),
             'risk_score': round(risk_score, 2),
             'market_analysis': market_analysis,
             'recommendations': recommendations,
@@ -277,7 +278,7 @@ class ROICalculatorService:
         tax_amount = net_profit * (effective_tax_rate / 100)
         after_tax_profit = net_profit - tax_amount
         
-        return tax_amount, after_tax_profit
+        return tax_amount, after_tax_profit, effective_tax_rate
     
     def _calculate_risk_score(self, business_scenario: str, country_code: str, investment_amount: float) -> float:
         """Calculate risk score (0-10) based on various factors"""
