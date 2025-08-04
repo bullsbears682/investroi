@@ -17,8 +17,8 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         calculation_data: calculationData
       });
       
-      // Create blob from response
-      const blob = new Blob([response], { type: 'application/pdf' });
+      // Create blob from response data
+      const blob = new Blob([response.data], { type: 'application/pdf' });
       
       // Create download link
       const url = window.URL.createObjectURL(blob);
