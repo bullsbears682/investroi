@@ -197,22 +197,23 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           </div>
         </div>
 
-        {/* Country Selection */}
+        {/* Country Selection - Temporarily Disabled */}
         <div>
-          <label className="block text-white/80 text-sm font-medium mb-2 flex items-center">
+          <label className="block text-white/60 text-sm font-medium mb-2 flex items-center">
             <Globe className="w-4 h-4 mr-2" />
-            Country (for tax calculations)
+            Country Selection (Temporarily Disabled)
           </label>
           <select
-            {...register('country_code', { required: 'Country is required' })}
-            className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+            {...register('country_code')}
+            defaultValue="US"
+            className="w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 text-white/40 focus:outline-none cursor-not-allowed"
+            disabled
           >
-            {countries.map((country) => (
-              <option key={country.code} value={country.code}>
-                {country.flag} {country.name}
-              </option>
-            ))}
+            <option value="US">🇺🇸 United States (Default)</option>
           </select>
+          <div className="text-xs text-white/40 mt-1">
+            Country selection temporarily disabled - will be re-enabled with tax calculations
+          </div>
         </div>
       </div>
 

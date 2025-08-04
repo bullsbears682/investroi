@@ -41,10 +41,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   const roiPercentage = result.roi_percentage || 0;
   const expectedReturn = result.expected_return || (totalInvestment * (roiPercentage / 100));
   
-  // Use actual tax data from backend response
-  const taxAmount = result.tax_amount || 0;
-  const afterTaxProfit = result.after_tax_profit || (netProfit - taxAmount);
-  const afterTaxROI = totalInvestment > 0 ? (afterTaxProfit / totalInvestment) * 100 : 0;
+  // Tax calculations temporarily removed - variables not used
 
 
 
@@ -172,7 +169,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
         </div>
       </motion.div>
 
-      {/* Tax Analysis */}
+      {/* Tax Analysis - Temporarily Disabled */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -184,33 +181,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           Tax Analysis
         </h3>
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-white/70">Effective Tax Rate:</span>
-            <span className="text-blue-400 font-medium">
-              {result.effective_tax_rate ? `${result.effective_tax_rate}%` : 'N/A'}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-white/70">Tax Amount:</span>
-            <span className="text-red-400 font-medium">
-              {formatCurrency(taxAmount)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-white/70">After-Tax Profit:</span>
-            <span className={`font-medium ${afterTaxProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {formatCurrency(afterTaxProfit)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-white/70">After-Tax ROI:</span>
-            <span className={`font-medium ${getROIColor(afterTaxROI)}`}>
-              {formatPercentage(afterTaxROI)}
-            </span>
-          </div>
-          <div className="pt-2 border-t border-white/10">
-            <div className="text-xs text-white/60">
-              Tax calculations are based on {result.country_code || 'selected country'} corporate tax rates and business type adjustments.
+          <div className="text-center py-4">
+            <div className="text-white/60 text-sm">
+              Tax calculations are temporarily disabled and will be re-added with improved functionality.
             </div>
           </div>
         </div>
