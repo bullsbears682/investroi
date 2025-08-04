@@ -228,33 +228,33 @@ class ROICalculatorService:
     def _calculate_taxes(self, net_profit: float, country_code: str, business_scenario: str) -> tuple:
         """Calculate taxes based on country and business type"""
         
-        # Tax rates by country (real rates)
+        # Real corporate tax rates by country (2024 data)
         tax_rates = {
-            'US': {'corporate': 21.0, 'capital_gains': 15.0, 'dividend': 15.0},
-            'GB': {'corporate': 19.0, 'capital_gains': 20.0, 'dividend': 7.5},
-            'DE': {'corporate': 29.9, 'capital_gains': 25.0, 'dividend': 26.4},
-            'FR': {'corporate': 28.4, 'capital_gains': 30.0, 'dividend': 30.0},
-            'CA': {'corporate': 26.5, 'capital_gains': 16.5, 'dividend': 15.0},
-            'AU': {'corporate': 30.0, 'capital_gains': 23.5, 'dividend': 23.5},
-            'JP': {'corporate': 29.7, 'capital_gains': 20.3, 'dividend': 20.3},
-            'SG': {'corporate': 17.0, 'capital_gains': 0.0, 'dividend': 0.0},
-            'NL': {'corporate': 25.8, 'capital_gains': 30.0, 'dividend': 15.0},
-            'CH': {'corporate': 18.0, 'capital_gains': 0.0, 'dividend': 35.0},
-            'SE': {'corporate': 20.6, 'capital_gains': 30.0, 'dividend': 30.0},
-            'NO': {'corporate': 22.0, 'capital_gains': 22.0, 'dividend': 22.0},
-            'DK': {'corporate': 22.0, 'capital_gains': 27.0, 'dividend': 27.0},
-            'FI': {'corporate': 20.0, 'capital_gains': 30.0, 'dividend': 30.0},
-            'IE': {'corporate': 12.5, 'capital_gains': 33.0, 'dividend': 25.0},
-            'ES': {'corporate': 25.0, 'capital_gains': 23.0, 'dividend': 23.0},
-            'IT': {'corporate': 24.0, 'capital_gains': 26.0, 'dividend': 26.0},
-            'BE': {'corporate': 25.0, 'capital_gains': 0.0, 'dividend': 30.0},
-            'AT': {'corporate': 25.0, 'capital_gains': 27.5, 'dividend': 27.5},
-            'PL': {'corporate': 19.0, 'capital_gains': 19.0, 'dividend': 19.0},
-            'CZ': {'corporate': 19.0, 'capital_gains': 15.0, 'dividend': 15.0},
-            'HU': {'corporate': 9.0, 'capital_gains': 15.0, 'dividend': 15.0},
-            'SK': {'corporate': 21.0, 'capital_gains': 19.0, 'dividend': 19.0},
-            'SI': {'corporate': 19.0, 'capital_gains': 27.5, 'dividend': 27.5},
-            'EE': {'corporate': 20.0, 'capital_gains': 20.0, 'dividend': 20.0},
+            'US': {'corporate': 21.0, 'capital_gains': 15.0, 'dividend': 15.0},    # Federal corporate tax rate
+            'GB': {'corporate': 25.0, 'capital_gains': 20.0, 'dividend': 7.5},     # UK corporation tax rate (updated 2024)
+            'DE': {'corporate': 29.9, 'capital_gains': 25.0, 'dividend': 26.4},    # German corporate tax (including trade tax)
+            'FR': {'corporate': 25.8, 'capital_gains': 30.0, 'dividend': 30.0},    # French corporate tax rate (updated 2024)
+            'CA': {'corporate': 26.5, 'capital_gains': 16.5, 'dividend': 15.0},    # Canadian federal + provincial average
+            'AU': {'corporate': 30.0, 'capital_gains': 23.5, 'dividend': 23.5},    # Australian corporate tax rate
+            'JP': {'corporate': 29.7, 'capital_gains': 20.3, 'dividend': 20.3},    # Japanese corporate tax rate
+            'SG': {'corporate': 17.0, 'capital_gains': 0.0, 'dividend': 0.0},      # Singapore corporate tax rate
+            'NL': {'corporate': 25.8, 'capital_gains': 30.0, 'dividend': 15.0},    # Dutch corporate tax rate
+            'CH': {'corporate': 18.0, 'capital_gains': 0.0, 'dividend': 35.0},     # Swiss corporate tax rate (average)
+            'SE': {'corporate': 20.6, 'capital_gains': 30.0, 'dividend': 30.0},    # Swedish corporate tax rate
+            'NO': {'corporate': 22.0, 'capital_gains': 22.0, 'dividend': 22.0},    # Norwegian corporate tax rate
+            'DK': {'corporate': 22.0, 'capital_gains': 27.0, 'dividend': 27.0},    # Danish corporate tax rate
+            'FI': {'corporate': 20.0, 'capital_gains': 30.0, 'dividend': 30.0},    # Finnish corporate tax rate
+            'IE': {'corporate': 12.5, 'capital_gains': 33.0, 'dividend': 25.0},    # Irish corporate tax rate
+            'ES': {'corporate': 25.0, 'capital_gains': 23.0, 'dividend': 23.0},    # Spanish corporate tax rate
+            'IT': {'corporate': 24.0, 'capital_gains': 26.0, 'dividend': 26.0},    # Italian corporate tax rate
+            'BE': {'corporate': 25.0, 'capital_gains': 0.0, 'dividend': 30.0},     # Belgian corporate tax rate
+            'AT': {'corporate': 25.0, 'capital_gains': 27.5, 'dividend': 27.5},    # Austrian corporate tax rate
+            'PL': {'corporate': 19.0, 'capital_gains': 19.0, 'dividend': 19.0},    # Polish corporate tax rate
+            'CZ': {'corporate': 19.0, 'capital_gains': 15.0, 'dividend': 15.0},    # Czech corporate tax rate
+            'HU': {'corporate': 9.0, 'capital_gains': 15.0, 'dividend': 15.0},     # Hungarian corporate tax rate
+            'SK': {'corporate': 21.0, 'capital_gains': 19.0, 'dividend': 19.0},    # Slovak corporate tax rate
+            'SI': {'corporate': 19.0, 'capital_gains': 27.5, 'dividend': 27.5},    # Slovenian corporate tax rate
+            'EE': {'corporate': 20.0, 'capital_gains': 20.0, 'dividend': 20.0},    # Estonian corporate tax rate
         }
         
         # Get tax rates for the country
