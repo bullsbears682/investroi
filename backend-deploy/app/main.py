@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
-from app.routers import pdf_export
+from app.routers import pdf_export, roi_calculator
 
 # Optional dotenv import to prevent deployment failures
 try:
@@ -41,6 +41,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(pdf_export.router)
+app.include_router(roi_calculator.router)
 
 # Health check endpoint
 @app.get("/")
@@ -1275,35 +1276,7 @@ async def get_mini_scenarios(scenario_id: int):
     
     return mini_scenarios.get(scenario_id, [])
 
-# Simple ROI calculation endpoint
-@app.post("/api/roi/calculate")
-async def calculate_roi(request: dict):
-    """Simple ROI calculation endpoint"""
-    try:
-        initial_investment = request.get("initial_investment", 0)
-        additional_costs = request.get("additional_costs", 0)
-        time_period = request.get("time_period", 1)
-        time_unit = request.get("time_unit", "years")
-        
-        total_investment = initial_investment + additional_costs
-        
-        # Simple ROI calculation (for testing)
-        roi_percentage = 15.0  # Mock ROI
-        net_profit = total_investment * (roi_percentage / 100)
-        annualized_roi = roi_percentage
-        
-        return {
-            "roi_percentage": roi_percentage,
-            "net_profit": net_profit,
-            "annualized_roi": annualized_roi,
-            "total_investment": total_investment,
-            "tax_amount": net_profit * 0.25,  # Mock tax
-            "after_tax_profit": net_profit * 0.75,
-            "risk_score": 5.0,
-            "session_id": "test_session_123"
-        }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+
 
 # Simple PDF export endpoint
 @app.post("/api/pdf/export")

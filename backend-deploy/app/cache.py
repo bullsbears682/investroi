@@ -1,77 +1,88 @@
-import redis
 import json
 import os
 from dotenv import load_dotenv
 from typing import Optional, Any, Dict
+from datetime import datetime, timedelta
 
 load_dotenv()
 
-# Redis configuration
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-redis_client = redis.from_url(REDIS_URL, decode_responses=True)
+# In-memory cache for development
+_cache = {}
+_cache_expiry = {}
 
 class CacheManager:
     def __init__(self):
-        self.redis = redis_client
+        self.cache = _cache
+        self.expiry = _cache_expiry
     
     def set_calculation(self, session_id: str, calculation_data: Dict[str, Any], expire: int = 3600):
         """Store ROI calculation in cache"""
         key = f"roi_calculation:{session_id}"
-        self.redis.setex(key, expire, json.dumps(calculation_data))
+        self.cache[key] = calculation_data
+        self.expiry[key] = datetime.now() + timedelta(seconds=expire)
     
     def get_calculation(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Retrieve ROI calculation from cache"""
         key = f"roi_calculation:{session_id}"
-        data = self.redis.get(key)
-        return json.loads(data) if data else None
+        if key in self.cache and datetime.now() < self.expiry.get(key, datetime.min):
+            return self.cache[key]
+        return None
     
     def set_user_preferences(self, session_id: str, preferences: Dict[str, Any], expire: int = 86400):
         """Store user preferences in cache"""
         key = f"user_preferences:{session_id}"
-        self.redis.setex(key, expire, json.dumps(preferences))
+        self.cache[key] = preferences
+        self.expiry[key] = datetime.now() + timedelta(seconds=expire)
     
     def get_user_preferences(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Retrieve user preferences from cache"""
         key = f"user_preferences:{session_id}"
-        data = self.redis.get(key)
-        return json.loads(data) if data else None
+        if key in self.cache and datetime.now() < self.expiry.get(key, datetime.min):
+            return self.cache[key]
+        return None
     
     def set_market_data(self, scenario_id: int, market_data: Dict[str, Any], expire: int = 86400):
         """Store market data in cache"""
         key = f"market_data:{scenario_id}"
-        self.redis.setex(key, expire, json.dumps(market_data))
+        self.cache[key] = market_data
+        self.expiry[key] = datetime.now() + timedelta(seconds=expire)
     
     def get_market_data(self, scenario_id: int) -> Optional[Dict[str, Any]]:
         """Retrieve market data from cache"""
         key = f"market_data:{scenario_id}"
-        data = self.redis.get(key)
-        return json.loads(data) if data else None
+        if key in self.cache and datetime.now() < self.expiry.get(key, datetime.min):
+            return self.cache[key]
+        return None
     
     def set_tax_data(self, country_code: str, tax_data: Dict[str, Any], expire: int = 86400):
         """Store tax data in cache"""
         key = f"tax_data:{country_code}"
-        self.redis.setex(key, expire, json.dumps(tax_data))
+        self.cache[key] = tax_data
+        self.expiry[key] = datetime.now() + timedelta(seconds=expire)
     
     def get_tax_data(self, country_code: str) -> Optional[Dict[str, Any]]:
         """Retrieve tax data from cache"""
         key = f"tax_data:{country_code}"
-        data = self.redis.get(key)
-        return json.loads(data) if data else None
+        if key in self.cache and datetime.now() < self.expiry.get(key, datetime.min):
+            return self.cache[key]
+        return None
     
     def increment_usage_counter(self, session_id: str):
         """Increment usage counter for analytics"""
         key = f"usage_counter:{session_id}"
-        self.redis.incr(key)
-        self.redis.expire(key, 86400)  # Expire after 24 hours
+        if key in self.cache:
+            self.cache[key] += 1
+        else:
+            self.cache[key] = 1
+        self.expiry[key] = datetime.now() + timedelta(seconds=86400)
     
     def get_usage_stats(self) -> Dict[str, int]:
         """Get usage statistics"""
-        keys = self.redis.keys("usage_counter:*")
         stats = {}
-        for key in keys:
-            session_id = key.split(":")[1]
-            count = self.redis.get(key)
-            stats[session_id] = int(count) if count else 0
+        for key in self.cache:
+            if key.startswith("usage_counter:") and datetime.now() < self.expiry.get(key, datetime.min):
+                session_id = key.split(":")[1]
+                stats[session_id] = self.cache[key]
         return stats
     
     def clear_session_data(self, session_id: str):
@@ -82,7 +93,10 @@ class CacheManager:
             f"usage_counter:{session_id}"
         ]
         for pattern in patterns:
-            self.redis.delete(pattern)
+            if pattern in self.cache:
+                del self.cache[pattern]
+            if pattern in self.expiry:
+                del self.expiry[pattern]
 
 # Global cache manager instance
 cache_manager = CacheManager()
