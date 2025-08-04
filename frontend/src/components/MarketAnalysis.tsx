@@ -20,12 +20,12 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         growth_rate: 14.8,
         competition_level: 'High',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up' },
-          { period: 'Q2 2023', value: 118, direction: 'up' },
-          { period: 'Q3 2023', value: 135, direction: 'up' },
-          { period: 'Q4 2023', value: 152, direction: 'up' },
-          { period: 'Q1 2024', value: 168, direction: 'up' },
-          { period: 'Q2 2024', value: 185, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Market recovery post-pandemic' },
+          { period: 'Q2 2023', value: 118, direction: 'up', growth: 18, description: 'Mobile commerce surge' },
+          { period: 'Q3 2023', value: 135, direction: 'up', growth: 14.4, description: 'AI integration acceleration' },
+          { period: 'Q4 2023', value: 152, direction: 'up', growth: 12.6, description: 'Holiday season boost' },
+          { period: 'Q1 2024', value: 168, direction: 'up', growth: 10.5, description: 'Cross-border expansion' },
+          { period: 'Q2 2024', value: 185, direction: 'up', growth: 10.1, description: 'Social commerce growth' }
         ],
         key_players: [
           { name: 'Amazon', market_share: 38.7, strength_score: 0.95 },
@@ -54,12 +54,12 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         growth_rate: 21.3,
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up' },
-          { period: 'Q2 2023', value: 125, direction: 'up' },
-          { period: 'Q3 2023', value: 148, direction: 'up' },
-          { period: 'Q4 2023', value: 172, direction: 'up' },
-          { period: 'Q1 2024', value: 198, direction: 'up' },
-          { period: 'Q2 2024', value: 225, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Cloud adoption acceleration' },
+          { period: 'Q2 2023', value: 125, direction: 'up', growth: 25, description: 'AI/ML integration surge' },
+          { period: 'Q3 2023', value: 148, direction: 'up', growth: 18.4, description: 'Remote work solutions' },
+          { period: 'Q4 2023', value: 172, direction: 'up', growth: 16.2, description: 'Enterprise digital transformation' },
+          { period: 'Q1 2024', value: 198, direction: 'up', growth: 15.1, description: 'Industry-specific solutions' },
+          { period: 'Q2 2024', value: 225, direction: 'up', growth: 13.6, description: 'Security & compliance focus' }
         ],
         key_players: [
           { name: 'Microsoft', market_share: 32.8, strength_score: 0.92 },
@@ -88,12 +88,12 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         growth_rate: 11.2,
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up' },
-          { period: 'Q2 2023', value: 112, direction: 'up' },
-          { period: 'Q3 2023', value: 124, direction: 'up' },
-          { period: 'Q4 2023', value: 135, direction: 'up' },
-          { period: 'Q1 2024', value: 147, direction: 'up' },
-          { period: 'Q2 2024', value: 158, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Remote work adoption' },
+          { period: 'Q2 2023', value: 112, direction: 'up', growth: 12, description: 'Gig economy expansion' },
+          { period: 'Q3 2023', value: 124, direction: 'up', growth: 10.7, description: 'Specialized skills demand' },
+          { period: 'Q4 2023', value: 135, direction: 'up', growth: 8.9, description: 'Project-based work growth' },
+          { period: 'Q1 2024', value: 147, direction: 'up', growth: 8.9, description: 'Global talent access' },
+          { period: 'Q2 2024', value: 158, direction: 'up', growth: 7.5, description: 'AI-augmented freelancing' }
         ],
         key_players: [
           { name: 'Upwork', market_share: 42.3, strength_score: 0.85 },
@@ -122,12 +122,12 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         growth_rate: 8.7,
         competition_level: 'High',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up' },
-          { period: 'Q2 2023', value: 108, direction: 'up' },
-          { period: 'Q3 2023', value: 115, direction: 'up' },
-          { period: 'Q4 2023', value: 122, direction: 'up' },
-          { period: 'Q1 2024', value: 128, direction: 'up' },
-          { period: 'Q2 2024', value: 135, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Post-pandemic recovery' },
+          { period: 'Q2 2023', value: 108, direction: 'up', growth: 8, description: 'Digital transformation demand' },
+          { period: 'Q3 2023', value: 115, direction: 'up', growth: 6.5, description: 'Performance marketing growth' },
+          { period: 'Q4 2023', value: 122, direction: 'up', growth: 6.1, description: 'Creative technology adoption' },
+          { period: 'Q1 2024', value: 128, direction: 'up', growth: 4.9, description: 'Data-driven strategies' },
+          { period: 'Q2 2024', value: 135, direction: 'up', growth: 5.5, description: 'Brand experience focus' }
         ],
         key_players: [
           { name: 'WPP Group', market_share: 16.8, strength_score: 0.88 },
@@ -156,12 +156,12 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         growth_rate: 25.8,
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up' },
-          { period: 'Q2 2023', value: 135, direction: 'up' },
-          { period: 'Q3 2023', value: 168, direction: 'up' },
-          { period: 'Q4 2023', value: 198, direction: 'up' },
-          { period: 'Q1 2024', value: 225, direction: 'up' },
-          { period: 'Q2 2024', value: 252, direction: 'up' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Innovation ecosystem growth' },
+          { period: 'Q2 2023', value: 135, direction: 'up', growth: 35, description: 'AI/ML startup surge' },
+          { period: 'Q3 2023', value: 168, direction: 'up', growth: 24.4, description: 'FinTech disruption' },
+          { period: 'Q4 2023', value: 198, direction: 'up', growth: 17.9, description: 'HealthTech innovation' },
+          { period: 'Q1 2024', value: 225, direction: 'up', growth: 13.6, description: 'GreenTech acceleration' },
+          { period: 'Q2 2024', value: 252, direction: 'up', growth: 12.0, description: 'EdTech market expansion' }
         ],
         key_players: [
           { name: 'Tech Giants', market_share: 35.2, strength_score: 0.92 },
@@ -191,12 +191,12 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
       growth_rate: 12.0,
       competition_level: 'Medium',
       market_trends: [
-        { period: 'Q1 2023', value: 100, direction: 'up' },
-        { period: 'Q2 2023', value: 115, direction: 'up' },
-        { period: 'Q3 2023', value: 128, direction: 'up' },
-        { period: 'Q4 2023', value: 142, direction: 'up' },
-        { period: 'Q1 2024', value: 155, direction: 'up' },
-        { period: 'Q2 2024', value: 168, direction: 'up' }
+        { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Market stabilization' },
+        { period: 'Q2 2023', value: 115, direction: 'up', growth: 15, description: 'Growth acceleration' },
+        { period: 'Q3 2023', value: 128, direction: 'up', growth: 11.3, description: 'Technology adoption' },
+        { period: 'Q4 2023', value: 142, direction: 'up', growth: 10.9, description: 'Market expansion' },
+        { period: 'Q1 2024', value: 155, direction: 'up', growth: 9.2, description: 'Innovation focus' },
+        { period: 'Q2 2024', value: 168, direction: 'up', growth: 8.4, description: 'Sustainable growth' }
       ],
       key_players: [
         { name: 'Market Leaders', market_share: 38.5, strength_score: 0.82 },
@@ -350,7 +350,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
                       isPositive ? 'bg-green-400' : 'bg-red-400'
                     }`}></div>
                     <span className="text-white/60">
-                      {isPositive ? 'Strong Growth' : 'Decline'} • 
+                      {trend.description} • 
                       {index === 0 ? ' Baseline' : ` ${growth}% ${isPositive ? 'increase' : 'decrease'} from previous quarter`}
                     </span>
                   </div>
@@ -476,30 +476,70 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-white/70">Market Maturity:</span>
-              <span className="text-white font-medium">Growing</span>
+              <span className="text-white font-medium">
+                {market_size > 100 ? 'Mature' : market_size > 50 ? 'Growing' : 'Emerging'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/70">Entry Barriers:</span>
-              <span className="text-white font-medium">Medium</span>
+              <span className="text-white font-medium">
+                {competition_level === 'High' ? 'High' : competition_level === 'Medium' ? 'Medium' : 'Low'}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/70">Regulatory Environment:</span>
-              <span className="text-white font-medium">Favorable</span>
+              <span className="text-white/70">Growth Trajectory:</span>
+              <span className="text-white font-medium">
+                {growth_rate > 20 ? 'Exponential' : growth_rate > 10 ? 'Strong' : 'Moderate'}
+              </span>
             </div>
           </div>
           
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-white/70">Technology Adoption:</span>
-              <span className="text-white font-medium">High</span>
+              <span className="text-white font-medium">
+                {scenarioId === 2 ? 'Very High' : scenarioId === 1 ? 'High' : 'Medium'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/70">Customer Demand:</span>
-              <span className="text-white font-medium">Strong</span>
+              <span className="text-white font-medium">
+                {growth_rate > 15 ? 'Very Strong' : growth_rate > 8 ? 'Strong' : 'Moderate'}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/70">Supply Chain:</span>
-              <span className="text-white font-medium">Stable</span>
+              <span className="text-white/70">Market Volatility:</span>
+              <span className="text-white font-medium">
+                {scenarioId === 5 ? 'High' : scenarioId === 2 ? 'Medium' : 'Low'}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Market Health Indicators */}
+        <div className="mt-4 pt-4 border-t border-white/10">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-white/60 text-xs">Market Health</div>
+              <div className={`text-lg font-bold ${
+                growth_rate > 15 ? 'text-green-400' : growth_rate > 8 ? 'text-yellow-400' : 'text-red-400'
+              }`}>
+                {growth_rate > 15 ? 'Excellent' : growth_rate > 8 ? 'Good' : 'Fair'}
+              </div>
+            </div>
+            <div>
+              <div className="text-white/60 text-xs">Competition Level</div>
+              <div className={`text-lg font-bold ${
+                competition_level === 'Low' ? 'text-green-400' : competition_level === 'Medium' ? 'text-yellow-400' : 'text-red-400'
+              }`}>
+                {competition_level}
+              </div>
+            </div>
+            <div>
+              <div className="text-white/60 text-xs">Market Size</div>
+                              <div className="text-lg font-bold text-blue-400">
+                  ${market_size}B
+                </div>
             </div>
           </div>
         </div>
