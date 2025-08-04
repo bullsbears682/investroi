@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Download } from 'lucide-react';
 import { apiService } from '../services/api';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface PDFExportProps {
   calculationData: any;
@@ -53,56 +55,128 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
 
   const generateFrontendPDF = () => {
     try {
-      // Create a simple text-based PDF content
-      const pdfContent = `
-ROI Investment Report
-Generated: ${new Date().toLocaleDateString()}
-
-Investment Summary:
-- Initial Investment: $${calculationData.initial_investment?.toLocaleString() || 'N/A'}
-- Additional Costs: $${calculationData.additional_costs?.toLocaleString() || '0'}
-- Total Investment: $${calculationData.total_investment?.toLocaleString() || 'N/A'}
-
-ROI Results:
-- ROI Percentage: ${calculationData.roi_percentage?.toFixed(2) || 'N/A'}%
-- Net Profit: $${calculationData.net_profit?.toLocaleString() || 'N/A'}
-- Expected Return: $${calculationData.expected_return?.toLocaleString() || 'N/A'}
-
-Business Details:
-- Scenario: ${calculationData.scenario_name || 'N/A'}
-- Mini Scenario: ${calculationData.mini_scenario_name || 'N/A'}
-- Country: ${calculationData.country_code || 'N/A'}
-
-Tax Analysis:
-- Effective Tax Rate: ${calculationData.effective_tax_rate?.toFixed(1) || 'N/A'}%
-- Tax Amount: $${calculationData.tax_amount?.toLocaleString() || 'N/A'}
-- After-Tax Profit: $${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}
-
-Calculation Method: ${calculationData.calculation_method || 'Local Fallback'}
-      `;
-
-      // Create blob with text content
-      const blob = new Blob([pdfContent], { type: 'text/plain' });
+      // Create new PDF document
+      const doc = new jsPDF();
       
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `roi_investment_report_${new Date().toISOString().split('T')[0]}.txt`;
+      // Set document properties
+      doc.setProperties({
+        title: 'ROI Investment Report',
+        subject: 'Investment Analysis Report',
+        author: 'InvestWise Pro',
+        creator: 'InvestWise Pro ROI Calculator'
+      });
+
+      // Add header
+      doc.setFontSize(24);
+      doc.setTextColor(0, 0, 139); // Dark blue
+      doc.text('ROI Investment Report', 105, 20, { align: 'center' });
       
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Add subtitle
+      doc.setFontSize(12);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 105, 30, { align: 'center' });
       
-      // Clean up
-      window.URL.revokeObjectURL(url);
+      // Add line separator
+      doc.setDrawColor(200, 200, 200);
+      doc.line(20, 35, 190, 35);
+
+      // Investment Summary Section
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 139);
+      doc.text('Investment Summary', 20, 50);
       
-      toast.success('Report downloaded successfully! (Text format)', { id: 'pdf-export' });
+      // Investment summary table
+      const investmentData = [
+        ['Initial Investment', `$${calculationData.initial_investment?.toLocaleString() || 'N/A'}`],
+        ['Additional Costs', `$${calculationData.additional_costs?.toLocaleString() || '0'}`],
+        ['Total Investment', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`]
+      ];
+      
+      autoTable(doc, {
+        startY: 55,
+        head: [['Item', 'Amount']],
+        body: investmentData,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+        styles: { fontSize: 10 }
+      });
+
+      // ROI Results Section
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 139);
+      doc.text('ROI Results', 20, 100);
+      
+      // ROI results table
+      const roiData = [
+        ['ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || 'N/A'}%`],
+        ['Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
+        ['Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`]
+      ];
+      
+      autoTable(doc, {
+        startY: 105,
+        head: [['Metric', 'Value']],
+        body: roiData,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+        styles: { fontSize: 10 }
+      });
+
+      // Business Details Section
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 139);
+      doc.text('Business Details', 20, 150);
+      
+      const businessData = [
+        ['Scenario', calculationData.scenario_name || 'N/A'],
+        ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
+        ['Country', calculationData.country_code || 'N/A']
+      ];
+      
+      autoTable(doc, {
+        startY: 155,
+        head: [['Detail', 'Value']],
+        body: businessData,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+        styles: { fontSize: 10 }
+      });
+
+      // Tax Analysis Section
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 139);
+      doc.text('Tax Analysis', 20, 200);
+      
+      const taxData = [
+        ['Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || 'N/A'}%`],
+        ['Tax Amount', `$${calculationData.tax_amount?.toLocaleString() || 'N/A'}`],
+        ['After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`]
+      ];
+      
+      autoTable(doc, {
+        startY: 205,
+        head: [['Tax Item', 'Amount']],
+        body: taxData,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+        styles: { fontSize: 10 }
+      });
+
+      // Footer
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Calculation Method: ${calculationData.calculation_method || 'Local Fallback'}`, 20, 280);
+      doc.text('Generated by InvestWise Pro ROI Calculator', 105, 285, { align: 'center' });
+
+      // Save the PDF
+      const filename = `roi_investment_report_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(filename);
+      
+      toast.success('PDF report generated successfully!', { id: 'pdf-export' });
       
     } catch (error) {
       console.error('Frontend PDF generation error:', error);
-      toast.error('Report generation failed. Please try again.', { id: 'pdf-export' });
+      toast.error('PDF generation failed. Please try again.', { id: 'pdf-export' });
     }
   };
 
