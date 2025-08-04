@@ -357,6 +357,8 @@ const CalculatorPage: React.FC = () => {
           isLoading={calculateMutation.isPending}
           selectedScenario={selectedScenario}
           selectedMiniScenario={selectedMiniScenario}
+          scenariosData={scenariosData}
+          miniScenariosData={miniScenariosData}
         />
           </motion.div>
         </motion.div>
