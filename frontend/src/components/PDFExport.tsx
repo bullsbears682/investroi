@@ -96,62 +96,62 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         creator: 'InvestWise Pro ROI Calculator'
       });
 
-      // App-style background - dark gradient like the app
-      doc.setFillColor(15, 23, 42); // Dark blue base like app
+      // Modern template background - clean white
+      doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, 210, 297, 'F');
       
-      // App-style header with gradient effect
-      doc.setFillColor(59, 130, 246); // Blue like app header
-      doc.rect(0, 0, 210, 80, 'F');
+      // Modern header with gradient effect
+      doc.setFillColor(59, 130, 246); // Blue
+      doc.rect(0, 0, 210, 60, 'F');
       
-      // App-style accent line
-      doc.setFillColor(16, 185, 129); // Green accent like app
-      doc.rect(0, 75, 210, 5, 'F');
+      // Modern accent line
+      doc.setFillColor(16, 185, 129); // Green
+      doc.rect(0, 55, 210, 5, 'F');
       
-      // App-style header text
-      doc.setFontSize(28);
+      // Modern header text
+      doc.setFontSize(24);
       doc.setTextColor(255, 255, 255);
-      doc.text('InvestWise Pro', 105, 35, { align: 'center' });
+      doc.text('InvestWise Pro', 105, 25, { align: 'center' });
       
-      doc.setFontSize(16);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('ROI Investment Report', 105, 55, { align: 'center' });
-      
-      doc.setFontSize(12);
+      doc.setFontSize(14);
       doc.setTextColor(255, 255, 255);
-      doc.text('Professional Investment Analysis', 105, 70, { align: 'center' });
+      doc.text('ROI Investment Report', 105, 40, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text('Professional Investment Analysis', 105, 50, { align: 'center' });
 
-      // App-style ROI Highlight Card (like ResultsDisplay)
-      doc.setFillColor(255, 255, 255, 0.1); // White with transparency like app
-      doc.rect(15, 100, 180, 80, 'F');
-      doc.setDrawColor(255, 255, 255, 0.2); // White border like app
-      doc.rect(15, 100, 180, 80, 'S');
+      // Modern ROI Highlight Card (like popular templates)
+      doc.setFillColor(248, 250, 252); // Light gray background
+      doc.rect(15, 80, 180, 70, 'F');
+      doc.setDrawColor(226, 232, 240); // Light border
+      doc.rect(15, 80, 180, 70, 'S');
       
-      // App-style accent on card
+      // Modern accent on card
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(15, 100, 180, 4, 'F');
+      doc.rect(15, 80, 180, 4, 'F');
       
-      // ROI display with app-style colors
+      // ROI display with modern colors
       const roi = calculationData.roi_percentage || 0;
       let roiColor = [16, 185, 129]; // Green
       if (roi < 10) roiColor = [59, 130, 246]; // Blue
       if (roi < 0) roiColor = [239, 68, 68]; // Red
       
-      doc.setFontSize(26);
+      doc.setFontSize(22);
       doc.setTextColor(roiColor[0], roiColor[1], roiColor[2]);
-      doc.text(`${roi.toFixed(2)}% ROI`, 105, 125, { align: 'center' });
+      doc.text(`${roi.toFixed(2)}% ROI`, 105, 105, { align: 'center' });
       
-      doc.setFontSize(14);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 145, { align: 'center' });
-      doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 160, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setTextColor(71, 85, 105); // Gray text
+      doc.text(`Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 120, { align: 'center' });
+      doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 135, { align: 'center' });
 
-      // App-style Performance indicator
-      const performanceY = 200;
-      doc.setFillColor(255, 255, 255, 0.1); // White with transparency
-      doc.rect(15, performanceY, 180, 60, 'F');
-      doc.setDrawColor(255, 255, 255, 0.2); // White border
-      doc.rect(15, performanceY, 180, 60, 'S');
+      // Modern Performance indicator
+      const performanceY = 170;
+      doc.setFillColor(248, 250, 252); // Light gray background
+      doc.rect(15, performanceY, 180, 50, 'F');
+      doc.setDrawColor(226, 232, 240); // Light border
+      doc.rect(15, performanceY, 180, 50, 'S');
       
       // Performance accent
       let performanceColor = [16, 185, 129]; // Green
@@ -168,15 +168,15 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       doc.setFillColor(performanceColor[0], performanceColor[1], performanceColor[2]);
       doc.rect(15, performanceY, 180, 4, 'F');
       
-      doc.setFontSize(16);
-      doc.setTextColor(255, 255, 255);
-      doc.text('Performance Rating', 105, performanceY + 20, { align: 'center' });
-      
       doc.setFontSize(14);
+      doc.setTextColor(71, 85, 105); // Gray text
+      doc.text('Performance Rating', 105, performanceY + 15, { align: 'center' });
+      
+      doc.setFontSize(12);
       doc.setTextColor(performanceColor[0], performanceColor[1], performanceColor[2]);
-      doc.text(performanceText, 105, performanceY + 40, { align: 'center' });
+      doc.text(performanceText, 105, performanceY + 30, { align: 'center' });
 
-      // App-style Summary table with proper alignment
+      // Modern Summary table with proper alignment
       const summaryData = [
         ['Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
         ['Additional Costs', `$${calculationData.additional_costs?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
@@ -189,34 +189,34 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ];
       
       autoTable(doc, {
-        startY: 280,
+        startY: 240,
         head: [['Metric', 'Value']],
         body: summaryData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [59, 130, 246], // Blue like app
+          fillColor: [59, 130, 246], // Blue
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 11,
           fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
-          fontSize: 11,
-          cellPadding: 8,
-          textColor: [255, 255, 255],
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: [71, 85, 105], // Gray text
           halign: 'left'
         },
         margin: { left: 15, right: 15 },
         alternateRowStyles: {
-          fillColor: [30, 41, 59] // Dark slate
+          fillColor: [248, 250, 252] // Light gray
         }
       });
 
-      // App-style footer
-      doc.setFillColor(59, 130, 246); // Blue like app
+      // Modern footer
+      doc.setFillColor(59, 130, 246); // Blue
       doc.rect(0, 270, 210, 27, 'F');
       
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setTextColor(255, 255, 255);
       doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
       doc.text('Professional Investment Analysis Tool', 105, 287, { align: 'center' });
@@ -243,38 +243,38 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         creator: 'InvestWise Pro ROI Calculator'
       });
 
-      // App-style background
-      doc.setFillColor(15, 23, 42); // Dark blue base
+      // Modern template background - clean white
+      doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, 210, 297, 'F');
       
-      // App-style header
-      doc.setFillColor(59, 130, 246); // Blue like app
-      doc.rect(0, 0, 210, 80, 'F');
+      // Modern header
+      doc.setFillColor(59, 130, 246); // Blue
+      doc.rect(0, 0, 210, 60, 'F');
       
-      // App-style accent line
-      doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(0, 75, 210, 5, 'F');
+      // Modern accent line
+      doc.setFillColor(16, 185, 129); // Green
+      doc.rect(0, 55, 210, 5, 'F');
       
-      doc.setFontSize(24);
+      doc.setFontSize(20);
       doc.setTextColor(255, 255, 255);
-      doc.text('InvestWise Pro', 105, 35, { align: 'center' });
+      doc.text('InvestWise Pro', 105, 25, { align: 'center' });
       
-      doc.setFontSize(16);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Detailed Investment Analysis', 105, 55, { align: 'center' });
-      
-      doc.setFontSize(12);
+      doc.setFontSize(14);
       doc.setTextColor(255, 255, 255);
-      doc.text('Comprehensive Investment Report', 105, 70, { align: 'center' });
+      doc.text('Detailed Investment Analysis', 105, 40, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text('Comprehensive Investment Report', 105, 50, { align: 'center' });
 
-      // Investment Summary Section with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Investment Summary', 20, 100);
+      // Investment Summary Section with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('Investment Summary', 20, 85);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 102, 60, 3, 'F');
+      doc.rect(20, 87, 60, 3, 'F');
       
       const investmentData = [
         ['Initial Investment', `$${calculationData.initial_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
@@ -284,37 +284,37 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ];
       
       autoTable(doc, {
-        startY: 115,
+        startY: 100,
         head: [['Item', 'Amount']],
         body: investmentData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [59, 130, 246], // Blue like app
+          fillColor: [59, 130, 246], // Blue
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 11,
           fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
-          fontSize: 11,
-          cellPadding: 8,
-          textColor: [255, 255, 255],
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: [71, 85, 105], // Gray text
           halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [30, 41, 59] // Dark slate
+          fillColor: [248, 250, 252] // Light gray
         }
       });
 
-      // ROI Performance Section with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('ROI Performance', 20, 180);
+      // ROI Performance Section with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('ROI Performance', 20, 170);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 182, 60, 3, 'F');
+      doc.rect(20, 172, 60, 3, 'F');
       
       const roiData = [
         ['ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
@@ -324,37 +324,37 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ];
       
       autoTable(doc, {
-        startY: 195,
+        startY: 185,
         head: [['Metric', 'Value']],
         body: roiData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [59, 130, 246], // Blue like app
+          fillColor: [59, 130, 246], // Blue
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 11,
           fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
-          fontSize: 11,
-          cellPadding: 8,
-          textColor: [255, 255, 255],
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: [71, 85, 105], // Gray text
           halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [30, 41, 59] // Dark slate
+          fillColor: [248, 250, 252] // Light gray
         }
       });
 
-      // Business Information Section with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Business Information', 20, 260);
+      // Business Information Section with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('Business Information', 20, 250);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 262, 60, 3, 'F');
+      doc.rect(20, 252, 60, 3, 'F');
       
       const businessData = [
         ['Scenario', calculationData.scenario_name || 'N/A'],
@@ -364,43 +364,43 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ];
       
       autoTable(doc, {
-        startY: 275,
+        startY: 265,
         head: [['Detail', 'Value']],
         body: businessData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [59, 130, 246], // Blue like app
+          fillColor: [59, 130, 246], // Blue
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 11,
           fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
-          fontSize: 11,
-          cellPadding: 8,
-          textColor: [255, 255, 255],
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: [71, 85, 105], // Gray text
           halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [30, 41, 59] // Dark slate
+          fillColor: [248, 250, 252] // Light gray
         }
       });
 
-      // Second page with app-style design
+      // Second page with modern design
       doc.addPage();
       
       // Second page header
-      doc.setFillColor(59, 130, 246); // Blue like app
-      doc.rect(0, 0, 210, 60, 'F');
+      doc.setFillColor(59, 130, 246); // Blue
+      doc.rect(0, 0, 210, 50, 'F');
       
-      // App-style accent line
-      doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(0, 55, 210, 5, 'F');
+      // Modern accent line
+      doc.setFillColor(16, 185, 129); // Green
+      doc.rect(0, 45, 210, 5, 'F');
       
-      doc.setFontSize(18);
+      doc.setFontSize(16);
       doc.setTextColor(255, 255, 255);
-      doc.text('Tax Analysis', 20, 35);
+      doc.text('Tax Analysis', 20, 30);
       
       const taxData = [
         ['Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || '0.0'}%`],
@@ -410,41 +410,41 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ];
       
       autoTable(doc, {
-        startY: 70,
+        startY: 60,
         head: [['Tax Item', 'Amount']],
         body: taxData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [59, 130, 246], // Blue like app
+          fillColor: [59, 130, 246], // Blue
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 11,
           fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
-          fontSize: 11,
-          cellPadding: 8,
-          textColor: [255, 255, 255],
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: [71, 85, 105], // Gray text
           halign: 'left'
         },
         margin: { left: 20, right: 20 },
         alternateRowStyles: {
-          fillColor: [30, 41, 59] // Dark slate
+          fillColor: [248, 250, 252] // Light gray
         }
       });
 
-      // Risk Assessment with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Risk Assessment', 20, 140);
+      // Risk Assessment with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('Risk Assessment', 20, 130);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 142, 60, 3, 'F');
+      doc.rect(20, 132, 60, 3, 'F');
       
       const roi = calculationData.roi_percentage || 0;
       let riskLevel = '';
-      let riskColor = [255, 255, 255];
+      let riskColor = [71, 85, 105]; // Gray
       if (roi >= 20) {
         riskLevel = 'LOW RISK - Excellent potential';
         riskColor = [16, 185, 129]; // Green
@@ -459,18 +459,18 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         riskColor = [239, 68, 68]; // Red
       }
       
-      doc.setFontSize(14);
+      doc.setFontSize(12);
       doc.setTextColor(riskColor[0], riskColor[1], riskColor[2]);
-      doc.text(riskLevel, 20, 160);
+      doc.text(riskLevel, 20, 150);
 
-      // Market Analysis Section with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Market Analysis', 20, 190);
+      // Market Analysis Section with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('Market Analysis', 20, 180);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 192, 60, 3, 'F');
+      doc.rect(20, 182, 60, 3, 'F');
       
       const marketInsights = [
         `Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
@@ -479,17 +479,17 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         `Tax Efficiency: ${(calculationData.effective_tax_rate || 0) <= 20 ? 'Tax Efficient' : 'Standard Tax Impact'}`
       ];
       
-      doc.setFontSize(12);
-      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setTextColor(71, 85, 105); // Gray text
       marketInsights.forEach((insight, index) => {
-        doc.text(insight, 20, 210 + (index * 12));
+        doc.text(insight, 20, 200 + (index * 12));
       });
 
-      // App-style footer
-      doc.setFillColor(59, 130, 246); // Blue like app
+      // Modern footer
+      doc.setFillColor(59, 130, 246); // Blue
       doc.rect(0, 270, 210, 27, 'F');
       
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setTextColor(255, 255, 255);
       doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
       doc.text('Professional Investment Analysis Tool', 105, 287, { align: 'center' });
@@ -516,49 +516,49 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         creator: 'InvestWise Pro ROI Calculator'
       });
 
-      // App-style background
-      doc.setFillColor(15, 23, 42); // Dark blue base
+      // Modern template background - clean white
+      doc.setFillColor(255, 255, 255);
       doc.rect(0, 0, 210, 297, 'F');
       
-      // App-style header
-      doc.setFillColor(59, 130, 246); // Blue like app
-      doc.rect(0, 0, 210, 80, 'F');
+      // Modern header
+      doc.setFillColor(59, 130, 246); // Blue
+      doc.rect(0, 0, 210, 60, 'F');
       
-      // App-style accent line
-      doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(0, 75, 210, 5, 'F');
+      // Modern accent line
+      doc.setFillColor(16, 185, 129); // Green
+      doc.rect(0, 55, 210, 5, 'F');
       
-      doc.setFontSize(24);
+      doc.setFontSize(20);
       doc.setTextColor(255, 255, 255);
-      doc.text('InvestWise Pro', 105, 35, { align: 'center' });
+      doc.text('InvestWise Pro', 105, 25, { align: 'center' });
       
-      doc.setFontSize(16);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Executive Summary', 105, 55, { align: 'center' });
-      
-      doc.setFontSize(12);
-      doc.setTextColor(255, 255, 255);
-      doc.text('For Executive Decision Making', 105, 70, { align: 'center' });
-
-      // Executive Summary Card with app-style design
-      doc.setFillColor(255, 255, 255, 0.1); // White with transparency
-      doc.rect(15, 100, 180, 80, 'F');
-      doc.setDrawColor(255, 255, 255, 0.2); // White border
-      doc.rect(15, 100, 180, 80, 'S');
-      
-      // App-style accent on card
-      doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(15, 100, 180, 4, 'F');
-      
-      doc.setFontSize(24);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text(`${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI`, 105, 125, { align: 'center' });
       doc.setFontSize(14);
       doc.setTextColor(255, 255, 255);
-      doc.text(`Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 145, { align: 'center' });
-      doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 160, { align: 'center' });
+      doc.text('Executive Summary', 105, 40, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setTextColor(255, 255, 255);
+      doc.text('For Executive Decision Making', 105, 50, { align: 'center' });
 
-      // Executive Summary Table with app-style styling
+      // Executive Summary Card with modern design
+      doc.setFillColor(248, 250, 252); // Light gray background
+      doc.rect(15, 80, 180, 70, 'F');
+      doc.setDrawColor(226, 232, 240); // Light border
+      doc.rect(15, 80, 180, 70, 'S');
+      
+      // Modern accent on card
+      doc.setFillColor(16, 185, 129); // Green accent
+      doc.rect(15, 80, 180, 4, 'F');
+      
+      doc.setFontSize(20);
+      doc.setTextColor(16, 185, 129); // Green
+      doc.text(`${calculationData.roi_percentage?.toFixed(2) || '0.00'}% ROI`, 105, 105, { align: 'center' });
+      doc.setFontSize(12);
+      doc.setTextColor(71, 85, 105); // Gray text
+      doc.text(`Investment: $${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 120, { align: 'center' });
+      doc.text(`Net Profit: $${calculationData.net_profit?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`, 105, 135, { align: 'center' });
+
+      // Executive Summary Table with modern styling
       const executiveData = [
         ['Investment Amount', `$${calculationData.total_investment?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') || 'N/A'}`],
         ['ROI Performance', `${calculationData.roi_percentage?.toFixed(2) || '0.00'}%`],
@@ -571,58 +571,58 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ];
       
       autoTable(doc, {
-        startY: 200,
+        startY: 170,
         head: [['Metric', 'Value']],
         body: executiveData,
         theme: 'grid',
         headStyles: { 
-          fillColor: [59, 130, 246], // Blue like app
+          fillColor: [59, 130, 246], // Blue
           textColor: [255, 255, 255],
-          fontSize: 12,
+          fontSize: 11,
           fontStyle: 'bold',
           halign: 'center'
         },
         styles: { 
-          fontSize: 11,
-          cellPadding: 8,
-          textColor: [255, 255, 255],
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: [71, 85, 105], // Gray text
           halign: 'left'
         },
         margin: { left: 15, right: 15 },
         alternateRowStyles: {
-          fillColor: [30, 41, 59] // Dark slate
+          fillColor: [248, 250, 252] // Light gray
         }
       });
 
-      // Second page with app-style design
+      // Second page with modern design
       doc.addPage();
       
       // Second page header
-      doc.setFillColor(59, 130, 246); // Blue like app
-      doc.rect(0, 0, 210, 60, 'F');
+      doc.setFillColor(59, 130, 246); // Blue
+      doc.rect(0, 0, 210, 50, 'F');
       
-      // App-style accent line
-      doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(0, 55, 210, 5, 'F');
+      // Modern accent line
+      doc.setFillColor(16, 185, 129); // Green
+      doc.rect(0, 45, 210, 5, 'F');
       
-      doc.setFontSize(18);
+      doc.setFontSize(16);
       doc.setTextColor(255, 255, 255);
-      doc.text('Investment Assessment & Analysis', 105, 35, { align: 'center' });
+      doc.text('Investment Assessment & Analysis', 105, 30, { align: 'center' });
 
-      // Investment Assessment with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Investment Assessment', 20, 80);
+      // Investment Assessment with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('Investment Assessment', 20, 70);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 82, 60, 3, 'F');
+      doc.rect(20, 72, 60, 3, 'F');
       
       const roi = calculationData.roi_percentage || 0;
       let recommendation = '';
-      let recommendationColor = [255, 255, 255];
+      let recommendationColor = [71, 85, 105]; // Gray
       let confidence = '';
-      let confidenceColor = [255, 255, 255];
+      let confidenceColor = [71, 85, 105]; // Gray
       
       if (roi >= 20) {
         recommendation = 'EXCELLENT - High potential investment';
@@ -646,26 +646,26 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         confidenceColor = [239, 68, 68]; // Red
       }
       
-      doc.setFontSize(14);
+      doc.setFontSize(12);
       doc.setTextColor(recommendationColor[0], recommendationColor[1], recommendationColor[2]);
-      doc.text(recommendation, 20, 100);
+      doc.text(recommendation, 20, 90);
       
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setTextColor(confidenceColor[0], confidenceColor[1], confidenceColor[2]);
-      doc.text(`Confidence Level: ${confidence}`, 20, 115);
+      doc.text(`Confidence Level: ${confidence}`, 20, 105);
       
-      doc.setFontSize(12);
-      doc.setTextColor(255, 255, 255);
-      doc.text(`Based on ${roi.toFixed(2)}% ROI analysis`, 20, 130);
+      doc.setFontSize(10);
+      doc.setTextColor(71, 85, 105); // Gray text
+      doc.text(`Based on ${roi.toFixed(2)}% ROI analysis`, 20, 120);
 
-      // Market Analysis Section with app-style design
-      doc.setFontSize(18);
-      doc.setTextColor(16, 185, 129); // Green like app
-      doc.text('Market Analysis', 20, 160);
+      // Market Analysis Section with modern design
+      doc.setFontSize(16);
+      doc.setTextColor(31, 41, 55); // Dark gray
+      doc.text('Market Analysis', 20, 150);
       
-      // App-style section accent
+      // Modern section accent
       doc.setFillColor(16, 185, 129); // Green accent
-      doc.rect(20, 162, 60, 3, 'F');
+      doc.rect(20, 152, 60, 3, 'F');
       
       const marketInsights = [
         `Investment Size: ${(calculationData.total_investment || 0) >= 100000 ? 'Large Scale' : (calculationData.total_investment || 0) >= 25000 ? 'Medium Scale' : 'Small Scale'}`,
@@ -674,17 +674,17 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         `Tax Efficiency: ${(calculationData.effective_tax_rate || 0) <= 20 ? 'Tax Efficient' : 'Standard Tax Impact'}`
       ];
       
-      doc.setFontSize(12);
-      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setTextColor(71, 85, 105); // Gray text
       marketInsights.forEach((insight, index) => {
-        doc.text(insight, 20, 180 + (index * 12));
+        doc.text(insight, 20, 170 + (index * 12));
       });
 
-      // App-style footer
-      doc.setFillColor(59, 130, 246); // Blue like app
+      // Modern footer
+      doc.setFillColor(59, 130, 246); // Blue
       doc.rect(0, 270, 210, 27, 'F');
       
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setTextColor(255, 255, 255);
       doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
       doc.text('Professional Investment Analysis Tool', 105, 287, { align: 'center' });
