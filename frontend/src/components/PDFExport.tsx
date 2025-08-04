@@ -122,7 +122,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // ROI Highlight Card (app-style) - moved down for better spacing
     doc.setFillColor(255, 255, 255, 0.1); // White with 10% opacity
     doc.rect(20, 80, 170, 50, 'F');
-    doc.setDrawColor(255, 255, 255, 0.2);
+    doc.setDrawColor(255, 255, 255);
     doc.rect(20, 80, 170, 50, 'S');
     
     doc.setFontSize(24);
@@ -168,7 +168,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     const performanceY = 240;
     doc.setFillColor(255, 255, 255, 0.1);
     doc.rect(20, performanceY - 5, 170, 30, 'F');
-    doc.setDrawColor(255, 255, 255, 0.2);
+    doc.setDrawColor(255, 255, 255);
     doc.rect(20, performanceY - 5, 170, 30, 'S');
     
     doc.setFontSize(14);
@@ -244,7 +244,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Executive Summary Card (app-style glass) - better spacing
     doc.setFillColor(255, 255, 255, 0.1);
     doc.rect(20, 85, 170, 40, 'F');
-    doc.setDrawColor(255, 255, 255, 0.2);
+    doc.setDrawColor(255, 255, 255);
     doc.rect(20, 85, 170, 40, 'S');
     
     const roi = calculationData.roi_percentage || 0;
@@ -495,7 +495,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
     // Key Performance Indicators Box (app-style glass) - better spacing
     doc.setFillColor(255, 255, 255, 0.1);
     doc.rect(20, 95, 170, 50, 'F');
-    doc.setDrawColor(255, 255, 255, 0.2);
+    doc.setDrawColor(255, 255, 255);
     doc.rect(20, 95, 170, 50, 'S');
     
     const roi = calculationData.roi_percentage || 0;
