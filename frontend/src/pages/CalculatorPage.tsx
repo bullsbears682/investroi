@@ -22,7 +22,7 @@ import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
-import PDFExport from '../components/PDFExport';
+
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -464,7 +464,7 @@ const CalculatorPage: React.FC = () => {
                 Export Report
               </h2>
               
-              <PDFExport sessionId="test-session" />
+      
             </div>
           )}
 
