@@ -83,11 +83,22 @@ const CalculatorPage: React.FC = () => {
       setCalculationResult({ data: result });
       toast.success('ROI calculation completed!');
     },
-    onError: (_error: any) => {
-      console.error('API calculation failed, using fallback...');
-      // Fallback to local calculation
-      performLocalCalculation();
-    },
+            onError: (error: any) => {
+          console.error('API calculation failed:', error);
+          
+          // Log specific error details
+          if (error.response) {
+            console.error('Response status:', error.response.status);
+            console.error('Response data:', error.response.data);
+          } else if (error.request) {
+            console.error('No response received - network issue');
+          } else {
+            console.error('Request setup error:', error.message);
+          }
+          
+          // Fallback to local calculation
+          performLocalCalculation();
+        },
   });
 
   // Local calculation fallback
@@ -154,29 +165,40 @@ const CalculatorPage: React.FC = () => {
     toast.success('ROI calculation completed (local fallback)!');
   };
 
-  const handleCalculate = (formData: any) => {
-    if (!selectedScenario || !selectedMiniScenario) {
-      toast.error('Please select a business scenario and mini scenario');
-      return;
-    }
+        const handleCalculate = (formData: any) => {
+        if (!selectedScenario || !selectedMiniScenario) {
+          toast.error('Please select a business scenario and mini scenario');
+          return;
+        }
 
-    // Store form data for fallback
-    (window as any).formData = formData;
+        // Store form data for fallback
+        (window as any).formData = formData;
 
-    // Prepare data for API call
-    const calculationData = {
-      initial_investment: Number(formData.initial_investment) || 0,
-      additional_costs: Number(formData.additional_costs) || 0,
-      time_period: Number(formData.time_period) || 1,
-      time_unit: formData.time_unit || 'years',
-      business_scenario_id: selectedScenario,
-      mini_scenario_id: selectedMiniScenario,
-      country_code: formData.country_code || 'US'
-    };
+        // Prepare data for API call
+        const calculationData = {
+          initial_investment: Number(formData.initial_investment) || 0,
+          additional_costs: Number(formData.additional_costs) || 0,
+          time_period: Number(formData.time_period) || 1,
+          time_unit: formData.time_unit || 'years',
+          business_scenario_id: selectedScenario,
+          mini_scenario_id: selectedMiniScenario,
+          country_code: formData.country_code || 'US'
+        };
 
-    console.log('Sending calculation request to API...');
-    calculateMutation.mutate(calculationData);
-  };
+        console.log('Sending calculation request to API...');
+        
+        // First try a simple health check
+        api.get('/api/roi/calculate')
+          .then(() => {
+            console.log('API is reachable, proceeding with calculation...');
+            calculateMutation.mutate(calculationData);
+          })
+          .catch((error) => {
+            console.error('API health check failed:', error);
+            console.log('Using local fallback immediately...');
+            performLocalCalculation();
+          });
+      };
 
   // Use scenarios data with fallback
   const scenariosData = scenarios?.data || mockScenarios;
