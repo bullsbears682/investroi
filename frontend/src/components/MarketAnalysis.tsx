@@ -14,7 +14,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
   countryCode: _countryCode
 }) => {
   // Enhanced market analysis using research-based data
-    const getMarketData = () => {
+  const getMarketData = () => {
     // Get research-based market data
     const researchData = getResearchBasedMarketData(scenarioId);
     
