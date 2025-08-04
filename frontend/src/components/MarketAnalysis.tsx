@@ -221,24 +221,26 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 text-center">
-          <Globe className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-          <div className="text-2xl font-bold text-white">${market_size}B</div>
-          <div className="text-white/60 text-sm">Market Size</div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center">
+          <Globe className="w-8 h-8 mx-auto mb-3 text-blue-400" />
+          <div className="text-2xl font-bold text-white mb-1">
+            ${market_size}{market_size >= 100 ? 'T' : market_size >= 1 ? 'B' : 'M'}
+          </div>
+          <div className="text-white/60 text-sm font-medium">Market Size</div>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 text-center">
-          <TrendingUp className="w-8 h-8 mx-auto mb-2 text-green-400" />
-          <div className="text-2xl font-bold text-white">{growth_rate}%</div>
-          <div className="text-white/60 text-sm">Growth Rate</div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center">
+          <TrendingUp className="w-8 h-8 mx-auto mb-3 text-green-400" />
+          <div className="text-2xl font-bold text-white mb-1">{growth_rate}%</div>
+          <div className="text-white/60 text-sm font-medium">Growth Rate</div>
         </div>
         
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 text-center">
-          <Users className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-          <div className="text-2xl font-bold text-white">{competition_level}</div>
-          <div className="text-white/60 text-sm">Competition</div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center">
+          <Users className="w-8 h-8 mx-auto mb-3 text-purple-400" />
+          <div className="text-2xl font-bold text-white mb-1">{competition_level}</div>
+          <div className="text-white/60 text-sm font-medium">Competition</div>
         </div>
       </motion.div>
 
