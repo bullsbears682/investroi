@@ -318,23 +318,35 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
               <div>
                 <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 8px 0;">Key Growth Factors:</p>
                 <div style="space-y: 2;">
-                  ${data.marketResearchData.market_trends?.key_factors?.slice(0, 3).map((factor: string) => `
-                    <p style="color: #10b981; font-size: 11px; margin: 0; padding-left: 12px; position: relative;">
-                      <span style="position: absolute; left: 0; top: 4px; width: 3px; height: 3px; background: #10b981; border-radius: 50%;"></span>
-                      ${factor}
-                    </p>
-                  `).join('') || '<p style="color: #a5b4fc; font-size: 11px; margin: 0;">Market growth and expansion opportunities</p>'}
+                  ${(() => {
+                    const factors = data.marketResearchData.market_trends?.key_factors?.slice(0, 3);
+                    if (factors && factors.length > 0) {
+                      return factors.map((factor: string) => 
+                        `<p style="color: #10b981; font-size: 11px; margin: 0; padding-left: 12px; position: relative;">
+                          <span style="position: absolute; left: 0; top: 4px; width: 3px; height: 3px; background: #10b981; border-radius: 50%;"></span>
+                          ${factor}
+                        </p>`
+                      ).join('');
+                    }
+                    return '<p style="color: #a5b4fc; font-size: 11px; margin: 0;">Market growth and expansion opportunities</p>';
+                  })()}
                 </div>
               </div>
               <div>
                 <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 8px 0;">Risk Factors:</p>
                 <div style="space-y: 2;">
-                  ${data.marketResearchData.market_trends?.risk_factors?.slice(0, 3).map((factor: string) => `
-                    <p style="color: #ef4444; font-size: 11px; margin: 0; padding-left: 12px; position: relative;">
-                      <span style="position: absolute; left: 0; top: 4px; width: 3px; height: 3px; background: #ef4444; border-radius: 50%;"></span>
-                      ${factor}
-                    </p>
-                  `).join('') || '<p style="color: #a5b4fc; font-size: 11px; margin: 0;">Economic uncertainty and competition</p>'}
+                  ${(() => {
+                    const factors = data.marketResearchData.market_trends?.risk_factors?.slice(0, 3);
+                    if (factors && factors.length > 0) {
+                      return factors.map((factor: string) => 
+                        `<p style="color: #ef4444; font-size: 11px; margin: 0; padding-left: 12px; position: relative;">
+                          <span style="position: absolute; left: 0; top: 4px; width: 3px; height: 3px; background: #ef4444; border-radius: 50%;"></span>
+                          ${factor}
+                        </p>`
+                      ).join('');
+                    }
+                    return '<p style="color: #a5b4fc; font-size: 11px; margin: 0;">Economic uncertainty and competition</p>';
+                  })()}
                 </div>
               </div>
             </div>
