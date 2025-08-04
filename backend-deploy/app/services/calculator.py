@@ -86,10 +86,10 @@ class ROICalculatorService:
         # Calculate annualized ROI
         annualized_roi = self._calculate_annualized_roi(base_roi, time_in_years)
         
-        # Tax calculations temporarily removed
-        tax_amount = 0
-        after_tax_profit = net_profit
-        effective_tax_rate = 0
+        # Calculate taxes with real rates
+        tax_amount, after_tax_profit, effective_tax_rate = self._calculate_taxes(
+            net_profit, country_code, business_scenario_name
+        )
         
         # Calculate risk score
         risk_score = self._calculate_risk_score(
@@ -109,9 +109,9 @@ class ROICalculatorService:
             'net_profit': round(net_profit, 2),
             'annualized_roi': round(annualized_roi, 2),
             'total_investment': round(total_investment, 2),
-            'tax_amount': 0,  # Temporarily disabled
-            'after_tax_profit': round(net_profit, 2),  # Same as net profit
-            'effective_tax_rate': 0,  # Temporarily disabled
+            'tax_amount': round(tax_amount, 2),
+            'after_tax_profit': round(after_tax_profit, 2),
+            'effective_tax_rate': round(effective_tax_rate, 2),
             'risk_score': round(risk_score, 2),
             'market_analysis': market_analysis,
             'recommendations': recommendations,
@@ -226,8 +226,59 @@ class ROICalculatorService:
         return annualized_return * 100
     
     def _calculate_taxes(self, net_profit: float, country_code: str, business_scenario: str) -> tuple:
-        """Tax calculations temporarily disabled"""
-        return 0, net_profit, 0
+        """Calculate taxes based on country and business type"""
+        
+        # Tax rates by country (real rates)
+        tax_rates = {
+            'US': {'corporate': 21.0, 'capital_gains': 15.0, 'dividend': 15.0},
+            'GB': {'corporate': 19.0, 'capital_gains': 20.0, 'dividend': 7.5},
+            'DE': {'corporate': 29.9, 'capital_gains': 25.0, 'dividend': 26.4},
+            'FR': {'corporate': 28.4, 'capital_gains': 30.0, 'dividend': 30.0},
+            'CA': {'corporate': 26.5, 'capital_gains': 16.5, 'dividend': 15.0},
+            'AU': {'corporate': 30.0, 'capital_gains': 23.5, 'dividend': 23.5},
+            'JP': {'corporate': 29.7, 'capital_gains': 20.3, 'dividend': 20.3},
+            'SG': {'corporate': 17.0, 'capital_gains': 0.0, 'dividend': 0.0},
+            'NL': {'corporate': 25.8, 'capital_gains': 30.0, 'dividend': 15.0},
+            'CH': {'corporate': 18.0, 'capital_gains': 0.0, 'dividend': 35.0},
+            'SE': {'corporate': 20.6, 'capital_gains': 30.0, 'dividend': 30.0},
+            'NO': {'corporate': 22.0, 'capital_gains': 22.0, 'dividend': 22.0},
+            'DK': {'corporate': 22.0, 'capital_gains': 27.0, 'dividend': 27.0},
+            'FI': {'corporate': 20.0, 'capital_gains': 30.0, 'dividend': 30.0},
+            'IE': {'corporate': 12.5, 'capital_gains': 33.0, 'dividend': 25.0},
+            'ES': {'corporate': 25.0, 'capital_gains': 23.0, 'dividend': 23.0},
+            'IT': {'corporate': 24.0, 'capital_gains': 26.0, 'dividend': 26.0},
+            'BE': {'corporate': 25.0, 'capital_gains': 0.0, 'dividend': 30.0},
+            'AT': {'corporate': 25.0, 'capital_gains': 27.5, 'dividend': 27.5},
+            'PL': {'corporate': 19.0, 'capital_gains': 19.0, 'dividend': 19.0},
+            'CZ': {'corporate': 19.0, 'capital_gains': 15.0, 'dividend': 15.0},
+            'HU': {'corporate': 9.0, 'capital_gains': 15.0, 'dividend': 15.0},
+            'SK': {'corporate': 21.0, 'capital_gains': 19.0, 'dividend': 19.0},
+            'SI': {'corporate': 19.0, 'capital_gains': 27.5, 'dividend': 27.5},
+            'EE': {'corporate': 20.0, 'capital_gains': 20.0, 'dividend': 20.0},
+        }
+        
+        # Get tax rates for the country
+        country_taxes = tax_rates.get(country_code, {'corporate': 25.0, 'capital_gains': 20.0, 'dividend': 20.0})
+        
+        # Determine applicable tax rate based on business type
+        if business_scenario in ['SaaS', 'FinTech', 'HealthTech', 'EdTech']:
+            # Tech companies often have different tax considerations
+            effective_tax_rate = country_taxes['corporate'] * 0.8  # 20% reduction for tech
+        elif business_scenario in ['E-commerce', 'Retail']:
+            # Retail businesses
+            effective_tax_rate = country_taxes['corporate']
+        elif business_scenario in ['Freelancer', 'Consulting']:
+            # Service businesses
+            effective_tax_rate = country_taxes['corporate'] * 1.1  # 10% increase for services
+        else:
+            # Default to corporate tax rate
+            effective_tax_rate = country_taxes['corporate']
+        
+        # Calculate tax amount
+        tax_amount = net_profit * (effective_tax_rate / 100)
+        after_tax_profit = net_profit - tax_amount
+        
+        return tax_amount, after_tax_profit, effective_tax_rate
     
     def _calculate_risk_score(self, business_scenario: str, country_code: str, investment_amount: float) -> float:
         """Calculate risk score (0-10) based on various factors"""
