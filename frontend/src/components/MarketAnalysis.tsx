@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Activity, Globe, Users, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
-import { getResearchBasedMarketData, getMarketResearchInsights, validateMarketData } from '../utils/marketResearchData';
+import { getResearchBasedMarketData, validateMarketData } from '../utils/marketResearchData';
 
 
 interface MarketAnalysisProps {
@@ -27,7 +27,7 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
     }
     
     // Use research-based data with fallback to original data
-    const marketData = {
+    return {
       data: {
         market_size: researchData.market_size,
         growth_rate: researchData.growth_rate,
@@ -42,12 +42,9 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         market_trends: researchData.market_trends
       }
     };
-    
-    return marketData;
-  };
   };
 
-  const marketData = { data: getMarketData() };
+  const marketData = getMarketData();
   const isLoading = false;
 
 
