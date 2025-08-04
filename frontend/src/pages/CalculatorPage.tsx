@@ -129,9 +129,9 @@ const CalculatorPage: React.FC = () => {
 
     // Test API connection first
     console.log('Testing API connection...');
-    api.get('/test')
+    api.get('/health')
       .then(response => {
-        console.log('API test successful:', response.data);
+        console.log('API health check successful:', response.data);
         
         // Prepare data for backend API call
         const calculationData = {
@@ -149,14 +149,27 @@ const CalculatorPage: React.FC = () => {
         calculateMutation.mutate(calculationData);
       })
       .catch(error => {
-        console.error('API test failed:', error);
+        console.error('API health check failed:', error);
         console.error('Error details:', {
           message: error.message,
           status: error.response?.status,
           statusText: error.response?.statusText,
           data: error.response?.data
         });
-        toast.error('Cannot connect to server - please try again later');
+        
+        // Try direct calculation as fallback
+        console.log('Trying fallback calculation...');
+        const calculationData = {
+          initial_investment: Number(formData.initial_investment) || 0,
+          additional_costs: Number(formData.additional_costs) || 0,
+          time_period: Number(formData.time_period) || 1,
+          time_unit: formData.time_unit || 'years',
+          business_scenario_id: selectedScenario,
+          mini_scenario_id: selectedMiniScenario,
+          country_code: formData.country_code || 'US'
+        };
+        
+        calculateMutation.mutate(calculationData);
       });
   };
 

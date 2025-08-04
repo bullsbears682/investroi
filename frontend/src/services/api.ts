@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create axios instance with default configuration
 const api = axios.create({
   baseURL: (import.meta as any).env?.VITE_API_URL || 'https://investwise-29ne.onrender.com',
-  timeout: 30000,
+  timeout: 15000, // Reduced timeout
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,12 +31,20 @@ api.interceptors.response.use(
   },
   (error) => {
     // Handle common errors
+    console.error('API Error:', {
+      status: error.response?.status,
+      message: error.message,
+      url: error.config?.url
+    });
+    
     if (error.response?.status === 401) {
       // Handle unauthorized
       console.error('Unauthorized access');
     } else if (error.response?.status === 500) {
       // Handle server errors
       console.error('Server error occurred');
+    } else if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+      console.error('Network error - possible CORS issue');
     }
     return Promise.reject(error);
   }
