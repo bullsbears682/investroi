@@ -142,21 +142,32 @@ const DemoPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 hover:bg-white/15 transition-all duration-300"
+              className={`bg-white/10 backdrop-blur-lg border-2 rounded-2xl p-8 hover:bg-white/15 transition-all duration-300 ${
+                demo.id === 1 ? 'border-blue-400/30' :
+                demo.id === 2 ? 'border-purple-400/30' :
+                'border-green-400/30'
+              }`}
             >
               {/* Demo Header */}
               <div className="text-center mb-8">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold text-sm">{demo.id}</span>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 border-2 border-white/20 ${
+                    demo.id === 1 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
+                    demo.id === 2 ? 'bg-gradient-to-r from-purple-500 to-pink-500' :
+                    'bg-gradient-to-r from-green-500 to-emerald-500'
+                  }`}>
+                    <span className="text-white font-bold text-lg">{demo.id}</span>
                   </div>
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                     <Calculator className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">{demo.title}</h3>
+                <div className="flex items-center justify-center mb-2">
+                  <span className="text-white/40 text-sm font-medium">DEMO #{demo.id}</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">{demo.title}</h3>
                 <p className="text-white/60 text-sm mb-4">{demo.subtitle}</p>
-                <div className="text-2xl font-bold text-green-400 mb-2">
+                <div className="text-3xl font-bold text-green-400 mb-2">
                   {formatCurrency(demo.investment)}
                 </div>
                 <p className="text-white/70 text-sm">Initial Investment</p>
