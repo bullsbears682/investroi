@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { 
   DollarSign, 
-  Calendar, 
   Globe, 
   Calculator, 
   AlertCircle,
@@ -24,8 +23,6 @@ interface ROICalculatorProps {
 interface FormData {
   initial_investment: number;
   additional_costs: number;
-  time_period: number;
-  time_unit: 'years' | 'months' | 'days';
   country_code: string;
 }
 
@@ -46,8 +43,6 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
     defaultValues: {
       initial_investment: 10000,
       additional_costs: 0,
-      time_period: 2,
-      time_unit: 'years',
       country_code: 'US'
     },
     mode: 'onChange'
@@ -204,49 +199,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           </div>
         </div>
 
-        {/* Time Period */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-white/80 text-sm font-medium mb-2 flex items-center">
-              <Calendar className="w-4 h-4 mr-2" />
-              Time Period
-            </label>
-            <input
-              type="number"
-              {...register('time_period', {
-                required: 'Time period is required',
-                min: { value: 0.1, message: 'Minimum time period is 0.1' },
-                max: { value: 50, message: 'Maximum time period is 50' }
-              })}
-              className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-              placeholder="Enter time period"
-            />
-            {errors.time_period && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center mt-2 text-red-400 text-sm"
-              >
-                <AlertCircle className="w-4 h-4 mr-1" />
-                {errors.time_period.message}
-              </motion.div>
-            )}
-          </div>
 
-          <div>
-            <label className="block text-white/80 text-sm font-medium mb-2">
-              Time Unit
-            </label>
-            <select
-              {...register('time_unit')}
-              className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-            >
-              <option value="years">Years</option>
-              <option value="months">Months</option>
-              <option value="days">Days</option>
-            </select>
-          </div>
-        </div>
 
         {/* Country Selection */}
         <div>
@@ -322,12 +275,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
               </span>
             </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-white/70">Time Period:</span>
-            <span className="text-white font-medium">
-              {watchedValues.time_period || 0} {watchedValues.time_unit}
-            </span>
-          </div>
+
           <div className="flex justify-between">
             <span className="text-white/70">Country:</span>
             <span className="text-white font-medium">
