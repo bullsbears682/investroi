@@ -109,6 +109,12 @@ const CalculatorPage: React.FC = () => {
     const initialInvestment = Number(formData?.initial_investment) || 0;
     const additionalCosts = Number(formData?.additional_costs) || 0;
     const totalInvestment = initialInvestment + additionalCosts;
+    
+    console.log('DEBUG - Investment amounts:');
+    console.log('Form data:', formData);
+    console.log('Initial investment:', initialInvestment);
+    console.log('Additional costs:', additionalCosts);
+    console.log('Total investment:', totalInvestment);
     const countryCode = formData?.country_code || 'US';
     
     console.log('Form data:', formData);

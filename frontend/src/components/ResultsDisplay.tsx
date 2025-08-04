@@ -35,17 +35,20 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
     return 'text-red-400';
   };
 
+  // Extract data from nested structure
+  const resultData = result.data || result;
+  
   // Calculate missing values
-  const totalInvestment = (result.initial_investment || 0) + (result.additional_costs || 0);
-  const netProfit = result.net_profit || 0;
-  const roiPercentage = result.roi_percentage || 0;
-  const expectedReturn = result.expected_return || (totalInvestment * (roiPercentage / 100));
+  const totalInvestment = (resultData.initial_investment || 0) + (resultData.additional_costs || 0);
+  const netProfit = resultData.net_profit || 0;
+  const roiPercentage = resultData.roi_percentage || 0;
+  const expectedReturn = resultData.expected_return || (totalInvestment * (roiPercentage / 100));
   
   // Tax calculations - using data from API or fallback
-  const taxAmount = result.tax_amount || 0;
-  const afterTaxProfit = result.after_tax_profit || netProfit;
+  const taxAmount = resultData.tax_amount || 0;
+  const afterTaxProfit = resultData.after_tax_profit || netProfit;
   const afterTaxROI = totalInvestment > 0 ? (afterTaxProfit / totalInvestment) * 100 : 0;
-  const effectiveTaxRate = result.effective_tax_rate || 0;
+  const effectiveTaxRate = resultData.effective_tax_rate || 0;
 
 
 
@@ -53,12 +56,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   const investmentBreakdown = [
     {
       name: 'Initial Investment',
-      value: result.initial_investment || 0,
+      value: resultData.initial_investment || 0,
       color: '#3B82F6'
     },
     {
       name: 'Additional Costs',
-      value: result.additional_costs || 0,
+      value: resultData.additional_costs || 0,
       color: '#8B5CF6'
     },
     {
@@ -211,7 +214,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           </div>
                   <div className="pt-2 border-t border-white/10">
           <div className="text-xs text-white/60">
-            {result.calculation_method === 'local_fallback'
+            {resultData.calculation_method === 'local_fallback'
               ? '✓ Real-time calculations with business-specific tax rates'
               : '✓ Real-time calculations with enhanced market data'
             }
@@ -244,13 +247,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
           <div className="flex justify-between items-center">
             <span className="text-white/70">Scenario:</span>
             <span className="text-white font-medium">
-              {result.scenario_name || 'Selected Scenario'} - {result.mini_scenario_name || 'Selected Mini Scenario'}
+              {resultData.scenario_name || 'Selected Scenario'} - {resultData.mini_scenario_name || 'Selected Mini Scenario'}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-white/70">Calculation Method:</span>
             <span className="text-green-400 font-medium">
-              {result.calculation_method === 'local_fallback' ? 'Real-time Local' : 'Real-time API'}
+              {resultData.calculation_method === 'local_fallback' ? 'Real-time Local' : 'Real-time API'}
             </span>
           </div>
         </div>
