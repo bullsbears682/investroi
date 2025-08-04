@@ -22,7 +22,6 @@ import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
-import PDFExport from '../components/PDFExport';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -464,11 +463,9 @@ const CalculatorPage: React.FC = () => {
                 Export Report
               </h2>
               
-              <PDFExport 
-                sessionId="roi-session" 
-                calculationData={calculationResult?.data}
-                onExportComplete={() => console.log('PDF export completed')}
-              />
+              <div className="text-white/60 text-center py-8">
+                <p>PDF export functionality will be added here</p>
+              </div>
             </div>
           )}
 

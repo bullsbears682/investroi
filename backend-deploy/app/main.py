@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
-from app.routers import roi_calculator, pdf_export
+from app.routers import roi_calculator
 
 # Optional dotenv import to prevent deployment failures
 try:
@@ -42,7 +42,6 @@ app.add_middleware(
 # Include routers
 
 app.include_router(roi_calculator.router, prefix="/api/roi")
-app.include_router(pdf_export.router, prefix="/api/pdf")
 
 # Health check endpoint
 @app.get("/")
