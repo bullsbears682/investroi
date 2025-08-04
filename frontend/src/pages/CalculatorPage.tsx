@@ -110,9 +110,14 @@ const CalculatorPage: React.FC = () => {
     
     // Calculate ROI locally
     const avgROI = (selectedMiniScenarioData.typical_roi_min + selectedMiniScenarioData.typical_roi_max) / 2;
-    const expectedReturn = totalInvestment * (avgROI / 100);
+    const expectedReturn = totalInvestment * (1 + avgROI / 100);
     const netProfit = expectedReturn - totalInvestment;
     const roiPercentage = (netProfit / totalInvestment) * 100;
+    
+    // Simple tax calculation for fallback (21% US corporate tax)
+    const taxRate = 21.0;
+    const taxAmount = netProfit > 0 ? netProfit * (taxRate / 100) : 0;
+    const afterTaxProfit = netProfit - taxAmount;
     
     const result = {
       data: {
@@ -126,9 +131,9 @@ const CalculatorPage: React.FC = () => {
         scenario_name: selectedScenarioData.name,
         mini_scenario_name: selectedMiniScenarioData.name,
         calculation_method: 'local_fallback',
-        tax_amount: 0,
-        after_tax_profit: netProfit,
-        effective_tax_rate: 0
+        tax_amount: taxAmount,
+        after_tax_profit: afterTaxProfit,
+        effective_tax_rate: taxRate
       }
     };
     
