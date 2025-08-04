@@ -14,6 +14,8 @@ export interface PDFExportData {
   miniScenarioName?: string;
   calculationDate: string;
   exportOptions?: ExportOptions;
+  marketResearchData?: any; // Add market research data
+  scenarioId?: number; // Add scenario ID for research data lookup
 }
 
 export const generatePDF = async (data: PDFExportData): Promise<void> => {
@@ -251,6 +253,95 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
         </div>
       ` : '';
 
+      // Market Research Data Section
+      const marketResearchSection = data.marketResearchData && options.includeMarketAnalysis ? `
+        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
+          <h2 style="color: #ffffff; font-size: 20px; margin: 0 0 16px 0; font-weight: bold;">
+            Market Research Data
+          </h2>
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #a5b4fc; font-size: 16px; margin: 0 0 12px 0; font-weight: 500;">
+              Research Sources & Methodology
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div>
+                <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 4px 0;">Data Confidence:</p>
+                <p style="color: ${data.marketResearchData.data_confidence === 'high' ? '#10b981' : data.marketResearchData.data_confidence === 'medium' ? '#f59e0b' : '#ef4444'}; font-size: 14px; margin: 0; font-weight: 500; text-transform: uppercase;">
+                  ${data.marketResearchData.data_confidence}
+                </p>
+              </div>
+              <div>
+                <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 4px 0;">Last Updated:</p>
+                <p style="color: #ffffff; font-size: 14px; margin: 0; font-weight: 500;">
+                  ${data.marketResearchData.last_updated}
+                </p>
+              </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+              <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 8px 0;">Research Sources:</p>
+              <div style="display: grid; grid-template-columns: 1fr; gap: 4px;">
+                ${data.marketResearchData.research_sources?.map((source: string) => `
+                  <p style="color: #ffffff; font-size: 12px; margin: 0; padding-left: 12px; position: relative;">
+                    <span style="position: absolute; left: 0; top: 6px; width: 4px; height: 4px; background: #6366f1; border-radius: 50%;"></span>
+                    ${source}
+                  </p>
+                `).join('') || 'Market research data from industry reports and analysis'}
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #a5b4fc; font-size: 16px; margin: 0 0 12px 0; font-weight: 500;">
+              Market Trends Analysis
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 4px 0;">Trend Direction:</p>
+                <p style="color: ${data.marketResearchData.market_trends?.trend_direction === 'up' ? '#10b981' : data.marketResearchData.market_trends?.trend_direction === 'down' ? '#ef4444' : '#f59e0b'}; font-size: 14px; margin: 0; font-weight: 500; text-transform: uppercase;">
+                  ${data.marketResearchData.market_trends?.trend_direction || 'Stable'}
+                </p>
+              </div>
+              <div>
+                <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 4px 0;">Current Year:</p>
+                <p style="color: #ffffff; font-size: 14px; margin: 0; font-weight: 500;">
+                  ${data.marketResearchData.market_trends?.current_year || '2025'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <h3 style="color: #a5b4fc; font-size: 16px; margin: 0 0 12px 0; font-weight: 500;">
+              Key Market Factors
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 8px 0;">Key Growth Factors:</p>
+                <div style="space-y: 2;">
+                  ${data.marketResearchData.market_trends?.key_factors?.slice(0, 3).map((factor: string) => `
+                    <p style="color: #10b981; font-size: 11px; margin: 0; padding-left: 12px; position: relative;">
+                      <span style="position: absolute; left: 0; top: 4px; width: 3px; height: 3px; background: #10b981; border-radius: 50%;"></span>
+                      ${factor}
+                    </p>
+                  `).join('') || '<p style="color: #a5b4fc; font-size: 11px; margin: 0;">Market growth and expansion opportunities</p>'}
+                </div>
+              </div>
+              <div>
+                <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 8px 0;">Risk Factors:</p>
+                <div style="space-y: 2;">
+                  ${data.marketResearchData.market_trends?.risk_factors?.slice(0, 3).map((factor: string) => `
+                    <p style="color: #ef4444; font-size: 11px; margin: 0; padding-left: 12px; position: relative;">
+                      <span style="position: absolute; left: 0; top: 4px; width: 3px; height: 3px; background: #ef4444; border-radius: 50%;"></span>
+                      ${factor}
+                    </p>
+                  `).join('') || '<p style="color: #a5b4fc; font-size: 11px; margin: 0;">Economic uncertainty and competition</p>'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ` : '';
+
       const recommendationsSection = options.includeRecommendations ? `
         <div style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid rgba(255, 255, 255, 0.2);">
           <h2 style="color: #ffffff; font-size: 20px; margin: 0 0 16px 0; font-weight: bold;">
@@ -326,12 +417,12 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
       let content = baseHeader + scenarioSection + keyResultsSection;
       
       if (options.template === 'executive') {
-        content += investmentDetailsSection + performanceSummarySection;
+        content += investmentDetailsSection + marketResearchSection + performanceSummarySection;
       } else if (options.template === 'detailed') {
-        content += investmentDetailsSection + taxAnalysisSection + chartsSection + marketAnalysisSection + recommendationsSection + performanceSummarySection;
+        content += investmentDetailsSection + taxAnalysisSection + chartsSection + marketAnalysisSection + marketResearchSection + recommendationsSection + performanceSummarySection;
       } else {
         // Standard template
-        content += investmentDetailsSection + taxAnalysisSection + chartsSection + marketAnalysisSection + recommendationsSection + performanceSummarySection;
+        content += investmentDetailsSection + taxAnalysisSection + chartsSection + marketAnalysisSection + marketResearchSection + recommendationsSection + performanceSummarySection;
       }
       
       content += footerSection;

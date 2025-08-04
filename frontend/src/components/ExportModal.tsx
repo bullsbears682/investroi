@@ -18,6 +18,8 @@ interface ExportModalProps {
   result: any;
   scenarioName?: string;
   miniScenarioName?: string;
+  scenarioId?: number;
+  marketResearchData?: any;
 }
 
 interface ExportOptions {
@@ -32,7 +34,9 @@ const ExportModal: React.FC<ExportModalProps> = ({
   onClose,
   result,
   scenarioName,
-  miniScenarioName
+  miniScenarioName,
+  scenarioId,
+  marketResearchData
 }) => {
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     template: 'standard',
@@ -86,7 +90,9 @@ const ExportModal: React.FC<ExportModalProps> = ({
           hour: '2-digit',
           minute: '2-digit'
         }),
-        exportOptions
+        exportOptions,
+        scenarioId,
+        marketResearchData
       };
 
       await generatePDF(exportData);

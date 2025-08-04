@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 
 import ExportModal from './ExportModal';
+import { getResearchBasedMarketData } from '../utils/marketResearchData';
 
 interface ROICalculatorProps {
   onCalculate: (data: any) => void;
@@ -448,6 +449,8 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           result={calculationResult}
           scenarioName={scenariosData.find((s: any) => s.id === selectedScenario)?.name}
           miniScenarioName={miniScenariosData.find((ms: any) => ms.id === selectedMiniScenario)?.name}
+          scenarioId={selectedScenario || undefined}
+          marketResearchData={selectedScenario ? getResearchBasedMarketData(selectedScenario) : undefined}
         />
       </motion.div>
 
