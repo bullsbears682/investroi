@@ -32,21 +32,11 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://localhost:5173", 
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "https://investwise-pro.vercel.app",
-        "https://investwise-pro-frontend.vercel.app",
-        "https://investwise-pro-frontend-git-main-bullsbears682.vercel.app",
-        "https://investwise-pro-frontend-bullsbears682.vercel.app",
-        "https://*.vercel.app",
-        "*"  # Allow all origins for development
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=False,  # Set to False when using "*"
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include routers
@@ -64,6 +54,10 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "InvestWise Pro"}
+
+@app.get("/test")
+async def test_endpoint():
+    return {"message": "Test endpoint working", "timestamp": "2025-08-04"}
 
 # ROI Scenarios endpoint
 @app.get("/api/roi/scenarios")

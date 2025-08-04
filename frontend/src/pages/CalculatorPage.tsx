@@ -129,9 +129,9 @@ const CalculatorPage: React.FC = () => {
 
     // Test API connection first
     console.log('Testing API connection...');
-    api.get('/health')
+    api.get('/test')
       .then(response => {
-        console.log('API health check successful:', response.data);
+        console.log('API test successful:', response.data);
         
         // Prepare data for backend API call
         const calculationData = {
@@ -149,7 +149,13 @@ const CalculatorPage: React.FC = () => {
         calculateMutation.mutate(calculationData);
       })
       .catch(error => {
-        console.error('API health check failed:', error);
+        console.error('API test failed:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data
+        });
         toast.error('Cannot connect to server - please try again later');
       });
   };
