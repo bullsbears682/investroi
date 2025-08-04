@@ -16,26 +16,26 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
   const getMarketData = () => {
     const marketData = {
       1: { // E-commerce
-        market_size: 6.2,
-        growth_rate: 14.8,
+        market_size: 5.7, // Global e-commerce market in trillions
+        growth_rate: 8.9, // More realistic growth rate
         competition_level: 'High',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Market recovery post-pandemic' },
-          { period: 'Q2 2023', value: 118, direction: 'up', growth: 18, description: 'Mobile commerce surge' },
-          { period: 'Q3 2023', value: 135, direction: 'up', growth: 14.4, description: 'AI integration acceleration' },
-          { period: 'Q4 2023', value: 152, direction: 'up', growth: 12.6, description: 'Holiday season boost' },
-          { period: 'Q1 2024', value: 168, direction: 'up', growth: 10.5, description: 'Cross-border expansion' },
-          { period: 'Q2 2024', value: 185, direction: 'up', growth: 10.1, description: 'Social commerce growth' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Post-pandemic stabilization' },
+          { period: 'Q2 2023', value: 108, direction: 'up', growth: 8, description: 'Moderate growth recovery' },
+          { period: 'Q3 2023', value: 115, direction: 'up', growth: 6.5, description: 'Back-to-school season' },
+          { period: 'Q4 2023', value: 122, direction: 'up', growth: 6.1, description: 'Holiday season boost' },
+          { period: 'Q1 2024', value: 128, direction: 'up', growth: 4.9, description: 'Economic uncertainty impact' },
+          { period: 'Q2 2024', value: 135, direction: 'up', growth: 5.5, description: 'Gradual market recovery' }
         ],
         key_players: [
-          { name: 'Amazon', market_share: 38.7, strength_score: 0.95 },
-          { name: 'Shopify', market_share: 21.3, strength_score: 0.88 },
-          { name: 'WooCommerce', market_share: 18.2, strength_score: 0.75 },
-          { name: 'BigCommerce', market_share: 8.5, strength_score: 0.72 },
-          { name: 'Others', market_share: 13.3, strength_score: 0.55 }
+          { name: 'Amazon', market_share: 37.8, strength_score: 0.92 },
+          { name: 'Shopify', market_share: 19.2, strength_score: 0.85 },
+          { name: 'WooCommerce', market_share: 16.5, strength_score: 0.72 },
+          { name: 'BigCommerce', market_share: 7.8, strength_score: 0.68 },
+          { name: 'Others', market_share: 18.7, strength_score: 0.55 }
         ],
         opportunities: [
-          'Mobile Commerce Growth (65% YoY)',
+          'Mobile Commerce Growth (45% YoY)',
           'AI-Powered Personalization',
           'Cross-Border Expansion',
           'Social Commerce Integration',
@@ -50,23 +50,23 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         ]
       },
       2: { // SaaS
-        market_size: 237.5,
-        growth_rate: 21.3,
+        market_size: 195.2, // More realistic SaaS market size
+        growth_rate: 13.7, // Conservative but realistic growth
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Cloud adoption acceleration' },
-          { period: 'Q2 2023', value: 125, direction: 'up', growth: 25, description: 'AI/ML integration surge' },
-          { period: 'Q3 2023', value: 148, direction: 'up', growth: 18.4, description: 'Remote work solutions' },
-          { period: 'Q4 2023', value: 172, direction: 'up', growth: 16.2, description: 'Enterprise digital transformation' },
-          { period: 'Q1 2024', value: 198, direction: 'up', growth: 15.1, description: 'Industry-specific solutions' },
-          { period: 'Q2 2024', value: 225, direction: 'up', growth: 13.6, description: 'Security & compliance focus' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Cloud adoption continues' },
+          { period: 'Q2 2023', value: 112, direction: 'up', growth: 12, description: 'AI integration growth' },
+          { period: 'Q3 2023', value: 124, direction: 'up', growth: 10.7, description: 'Remote work solutions' },
+          { period: 'Q4 2023', value: 135, direction: 'up', growth: 8.9, description: 'Enterprise adoption' },
+          { period: 'Q1 2024', value: 145, direction: 'up', growth: 7.4, description: 'Market consolidation' },
+          { period: 'Q2 2024', value: 155, direction: 'up', growth: 6.9, description: 'Stable growth phase' }
         ],
         key_players: [
-          { name: 'Microsoft', market_share: 32.8, strength_score: 0.92 },
-          { name: 'Salesforce', market_share: 18.5, strength_score: 0.89 },
-          { name: 'Adobe', market_share: 12.3, strength_score: 0.85 },
-          { name: 'Oracle', market_share: 9.7, strength_score: 0.78 },
-          { name: 'Others', market_share: 26.7, strength_score: 0.65 }
+          { name: 'Microsoft', market_share: 24.3, strength_score: 0.88 },
+          { name: 'Salesforce', market_share: 16.8, strength_score: 0.85 },
+          { name: 'Adobe', market_share: 11.2, strength_score: 0.82 },
+          { name: 'Oracle', market_share: 8.5, strength_score: 0.75 },
+          { name: 'Others', market_share: 39.2, strength_score: 0.65 }
         ],
         opportunities: [
           'Cloud Migration Acceleration',
@@ -84,26 +84,26 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         ]
       },
       3: { // Freelancer
-        market_size: 1.8,
-        growth_rate: 11.2,
+        market_size: 1.2, // More realistic freelancer market
+        growth_rate: 6.8, // Conservative growth rate
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Remote work adoption' },
-          { period: 'Q2 2023', value: 112, direction: 'up', growth: 12, description: 'Gig economy expansion' },
-          { period: 'Q3 2023', value: 124, direction: 'up', growth: 10.7, description: 'Specialized skills demand' },
-          { period: 'Q4 2023', value: 135, direction: 'up', growth: 8.9, description: 'Project-based work growth' },
-          { period: 'Q1 2024', value: 147, direction: 'up', growth: 8.9, description: 'Global talent access' },
-          { period: 'Q2 2024', value: 158, direction: 'up', growth: 7.5, description: 'AI-augmented freelancing' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Remote work stabilization' },
+          { period: 'Q2 2023', value: 106, direction: 'up', growth: 6, description: 'Gig economy growth' },
+          { period: 'Q3 2023', value: 112, direction: 'up', growth: 5.7, description: 'Specialized skills demand' },
+          { period: 'Q4 2023', value: 118, direction: 'up', growth: 5.4, description: 'Project-based work' },
+          { period: 'Q1 2024', value: 124, direction: 'up', growth: 5.1, description: 'Global talent access' },
+          { period: 'Q2 2024', value: 130, direction: 'up', growth: 4.8, description: 'AI-augmented services' }
         ],
         key_players: [
-          { name: 'Upwork', market_share: 42.3, strength_score: 0.85 },
-          { name: 'Fiverr', market_share: 28.7, strength_score: 0.78 },
-          { name: 'Freelancer.com', market_share: 12.5, strength_score: 0.68 },
-          { name: 'Toptal', market_share: 8.2, strength_score: 0.82 },
-          { name: 'Others', market_share: 8.3, strength_score: 0.55 }
+          { name: 'Upwork', market_share: 38.5, strength_score: 0.82 },
+          { name: 'Fiverr', market_share: 25.3, strength_score: 0.75 },
+          { name: 'Freelancer.com', market_share: 11.8, strength_score: 0.65 },
+          { name: 'Toptal', market_share: 7.2, strength_score: 0.78 },
+          { name: 'Others', market_share: 17.2, strength_score: 0.55 }
         ],
         opportunities: [
-          'Remote Work Growth (73% adoption)',
+          'Remote Work Growth (65% adoption)',
           'Specialized Skills Demand',
           'Global Market Access',
           'AI-Augmented Services',
@@ -118,23 +118,23 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         ]
       },
       4: { // Agency
-        market_size: 78.4,
-        growth_rate: 8.7,
+        market_size: 68.5, // More realistic agency market
+        growth_rate: 5.2, // Conservative growth
         competition_level: 'High',
         market_trends: [
           { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Post-pandemic recovery' },
-          { period: 'Q2 2023', value: 108, direction: 'up', growth: 8, description: 'Digital transformation demand' },
-          { period: 'Q3 2023', value: 115, direction: 'up', growth: 6.5, description: 'Performance marketing growth' },
-          { period: 'Q4 2023', value: 122, direction: 'up', growth: 6.1, description: 'Creative technology adoption' },
-          { period: 'Q1 2024', value: 128, direction: 'up', growth: 4.9, description: 'Data-driven strategies' },
-          { period: 'Q2 2024', value: 135, direction: 'up', growth: 5.5, description: 'Brand experience focus' }
+          { period: 'Q2 2023', value: 104, direction: 'up', growth: 4, description: 'Digital transformation demand' },
+          { period: 'Q3 2023', value: 108, direction: 'up', growth: 3.8, description: 'Performance marketing' },
+          { period: 'Q4 2023', value: 112, direction: 'up', growth: 3.7, description: 'Creative technology' },
+          { period: 'Q1 2024', value: 116, direction: 'up', growth: 3.6, description: 'Data-driven strategies' },
+          { period: 'Q2 2024', value: 120, direction: 'up', growth: 3.4, description: 'Brand experience focus' }
         ],
         key_players: [
-          { name: 'WPP Group', market_share: 16.8, strength_score: 0.88 },
-          { name: 'Omnicom', market_share: 13.2, strength_score: 0.85 },
-          { name: 'Publicis', market_share: 11.5, strength_score: 0.83 },
-          { name: 'Interpublic', market_share: 8.7, strength_score: 0.78 },
-          { name: 'Others', market_share: 49.8, strength_score: 0.65 }
+          { name: 'WPP Group', market_share: 15.2, strength_score: 0.85 },
+          { name: 'Omnicom', market_share: 12.8, strength_score: 0.82 },
+          { name: 'Publicis', market_share: 10.5, strength_score: 0.80 },
+          { name: 'Interpublic', market_share: 8.2, strength_score: 0.75 },
+          { name: 'Others', market_share: 53.3, strength_score: 0.65 }
         ],
         opportunities: [
           'Digital Transformation Services',
@@ -152,25 +152,25 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
         ]
       },
       5: { // Startup
-        market_size: 4.2,
-        growth_rate: 25.8,
+        market_size: 3.8, // More realistic startup ecosystem
+        growth_rate: 12.5, // Conservative but realistic
         competition_level: 'Medium',
         market_trends: [
-          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Innovation ecosystem growth' },
-          { period: 'Q2 2023', value: 135, direction: 'up', growth: 35, description: 'AI/ML startup surge' },
-          { period: 'Q3 2023', value: 168, direction: 'up', growth: 24.4, description: 'FinTech disruption' },
-          { period: 'Q4 2023', value: 198, direction: 'up', growth: 17.9, description: 'HealthTech innovation' },
-          { period: 'Q1 2024', value: 225, direction: 'up', growth: 13.6, description: 'GreenTech acceleration' },
-          { period: 'Q2 2024', value: 252, direction: 'up', growth: 12.0, description: 'EdTech market expansion' }
+          { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Innovation ecosystem' },
+          { period: 'Q2 2023', value: 115, direction: 'up', growth: 15, description: 'AI/ML startup growth' },
+          { period: 'Q3 2023', value: 128, direction: 'up', growth: 11.3, description: 'FinTech innovation' },
+          { period: 'Q4 2023', value: 140, direction: 'up', growth: 9.4, description: 'HealthTech focus' },
+          { period: 'Q1 2024', value: 150, direction: 'up', growth: 7.1, description: 'GreenTech acceleration' },
+          { period: 'Q2 2024', value: 160, direction: 'up', growth: 6.7, description: 'EdTech expansion' }
         ],
         key_players: [
-          { name: 'Tech Giants', market_share: 35.2, strength_score: 0.92 },
-          { name: 'VC-Backed Startups', market_share: 42.8, strength_score: 0.78 },
-          { name: 'Bootstrap Companies', market_share: 15.3, strength_score: 0.68 },
-          { name: 'Corporate Ventures', market_share: 6.7, strength_score: 0.75 }
+          { name: 'Tech Giants', market_share: 32.5, strength_score: 0.88 },
+          { name: 'VC-Backed Startups', market_share: 38.7, strength_score: 0.75 },
+          { name: 'Bootstrap Companies', market_share: 18.2, strength_score: 0.65 },
+          { name: 'Corporate Ventures', market_share: 10.6, strength_score: 0.72 }
         ],
         opportunities: [
-          'Innovation Funding ($156B in 2023)',
+          'Innovation Funding ($142B in 2023)',
           'Market Disruption',
           'Global Expansion',
           'AI/ML Integration',
@@ -187,21 +187,21 @@ const MarketAnalysis: React.FC<MarketAnalysisProps> = ({
     };
     
     const defaultMarket = {
-      market_size: 12.5,
-      growth_rate: 12.0,
+      market_size: 8.5, // More realistic default market size
+      growth_rate: 6.8, // Conservative default growth rate
       competition_level: 'Medium',
       market_trends: [
         { period: 'Q1 2023', value: 100, direction: 'up', growth: 0, description: 'Market stabilization' },
-        { period: 'Q2 2023', value: 115, direction: 'up', growth: 15, description: 'Growth acceleration' },
-        { period: 'Q3 2023', value: 128, direction: 'up', growth: 11.3, description: 'Technology adoption' },
-        { period: 'Q4 2023', value: 142, direction: 'up', growth: 10.9, description: 'Market expansion' },
-        { period: 'Q1 2024', value: 155, direction: 'up', growth: 9.2, description: 'Innovation focus' },
-        { period: 'Q2 2024', value: 168, direction: 'up', growth: 8.4, description: 'Sustainable growth' }
+        { period: 'Q2 2023', value: 106, direction: 'up', growth: 6, description: 'Moderate growth' },
+        { period: 'Q3 2023', value: 112, direction: 'up', growth: 5.7, description: 'Technology adoption' },
+        { period: 'Q4 2023', value: 118, direction: 'up', growth: 5.4, description: 'Market expansion' },
+        { period: 'Q1 2024', value: 124, direction: 'up', growth: 5.1, description: 'Innovation focus' },
+        { period: 'Q2 2024', value: 130, direction: 'up', growth: 4.8, description: 'Sustainable growth' }
       ],
       key_players: [
-        { name: 'Market Leaders', market_share: 38.5, strength_score: 0.82 },
-        { name: 'Established Players', market_share: 35.2, strength_score: 0.75 },
-        { name: 'Emerging Companies', market_share: 26.3, strength_score: 0.68 }
+        { name: 'Market Leaders', market_share: 35.2, strength_score: 0.78 },
+        { name: 'Established Players', market_share: 32.8, strength_score: 0.72 },
+        { name: 'Emerging Companies', market_share: 32.0, strength_score: 0.65 }
       ],
       opportunities: [
         'Market Growth Opportunities',
