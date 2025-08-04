@@ -3,15 +3,16 @@ import { motion } from 'framer-motion';
 import { 
   Users, 
   Target, 
- 
   Heart, 
   Globe, 
   Shield, 
-  
   Calculator,
   BarChart3,
   FileText,
-  CheckCircle
+  CheckCircle,
+  Download,
+  Search,
+  Lock
 } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
@@ -65,26 +66,75 @@ const AboutPage: React.FC = () => {
     }
   ];
 
-  const milestones = [
+  const features = [
     {
-      year: '2023',
-      title: 'Platform Launch',
-      description: 'Launched InvestWise Pro with 35 business scenarios and comprehensive ROI calculation tools.'
+      icon: Calculator,
+      title: 'Advanced ROI Calculator',
+      description: 'Comprehensive ROI calculations with 35+ business scenarios and 245+ mini-scenarios covering various industries and investment types.',
+      highlights: ['Real-time calculations', 'Multiple investment types', 'Tax considerations', 'Risk assessment']
     },
     {
-      year: '2024',
-      title: 'Global Expansion',
-      description: 'Expanded to support 25 countries with real-time tax data and market analysis.'
+      icon: BarChart3,
+      title: 'Market Analysis',
+      description: 'In-depth market research with real data from industry reports, competitive analysis, and growth projections.',
+      highlights: ['Industry insights', 'Competitive landscape', 'Growth trends', 'Market opportunities']
     },
     {
-      year: '2024',
-      title: 'Advanced Features',
-      description: 'Added professional PDF reporting, risk assessment, and market analysis capabilities.'
+      icon: Download,
+      title: 'Professional Reports',
+      description: 'Export detailed PDF reports with executive summaries, charts, and recommendations for presentations and decision-making.',
+      highlights: ['Multiple templates', 'Executive summaries', 'Visual charts', 'Actionable insights']
     },
     {
-      year: '2024',
-      title: 'Enterprise Launch',
-      description: 'Introduced enterprise features for teams and organizations with advanced collaboration tools.'
+      icon: Search,
+      title: 'Investment Guide',
+      description: 'Comprehensive educational resources covering investment strategies, risk management, and market analysis techniques.',
+      highlights: ['Educational content', 'Best practices', 'Risk management', 'Strategy guides']
+    },
+    {
+      icon: Globe,
+      title: 'Global Tax Data',
+      description: 'Real-time tax information for 25 countries, ensuring accurate calculations for international investments.',
+      highlights: ['25 countries', 'Real-time updates', 'Tax optimization', 'Compliance data']
+    },
+    {
+      icon: Lock,
+      title: 'Secure & Private',
+      description: 'Enterprise-grade security with data encryption, secure transmission, and complete user privacy protection.',
+      highlights: ['Data encryption', 'Privacy protection', 'Secure transmission', 'GDPR compliant']
+    }
+  ];
+
+  const capabilities = [
+    {
+      title: 'Business Scenarios',
+      count: '35+',
+      description: 'Comprehensive business models covering e-commerce, SaaS, manufacturing, and more'
+    },
+    {
+      title: 'Mini Scenarios',
+      count: '245+',
+      description: 'Detailed sub-categories for precise investment analysis and planning'
+    },
+    {
+      title: 'Countries Supported',
+      count: '25',
+      description: 'Global tax data and market analysis for international investments'
+    },
+    {
+      title: 'Real-time Data',
+      count: '24/7',
+      description: 'Continuous updates with latest market trends and tax information'
+    },
+    {
+      title: 'Report Templates',
+      count: '3',
+      description: 'Standard, executive, and detailed formats for different audiences'
+    },
+    {
+      title: 'Market Analysis',
+      count: '100%',
+      description: 'Comprehensive research-based data for informed decision making'
     }
   ];
 
@@ -212,6 +262,88 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Features Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Platform Features
+            </h2>
+            <p className="text-xl text-white/70">
+              Comprehensive tools designed for professional investment analysis
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                <p className="text-white/70 mb-4">{feature.description}</p>
+                <div className="space-y-2">
+                  {feature.highlights.map((highlight, idx) => (
+                    <div key={idx} className="flex items-center space-x-2">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                      <span className="text-white/80 text-sm">{highlight}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Capabilities Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Platform Capabilities
+            </h2>
+            <p className="text-xl text-white/70">
+              The numbers that define our comprehensive investment analysis platform
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {capabilities.map((capability, index) => (
+              <motion.div
+                key={capability.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center"
+              >
+                <div className="text-3xl font-bold text-blue-400 mb-2">{capability.count}</div>
+                <h3 className="text-lg font-semibold text-white mb-2">{capability.title}</h3>
+                <p className="text-white/70 text-sm">{capability.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Team Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -259,50 +391,6 @@ const AboutPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Milestones Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Our Journey
-            </h2>
-            <p className="text-xl text-white/70">
-              Key milestones in our mission to democratize investment analysis
-            </p>
-          </motion.div>
-          
-          <div className="space-y-8">
-            {milestones.map((milestone, index) => (
-              <motion.div
-                key={milestone.year}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`flex items-center space-x-8 ${
-                  index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-                }`}
-              >
-                <div className="flex-1">
-                  <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-                    <div className="text-2xl font-bold text-blue-400 mb-2">{milestone.year}</div>
-                    <h3 className="text-xl font-semibold text-white mb-3">{milestone.title}</h3>
-                    <p className="text-white/70">{milestone.description}</p>
-                  </div>
-                </div>
-                <div className="w-4 h-4 bg-blue-400 rounded-full"></div>
-                <div className="flex-1"></div>
               </motion.div>
             ))}
           </div>
