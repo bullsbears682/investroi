@@ -69,9 +69,11 @@ async def calculate_roi(
         additional_costs=request.additional_costs,
         time_period=request.time_period,
         time_unit=request.time_unit,
-        business_scenario=business_scenario,
-        mini_scenario=mini_scenario,
-        country=country
+        business_scenario_id=request.business_scenario_id,
+        mini_scenario_id=request.mini_scenario_id,
+        country_code=country.country_code,
+        business_scenario_name=business_scenario.name,
+        mini_scenario_name=mini_scenario.name
     )
     
     # Generate session ID if not provided
@@ -158,9 +160,11 @@ async def compare_scenarios(
                     additional_costs=0,
                     time_period=time_period,
                     time_unit=time_unit,
-                    business_scenario=business_scenario,
-                    mini_scenario=mini_scenario,
-                    country=country
+                    business_scenario_id=scenario_id,
+                    mini_scenario_id=mini_scenario.id,
+                    country_code=country.country_code,
+                    business_scenario_name=business_scenario.name,
+                    mini_scenario_name=mini_scenario.name
                 )
                 
                 comparison_results.append({
