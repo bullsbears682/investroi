@@ -164,9 +164,33 @@ const CalculatorPage: React.FC = () => {
     };
     
     const realisticROI = getRealisticROI(selectedMiniScenarioData, totalInvestment);
-    const expectedReturn = totalInvestment * (1 + realisticROI / 100);
-    const netProfit = expectedReturn - totalInvestment;
-    const roiPercentage = (netProfit / totalInvestment) * 100;
+    
+    // Get time period for annualization
+    const timePeriod = Number(formData?.time_period) || 1;
+    const timeUnit = formData?.time_unit || 'years';
+    
+    // Convert time to years for proper annualization
+    let timeInYears = timePeriod;
+    if (timeUnit === 'months') timeInYears = timePeriod / 12;
+    else if (timeUnit === 'weeks') timeInYears = timePeriod / 52;
+    else if (timeUnit === 'days') timeInYears = timePeriod / 365;
+    
+    // Debug time period
+    console.log('Time period debug:');
+    console.log('timePeriod:', timePeriod);
+    console.log('timeUnit:', timeUnit);
+    console.log('timeInYears:', timeInYears);
+    
+    // Calculate total return over the time period
+    const totalReturn = totalInvestment * (1 + realisticROI / 100);
+    const netProfit = totalReturn - totalInvestment;
+    
+    // Calculate annualized ROI
+    const annualizedROI = timeInYears > 0 ? 
+      (Math.pow(totalReturn / totalInvestment, 1 / timeInYears) - 1) * 100 : 
+      realisticROI;
+    
+    const roiPercentage = annualizedROI;
     
             // Enhanced tax calculation for fallback (matching backend logic)
         const getTaxRate = (businessScenario: string, countryCode: string) => {
@@ -218,7 +242,7 @@ const CalculatorPage: React.FC = () => {
     const result = {
       data: {
         roi_percentage: roiPercentage,
-        expected_return: expectedReturn,
+        expected_return: totalReturn,
         net_profit: netProfit,
         total_investment: totalInvestment,
         initial_investment: initialInvestment,
