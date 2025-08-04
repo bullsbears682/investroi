@@ -19,6 +19,8 @@ import ScenariosPage from './pages/ScenariosPage';
 import InvestmentGuidePage from './pages/InvestmentGuidePage';
 import TaxInfoPage from './pages/TaxInfoPage';
 import MarketResearchPage from './pages/MarketResearchPage';
+import ContactPage from './pages/ContactPage';
+import TermsPage from './pages/TermsPage';
 import CookieConsent from './components/CookieConsent';
 
 // Store
@@ -75,6 +77,8 @@ function App() {
                       <Route path="/market-research" element={<MarketResearchPage />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/privacy" element={<PrivacyPage />} />
+                      <Route path="/contact" element={<ContactPage />} />
+                      <Route path="/terms" element={<TermsPage />} />
                     </Routes>
                   </main>
                   

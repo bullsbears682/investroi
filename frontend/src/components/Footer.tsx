@@ -16,8 +16,8 @@ const Footer: React.FC = () => {
     company: [
       { name: 'About Us', href: '/about' },
       { name: 'Privacy Policy', href: '/privacy' },
-      { name: 'Terms of Service', href: '/privacy' },
-      { name: 'Contact', href: '/about' }
+      { name: 'Terms of Service', href: '/terms' },
+      { name: 'Contact', href: '/contact' }
     ],
     resources: [
       { name: 'Investment Guide', href: '/investment-guide' },
@@ -158,11 +158,11 @@ const Footer: React.FC = () => {
               <Link to="/privacy" className="text-white/60 hover:text-white transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/privacy" className="text-white/60 hover:text-white transition-colors">
+              <Link to="/terms" className="text-white/60 hover:text-white transition-colors">
                 Terms of Service
               </Link>
-              <Link to="/about" className="text-white/60 hover:text-white transition-colors">
-                Cookie Policy
+              <Link to="/contact" className="text-white/60 hover:text-white transition-colors">
+                Contact
               </Link>
             </div>
           </div>
