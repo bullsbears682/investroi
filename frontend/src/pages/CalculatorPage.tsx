@@ -170,52 +170,69 @@ const CalculatorPage: React.FC = () => {
     const netProfit = totalReturn - totalInvestment;
     const roiPercentage = realisticROI;
     
-            // Enhanced tax calculation for fallback (matching backend logic)
-        const getTaxRate = (businessScenario: string, countryCode: string) => {
-          // Real corporate tax rates by country (2024 data)
-          const countryTaxRates: { [key: string]: number } = {
-            'US': 21.0,    // Federal corporate tax rate
-            'GB': 25.0,    // UK corporation tax rate
-            'DE': 29.9,    // German corporate tax (including trade tax)
-            'FR': 25.8,    // French corporate tax rate
-            'CA': 26.5,    // Canadian federal + provincial average
-            'AU': 30.0,    // Australian corporate tax rate
-            'JP': 29.7,    // Japanese corporate tax rate
-            'SG': 17.0,    // Singapore corporate tax rate
-            'NL': 25.8,    // Dutch corporate tax rate
-            'CH': 18.0,    // Swiss corporate tax rate (average)
-            'SE': 20.6,    // Swedish corporate tax rate
-            'NO': 22.0,    // Norwegian corporate tax rate
-            'DK': 22.0,    // Danish corporate tax rate
-            'FI': 20.0,    // Finnish corporate tax rate
-            'IE': 12.5,    // Irish corporate tax rate
-            'ES': 25.0,    // Spanish corporate tax rate
-            'IT': 24.0,    // Italian corporate tax rate
-            'BE': 25.0,    // Belgian corporate tax rate
-            'AT': 25.0,    // Austrian corporate tax rate
-            'PL': 19.0,    // Polish corporate tax rate
-            'CZ': 19.0,    // Czech corporate tax rate
-            'HU': 9.0,     // Hungarian corporate tax rate
-            'SK': 21.0,    // Slovak corporate tax rate
-            'SI': 19.0,    // Slovenian corporate tax rate
-            'EE': 20.0     // Estonian corporate tax rate
-          };
-          
-          const baseRate = countryTaxRates[countryCode] || 21.0; // Default to US rate
-          
-          // Business type adjustments (matching backend logic)
-          if (['SaaS', 'FinTech', 'HealthTech', 'EdTech'].includes(businessScenario)) {
-            return baseRate * 0.8; // 20% reduction for tech
-          } else if (['Freelancer', 'Consulting'].includes(businessScenario)) {
-            return baseRate * 1.1; // 10% increase for services
-          } else {
-            return baseRate; // Default rate
-          }
-        };
-        
-        const effectiveTaxRate = getTaxRate(selectedScenarioData.name, countryCode);
-        const taxAmount = netProfit > 0 ? netProfit * (effectiveTaxRate / 100) : 0;
-        const afterTaxProfit = netProfit - taxAmount;
+    // Enhanced tax calculation for fallback (matching backend logic)
+    const getTaxRate = (businessScenario: string, countryCode: string) => {
+      // Real corporate tax rates by country (2024 data)
+      const countryTaxRates: { [key: string]: number } = {
+        'US': 21.0,    // Federal corporate tax rate
+        'GB': 25.0,    // UK corporation tax rate
+        'DE': 29.9,    // German corporate tax (including trade tax)
+        'FR': 25.8,    // French corporate tax rate
+        'CA': 26.5,    // Canadian federal + provincial average
+        'AU': 30.0,    // Australian corporate tax rate
+        'JP': 29.7,    // Japanese corporate tax rate
+        'SG': 17.0,    // Singapore corporate tax rate
+        'NL': 25.8,    // Dutch corporate tax rate
+        'CH': 18.0,    // Swiss corporate tax rate (average)
+        'SE': 20.6,    // Swedish corporate tax rate
+        'NO': 22.0,    // Norwegian corporate tax rate
+        'DK': 22.0,    // Danish corporate tax rate
+        'FI': 20.0,    // Finnish corporate tax rate
+        'IE': 12.5,    // Irish corporate tax rate
+        'ES': 25.0,    // Spanish corporate tax rate
+        'IT': 24.0,    // Italian corporate tax rate
+        'BE': 25.0,    // Belgian corporate tax rate
+        'AT': 25.0,    // Austrian corporate tax rate
+        'PL': 19.0,    // Polish corporate tax rate
+        'CZ': 19.0,    // Czech corporate tax rate
+        'HU': 9.0,     // Hungarian corporate tax rate
+        'SK': 21.0,    // Slovak corporate tax rate
+        'SI': 19.0,    // Slovenian corporate tax rate
+        'EE': 20.0     // Estonian corporate tax rate
+      };
+      
+      const baseRate = countryTaxRates[countryCode] || 21.0; // Default to US rate
+      
+      // Business type adjustments (matching backend logic)
+      if (['SaaS', 'FinTech', 'HealthTech', 'EdTech'].includes(businessScenario)) {
+        return baseRate * 0.8; // 20% reduction for tech
+      } else if (['Freelancer', 'Consulting'].includes(businessScenario)) {
+        return baseRate * 1.1; // 10% increase for services
+      } else {
+        return baseRate; // Default rate
+      }
+    };
+    
+    const effectiveTaxRate = getTaxRate(selectedScenarioData.name, countryCode);
+    const taxAmount = netProfit > 0 ? netProfit * (effectiveTaxRate / 100) : 0;
+    const afterTaxProfit = netProfit - taxAmount;
+    
+    // Comprehensive debugging for testing
+    console.log('=== COMPREHENSIVE TEST DATA ===');
+    console.log('Scenario:', selectedScenarioData.name);
+    console.log('Mini Scenario:', selectedMiniScenarioData.name);
+    console.log('Investment:', totalInvestment);
+    console.log('Base ROI Range:', selectedMiniScenarioData.typical_roi_min, '-', selectedMiniScenarioData.typical_roi_max);
+    console.log('Realistic ROI:', realisticROI);
+    console.log('Total Return:', totalReturn);
+    console.log('Net Profit:', netProfit);
+    console.log('ROI Percentage:', roiPercentage);
+    console.log('Country:', countryCode);
+    console.log('Tax Rate:', effectiveTaxRate);
+    console.log('After Tax Profit:', afterTaxProfit);
+    console.log('================================');
+    
+
     
     const result = {
       data: {
