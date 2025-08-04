@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calculator, BarChart3, Info, Shield, Target, TrendingUp } from 'lucide-react';
+import { Menu, X, Calculator, Info, Shield, Target, TrendingUp } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
