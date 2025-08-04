@@ -11,7 +11,8 @@ import {
   BarChart3,
   Target,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Play
 } from 'lucide-react';
 
 import { api } from '../services/api';
@@ -317,10 +318,28 @@ const CalculatorPage: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-white">ROI Calculator</h1>
         </div>
-        <p className="text-white/70 text-lg max-w-2xl mx-auto">
+        <p className="text-white/70 text-lg max-w-2xl mx-auto mb-6">
           Analyze your business investment with our comprehensive ROI calculator featuring 
           35 business scenarios and real-world market data.
         </p>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex justify-center"
+        >
+          <Link to="/demo">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold border border-white/20 transition-all flex items-center space-x-2"
+            >
+              <Play className="w-4 h-4" />
+              <span>Watch Demo</span>
+            </motion.button>
+          </Link>
+        </motion.div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

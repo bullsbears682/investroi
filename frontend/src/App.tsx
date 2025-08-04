@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import CalculatorPage from './pages/CalculatorPage';
 import AboutPage from './pages/AboutPage';
 import PrivacyPage from './pages/PrivacyPage';
+import DemoPage from './pages/DemoPage';
 import CookieConsent from './components/CookieConsent';
 
 // Store
@@ -63,6 +64,7 @@ function App() {
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/calculator" element={<CalculatorPage />} />
+                      <Route path="/demo" element={<DemoPage />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/privacy" element={<PrivacyPage />} />
                     </Routes>
