@@ -64,39 +64,44 @@ class PDFGeneratorService:
     def generate_roi_report(self, calculation_data: Dict[str, Any]) -> str:
         """Generate a comprehensive ROI report PDF"""
         
-        # Create temporary file
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
-        temp_filename = temp_file.name
-        temp_file.close()
-        
-        # Create PDF document
-        doc = SimpleDocTemplate(
-            temp_filename,
-            pagesize=A4,
-            rightMargin=72,
-            leftMargin=72,
-            topMargin=72,
-            bottomMargin=72
-        )
-        
-        # Build story (content)
-        story = []
-        
-        # Add content sections
-        story.extend(self._create_header(calculation_data))
-        story.extend(self._create_executive_summary(calculation_data))
-        story.extend(self._create_investment_details(calculation_data))
-        story.extend(self._create_roi_analysis(calculation_data))
-        story.extend(self._create_tax_analysis(calculation_data))
-        story.extend(self._create_risk_assessment(calculation_data))
-        story.extend(self._create_market_analysis(calculation_data))
-        story.extend(self._create_recommendations(calculation_data))
-        story.extend(self._create_footer(calculation_data))
-        
-        # Build PDF
-        doc.build(story)
-        
-        return temp_filename
+        try:
+            # Create temporary file
+            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            temp_filename = temp_file.name
+            temp_file.close()
+            
+            # Create PDF document
+            doc = SimpleDocTemplate(
+                temp_filename,
+                pagesize=A4,
+                rightMargin=72,
+                leftMargin=72,
+                topMargin=72,
+                bottomMargin=72
+            )
+            
+            # Build story (content)
+            story = []
+            
+            # Add content sections
+            story.extend(self._create_header(calculation_data))
+            story.extend(self._create_executive_summary(calculation_data))
+            story.extend(self._create_investment_details(calculation_data))
+            story.extend(self._create_roi_analysis(calculation_data))
+            story.extend(self._create_tax_analysis(calculation_data))
+            story.extend(self._create_risk_assessment(calculation_data))
+            story.extend(self._create_market_analysis(calculation_data))
+            story.extend(self._create_recommendations(calculation_data))
+            story.extend(self._create_footer(calculation_data))
+            
+            # Build PDF
+            doc.build(story)
+            
+            return temp_filename
+            
+        except Exception as e:
+            print(f"PDF generation error: {str(e)}")
+            raise Exception(f"PDF generation failed: {str(e)}")
     
     def _create_header(self, data: Dict[str, Any]) -> List:
         """Create the report header"""

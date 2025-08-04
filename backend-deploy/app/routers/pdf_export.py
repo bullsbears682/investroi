@@ -23,7 +23,7 @@ class PDFExportResponse(BaseModel):
     filename: Optional[str] = None
     file_size: Optional[int] = None
 
-@router.post("/export", response_model=PDFExportResponse)
+@router.post("/export")
 async def export_pdf(request: PDFExportRequest):
     """
     Export ROI calculation results as a PDF report
@@ -32,7 +32,7 @@ async def export_pdf(request: PDFExportRequest):
         request: PDFExportRequest containing calculation data and export options
         
     Returns:
-        PDFExportResponse with success status and file information
+        FileResponse with the generated PDF
     """
     try:
         # Validate calculation data
@@ -42,18 +42,18 @@ async def export_pdf(request: PDFExportRequest):
         # Generate PDF report
         pdf_filename = pdf_generator_service.generate_roi_report(request.calculation_data)
         
-        # Get file size
-        file_size = os.path.getsize(pdf_filename) if os.path.exists(pdf_filename) else 0
-        
-        # Generate filename for download
+        # Generate filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        download_filename = f"roi_report_{timestamp}.pdf"
+        filename = f"roi_report_{timestamp}.pdf"
         
-        return PDFExportResponse(
-            success=True,
-            message="PDF report generated successfully",
-            filename=download_filename,
-            file_size=file_size
+        # Return file response
+        return FileResponse(
+            path=pdf_filename,
+            filename=filename,
+            media_type='application/pdf',
+            headers={
+                'Content-Disposition': f'attachment; filename="{filename}"'
+            }
         )
         
     except Exception as e:
