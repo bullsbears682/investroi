@@ -336,7 +336,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       ['📊 Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || 'N/A'}%`],
       ['💸 Tax Amount', `$${calculationData.tax_amount?.toLocaleString() || 'N/A'}`],
       ['💵 After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`],
-      ['📈 Tax Impact', `${((calculationData.tax_amount / calculationData.net_profit) * 100)?.toFixed(1) || 'N/A'}% of profit`
+      ['📈 Tax Impact', `${((calculationData.tax_amount / (calculationData.net_profit || 1)) * 100)?.toFixed(1) || 'N/A'}% of profit`]
     ];
     
     autoTable(doc, {
