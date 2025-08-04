@@ -253,6 +253,12 @@ const CalculatorPage: React.FC = () => {
           country_code: formData.country_code || 'US'
         };
 
+        console.log('DEBUG - Form submission:');
+        console.log('Raw formData:', formData);
+        console.log('Processed calculationData:', calculationData);
+        console.log('Initial investment (raw):', formData.initial_investment);
+        console.log('Initial investment (processed):', calculationData.initial_investment);
+
         console.log('Sending calculation request to API...');
         
         // First try a simple health check
