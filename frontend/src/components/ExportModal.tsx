@@ -7,8 +7,7 @@ import {
   TrendingUp, 
   Shield, 
   X,
-  Check,
-  AlertCircle
+  Check
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { generatePDF, PDFExportData } from '../utils/pdfExport';
