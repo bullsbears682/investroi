@@ -222,6 +222,18 @@ const CalculatorPage: React.FC = () => {
     console.log('Scenario:', selectedScenarioData.name);
     console.log('Mini Scenario:', selectedMiniScenarioData.name);
     console.log('Investment:', totalInvestment);
+    console.log('Investment Size Category:', 
+      totalInvestment < 1000 ? 'Very Small' :
+      totalInvestment < 5000 ? 'Small' :
+      totalInvestment < 25000 ? 'Medium' :
+      totalInvestment < 100000 ? 'Large' : 'Very Large'
+    );
+    console.log('Recommended Range:', selectedMiniScenarioData.recommended_investment_min, '-', selectedMiniScenarioData.recommended_investment_max);
+    console.log('Investment Fit:', 
+      totalInvestment < selectedMiniScenarioData.recommended_investment_min * 0.5 ? 'Very Small' :
+      totalInvestment < selectedMiniScenarioData.recommended_investment_min ? 'Small' :
+      totalInvestment > selectedMiniScenarioData.recommended_investment_max ? 'Large' : 'Good'
+    );
     console.log('Base ROI Range:', selectedMiniScenarioData.typical_roi_min, '-', selectedMiniScenarioData.typical_roi_max);
     console.log('Realistic ROI:', realisticROI);
     console.log('Total Return:', totalReturn);
@@ -281,8 +293,8 @@ const CalculatorPage: React.FC = () => {
         console.log('Initial investment (processed):', calculationData.initial_investment);
         
         // Mobile-friendly debug display
-        const debugInfo = `DEBUG: Raw=${formData.initial_investment}, Processed=${calculationData.initial_investment}`;
-        toast(debugInfo, { duration: 5000 });
+        const debugInfo = `TEST: $${formData.initial_investment} | ${formData.country_code} | ${selectedScenario} | ${selectedMiniScenario}`;
+        toast(debugInfo, { duration: 3000 });
 
         console.log('Sending calculation request to API...');
         
