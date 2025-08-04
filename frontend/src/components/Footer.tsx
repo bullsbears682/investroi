@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
     ],
     resources: [
       { name: 'Investment Guide', href: '/investment-guide' },
-      { name: 'Tax Information', href: '/about' },
+      { name: 'Tax Information', href: '/tax-info' },
       { name: 'Market Research', href: '/scenarios' },
       { name: 'Risk Assessment', href: '/calculator' }
     ]

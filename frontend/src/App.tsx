@@ -17,6 +17,7 @@ import PrivacyPage from './pages/PrivacyPage';
 import DemoPage from './pages/DemoPage';
 import ScenariosPage from './pages/ScenariosPage';
 import InvestmentGuidePage from './pages/InvestmentGuidePage';
+import TaxInfoPage from './pages/TaxInfoPage';
 import CookieConsent from './components/CookieConsent';
 
 // Store
@@ -69,6 +70,7 @@ function App() {
                       <Route path="/calculator" element={<CalculatorPage />} />
                       <Route path="/demo" element={<DemoPage />} />
                       <Route path="/investment-guide" element={<InvestmentGuidePage />} />
+                      <Route path="/tax-info" element={<TaxInfoPage />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/privacy" element={<PrivacyPage />} />
                     </Routes>
