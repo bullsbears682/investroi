@@ -15,6 +15,7 @@ import CalculatorPage from './pages/CalculatorPage';
 import AboutPage from './pages/AboutPage';
 import PrivacyPage from './pages/PrivacyPage';
 import DemoPage from './pages/DemoPage';
+import ScenariosPage from './pages/ScenariosPage';
 import CookieConsent from './components/CookieConsent';
 
 // Store
@@ -63,6 +64,7 @@ function App() {
                   <main className="container mx-auto px-4 py-8">
                     <Routes>
                       <Route path="/" element={<HomePage />} />
+                      <Route path="/scenarios" element={<ScenariosPage />} />
                       <Route path="/calculator" element={<CalculatorPage />} />
                       <Route path="/demo" element={<DemoPage />} />
                       <Route path="/about" element={<AboutPage />} />
