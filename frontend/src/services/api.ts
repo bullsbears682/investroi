@@ -74,6 +74,9 @@ export const apiEndpoints = {
   businessScenario: (id: number) => `/api/business-scenarios/${id}`,
   businessScenarioMiniScenarios: (id: number) => `/api/business-scenarios/${id}/mini-scenarios`,
   popularScenarios: '/api/business-scenarios/popular/scenarios',
+
+  // PDF Export
+  pdfExport: '/api/pdf/export',
 };
 
 // API service functions
@@ -107,6 +110,9 @@ export const apiService = {
   getBusinessScenario: (id: number) => api.get(apiEndpoints.businessScenario(id)),
   getBusinessScenarioMiniScenarios: (id: number) => api.get(apiEndpoints.businessScenarioMiniScenarios(id)),
   getPopularScenarios: () => api.get(apiEndpoints.popularScenarios),
+
+  // PDF Export
+  exportPDF: (data: any) => api.post(apiEndpoints.pdfExport, data, { responseType: 'blob' }),
 };
 
 export { api };

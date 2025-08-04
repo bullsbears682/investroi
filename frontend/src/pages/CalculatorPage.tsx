@@ -22,6 +22,7 @@ import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
+import PDFExport from '../components/PDFExport';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
@@ -463,9 +464,7 @@ const CalculatorPage: React.FC = () => {
                 Export Report
               </h2>
               
-              <div className="text-white/60 text-center py-8">
-                <p>PDF export functionality will be added here</p>
-              </div>
+              <PDFExport calculationData={calculationResult?.data || calculationResult} />
             </div>
           )}
 
