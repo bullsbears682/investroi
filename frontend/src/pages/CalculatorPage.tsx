@@ -114,10 +114,23 @@ const CalculatorPage: React.FC = () => {
     const netProfit = expectedReturn - totalInvestment;
     const roiPercentage = (netProfit / totalInvestment) * 100;
     
-    // Simple tax calculation for fallback (21% US corporate tax)
-    const taxRate = 21.0;
-    const taxAmount = netProfit > 0 ? netProfit * (taxRate / 100) : 0;
-    const afterTaxProfit = netProfit - taxAmount;
+            // Enhanced tax calculation for fallback (matching backend logic)
+        const getTaxRate = (businessScenario: string) => {
+          const baseRate = 21.0; // US corporate tax rate
+          
+          // Business type adjustments (matching backend logic)
+          if (['SaaS', 'FinTech', 'HealthTech', 'EdTech'].includes(businessScenario)) {
+            return baseRate * 0.8; // 20% reduction for tech
+          } else if (['Freelancer', 'Consulting'].includes(businessScenario)) {
+            return baseRate * 1.1; // 10% increase for services
+          } else {
+            return baseRate; // Default rate
+          }
+        };
+        
+        const effectiveTaxRate = getTaxRate(selectedScenarioData.name);
+        const taxAmount = netProfit > 0 ? netProfit * (effectiveTaxRate / 100) : 0;
+        const afterTaxProfit = netProfit - taxAmount;
     
     const result = {
       data: {
@@ -130,10 +143,10 @@ const CalculatorPage: React.FC = () => {
         annualized_roi: roiPercentage,
         scenario_name: selectedScenarioData.name,
         mini_scenario_name: selectedMiniScenarioData.name,
-        calculation_method: 'local_fallback',
-        tax_amount: taxAmount,
-        after_tax_profit: afterTaxProfit,
-        effective_tax_rate: taxRate
+                  calculation_method: 'local_fallback',
+          tax_amount: taxAmount,
+          after_tax_profit: afterTaxProfit,
+          effective_tax_rate: effectiveTaxRate
       }
     };
     
