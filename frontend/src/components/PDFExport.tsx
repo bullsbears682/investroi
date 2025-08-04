@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download } from 'lucide-react';
+import { Download, FileText, BarChart3, TrendingUp } from 'lucide-react';
 import { apiService } from '../services/api';
 import toast from 'react-hot-toast';
 import jsPDF from 'jspdf';
@@ -10,10 +10,17 @@ interface PDFExportProps {
   calculationData: any;
 }
 
+type PDFType = 'simple' | 'detailed' | 'executive';
+
 const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
+  const [selectedPDFType, setSelectedPDFType] = useState<PDFType>('detailed');
+  const [isGenerating, setIsGenerating] = useState(false);
   const handleExportPDF = async () => {
+    if (isGenerating) return;
+    
+    setIsGenerating(true);
     try {
-      toast.loading('Generating PDF report...', { id: 'pdf-export' });
+      toast.loading(`Generating ${selectedPDFType} PDF report...`, { id: 'pdf-export' });
       
       // Try backend API first
       try {
@@ -28,7 +35,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `roi_investment_report_${new Date().toISOString().split('T')[0]}.pdf`;
+        link.download = `roi_investment_report_${selectedPDFType}_${new Date().toISOString().split('T')[0]}.pdf`;
         
         // Trigger download
         document.body.appendChild(link);
@@ -49,135 +56,297 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       
     } catch (error) {
       console.error('PDF export error:', error);
-      toast.error('PDF export failed. Please try again.', { id: 'pdf-export' });
+      toast.error('PDF generation failed. Please try again.', { id: 'pdf-export' });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
   const generateFrontendPDF = () => {
     try {
-      // Create new PDF document
-      const doc = new jsPDF();
-      
-      // Set document properties
-      doc.setProperties({
-        title: 'ROI Investment Report',
-        subject: 'Investment Analysis Report',
-        author: 'InvestWise Pro',
-        creator: 'InvestWise Pro ROI Calculator'
-      });
-
-      // Add header
-      doc.setFontSize(24);
-      doc.setTextColor(0, 0, 139); // Dark blue
-      doc.text('ROI Investment Report', 105, 20, { align: 'center' });
-      
-      // Add subtitle
-      doc.setFontSize(12);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 105, 30, { align: 'center' });
-      
-      // Add line separator
-      doc.setDrawColor(200, 200, 200);
-      doc.line(20, 35, 190, 35);
-
-      // Investment Summary Section
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 139);
-      doc.text('Investment Summary', 20, 50);
-      
-      // Investment summary table
-      const investmentData = [
-        ['Initial Investment', `$${calculationData.initial_investment?.toLocaleString() || 'N/A'}`],
-        ['Additional Costs', `$${calculationData.additional_costs?.toLocaleString() || '0'}`],
-        ['Total Investment', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`]
-      ];
-      
-      autoTable(doc, {
-        startY: 55,
-        head: [['Item', 'Amount']],
-        body: investmentData,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
-        styles: { fontSize: 10 }
-      });
-
-      // ROI Results Section
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 139);
-      doc.text('ROI Results', 20, 100);
-      
-      // ROI results table
-      const roiData = [
-        ['ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || 'N/A'}%`],
-        ['Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
-        ['Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`]
-      ];
-      
-      autoTable(doc, {
-        startY: 105,
-        head: [['Metric', 'Value']],
-        body: roiData,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
-        styles: { fontSize: 10 }
-      });
-
-      // Business Details Section
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 139);
-      doc.text('Business Details', 20, 150);
-      
-      const businessData = [
-        ['Scenario', calculationData.scenario_name || 'N/A'],
-        ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
-        ['Country', calculationData.country_code || 'N/A']
-      ];
-      
-      autoTable(doc, {
-        startY: 155,
-        head: [['Detail', 'Value']],
-        body: businessData,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
-        styles: { fontSize: 10 }
-      });
-
-      // Tax Analysis Section
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 139);
-      doc.text('Tax Analysis', 20, 200);
-      
-      const taxData = [
-        ['Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || 'N/A'}%`],
-        ['Tax Amount', `$${calculationData.tax_amount?.toLocaleString() || 'N/A'}`],
-        ['After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`]
-      ];
-      
-      autoTable(doc, {
-        startY: 205,
-        head: [['Tax Item', 'Amount']],
-        body: taxData,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 0, 139], textColor: 255 },
-        styles: { fontSize: 10 }
-      });
-
-      // Footer
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Calculation Method: ${calculationData.calculation_method || 'Local Fallback'}`, 20, 280);
-      doc.text('Generated by InvestWise Pro ROI Calculator', 105, 285, { align: 'center' });
-
-      // Save the PDF
-      const filename = `roi_investment_report_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(filename);
-      
-      toast.success('PDF report generated successfully!', { id: 'pdf-export' });
-      
+      switch (selectedPDFType) {
+        case 'simple':
+          generateSimplePDF();
+          break;
+        case 'detailed':
+          generateDetailedPDF();
+          break;
+        case 'executive':
+          generateExecutivePDF();
+          break;
+        default:
+          generateDetailedPDF();
+      }
     } catch (error) {
       console.error('Frontend PDF generation error:', error);
       toast.error('PDF generation failed. Please try again.', { id: 'pdf-export' });
     }
+  };
+
+  const generateSimplePDF = () => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(20);
+    doc.setTextColor(0, 0, 139);
+    doc.text('ROI Investment Report', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
+    
+    // Simple summary table
+    const summaryData = [
+      ['Investment', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`],
+      ['ROI', `${calculationData.roi_percentage?.toFixed(2) || 'N/A'}%`],
+      ['Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
+      ['Business', calculationData.scenario_name || 'N/A']
+    ];
+    
+    autoTable(doc, {
+      startY: 40,
+      head: [['Metric', 'Value']],
+      body: summaryData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+      styles: { fontSize: 12 }
+    });
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Generated by InvestWise Pro', 105, 280, { align: 'center' });
+    
+    const filename = `roi_simple_report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    
+    toast.success('Simple PDF report generated!', { id: 'pdf-export' });
+  };
+
+  const generateDetailedPDF = () => {
+    const doc = new jsPDF();
+    
+    // Set document properties
+    doc.setProperties({
+      title: 'ROI Investment Report - Detailed',
+      subject: 'Investment Analysis Report',
+      author: 'InvestWise Pro',
+      creator: 'InvestWise Pro ROI Calculator'
+    });
+
+    // Header
+    doc.setFontSize(24);
+    doc.setTextColor(0, 0, 139);
+    doc.text('ROI Investment Report', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 105, 30, { align: 'center' });
+    
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, 35, 190, 35);
+
+    // Investment Summary Section
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Investment Summary', 20, 50);
+    
+    const investmentData = [
+      ['Initial Investment', `$${calculationData.initial_investment?.toLocaleString() || 'N/A'}`],
+      ['Additional Costs', `$${calculationData.additional_costs?.toLocaleString() || '0'}`],
+      ['Total Investment', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`]
+    ];
+    
+    autoTable(doc, {
+      startY: 55,
+      head: [['Item', 'Amount']],
+      body: investmentData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+      styles: { fontSize: 10 }
+    });
+
+    // ROI Results Section
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 139);
+    doc.text('ROI Results', 20, 100);
+    
+    const roiData = [
+      ['ROI Percentage', `${calculationData.roi_percentage?.toFixed(2) || 'N/A'}%`],
+      ['Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
+      ['Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`]
+    ];
+    
+    autoTable(doc, {
+      startY: 105,
+      head: [['Metric', 'Value']],
+      body: roiData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+      styles: { fontSize: 10 }
+    });
+
+    // Business Details Section
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Business Details', 20, 150);
+    
+    const businessData = [
+      ['Scenario', calculationData.scenario_name || 'N/A'],
+      ['Mini Scenario', calculationData.mini_scenario_name || 'N/A'],
+      ['Country', calculationData.country_code || 'N/A']
+    ];
+    
+    autoTable(doc, {
+      startY: 155,
+      head: [['Detail', 'Value']],
+      body: businessData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+      styles: { fontSize: 10 }
+    });
+
+    // Tax Analysis Section
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Tax Analysis', 20, 200);
+    
+    const taxData = [
+      ['Effective Tax Rate', `${calculationData.effective_tax_rate?.toFixed(1) || 'N/A'}%`],
+      ['Tax Amount', `$${calculationData.tax_amount?.toLocaleString() || 'N/A'}`],
+      ['After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`]
+    ];
+    
+    autoTable(doc, {
+      startY: 205,
+      head: [['Tax Item', 'Amount']],
+      body: taxData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+      styles: { fontSize: 10 }
+    });
+
+    // Footer
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Calculation Method: ${calculationData.calculation_method || 'Local Fallback'}`, 20, 280);
+    doc.text('Generated by InvestWise Pro ROI Calculator', 105, 285, { align: 'center' });
+
+    const filename = `roi_detailed_report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    
+    toast.success('Detailed PDF report generated!', { id: 'pdf-export' });
+  };
+
+  const generateExecutivePDF = () => {
+    const doc = new jsPDF();
+    
+    // Set document properties
+    doc.setProperties({
+      title: 'ROI Investment Report - Executive Summary',
+      subject: 'Executive Investment Analysis',
+      author: 'InvestWise Pro',
+      creator: 'InvestWise Pro ROI Calculator'
+    });
+
+    // Executive Header
+    doc.setFontSize(28);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Executive Summary', 105, 25, { align: 'center' });
+    
+    doc.setFontSize(14);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Investment ROI Analysis', 105, 35, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 45, { align: 'center' });
+    
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, 50, 190, 50);
+
+    // Key Metrics Box
+    doc.setFillColor(240, 248, 255);
+    doc.rect(20, 60, 170, 40, 'F');
+    
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Key Performance Indicators', 105, 70, { align: 'center' });
+    
+    // ROI Highlight
+    const roiValue = calculationData.roi_percentage?.toFixed(2) || 'N/A';
+    const roiColor = calculationData.roi_percentage > 20 ? [0, 128, 0] : [255, 0, 0];
+    
+    doc.setFontSize(24);
+    doc.setTextColor(roiColor[0], roiColor[1], roiColor[2]);
+    doc.text(`${roiValue}% ROI`, 105, 85, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`on $${calculationData.total_investment?.toLocaleString() || 'N/A'} investment`, 105, 95, { align: 'center' });
+
+    // Executive Summary Table
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Investment Overview', 20, 120);
+    
+    const executiveData = [
+      ['Total Investment', `$${calculationData.total_investment?.toLocaleString() || 'N/A'}`],
+      ['Expected Return', `$${calculationData.expected_return?.toLocaleString() || 'N/A'}`],
+      ['Net Profit', `$${calculationData.net_profit?.toLocaleString() || 'N/A'}`],
+      ['After-Tax Profit', `$${calculationData.after_tax_profit?.toLocaleString() || 'N/A'}`],
+      ['Business Type', calculationData.scenario_name || 'N/A'],
+      ['Country', calculationData.country_code || 'N/A']
+    ];
+    
+    autoTable(doc, {
+      startY: 125,
+      head: [['Metric', 'Value']],
+      body: executiveData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 0, 139], textColor: 255 },
+      styles: { fontSize: 11 }
+    });
+
+    // Recommendation Section
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 139);
+    doc.text('Investment Assessment', 20, 200);
+    
+    const roi = calculationData.roi_percentage || 0;
+    let recommendation = '';
+    let recommendationColor = [0, 0, 0];
+    
+    if (roi >= 30) {
+      recommendation = 'EXCELLENT - High potential investment';
+      recommendationColor = [0, 128, 0];
+    } else if (roi >= 15) {
+      recommendation = 'GOOD - Solid investment opportunity';
+      recommendationColor = [0, 100, 0];
+    } else if (roi >= 5) {
+      recommendation = 'FAIR - Moderate risk/reward';
+      recommendationColor = [255, 165, 0];
+    } else {
+      recommendation = 'POOR - High risk, low return';
+      recommendationColor = [255, 0, 0];
+    }
+    
+    doc.setFontSize(12);
+    doc.setTextColor(recommendationColor[0], recommendationColor[1], recommendationColor[2]);
+    doc.text(recommendation, 20, 210);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Based on ${roi.toFixed(2)}% ROI analysis`, 20, 220);
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Generated by InvestWise Pro ROI Calculator', 105, 280, { align: 'center' });
+
+    const filename = `roi_executive_report_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    
+    toast.success('Executive PDF report generated!', { id: 'pdf-export' });
   };
 
   return (
@@ -187,21 +356,74 @@ const PDFExport: React.FC<PDFExportProps> = ({ calculationData }) => {
       transition={{ duration: 0.5 }}
       className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white"
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Export Report</h3>
-          <p className="text-blue-100 text-sm">
-            Download a detailed PDF report of your investment analysis
-          </p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Export Report</h3>
+            <p className="text-blue-100 text-sm">
+              Choose your preferred PDF report format
+            </p>
+          </div>
         </div>
+
+        {/* PDF Type Selection */}
+        <div className="grid grid-cols-3 gap-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelectedPDFType('simple')}
+            className={`flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 ${
+              selectedPDFType === 'simple'
+                ? 'bg-white/30 border-2 border-white'
+                : 'bg-white/10 hover:bg-white/20'
+            }`}
+          >
+            <FileText size={20} />
+            <span className="text-sm font-medium">Simple</span>
+            <span className="text-xs text-blue-100">Quick overview</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelectedPDFType('detailed')}
+            className={`flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 ${
+              selectedPDFType === 'detailed'
+                ? 'bg-white/30 border-2 border-white'
+                : 'bg-white/10 hover:bg-white/20'
+            }`}
+          >
+            <BarChart3 size={20} />
+            <span className="text-sm font-medium">Detailed</span>
+            <span className="text-xs text-blue-100">Complete analysis</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelectedPDFType('executive')}
+            className={`flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 ${
+              selectedPDFType === 'executive'
+                ? 'bg-white/30 border-2 border-white'
+                : 'bg-white/10 hover:bg-white/20'
+            }`}
+          >
+            <TrendingUp size={20} />
+            <span className="text-sm font-medium">Executive</span>
+            <span className="text-xs text-blue-100">Professional summary</span>
+          </motion.button>
+        </div>
+
+        {/* Export Button */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleExportPDF}
-          className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg transition-all duration-200"
+          disabled={isGenerating}
+          className="flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-6 py-3 rounded-lg transition-all duration-200 w-full disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Download size={18} />
-          <span>Export PDF</span>
+          <span>{isGenerating ? 'Generating...' : `Export ${selectedPDFType} PDF`}</span>
         </motion.button>
       </div>
     </motion.div>
