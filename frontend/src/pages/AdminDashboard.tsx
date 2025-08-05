@@ -2096,14 +2096,14 @@ const AdminDashboard: React.FC = () => {
                 className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
                 title="Run Comprehensive Test"
               >
-                Comprehensive Test
+                1
               </button>
               <button
                 onClick={handleComprehensiveTest}
                 className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
                 title="Test All Features"
               >
-                Test Features
+                2
               </button>
               <button
                 onClick={() => setShowLogout(true)}
