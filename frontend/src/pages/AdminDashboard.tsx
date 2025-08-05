@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { contactStorage, ContactSubmission } from '../utils/contactStorage';
 import { adminDataManager, AdminStats } from '../utils/adminData';
+import { userManager, User } from '../utils/userManagement';
 import { toast } from 'react-hot-toast';
 
 const AdminDashboard: React.FC = () => {
@@ -29,12 +30,15 @@ const AdminDashboard: React.FC = () => {
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
     if (isVisible) {
       const stats = adminDataManager.getAdminStats();
       const submissions = contactStorage.getSubmissions();
+      const allUsers = userManager.getAllUsers();
       
       // Update stats with contact data
       stats.totalContacts = submissions.length;
@@ -42,6 +46,7 @@ const AdminDashboard: React.FC = () => {
       
       setAdminStats(stats);
       setContactSubmissions(submissions);
+      setUsers(allUsers);
     }
   }, [isVisible]);
 
@@ -118,6 +123,7 @@ const AdminDashboard: React.FC = () => {
   const tabs = [
     { id: 'overview', name: 'Overview', icon: BarChart3 },
     { id: 'analytics', name: 'Analytics', icon: TrendingUp },
+    { id: 'users', name: 'Users', icon: Users },
     { id: 'contacts', name: 'Contacts', icon: Mail },
     { id: 'system', name: 'System', icon: Settings }
   ];
@@ -471,6 +477,137 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
+  const renderUsers = () => (
+    <div className="space-y-4 sm:space-y-6">
+      {/* User List */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg sm:text-xl font-semibold text-white">Registered Users</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">Total: {users.length}</span>
+            <span className="text-green-400 text-sm">Active: {users.filter(u => u.isActive).length}</span>
+          </div>
+        </div>
+        
+        {users.length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 text-white/40 mx-auto mb-4" />
+            <p className="text-white/60">No registered users yet</p>
+            <p className="text-white/40 text-sm mt-2">Users will appear here when they register</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {users.map((user) => (
+              <div
+                key={user.id}
+                className={`p-3 bg-white/5 rounded-lg cursor-pointer transition-all hover:bg-white/10 ${
+                  selectedUser?.id === user.id ? 'bg-blue-500/20 border border-blue-500/30' : ''
+                }`}
+                onClick={() => setSelectedUser(user)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white font-medium text-sm sm:text-base truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-white/60 text-xs sm:text-sm truncate">
+                        {user.email} • {new Date(user.registrationDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      user.isActive ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+                    }`}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Selected User Details */}
+      {selectedUser && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">User Details</h3>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedUser.email);
+                  toast.success('Email copied to clipboard!');
+                }}
+                className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full hover:bg-green-500/30"
+                title="Copy email"
+              >
+                Copy Email
+              </button>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Name</p>
+                <p className="text-white font-medium">{selectedUser.name}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Email</p>
+                <p className="text-white font-medium">{selectedUser.email}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Country</p>
+                <p className="text-white font-medium">{selectedUser.country || 'Not specified'}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Registration Date</p>
+                <p className="text-white font-medium">{new Date(selectedUser.registrationDate).toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Last Login</p>
+                <p className="text-white font-medium">{new Date(selectedUser.lastLogin).toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Status</p>
+                <p className={`font-medium ${selectedUser.isActive ? 'text-green-400' : 'text-gray-400'}`}>
+                  {selectedUser.isActive ? 'Active' : 'Inactive'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-3 bg-white/5 rounded-lg">
+                <p className="text-white/60 text-xs sm:text-sm">Total Calculations</p>
+                <p className="text-white font-medium text-lg">{selectedUser.totalCalculations}</p>
+              </div>
+              <div className="p-3 bg-white/5 rounded-lg">
+                <p className="text-white/60 text-xs sm:text-sm">Total Exports</p>
+                <p className="text-white font-medium text-lg">{selectedUser.totalExports}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+
   const renderContacts = () => (
     <div className="space-y-4 sm:space-y-6">
       {/* Contact Submissions */}
@@ -701,6 +838,8 @@ const AdminDashboard: React.FC = () => {
         return renderOverview();
       case 'analytics':
         return renderAnalytics();
+      case 'users':
+        return renderUsers();
       case 'contacts':
         return renderContacts();
       case 'system':
