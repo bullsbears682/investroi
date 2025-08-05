@@ -2151,14 +2151,14 @@ const AdminDashboard: React.FC = () => {
               className="px-4 py-2 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
               title="Run Comprehensive Test"
             >
-              1
+              1 - Comprehensive Test
             </button>
             <button
               onClick={handleComprehensiveTest}
               className="px-4 py-2 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
               title="Test All Features"
             >
-              2
+              2 - Test Features
             </button>
           </div>
         </div>
