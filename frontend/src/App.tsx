@@ -21,7 +21,7 @@ import TaxInfoPage from './pages/TaxInfoPage';
 import MarketResearchPage from './pages/MarketResearchPage';
 import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
-import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+
 import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 
@@ -81,7 +81,7 @@ function App() {
                       <Route path="/privacy" element={<PrivacyPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/terms" element={<TermsPage />} />
-                      <Route path="/admin" element={<ProtectedAdminRoute />} />
+
                     </Routes>
                   </main>
                   

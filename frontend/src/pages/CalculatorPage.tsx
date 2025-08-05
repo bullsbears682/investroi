@@ -28,7 +28,7 @@ import MarketAnalysis from '../components/MarketAnalysis';
 
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
-import { adminDataManager } from '../utils/adminData';
+
 import { userManager } from '../utils/userManagement';
 import UserAuth from '../components/UserAuth';
 
@@ -282,9 +282,8 @@ const CalculatorPage: React.FC = () => {
           country_code: formData.country_code || 'US'
         };
 
-        // Record the calculation for admin dashboard
+        // Record the calculation for current user if logged in
         const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
-        adminDataManager.recordCalculation(scenarioName);
         
         // Record calculation for current user if logged in
         if (currentUser) {

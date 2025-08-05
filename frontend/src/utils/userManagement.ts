@@ -7,7 +7,6 @@ export interface User {
   totalCalculations: number;
   totalExports: number;
   isActive: boolean;
-  role: 'user' | 'admin';
   country?: string;
   preferences?: {
     defaultScenario?: string;
@@ -28,75 +27,8 @@ class UserManager {
   private usersKey = 'registered_users';
   private sessionsKey = 'user_sessions';
   private currentUserKey = 'current_user';
-  private adminCredentialsKey = 'admin_credentials';
 
-  // Initialize admin user if not exists
-  initializeAdmin(): void {
-    const users = this.getAllUsers();
-    const adminExists = users.some(user => user.role === 'admin');
-    
-    if (!adminExists) {
-      const adminUser: User = {
-        id: 'admin_001',
-        email: 'admin@investwisepro.com',
-        name: 'System Administrator',
-        registrationDate: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        totalCalculations: 0,
-        totalExports: 0,
-        isActive: true,
-        role: 'admin',
-        preferences: {
-          notifications: true
-        }
-      };
-      
-      users.push(adminUser);
-      this.saveUsers(users);
-      
-      // Set default admin password
-      this.setAdminCredentials('admin@investwisepro.com', 'admin123');
-    }
-  }
 
-  // Set admin credentials
-  setAdminCredentials(email: string, password: string): void {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      const credentials = { email, password };
-      localStorage.setItem(this.adminCredentialsKey, JSON.stringify(credentials));
-    } catch (error) {
-      console.error('Error saving admin credentials:', error);
-    }
-  }
-
-  // Verify admin credentials
-  verifyAdminCredentials(email: string, password: string): boolean {
-    if (typeof window === 'undefined') return false;
-    
-    try {
-      const stored = localStorage.getItem(this.adminCredentialsKey);
-      if (!stored) return false;
-      
-      const credentials = JSON.parse(stored);
-      return credentials.email === email && credentials.password === password;
-    } catch (error) {
-      console.error('Error verifying admin credentials:', error);
-      return false;
-    }
-  }
-
-  // Check if current user is admin
-  isCurrentUserAdmin(): boolean {
-    const currentUser = this.getCurrentUser();
-    return currentUser?.role === 'admin';
-  }
-
-  // Get admin users
-  getAdminUsers(): User[] {
-    return this.getAllUsers().filter(user => user.role === 'admin');
-  }
 
   // Register a new user
   registerUser(email: string, name: string, country?: string): User {
@@ -114,7 +46,6 @@ class UserManager {
       totalCalculations: 0,
       totalExports: 0,
       isActive: true,
-      role: 'user',
       country,
       preferences: {
         defaultCountry: country,
@@ -150,27 +81,7 @@ class UserManager {
     return user;
   }
 
-  // Login admin with credentials
-  loginAdmin(email: string, password: string): User | null {
-    if (!this.verifyAdminCredentials(email, password)) {
-      return null;
-    }
 
-    const user = this.getUserByEmail(email);
-    if (!user || user.role !== 'admin') {
-      return null;
-    }
-
-    // Update last login
-    user.lastLogin = new Date().toISOString();
-    user.isActive = true;
-    this.updateUser(user);
-
-    // Create or update session
-    this.createSession(user.id);
-
-    return user;
-  }
 
   // Get current logged in user
   getCurrentUser(): User | null {
