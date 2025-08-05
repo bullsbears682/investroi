@@ -22,7 +22,8 @@ import {
   Target,
   BarChart,
   Calculator,
-  Calendar
+  Calendar,
+  Bell
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { contactStorage } from '../utils/contactStorage';
@@ -40,10 +41,29 @@ const AdminDashboard: React.FC = () => {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [showReplyForm, setShowReplyForm] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     loadRealData();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.notification-dropdown')) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -295,6 +315,54 @@ const AdminDashboard: React.FC = () => {
         console.log('Sample PDF export analytics created');
       }
 
+      // Load notifications
+      const storedNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
+      setNotifications(storedNotifications);
+      
+      // Create sample notifications if none exist
+      if (storedNotifications.length === 0) {
+        const sampleNotifications = [
+          {
+            id: '1',
+            type: 'info',
+            title: 'New User Registration',
+            message: 'John Smith registered for an account',
+            data: { userId: 'john@example.com', action: 'registration' },
+            timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+            read: false
+          },
+          {
+            id: '2',
+            type: 'warning',
+            title: 'New Contact Message',
+            message: 'Alice Cooper sent a message about investment questions',
+            data: { contactId: 'alice@example.com', action: 'contact' },
+            timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
+            read: false
+          },
+          {
+            id: '3',
+            type: 'success',
+            title: 'ROI Calculation Completed',
+            message: 'User completed a calculation for E-commerce Business',
+            data: { scenarioId: 1, action: 'calculation' },
+            timestamp: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
+            read: true
+          },
+          {
+            id: '4',
+            type: 'error',
+            title: 'PDF Export Failed',
+            message: 'Failed to generate PDF report for user',
+            data: { userId: 'sarah@example.com', action: 'export_failed' },
+            timestamp: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
+            read: false
+          }
+        ];
+        setNotifications(sampleNotifications);
+        localStorage.setItem('admin_notifications', JSON.stringify(sampleNotifications));
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -391,6 +459,9 @@ const AdminDashboard: React.FC = () => {
 
     // Show success message
     console.log(`Reply sent to ${contact.name} (${contact.email}): ${replyMessage}`);
+    
+    // Add notification
+    addNotification('success', 'Reply Sent', `Reply sent to ${contact.name}`, { contactId: replyingTo, contactEmail: contact.email });
   };
 
   const handleCancelReply = () => {
@@ -402,6 +473,55 @@ const AdminDashboard: React.FC = () => {
   const getRepliesForContact = (contactId: string) => {
     const replies = JSON.parse(localStorage.getItem('admin_replies') || '[]');
     return replies.filter((reply: any) => reply.contactId === contactId);
+  };
+
+  const addNotification = (type: 'info' | 'success' | 'warning' | 'error', title: string, message: string, data?: any) => {
+    const notification = {
+      id: Date.now().toString(),
+      type,
+      title,
+      message,
+      data,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    const updatedNotifications = [notification, ...notifications];
+    setNotifications(updatedNotifications);
+    
+    // Store in localStorage
+    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
+    
+    console.log('Notification added:', notification);
+  };
+
+  const markNotificationAsRead = (notificationId: string) => {
+    const updatedNotifications = notifications.map(notification =>
+      notification.id === notificationId ? { ...notification, read: true } : notification
+    );
+    setNotifications(updatedNotifications);
+    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
+  };
+
+  const markAllNotificationsAsRead = () => {
+    const updatedNotifications = notifications.map(notification => ({ ...notification, read: true }));
+    setNotifications(updatedNotifications);
+    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
+  };
+
+  const deleteNotification = (notificationId: string) => {
+    const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
+    setNotifications(updatedNotifications);
+    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    localStorage.removeItem('admin_notifications');
+  };
+
+  const getUnreadCount = () => {
+    return notifications.filter(notification => !notification.read).length;
   };
 
   const renderOverview = () => (
@@ -1247,6 +1367,105 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 sm:space-x-4">
+                {/* Notification Bell */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-white/10 text-gray-300 rounded-lg sm:rounded-xl hover:bg-white/20 transition-all duration-300 shadow-md border border-white/20 backdrop-blur-sm text-xs sm:text-sm relative"
+                  >
+                    <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="font-medium hidden sm:inline">Notifications</span>
+                    {getUnreadCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                        {getUnreadCount()}
+                      </span>
+                    )}
+                  </button>
+                  
+                  {/* Notification Dropdown */}
+                  {showNotifications && (
+                    <div className="notification-dropdown absolute right-0 mt-2 w-80 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl z-50">
+                      <div className="p-4 border-b border-white/20">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold text-white">Notifications</h3>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={markAllNotificationsAsRead}
+                              className="text-xs text-blue-400 hover:text-blue-300"
+                            >
+                              Mark all read
+                            </button>
+                            <button
+                              onClick={clearAllNotifications}
+                              className="text-xs text-red-400 hover:text-red-300"
+                            >
+                              Clear all
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.length > 0 ? (
+                          <div className="p-2">
+                            {notifications.map((notification) => (
+                              <div
+                                key={notification.id}
+                                className={`p-3 rounded-lg mb-2 transition-all duration-200 ${
+                                  notification.read 
+                                    ? 'bg-white/5 border border-white/10' 
+                                    : 'bg-blue-500/10 border border-blue-400/20'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center space-x-2 mb-1">
+                                      <div className={`w-2 h-2 rounded-full ${
+                                        notification.type === 'info' ? 'bg-blue-400' :
+                                        notification.type === 'success' ? 'bg-green-400' :
+                                        notification.type === 'warning' ? 'bg-yellow-400' :
+                                        'bg-red-400'
+                                      }`}></div>
+                                      <h4 className="text-sm font-medium text-white">{notification.title}</h4>
+                                      {!notification.read && (
+                                        <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-gray-300 mb-2">{notification.message}</p>
+                                    <p className="text-xs text-gray-400">
+                                      {new Date(notification.timestamp).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center space-x-1">
+                                    {!notification.read && (
+                                      <button
+                                        onClick={() => markNotificationAsRead(notification.id)}
+                                        className="text-xs text-blue-400 hover:text-blue-300"
+                                      >
+                                        Mark read
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={() => deleteNotification(notification.id)}
+                                      className="text-xs text-red-400 hover:text-red-300"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-4 text-center">
+                            <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-300">No notifications</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 <button
                   onClick={loadRealData}
                   className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-white/10 text-gray-300 rounded-lg sm:rounded-xl hover:bg-white/20 transition-all duration-300 shadow-md border border-white/20 backdrop-blur-sm text-xs sm:text-sm"
