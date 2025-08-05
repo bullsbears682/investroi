@@ -37,6 +37,9 @@ const AdminDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [showReplyForm, setShowReplyForm] = useState<string | null>(null);
 
   useEffect(() => {
     loadRealData();
@@ -315,10 +318,64 @@ const AdminDashboard: React.FC = () => {
 
   const handleQuickAction = (tabId: string) => {
     setActiveTab(tabId);
-    // Add a small delay for visual feedback
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 150);
+    }, 100);
+  };
+
+  const handleReply = (contactId: string) => {
+    setReplyingTo(contactId);
+    setShowReplyForm(contactId);
+    setReplyMessage('');
+  };
+
+  const handleSendReply = () => {
+    if (!replyMessage.trim() || !replyingTo) return;
+
+    // Find the contact being replied to
+    const contact = contacts.find(c => c.id === replyingTo);
+    if (!contact) return;
+
+    // Create reply object
+    const reply = {
+      id: Date.now().toString(),
+      contactId: replyingTo,
+      adminMessage: replyMessage.trim(),
+      timestamp: new Date().toISOString(),
+      status: 'sent'
+    };
+
+    // Store reply in localStorage
+    const replies = JSON.parse(localStorage.getItem('admin_replies') || '[]');
+    replies.push(reply);
+    localStorage.setItem('admin_replies', JSON.stringify(replies));
+
+    // Update contact status
+    const updatedContacts = contacts.map(c => 
+      c.id === replyingTo 
+        ? { ...c, status: 'replied', lastReply: new Date().toISOString() }
+        : c
+    );
+    setContacts(updatedContacts);
+
+    // Clear reply form
+    setReplyMessage('');
+    setShowReplyForm(null);
+    setReplyingTo(null);
+
+    // Show success message
+    console.log(`Reply sent to ${contact.name} (${contact.email}): ${replyMessage}`);
+  };
+
+  const handleCancelReply = () => {
+    setReplyMessage('');
+    setShowReplyForm(null);
+    setReplyingTo(null);
+  };
+
+  const getRepliesForContact = (contactId: string) => {
+    const replies = JSON.parse(localStorage.getItem('admin_replies') || '[]');
+    return replies.filter((reply: any) => reply.contactId === contactId);
   };
 
   const renderOverview = () => (
@@ -705,14 +762,74 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-3 sm:flex-col sm:space-y-2 sm:space-x-0">
-                    <button className="text-blue-400 hover:text-blue-300 text-xs sm:text-sm font-medium">Reply</button>
-                    <button className="text-red-400 hover:text-red-300 text-xs sm:text-sm font-medium">Delete</button>
+                    <button 
+                      onClick={() => handleReply(contact.id || `contact-${index}`)}
+                      className="text-blue-400 hover:text-blue-300 text-xs sm:text-sm font-medium transition-colors"
+                    >
+                      Reply
+                    </button>
+                    <button className="text-red-400 hover:text-red-300 text-xs sm:text-sm font-medium transition-colors">Delete</button>
                   </div>
                 </div>
                 <div className="mt-3 sm:mt-4 text-xs text-gray-500 flex items-center">
                   <Clock className="h-3 w-3 mr-1" />
                   {contact.timestamp ? new Date(contact.timestamp).toLocaleString() : 'Unknown date'}
                 </div>
+                
+                {/* Reply Form */}
+                {showReplyForm === (contact.id || `contact-${index}`) && (
+                  <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
+                    <div className="mb-3">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Reply to {contact.name || 'Contact'} ({contact.email || 'No email'})
+                      </label>
+                      <textarea
+                        value={replyMessage}
+                        onChange={(e) => setReplyMessage(e.target.value)}
+                        placeholder="Type your reply here..."
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm resize-none"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={handleSendReply}
+                        disabled={!replyMessage.trim()}
+                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      >
+                        Send Reply
+                      </button>
+                      <button
+                        onClick={handleCancelReply}
+                        className="px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 text-sm font-medium"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Show Previous Replies */}
+                {getRepliesForContact(contact.id || `contact-${index}`).length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h5 className="text-sm font-medium text-gray-300">Previous Replies:</h5>
+                    {getRepliesForContact(contact.id || `contact-${index}`).map((reply: any) => (
+                      <div key={reply.id} className="p-3 bg-green-500/10 rounded-lg border border-green-400/20">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm text-white">{reply.adminMessage}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {new Date(reply.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
+                            Sent
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
