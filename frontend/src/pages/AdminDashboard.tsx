@@ -157,6 +157,22 @@ const AdminDashboard: React.FC = () => {
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    // Smooth scroll to top of content
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleQuickAction = (tabId: string) => {
+    setActiveTab(tabId);
+    // Add a small delay for visual feedback
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 150);
+  };
+
   const renderOverview = () => (
     <div className="space-y-6 sm:space-y-8">
       {/* Hero Section */}
@@ -245,7 +261,10 @@ const AdminDashboard: React.FC = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-blue-400/30 shadow-xl transform hover:scale-105 transition-all duration-300">
+        <button 
+          onClick={() => handleQuickAction('users')}
+          className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-blue-400/30 shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer"
+        >
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="p-2 sm:p-3 bg-blue-500/30 rounded-lg sm:rounded-xl backdrop-blur-sm">
               <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-300" />
@@ -255,9 +274,12 @@ const AdminDashboard: React.FC = () => {
               <p className="text-blue-200 text-xs sm:text-sm">View and edit user accounts</p>
             </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-400/30 shadow-xl transform hover:scale-105 transition-all duration-300">
+        <button 
+          onClick={() => handleQuickAction('contacts')}
+          className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-400/30 shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer"
+        >
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="p-2 sm:p-3 bg-purple-500/30 rounded-lg sm:rounded-xl backdrop-blur-sm">
               <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-purple-300" />
@@ -267,9 +289,12 @@ const AdminDashboard: React.FC = () => {
               <p className="text-purple-200 text-xs sm:text-sm">Review and respond to messages</p>
             </div>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-green-400/30 shadow-xl transform hover:scale-105 transition-all duration-300">
+        <button 
+          onClick={() => handleQuickAction('analytics')}
+          className="bg-gradient-to-r from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-green-400/30 shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer"
+        >
           <div className="flex items-center space-x-3 sm:space-x-4">
             <div className="p-2 sm:p-3 bg-green-500/30 rounded-lg sm:rounded-xl backdrop-blur-sm">
               <BarChart className="h-5 w-5 sm:h-6 sm:w-6 text-green-300" />
@@ -279,7 +304,7 @@ const AdminDashboard: React.FC = () => {
               <p className="text-green-200 text-xs sm:text-sm">Check performance metrics</p>
             </div>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Recent Activity */}
@@ -772,7 +797,7 @@ const AdminDashboard: React.FC = () => {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleTabChange(tab.id)}
                     className={`flex items-center space-x-2 py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-300 min-w-fit ${
                       activeTab === tab.id
                         ? 'border-blue-400 text-blue-300'
