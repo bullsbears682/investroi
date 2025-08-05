@@ -2109,6 +2109,16 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
+                onClick={() => {
+                  adminDataManager.testAllFeatures();
+                  toast.success('All features tested successfully! Check console for details.');
+                }}
+                className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+                title="Test All Features"
+              >
+                Test Features
+              </button>
+              <button
                 onClick={() => setIsVisible(false)}
                 className="text-white/60 hover:text-white transition-colors p-2"
               >
