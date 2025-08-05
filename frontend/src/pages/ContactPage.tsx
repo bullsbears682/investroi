@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, MessageSquare, Globe } from 'lucide-react';
+import { contactStorage } from '../utils/contactStorage';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,15 +17,31 @@ const ContactPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Reset form
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setIsSubmitting(false);
-    
-    // Show success message (you can integrate with your notification system)
-    alert('Thank you for your message! We\'ll get back to you soon.');
+    try {
+      // Store the submission
+      const submission = contactStorage.addSubmission({
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
+      });
+      
+      // Simulate form submission delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Reset form
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setIsSubmitting(false);
+      
+      // Show success message
+      alert('Thank you for your message! We\'ll get back to you soon.');
+      
+      console.log('Contact submission stored:', submission);
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      setIsSubmitting(false);
+      alert('There was an error sending your message. Please try again.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

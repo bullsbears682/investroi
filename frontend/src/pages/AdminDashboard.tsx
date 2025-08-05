@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, 
@@ -14,13 +14,17 @@ import {
   DollarSign,
   Target,
   Menu,
-  X
+  X,
+  Mail
 } from 'lucide-react';
+import { contactStorage, ContactSubmission } from '../utils/contactStorage';
 
 const AdminDashboard: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
+  const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
 
   // Mock data for admin dashboard
   const stats = {
@@ -29,7 +33,9 @@ const AdminDashboard: React.FC = () => {
     totalCalculations: 3456,
     totalExports: 1234,
     revenue: 45600,
-    growthRate: 23.5
+    growthRate: 23.5,
+    totalContacts: contactSubmissions.length,
+    newContacts: contactSubmissions.filter(s => s.status === 'new').length
   };
 
   const recentActivity = [
@@ -93,10 +99,32 @@ const AdminDashboard: React.FC = () => {
   const tabs = [
     { id: 'overview', name: 'Overview', icon: BarChart3 },
     { id: 'analytics', name: 'Analytics', icon: TrendingUp },
-    { id: 'users', name: 'Users', icon: Users },
-    { id: 'system', name: 'System', icon: Settings },
-    { id: 'logs', name: 'Logs', icon: FileText }
+    { id: 'contacts', name: 'Contacts', icon: Mail },
+    { id: 'system', name: 'System', icon: Settings }
   ];
+
+  // Load contact submissions
+  useEffect(() => {
+    if (isVisible) {
+      const submissions = contactStorage.getSubmissions();
+      setContactSubmissions(submissions);
+    }
+  }, [isVisible]);
+
+  // Update submission status
+  const updateSubmissionStatus = (id: string, status: ContactSubmission['status']) => {
+    contactStorage.updateSubmissionStatus(id, status);
+    const submissions = contactStorage.getSubmissions();
+    setContactSubmissions(submissions);
+  };
+
+  // Delete submission
+  const deleteSubmission = (id: string) => {
+    contactStorage.deleteSubmission(id);
+    const submissions = contactStorage.getSubmissions();
+    setContactSubmissions(submissions);
+    setSelectedSubmission(null);
+  };
 
   const renderOverview = () => (
     <div className="space-y-4 sm:space-y-6">
@@ -158,6 +186,22 @@ const AdminDashboard: React.FC = () => {
               <p className="text-lg sm:text-2xl font-bold text-white">${stats.revenue.toLocaleString()}</p>
             </div>
             <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-xs sm:text-sm">Contact Submissions</p>
+              <p className="text-lg sm:text-2xl font-bold text-white">{stats.totalContacts}</p>
+              <p className="text-green-400 text-xs">+{stats.newContacts} new</p>
+            </div>
+            <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
           </div>
         </motion.div>
       </div>
@@ -249,6 +293,131 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
+  const renderContacts = () => (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Contact Submissions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg sm:text-xl font-semibold text-white">Contact Submissions</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">Total: {contactSubmissions.length}</span>
+            <span className="text-green-400 text-sm">New: {contactSubmissions.filter(s => s.status === 'new').length}</span>
+          </div>
+        </div>
+        
+        {contactSubmissions.length === 0 ? (
+          <div className="text-center py-8">
+            <Mail className="w-12 h-12 text-white/40 mx-auto mb-4" />
+            <p className="text-white/60">No contact submissions yet</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {contactSubmissions.map((submission) => (
+              <div
+                key={submission.id}
+                className={`p-3 bg-white/5 rounded-lg cursor-pointer transition-all hover:bg-white/10 ${
+                  selectedSubmission?.id === submission.id ? 'bg-blue-500/20 border border-blue-500/30' : ''
+                }`}
+                onClick={() => setSelectedSubmission(submission)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 min-w-0 flex-1">
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      submission.status === 'new' ? 'bg-green-400' : 
+                      submission.status === 'read' ? 'bg-yellow-400' : 'bg-blue-400'
+                    }`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white font-medium text-sm sm:text-base truncate">
+                        {submission.name} • {submission.subject}
+                      </p>
+                      <p className="text-white/60 text-xs sm:text-sm truncate">
+                        {submission.email} • {new Date(submission.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      submission.status === 'new' ? 'bg-green-500/20 text-green-400' :
+                      submission.status === 'read' ? 'bg-yellow-500/20 text-yellow-400' :
+                      'bg-blue-500/20 text-blue-400'
+                    }`}>
+                      {submission.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Selected Submission Details */}
+      {selectedSubmission && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">Submission Details</h3>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => updateSubmissionStatus(selectedSubmission.id, 'read')}
+                className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full hover:bg-yellow-500/30"
+              >
+                Mark Read
+              </button>
+              <button
+                onClick={() => updateSubmissionStatus(selectedSubmission.id, 'replied')}
+                className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full hover:bg-blue-500/30"
+              >
+                Mark Replied
+              </button>
+              <button
+                onClick={() => deleteSubmission(selectedSubmission.id)}
+                className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full hover:bg-red-500/30"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Name</p>
+                <p className="text-white font-medium">{selectedSubmission.name}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Email</p>
+                <p className="text-white font-medium">{selectedSubmission.email}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Subject</p>
+                <p className="text-white font-medium">{selectedSubmission.subject}</p>
+              </div>
+              <div>
+                <p className="text-white/60 text-xs sm:text-sm">Date</p>
+                <p className="text-white font-medium">{new Date(selectedSubmission.timestamp).toLocaleString()}</p>
+              </div>
+            </div>
+            
+            <div>
+              <p className="text-white/60 text-xs sm:text-sm mb-2">Message</p>
+              <div className="bg-white/5 rounded-lg p-3">
+                <p className="text-white text-sm sm:text-base whitespace-pre-wrap">{selectedSubmission.message}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+
   const renderSystem = () => (
     <div className="space-y-4 sm:space-y-6">
       {/* System Health */}
@@ -323,6 +492,8 @@ const AdminDashboard: React.FC = () => {
         return renderOverview();
       case 'analytics':
         return renderAnalytics();
+      case 'contacts':
+        return renderContacts();
       case 'system':
         return renderSystem();
       default:
