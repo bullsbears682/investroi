@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { contactStorage } from '../utils/contactStorage';
+import { chatSystem } from '../utils/chatSystem';
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -100,8 +101,28 @@ const AdminDashboard: React.FC = () => {
       const contactData = contactStorage.getSubmissions();
       console.log('Loaded contacts:', contactData);
       
+      // Load chat messages and convert them to contact format
+      const chatSessions = chatSystem.getAllSessions();
+      const chatMessages = chatSessions.map(session => {
+        const messages = chatSystem.getSessionMessages(session.id);
+        const firstMessage = messages.find(msg => !msg.isAdmin);
+        return {
+          id: session.id,
+          name: session.userName,
+          email: session.userEmail,
+          subject: 'Live Chat Message',
+          message: firstMessage ? firstMessage.message : 'Started a chat session',
+          timestamp: session.createdAt,
+          status: session.status === 'active' ? 'read' : session.status === 'waiting' ? 'new' : 'replied'
+        };
+      });
+      
+      // Combine regular contacts and chat messages
+      const allContacts = [...contactData, ...chatMessages];
+      console.log('All contacts including chat:', allContacts);
+      
       // If no contacts exist, create some sample data
-      if (!contactData || contactData.length === 0) {
+      if (!allContacts || allContacts.length === 0) {
         console.log('No contacts found, creating sample data...');
         // Create sample contacts
         contactStorage.addSubmission({
@@ -125,10 +146,24 @@ const AdminDashboard: React.FC = () => {
         
         // Reload the data
         const updatedContactData = contactStorage.getSubmissions();
-        setContacts(updatedContactData || []);
-        console.log('Sample contacts created:', updatedContactData);
+        const updatedChatMessages = chatSystem.getAllSessions().map(session => {
+          const messages = chatSystem.getSessionMessages(session.id);
+          const firstMessage = messages.find(msg => !msg.isAdmin);
+          return {
+            id: session.id,
+            name: session.userName,
+            email: session.userEmail,
+            subject: 'Live Chat Message',
+            message: firstMessage ? firstMessage.message : 'Started a chat session',
+            timestamp: session.createdAt,
+            status: session.status === 'active' ? 'read' : session.status === 'waiting' ? 'new' : 'replied'
+          };
+        });
+        const updatedAllContacts = [...updatedContactData, ...updatedChatMessages];
+        setContacts(updatedAllContacts || []);
+        console.log('Sample contacts created:', updatedAllContacts);
       } else {
-        setContacts(contactData || []);
+        setContacts(allContacts || []);
       }
 
       setIsLoading(false);
@@ -533,10 +568,17 @@ const AdminDashboard: React.FC = () => {
                           <h4 className="text-sm font-semibold text-white truncate">
                             {contact.name || `Contact ${index + 1}`}
                           </h4>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                            <Star className="h-3 w-3 mr-1" />
-                            New
-                          </span>
+                          {contact.subject === 'Live Chat Message' ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
+                              <MessageSquare className="h-3 w-3 mr-1" />
+                              Live Chat
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                              <Star className="h-3 w-3 mr-1" />
+                              Contact Form
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs sm:text-sm text-gray-400 truncate">
                           {contact.email || 'No email provided'}
