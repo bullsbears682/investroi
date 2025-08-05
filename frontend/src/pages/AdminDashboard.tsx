@@ -15,15 +15,13 @@ import {
   Target,
   Menu,
   X,
-  Mail,
-  MessageSquare
+  Mail
 } from 'lucide-react';
 import { contactStorage, ContactSubmission } from '../utils/contactStorage';
 import { adminDataManager, AdminStats } from '../utils/adminData';
 import { userManager, User } from '../utils/userManagement';
 
 import { toast } from 'react-hot-toast';
-import AdminChat from '../components/AdminChat';
 
 const AdminDashboard: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,7 +33,6 @@ const AdminDashboard: React.FC = () => {
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showChat, setShowChat] = useState(false);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -892,13 +889,6 @@ const AdminDashboard: React.FC = () => {
                 <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <span className="text-white/60 text-xs sm:text-sm hidden sm:block">Admin Mode</span>
-              <button
-                onClick={() => setShowChat(true)}
-                className="text-white/60 hover:text-white transition-colors p-2"
-                title="Chat Conversations"
-              >
-                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
             </div>
           </div>
         </div>
@@ -982,11 +972,6 @@ const AdminDashboard: React.FC = () => {
       {/* Metric Modal */}
       {renderMetricModal()}
 
-      {/* Admin Chat */}
-      <AdminChat 
-        isOpen={showChat} 
-        onClose={() => setShowChat(false)} 
-      />
     </div>
   );
 };
