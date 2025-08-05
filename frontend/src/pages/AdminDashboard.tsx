@@ -30,20 +30,106 @@ const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
 
   useEffect(() => {
     loadRealData();
   }, []);
 
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredUsers(users);
+    } else {
+      const filtered = users.filter(user => 
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    }
+  }, [users, searchTerm]);
+
+  const handleDeleteUser = (userId: string) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      const updatedUsers = users.filter(user => user.id !== userId);
+      setUsers(updatedUsers);
+      setFilteredUsers(filteredUsers.filter(user => user.id !== userId));
+      // In a real app, you would also delete from localStorage here
+      console.log('User deleted:', userId);
+    }
+  };
+
+  const handleAddUser = () => {
+    const newUser = {
+      id: Date.now().toString(),
+      name: `New User ${users.length + 1}`,
+      email: `user${users.length + 1}@example.com`,
+      createdAt: new Date().toISOString(),
+      isActive: true
+    };
+    setUsers([...users, newUser]);
+    setFilteredUsers([...filteredUsers, newUser]);
+    console.log('New user added:', newUser);
+  };
+
   const loadRealData = () => {
     try {
       // Load real user data
       const userData = userManager.getAllUsers();
-      setUsers(userData || []);
+      console.log('Loaded users:', userData);
+      
+      // If no users exist, create some sample data for demonstration
+      if (!userData || userData.length === 0) {
+        console.log('No users found, creating sample data...');
+        // Create sample users
+        userManager.registerUser('john@example.com', 'John Smith', 'USA');
+        userManager.registerUser('sarah@example.com', 'Sarah Johnson', 'Canada');
+        userManager.registerUser('mike@example.com', 'Mike Wilson', 'UK');
+        userManager.registerUser('emma@example.com', 'Emma Davis', 'Australia');
+        userManager.registerUser('alex@example.com', 'Alex Brown', 'Germany');
+        
+        // Reload the data
+        const updatedUserData = userManager.getAllUsers();
+        setUsers(updatedUserData || []);
+        console.log('Sample users created:', updatedUserData);
+      } else {
+        setUsers(userData || []);
+      }
 
       // Load real contact data using the correct method
       const contactData = contactStorage.getSubmissions();
-      setContacts(contactData || []);
+      console.log('Loaded contacts:', contactData);
+      
+      // If no contacts exist, create some sample data
+      if (!contactData || contactData.length === 0) {
+        console.log('No contacts found, creating sample data...');
+        // Create sample contacts
+        contactStorage.addSubmission({
+          name: 'Alice Cooper',
+          email: 'alice@example.com',
+          subject: 'Investment Question',
+          message: 'I have a question about ROI calculations for my business.'
+        });
+        contactStorage.addSubmission({
+          name: 'Bob Miller',
+          email: 'bob@example.com',
+          subject: 'Feature Request',
+          message: 'Would love to see more investment scenarios added to the platform.'
+        });
+        contactStorage.addSubmission({
+          name: 'Carol White',
+          email: 'carol@example.com',
+          subject: 'Technical Support',
+          message: 'Having trouble with the calculator export feature.'
+        });
+        
+        // Reload the data
+        const updatedContactData = contactStorage.getSubmissions();
+        setContacts(updatedContactData || []);
+        console.log('Sample contacts created:', updatedContactData);
+      } else {
+        setContacts(contactData || []);
+      }
 
       setIsLoading(false);
     } catch (error) {
@@ -256,24 +342,29 @@ const AdminDashboard: React.FC = () => {
             </div>
             <h3 className="text-xl font-bold text-white">Users Management</h3>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm"
-              />
+                      <div className="flex items-center space-x-3">
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm"
+                />
+              </div>
+              <button 
+                onClick={handleAddUser}
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Add User</span>
+              </button>
             </div>
-            <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg">
-              <Plus className="h-4 w-4" />
-              <span>Add User</span>
-            </button>
-          </div>
         </div>
       </div>
       <div className="p-6">
-        {users.length > 0 ? (
+        {filteredUsers.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-white/20">
               <thead className="bg-white/5">
@@ -286,8 +377,8 @@ const AdminDashboard: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
-                {users.map((user, index) => (
-                  <tr key={index} className="hover:bg-white/5 transition-colors">
+                {filteredUsers.map((user, index) => (
+                  <tr key={user.id || index} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
@@ -314,7 +405,12 @@ const AdminDashboard: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button className="text-blue-400 hover:text-blue-300 mr-3 transition-colors">Edit</button>
-                      <button className="text-red-400 hover:text-red-300 transition-colors">Delete</button>
+                      <button 
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
