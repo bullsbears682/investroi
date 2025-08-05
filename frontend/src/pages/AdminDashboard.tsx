@@ -44,6 +44,9 @@ const AdminDashboard: React.FC = () => {
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
     if (isVisible) {
+      // Initialize sample data if needed
+      adminDataManager.initializeSampleData();
+      
       const stats = adminDataManager.getAdminStats();
       const submissions = contactStorage.getSubmissions();
       const allUsers = userManager.getAllUsers();
@@ -186,13 +189,28 @@ const AdminDashboard: React.FC = () => {
 
   const handleDownloadReport = (report: Report) => {
     if (report.downloadUrl) {
-      const link = document.createElement('a');
-      link.href = report.downloadUrl;
-      link.download = `${report.name}.${report.format.toLowerCase()}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success('Report downloaded successfully!');
+      try {
+        const link = document.createElement('a');
+        link.href = report.downloadUrl;
+        
+        // Set proper filename with correct extension
+        let extension = report.format.toLowerCase();
+        if (report.format === 'Excel') {
+          extension = 'csv'; // Excel format creates CSV content
+        }
+        
+        link.download = `${report.name.replace(/[^a-zA-Z0-9\s-]/g, '')}.${extension}`;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast.success(`Report "${report.name}" downloaded successfully!`);
+      } catch (error) {
+        console.error('Download error:', error);
+        toast.error('Failed to download report. Please try again.');
+      }
     } else {
       toast.error('Download URL not available');
     }
