@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, 
@@ -46,169 +46,7 @@ const AdminDashboard: React.FC = () => {
   const [systemActionLoading, setSystemActionLoading] = useState<string | null>(null);
   const [showLogout, setShowLogout] = useState(false);
 
-  // Enhanced data loading with better error handling and real-time updates
-  const loadDashboardData = useCallback(() => {
-    try {
-      console.log('Loading dashboard data...');
-      
-      // Initialize sample data if needed
-      adminDataManager.initializeSampleData();
-      console.log('Sample data initialized');
-      
-      const stats = adminDataManager.getAdminStats();
-      console.log('Admin stats loaded:', stats);
-      
-      const submissions = contactStorage.getSubmissions();
-      console.log('Contact submissions loaded:', submissions.length);
-      
-      const allUsers = userManager.getAllUsers();
-      console.log('Users loaded:', allUsers.length);
-      
-      const allReports = adminDataManager.getReports();
-      console.log('Reports loaded:', allReports.length);
-      
-      const allNotifications = adminDataManager.getNotifications();
-      console.log('Notifications loaded:', allNotifications.length);
-      
-      const allNotificationSettings = adminDataManager.getNotificationSettings();
-      console.log('Notification settings loaded:', allNotificationSettings.length);
-      
-      const allSystemSettings = adminDataManager.getSystemSettings();
-      console.log('System settings loaded:', allSystemSettings.length);
-      
-      const health = adminDataManager.getSystemHealth();
-      console.log('System health loaded:', health);
-      
-      // Update stats with contact data
-      stats.totalContacts = submissions.length;
-      stats.newContacts = submissions.filter(s => s.status === 'new').length;
-      
-      setAdminStats(stats);
-      setContactSubmissions(submissions);
-      setUsers(allUsers);
-      setReports(allReports);
-      setNotifications(allNotifications);
-      setNotificationSettings(allNotificationSettings);
-      setSystemSettings(allSystemSettings);
-      setSystemHealth(health);
-      setLastActivityCheck(new Date());
 
-      // Create welcome notification if this is the first time
-      const existingNotifications = adminDataManager.getNotifications();
-      if (existingNotifications.length === 0) {
-        adminDataManager.createNotification(
-          'system',
-          'Admin dashboard accessed successfully. All systems are operational.',
-          'low'
-        );
-      }
-
-      // Create notifications for new users (if any)
-      const newUsers = allUsers.filter(user => {
-        const userCreated = new Date(user.registrationDate);
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-        return userCreated > oneHourAgo;
-      });
-
-      if (newUsers.length > 0) {
-        adminDataManager.createNotification(
-          'user',
-          `${newUsers.length} new user${newUsers.length > 1 ? 's' : ''} registered in the last hour`,
-          'medium'
-        );
-      }
-
-      // Start real-time monitoring
-      adminDataManager.startRealTimeMonitoring();
-
-      // Set up real-time updates listener
-      if (typeof window !== 'undefined' && window.BroadcastChannel) {
-        const channel = new BroadcastChannel('admin_realtime');
-        channel.onmessage = (event) => {
-          const { type, data } = event.data;
-          
-          switch (type) {
-            case 'metrics_update':
-              setAdminStats(data.stats);
-              setSystemHealth(data.systemHealth);
-              setNotifications(data.notifications);
-              setLastActivityCheck(new Date());
-              break;
-            case 'report_progress':
-              // Update specific report progress
-              setReports(prev => prev.map(report => 
-                report.id === data.reportId 
-                  ? { ...report, status: 'generating' as const }
-                  : report
-              ));
-              break;
-            case 'report_completed':
-              // Update reports list with completed report
-              setReports(prev => {
-                const updated = prev.map(report => 
-                  report.id === data.report.id ? data.report : report
-                );
-                return updated;
-              });
-              setGeneratingReport(null);
-              break;
-            case 'notification_created':
-              // Add new notification to list
-              setNotifications(prev => [data.notification, ...prev.slice(0, 99)]);
-              break;
-            case 'setting_updated':
-              // Update system settings
-              setSystemSettings(prev => prev.map(setting => 
-                setting.id === data.settingId 
-                  ? { ...setting, value: data.value }
-                  : setting
-              ));
-              break;
-            case 'notification_setting_updated':
-              // Update notification settings
-              setNotificationSettings(prev => prev.map(setting => 
-                setting.id === data.settingId 
-                  ? { ...setting, enabled: data.enabled }
-                  : setting
-              ));
-              break;
-          }
-        };
-
-        // Cleanup function
-        return () => {
-          channel.close();
-          adminDataManager.stopRealTimeMonitoring();
-        };
-      }
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-      toast.error(`Failed to load dashboard data: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      
-      // Set default data to prevent complete failure
-      setAdminStats({
-        totalUsers: 0,
-        activeUsers: 0,
-        totalCalculations: 0,
-        totalExports: 0,
-        revenue: 0,
-        growthRate: 0,
-        totalContacts: 0,
-        newContacts: 0,
-        popularScenarios: [],
-        exportStats: [],
-        recentActivity: [],
-        systemHealth: {
-          apiStatus: 'error',
-          databaseStatus: 'error',
-          cacheStatus: 'error',
-          uptime: '0 days',
-          lastBackup: 'Never',
-          activeConnections: 0
-        }
-      });
-    }
-  }, []);
 
   // Enhanced report generation with real-time progress
   const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
@@ -2015,8 +1853,172 @@ const AdminDashboard: React.FC = () => {
 
   // Load admin stats when dashboard mounts
   useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+    // Prevent infinite re-renders by not including loadDashboardData in deps
+    const initializeDashboard = () => {
+      try {
+        console.log('Loading dashboard data...');
+        
+        // Initialize sample data if needed
+        adminDataManager.initializeSampleData();
+        console.log('Sample data initialized');
+        
+        const stats = adminDataManager.getAdminStats();
+        console.log('Admin stats loaded:', stats);
+        
+        const submissions = contactStorage.getSubmissions();
+        console.log('Contact submissions loaded:', submissions.length);
+        
+        const allUsers = userManager.getAllUsers();
+        console.log('Users loaded:', allUsers.length);
+        
+        const allReports = adminDataManager.getReports();
+        console.log('Reports loaded:', allReports.length);
+        
+        const allNotifications = adminDataManager.getNotifications();
+        console.log('Notifications loaded:', allNotifications.length);
+        
+        const allNotificationSettings = adminDataManager.getNotificationSettings();
+        console.log('Notification settings loaded:', allNotificationSettings.length);
+        
+        const allSystemSettings = adminDataManager.getSystemSettings();
+        console.log('System settings loaded:', allSystemSettings.length);
+        
+        const health = adminDataManager.getSystemHealth();
+        console.log('System health loaded:', health);
+        
+        // Update stats with contact data
+        stats.totalContacts = submissions.length;
+        stats.newContacts = submissions.filter(s => s.status === 'new').length;
+        
+        setAdminStats(stats);
+        setContactSubmissions(submissions);
+        setUsers(allUsers);
+        setReports(allReports);
+        setNotifications(allNotifications);
+        setNotificationSettings(allNotificationSettings);
+        setSystemSettings(allSystemSettings);
+        setSystemHealth(health);
+        setLastActivityCheck(new Date());
+
+        // Create welcome notification if this is the first time
+        const existingNotifications = adminDataManager.getNotifications();
+        if (existingNotifications.length === 0) {
+          adminDataManager.createNotification(
+            'system',
+            'Admin dashboard accessed successfully. All systems are operational.',
+            'low'
+          );
+        }
+
+        // Create notifications for new users (if any)
+        const newUsers = allUsers.filter(user => {
+          const userCreated = new Date(user.registrationDate);
+          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+          return userCreated > oneHourAgo;
+        });
+
+        if (newUsers.length > 0) {
+          adminDataManager.createNotification(
+            'user',
+            `${newUsers.length} new user${newUsers.length > 1 ? 's' : ''} registered in the last hour`,
+            'medium'
+          );
+        }
+
+        // Start real-time monitoring
+        adminDataManager.startRealTimeMonitoring();
+
+        // Set up real-time updates listener
+        if (typeof window !== 'undefined' && window.BroadcastChannel) {
+          const channel = new BroadcastChannel('admin_realtime');
+          channel.onmessage = (event) => {
+            const { type, data } = event.data;
+            
+            switch (type) {
+              case 'metrics_update':
+                setAdminStats(data.stats);
+                setSystemHealth(data.systemHealth);
+                setNotifications(data.notifications);
+                setLastActivityCheck(new Date());
+                break;
+              case 'report_progress':
+                // Update specific report progress
+                setReports(prev => prev.map(report => 
+                  report.id === data.reportId 
+                    ? { ...report, status: 'generating' as const }
+                    : report
+                ));
+                break;
+              case 'report_completed':
+                // Update reports list with completed report
+                setReports(prev => {
+                  const updated = prev.map(report => 
+                    report.id === data.report.id ? data.report : report
+                  );
+                  return updated;
+                });
+                setGeneratingReport(null);
+                break;
+              case 'notification_created':
+                // Add new notification to list
+                setNotifications(prev => [data.notification, ...prev.slice(0, 99)]);
+                break;
+              case 'setting_updated':
+                // Update system settings
+                setSystemSettings(prev => prev.map(setting => 
+                  setting.id === data.settingId 
+                    ? { ...setting, value: data.value }
+                    : setting
+                ));
+                break;
+              case 'notification_setting_updated':
+                // Update notification settings
+                setNotificationSettings(prev => prev.map(setting => 
+                  setting.id === data.settingId 
+                    ? { ...setting, enabled: data.enabled }
+                    : setting
+                ));
+                break;
+            }
+          };
+
+          // Cleanup function
+          return () => {
+            channel.close();
+            adminDataManager.stopRealTimeMonitoring();
+          };
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        toast.error(`Failed to load dashboard data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        
+        // Set default data to prevent complete failure
+        setAdminStats({
+          totalUsers: 0,
+          activeUsers: 0,
+          totalCalculations: 0,
+          totalExports: 0,
+          revenue: 0,
+          growthRate: 0,
+          totalContacts: 0,
+          newContacts: 0,
+          popularScenarios: [],
+          exportStats: [],
+          recentActivity: [],
+          systemHealth: {
+            apiStatus: 'error',
+            databaseStatus: 'error',
+            cacheStatus: 'error',
+            uptime: '0 days',
+            lastBackup: 'Never',
+            activeConnections: 0
+          }
+        });
+      }
+    };
+
+    initializeDashboard();
+  }, []); // Empty dependency array to prevent infinite loops
 
   // Cleanup on unmount
   useEffect(() => {
@@ -2091,7 +2093,7 @@ const AdminDashboard: React.FC = () => {
       console.log('✅ Data management tested', { stats, health });
       
       // Refresh all data
-      loadDashboardData();
+      // Data loading is now handled in useEffect
       
       toast.success('🎉 Comprehensive test completed successfully! All systems operational.', { id: testToast });
       
