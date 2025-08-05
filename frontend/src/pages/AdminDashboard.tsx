@@ -342,20 +342,63 @@ const AdminDashboard: React.FC = () => {
     setSelectedSubmission(null);
   };
 
-  // Report handlers
+  // Real-time monitoring effect
+  useEffect(() => {
+    if (realTimeUpdates && isVisible) {
+      adminDataManager.startRealTimeMonitoring();
+      
+      // Set up automatic refresh of dashboard data
+      const refreshInterval = setInterval(() => {
+        if (isVisible) {
+          // Refresh all data
+          const stats = adminDataManager.getAdminStats();
+          const submissions = contactStorage.getSubmissions();
+          const allUsers = userManager.getAllUsers();
+          const allReports = adminDataManager.getReports();
+          const allNotifications = adminDataManager.getNotifications();
+          const allNotificationSettings = adminDataManager.getNotificationSettings();
+          const allSystemSettings = adminDataManager.getSystemSettings();
+          const health = adminDataManager.getSystemHealth();
+          
+          // Update stats with contact data
+          stats.totalContacts = submissions.length;
+          stats.newContacts = submissions.filter(s => s.status === 'new').length;
+          
+          setAdminStats(stats);
+          setContactSubmissions(submissions);
+          setUsers(allUsers);
+          setReports(allReports);
+          setNotifications(allNotifications);
+          setNotificationSettings(allNotificationSettings);
+          setSystemSettings(allSystemSettings);
+          setSystemHealth(health);
+          setLastActivityCheck(new Date());
+        }
+      }, 30000); // Refresh every 30 seconds
+      
+      return () => {
+        adminDataManager.stopRealTimeMonitoring();
+        clearInterval(refreshInterval);
+      };
+    } else {
+      adminDataManager.stopRealTimeMonitoring();
+    }
+  }, [realTimeUpdates, isVisible]);
+
+  // Enhanced report generation with better error handling and progress tracking
   const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
     setGeneratingReport(type);
     
-    // Show progress toast
-    const progressToast = toast.loading(`Generating ${type} report...`);
+    // Show progress toast with more detailed status
+    const progressToast = toast.loading(`Generating ${type} report in ${format} format...`);
     
     try {
       const report = await adminDataManager.generateReport(type, format);
       const updatedReports = adminDataManager.getReports();
       setReports(updatedReports);
       
-      // Update progress toast to success
-      toast.success(`Report "${report.name}" generated successfully!`, {
+      // Update progress toast to success with more details
+      toast.success(`Report "${report.name}" (${report.size}) generated successfully!`, {
         id: progressToast
       });
       
@@ -366,9 +409,15 @@ const AdminDashboard: React.FC = () => {
         'medium'
       );
       
+      // Auto-refresh reports list
+      setTimeout(() => {
+        const freshReports = adminDataManager.getReports();
+        setReports(freshReports);
+      }, 1000);
+      
     } catch (error) {
-      // Update progress toast to error
-      toast.error(`Failed to generate report: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+      // Update progress toast to error with more details
+      toast.error(`Failed to generate ${type} report: ${error instanceof Error ? error.message : 'Unknown error'}`, {
         id: progressToast
       });
       
@@ -383,26 +432,33 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Enhanced download with better error handling and file validation
   const handleDownloadReport = (report: Report) => {
     if (!report.downloadUrl) {
-      toast.error('Download URL not available');
+      toast.error('Download URL not available for this report');
+      return;
+    }
+
+    if (report.status !== 'completed') {
+      toast.error('Report is not ready for download yet');
       return;
     }
 
     try {
-      // Show download progress
-      const downloadToast = toast.loading(`Downloading ${report.name}...`);
+      // Show download progress with more details
+      const downloadToast = toast.loading(`Downloading ${report.name} (${report.size})...`);
       
       const link = document.createElement('a');
       link.href = report.downloadUrl;
       
-      // Set proper filename with correct extension
+      // Set proper filename with correct extension and timestamp
       let extension = report.format.toLowerCase();
       if (report.format === 'Excel') {
         extension = 'csv'; // Excel format creates CSV content
       }
       
-      const filename = `${report.name.replace(/[^a-zA-Z0-9\s-]/g, '')}.${extension}`;
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `${report.name.replace(/[^a-zA-Z0-9\s-]/g, '')}_${timestamp}.${extension}`;
       link.download = filename;
       link.style.display = 'none';
       
@@ -410,8 +466,8 @@ const AdminDashboard: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       
-      // Update toast to success
-      toast.success(`Report "${report.name}" downloaded successfully!`, {
+      // Update toast to success with file info
+      toast.success(`Report "${report.name}" (${report.size}) downloaded successfully!`, {
         id: downloadToast
       });
       
@@ -537,19 +593,33 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // System action handlers
+  // Enhanced system actions with better feedback and validation
   const handleClearCache = async () => {
     setSystemActionLoading('cache');
+    
+    // Show detailed progress
+    const progressToast = toast.loading('Clearing system cache...');
+    
     try {
       await adminDataManager.clearCache();
-      toast.success('Cache cleared successfully!');
+      
+      // Update toast with success
+      toast.success('Cache cleared successfully - system performance improved!', {
+        id: progressToast
+      });
       
       // Refresh system health
       const health = adminDataManager.getSystemHealth();
       setSystemHealth(health);
       setLastActivityCheck(new Date());
+      
+      // Create notification
+      adminDataManager.createNotification('system', 'System cache cleared successfully', 'low');
+      
     } catch (error) {
-      toast.error(`Failed to clear cache: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Failed to clear cache: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
     } finally {
       setSystemActionLoading(null);
     }
@@ -557,16 +627,30 @@ const AdminDashboard: React.FC = () => {
 
   const handleBackupData = async () => {
     setSystemActionLoading('backup');
+    
+    // Show detailed progress
+    const progressToast = toast.loading('Creating data backup...');
+    
     try {
       await adminDataManager.backupData();
-      toast.success('Data backup completed successfully!');
+      
+      // Update toast with success
+      toast.success('Data backup completed successfully!', {
+        id: progressToast
+      });
       
       // Refresh system health
       const health = adminDataManager.getSystemHealth();
       setSystemHealth(health);
       setLastActivityCheck(new Date());
+      
+      // Create notification
+      adminDataManager.createNotification('system', 'Data backup completed successfully', 'low');
+      
     } catch (error) {
-      toast.error(`Failed to backup data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Failed to backup data: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
     } finally {
       setSystemActionLoading(null);
     }
@@ -574,51 +658,34 @@ const AdminDashboard: React.FC = () => {
 
   const handleRestartServices = async () => {
     setSystemActionLoading('restart');
+    
+    // Show detailed progress
+    const progressToast = toast.loading('Restarting system services...');
+    
     try {
       await adminDataManager.restartServices();
-      toast.success('Services restarted successfully!');
+      
+      // Update toast with success
+      toast.success('Services restarted successfully - all systems operational!', {
+        id: progressToast
+      });
       
       // Refresh system health
       const health = adminDataManager.getSystemHealth();
       setSystemHealth(health);
       setLastActivityCheck(new Date());
+      
+      // Create notification
+      adminDataManager.createNotification('system', 'Services restarted successfully', 'medium');
+      
     } catch (error) {
-      toast.error(`Failed to restart services: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Failed to restart services: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
     } finally {
       setSystemActionLoading(null);
     }
   };
-
-  // Real-time monitoring effect
-  useEffect(() => {
-    if (realTimeUpdates && isVisible) {
-      adminDataManager.startRealTimeMonitoring();
-      
-      return () => {
-        adminDataManager.stopRealTimeMonitoring();
-      };
-    } else {
-      adminDataManager.stopRealTimeMonitoring();
-    }
-  }, [realTimeUpdates, isVisible]);
-
-  // Auto-refresh notifications and reports when real-time updates are enabled
-  useEffect(() => {
-    if (!realTimeUpdates || !isVisible) return;
-
-    const interval = setInterval(() => {
-      const updatedNotifications = adminDataManager.getNotifications();
-      const updatedReports = adminDataManager.getReports();
-      const updatedHealth = adminDataManager.getSystemHealth();
-      
-      setNotifications(updatedNotifications);
-      setReports(updatedReports);
-      setSystemHealth(updatedHealth);
-      setLastActivityCheck(new Date());
-    }, 30000); // Refresh every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [realTimeUpdates, isVisible]);
 
   const renderMetricModal = () => {
     if (!selectedMetric) return null;
@@ -1239,7 +1306,15 @@ const AdminDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Generate Reports */}
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Generate Reports</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Generate Reports</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">
+              {reports.filter(r => r.status === 'generating').length} generating
+            </span>
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { type: 'user' as const, name: 'User Analytics', icon: Users, color: 'text-blue-400' },
@@ -1249,14 +1324,17 @@ const AdminDashboard: React.FC = () => {
             { type: 'system' as const, name: 'System Health', icon: Activity, color: 'text-red-400' },
             { type: 'revenue' as const, name: 'Revenue Reports', icon: DollarSign, color: 'text-yellow-400' }
           ].map(({ type, name, icon: Icon, color }) => (
-            <div key={type} className="bg-white/5 rounded-lg p-4">
+            <div key={type} className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                   <Icon className={`w-5 h-5 ${color}`} />
                   <span className="text-white font-medium">{name}</span>
                 </div>
                 {generatingReport === type && (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span className="text-white/60 text-xs">Generating...</span>
+                  </div>
                 )}
               </div>
               <div className="space-y-2">
@@ -1265,9 +1343,12 @@ const AdminDashboard: React.FC = () => {
                     key={format}
                     onClick={() => handleGenerateReport(type, format as any)}
                     disabled={generatingReport === type}
-                    className="w-full text-left px-3 py-2 text-sm bg-white/10 hover:bg-white/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full text-left px-3 py-2 text-sm bg-white/10 hover:bg-white/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between"
                   >
-                    Generate {format}
+                    <span>Generate {format}</span>
+                    <span className="text-white/40 text-xs">
+                      {reports.filter(r => r.type === type && r.format === format).length} generated
+                    </span>
                   </button>
                 ))}
               </div>
@@ -1280,41 +1361,75 @@ const AdminDashboard: React.FC = () => {
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">Recent Reports</h3>
-          <span className="text-white/60 text-sm">{reports.length} reports</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">{reports.length} reports</span>
+            <button
+              onClick={() => {
+                const freshReports = adminDataManager.getReports();
+                setReports(freshReports);
+                toast.success('Reports refreshed');
+              }}
+              className="px-2 py-1 text-xs bg-white/10 text-white/60 rounded hover:bg-white/20 transition-colors"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
         <div className="space-y-3">
           {reports.length === 0 ? (
-            <p className="text-white/60 text-center py-8">No reports generated yet</p>
+            <div className="text-center py-8">
+              <FileText className="w-12 h-12 text-white/20 mx-auto mb-3" />
+              <p className="text-white/60">No reports generated yet</p>
+              <p className="text-white/40 text-sm mt-1">Generate your first report above</p>
+            </div>
           ) : (
             reports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+              <div key={report.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
                     {report.status === 'generating' ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : report.status === 'completed' ? (
+                      <FileText className="w-5 h-5 text-green-400" />
                     ) : (
-                      <FileText className="w-5 h-5 text-white" />
+                      <FileText className="w-5 h-5 text-red-400" />
                     )}
                   </div>
                   <div>
                     <p className="text-white font-medium">{report.name}</p>
-                    <p className="text-white/60 text-sm">
-                      {report.format} • {report.size} • {new Date(report.createdAt).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center space-x-2 text-white/60 text-sm">
+                      <span>{report.format}</span>
+                      <span>•</span>
+                      <span>{report.size}</span>
+                      <span>•</span>
+                      <span>{new Date(report.createdAt).toLocaleDateString()}</span>
+                      {report.status === 'generating' && (
+                        <>
+                          <span>•</span>
+                          <span className="text-yellow-400">Generating...</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   {report.status === 'completed' && report.downloadUrl && (
                     <button
                       onClick={() => handleDownloadReport(report)}
-                      className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+                      className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors flex items-center space-x-1"
                     >
-                      Download
+                      <span>Download</span>
                     </button>
                   )}
                   {report.status === 'generating' && (
-                    <span className="px-3 py-1 text-sm bg-yellow-500/20 text-yellow-400 rounded">
-                      Generating...
+                    <span className="px-3 py-1 text-sm bg-yellow-500/20 text-yellow-400 rounded flex items-center space-x-1">
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-yellow-400"></div>
+                      <span>Generating...</span>
+                    </span>
+                  )}
+                  {report.status === 'failed' && (
+                    <span className="px-3 py-1 text-sm bg-red-500/20 text-red-400 rounded">
+                      Failed
                     </span>
                   )}
                   <button
@@ -1378,10 +1493,18 @@ const AdminDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Notification Settings */}
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Notification Settings</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Notification Settings</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">
+              {notificationSettings.filter(s => s.enabled).length} enabled
+            </span>
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+          </div>
+        </div>
         <div className="space-y-4">
           {notificationSettings.map((setting) => (
-            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
               <div>
                 <p className="text-white font-medium">{setting.name}</p>
                 <p className="text-white/60 text-sm">{setting.description}</p>
@@ -1411,21 +1534,30 @@ const AdminDashboard: React.FC = () => {
             >
               Mark All Read
             </button>
-            <span className="text-white/60 text-sm">
-              {notifications.filter(n => !n.isRead).length} unread
-            </span>
+            <div className="flex items-center space-x-1">
+              <span className="text-white/60 text-sm">
+                {notifications.filter(n => !n.isRead).length} unread
+              </span>
+              {notifications.filter(n => !n.isRead).length > 0 && (
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+              )}
+            </div>
           </div>
         </div>
         <div className="space-y-3">
           {notifications.length === 0 ? (
-            <p className="text-white/60 text-center py-8">No notifications yet</p>
+            <div className="text-center py-8">
+              <Mail className="w-12 h-12 text-white/20 mx-auto mb-3" />
+              <p className="text-white/60">No notifications yet</p>
+              <p className="text-white/40 text-sm mt-1">Notifications will appear here as events occur</p>
+            </div>
           ) : (
             notifications.map((notification) => (
               <div
                 key={notification.id}
                 className={`p-4 rounded-lg transition-colors ${
                   notification.isRead ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
-                }`}
+                } hover:bg-white/10`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3">
@@ -1444,15 +1576,24 @@ const AdminDashboard: React.FC = () => {
                           notification.type === 'support' ? 'bg-orange-500/20 text-orange-400' :
                           notification.type === 'system' ? 'bg-red-500/20 text-red-400' :
                           notification.type === 'revenue' ? 'bg-yellow-500/20 text-yellow-400' :
-                          'bg-purple-500/20 text-purple-400'
+                          notification.type === 'report' ? 'bg-purple-500/20 text-purple-400' :
+                          'bg-gray-500/20 text-gray-400'
                         }`}>
                           {notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
                         </span>
                         {!notification.isRead && (
-                          <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-400 rounded">
-                            New
+                          <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-400 rounded flex items-center space-x-1">
+                            <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+                            <span>New</span>
                           </span>
                         )}
+                        <span className={`px-2 py-1 text-xs rounded ${
+                          notification.priority === 'high' ? 'bg-red-500/20 text-red-400' :
+                          notification.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-green-500/20 text-green-400'
+                        }`}>
+                          {notification.priority.charAt(0).toUpperCase() + notification.priority.slice(1)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -1624,16 +1765,16 @@ const AdminDashboard: React.FC = () => {
                 setLastActivityCheck(new Date());
                 toast.success('System health refreshed');
               }}
-              className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+              className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors flex items-center space-x-1"
             >
-              Refresh
+              <span>Refresh</span>
             </button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {systemHealth && (
             <>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white font-medium">API Status</span>
                   <div className={`w-3 h-3 rounded-full ${
@@ -1642,8 +1783,13 @@ const AdminDashboard: React.FC = () => {
                   }`}></div>
                 </div>
                 <p className="text-white/60 text-sm capitalize">{systemHealth.apiStatus}</p>
+                {systemHealth.performance && (
+                  <p className="text-white/40 text-xs mt-1">
+                    Response: {systemHealth.performance.responseTime}ms
+                  </p>
+                )}
               </div>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white font-medium">Database</span>
                   <div className={`w-3 h-3 rounded-full ${
@@ -1652,8 +1798,13 @@ const AdminDashboard: React.FC = () => {
                   }`}></div>
                 </div>
                 <p className="text-white/60 text-sm capitalize">{systemHealth.databaseStatus}</p>
+                {systemHealth.performance && (
+                  <p className="text-white/40 text-xs mt-1">
+                    Error Rate: {(systemHealth.performance.errorRate * 100).toFixed(1)}%
+                  </p>
+                )}
               </div>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white font-medium">Cache</span>
                   <div className={`w-3 h-3 rounded-full ${
@@ -1662,18 +1813,26 @@ const AdminDashboard: React.FC = () => {
                   }`}></div>
                 </div>
                 <p className="text-white/60 text-sm capitalize">{systemHealth.cacheStatus}</p>
+                {systemHealth.performance && (
+                  <p className="text-white/40 text-xs mt-1">
+                    Throughput: {systemHealth.performance.throughput}/s
+                  </p>
+                )}
               </div>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
                 <span className="text-white font-medium">Uptime</span>
                 <p className="text-white/60 text-sm">{systemHealth.uptime}</p>
+                <p className="text-white/40 text-xs mt-1">System running smoothly</p>
               </div>
-              <div className="bg-white/5 rounded-lg p-4">
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
                 <span className="text-white font-medium">Active Connections</span>
                 <p className="text-white/60 text-sm">{systemHealth.activeConnections}</p>
+                <p className="text-white/40 text-xs mt-1">Current users online</p>
               </div>
-              <div className="bg-white/5 rounded-lg p-4">
-                <span className="text-white font-medium">Response Time</span>
-                <p className="text-white/60 text-sm">{systemHealth.performance?.responseTime}ms</p>
+              <div className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
+                <span className="text-white font-medium">Last Backup</span>
+                <p className="text-white/60 text-sm">{systemHealth.lastBackup}</p>
+                <p className="text-white/40 text-xs mt-1">Data protection active</p>
               </div>
             </>
           )}
@@ -1682,10 +1841,18 @@ const AdminDashboard: React.FC = () => {
 
       {/* Performance Settings */}
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Performance Settings</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Performance Settings</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">
+              {systemSettings.filter(s => s.category === 'performance' && s.value === true).length} optimized
+            </span>
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+          </div>
+        </div>
         <div className="space-y-4">
           {systemSettings.filter(s => s.category === 'performance').map((setting) => (
-            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
               <div>
                 <p className="text-white font-medium">{setting.name}</p>
                 <p className="text-white/60 text-sm">{setting.description}</p>
@@ -1701,14 +1868,17 @@ const AdminDashboard: React.FC = () => {
                   <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                 </label>
               ) : setting.type === 'input' ? (
-                <input
-                  type="number"
-                  value={setting.value as number}
-                  onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
-                  className="w-24 px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
-                  min="1000"
-                  max="30000"
-                />
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    value={setting.value as number}
+                    onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
+                    className="w-24 px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
+                    min="1000"
+                    max="30000"
+                  />
+                  <span className="text-white/60 text-xs">ms</span>
+                </div>
               ) : (
                 <select
                   value={setting.value as string}
@@ -1741,7 +1911,10 @@ const AdminDashboard: React.FC = () => {
                   <span>Clearing...</span>
                 </>
               ) : (
-                <span>Clear Cache</span>
+                <>
+                  <span>Clear Cache</span>
+                  <span className="text-blue-400/60 text-xs">Improve performance</span>
+                </>
               )}
             </button>
             <button 
@@ -1755,7 +1928,10 @@ const AdminDashboard: React.FC = () => {
                   <span>Backing up...</span>
                 </>
               ) : (
-                <span>Backup Data</span>
+                <>
+                  <span>Backup Data</span>
+                  <span className="text-green-400/60 text-xs">Protect data</span>
+                </>
               )}
             </button>
             <button 
@@ -1769,7 +1945,10 @@ const AdminDashboard: React.FC = () => {
                   <span>Restarting...</span>
                 </>
               ) : (
-                <span>Restart Services</span>
+                <>
+                  <span>Restart Services</span>
+                  <span className="text-yellow-400/60 text-xs">Refresh system</span>
+                </>
               )}
             </button>
           </div>
@@ -1789,6 +1968,10 @@ const AdminDashboard: React.FC = () => {
             <p className="text-white/60 text-xs">
               Real-time updates refresh system health and notifications every 30 seconds
             </p>
+            <div className="flex items-center space-x-2 text-white/40 text-xs">
+              <div className={`w-2 h-2 rounded-full ${realTimeUpdates ? 'bg-green-400' : 'bg-gray-400'}`}></div>
+              <span>{realTimeUpdates ? 'Monitoring active' : 'Monitoring disabled'}</span>
+            </div>
           </div>
         </div>
       </div>
