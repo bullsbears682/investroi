@@ -237,19 +237,17 @@ class AdminDataManager {
     const exportStats = this.getExportStats();
     const recentActivity = this.getRecentActivity();
 
-    // Simulate some metrics that would come from a real backend
-    const totalUsers = Math.floor(totalCalculations * 0.3) + 500; // Estimate based on calculations
-    const activeUsers = Math.floor(totalUsers * 0.7); // 70% of total users
+    // Get real user statistics
+    const userStats = userManager.getUserStats();
     const revenue = totalExports * 25 + totalCalculations * 2; // Revenue simulation
-    const growthRate = 15 + (totalCalculations / 100); // Growth based on activity
 
     return {
-      totalUsers,
-      activeUsers,
+      totalUsers: userStats.totalUsers,
+      activeUsers: userStats.activeUsers,
       totalCalculations,
       totalExports,
       revenue,
-      growthRate,
+      growthRate: parseFloat(userStats.growthRate),
       totalContacts: 0, // Will be set by contact storage
       newContacts: 0, // Will be set by contact storage
       popularScenarios,
@@ -266,5 +264,7 @@ class AdminDataManager {
     };
   }
 }
+
+import { userManager } from './userManagement';
 
 export const adminDataManager = new AdminDataManager();

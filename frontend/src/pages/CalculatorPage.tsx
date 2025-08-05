@@ -13,7 +13,9 @@ import {
   Target,
   AlertTriangle,
   CheckCircle,
-  Play
+  Play,
+  User,
+  X
 } from 'lucide-react';
 
 import { api } from '../services/api';
@@ -27,6 +29,8 @@ import MarketAnalysis from '../components/MarketAnalysis';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 import { adminDataManager } from '../utils/adminData';
+import { userManager } from '../utils/userManagement';
+import UserAuth from '../components/UserAuth';
 
 const CalculatorPage: React.FC = () => {
 
@@ -34,6 +38,8 @@ const CalculatorPage: React.FC = () => {
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [showAuth, setShowAuth] = useState(false);
 
   // Fetch business scenarios with fallback to mock data
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
@@ -279,6 +285,11 @@ const CalculatorPage: React.FC = () => {
         // Record the calculation for admin dashboard
         const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
         adminDataManager.recordCalculation(scenarioName);
+        
+        // Record calculation for current user if logged in
+        if (currentUser) {
+          userManager.recordCalculation(scenarioName);
+        }
 
         console.log('Sending calculation request to API...');
         
@@ -333,7 +344,7 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex justify-center"
+          className="flex justify-center space-x-4"
         >
           <Link to="/demo">
             <motion.button
@@ -345,6 +356,45 @@ const CalculatorPage: React.FC = () => {
               <span>Watch Demo</span>
             </motion.button>
           </Link>
+          
+          {currentUser ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center space-x-3 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-2"
+            >
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-medium">
+                  {currentUser.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="text-white">
+                <p className="text-sm font-medium">{currentUser.name}</p>
+                <p className="text-xs text-white/60">{currentUser.totalCalculations} calculations</p>
+              </div>
+              <button
+                onClick={() => {
+                  userManager.logoutUser();
+                  setCurrentUser(null);
+                  toast.success('Logged out successfully');
+                }}
+                className="text-white/60 hover:text-white transition-colors"
+                title="Logout"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </motion.div>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAuth(true)}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center space-x-2"
+            >
+              <User className="w-4 h-4" />
+              <span>Login</span>
+            </motion.button>
+          )}
         </motion.div>
       </motion.div>
 
@@ -498,7 +548,15 @@ const CalculatorPage: React.FC = () => {
         </div>
       </motion.div>
 
-
+      {/* User Authentication Modal */}
+      <UserAuth
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        onLogin={(user) => {
+          setCurrentUser(user);
+          setShowAuth(false);
+        }}
+      />
     </div>
   );
 };

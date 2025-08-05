@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { generatePDF, PDFExportData } from '../utils/pdfExport';
 import { adminDataManager } from '../utils/adminData';
+import { userManager } from '../utils/userManagement';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -100,6 +101,9 @@ const ExportModal: React.FC<ExportModalProps> = ({
       
       // Record the export for admin dashboard
       adminDataManager.recordExport(exportOptions.template);
+      
+      // Record export for current user if logged in
+      userManager.recordExport(exportOptions.template);
       
       toast.success('PDF exported successfully!');
       onClose();
