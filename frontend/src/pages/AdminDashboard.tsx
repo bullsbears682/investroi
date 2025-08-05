@@ -28,6 +28,7 @@ import { userManager } from '../utils/userManagement';
 import { contactStorage } from '../utils/contactStorage';
 import { chatSystem } from '../utils/chatSystem';
 import { calculatorAnalytics } from '../utils/calculatorAnalytics';
+import { pdfExportAnalytics } from '../utils/pdfExportAnalytics';
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -215,6 +216,67 @@ const AdminDashboard: React.FC = () => {
         });
         
         console.log('Sample calculator analytics created');
+      }
+
+      // Load PDF export analytics data
+      const pdfExportData = pdfExportAnalytics.getAllAnalytics();
+      console.log('Loaded PDF export analytics:', pdfExportData);
+      
+      // If no PDF export data exists, create some sample data for demonstration
+      if (!pdfExportData || pdfExportData.length === 0) {
+        console.log('No PDF export analytics found, creating sample data...');
+        // Create sample PDF export usage data
+        pdfExportAnalytics.trackExport({
+          userId: 'sample-user-1',
+          userEmail: 'john@example.com',
+          template: 'standard',
+          scenarioName: 'E-commerce Business',
+          miniScenarioName: 'Online Store',
+          includeCharts: true,
+          includeMarketAnalysis: true,
+          includeRecommendations: true,
+          fileSize: 2450000, // 2.45MB
+          exportSuccess: true
+        });
+        pdfExportAnalytics.trackExport({
+          userId: 'sample-user-2',
+          userEmail: 'sarah@example.com',
+          template: 'executive',
+          scenarioName: 'SaaS Platform',
+          miniScenarioName: 'Subscription Service',
+          includeCharts: false,
+          includeMarketAnalysis: true,
+          includeRecommendations: true,
+          fileSize: 1800000, // 1.8MB
+          exportSuccess: true
+        });
+        pdfExportAnalytics.trackExport({
+          userId: 'sample-user-3',
+          userEmail: 'mike@example.com',
+          template: 'detailed',
+          scenarioName: 'E-commerce Business',
+          miniScenarioName: 'Dropshipping',
+          includeCharts: true,
+          includeMarketAnalysis: true,
+          includeRecommendations: false,
+          fileSize: 3200000, // 3.2MB
+          exportSuccess: true
+        });
+        pdfExportAnalytics.trackExport({
+          userId: 'sample-user-1',
+          userEmail: 'john@example.com',
+          template: 'standard',
+          scenarioName: 'Restaurant Business',
+          miniScenarioName: 'Fine Dining',
+          includeCharts: true,
+          includeMarketAnalysis: false,
+          includeRecommendations: true,
+          fileSize: 0,
+          exportSuccess: false,
+          errorMessage: 'Network timeout during export'
+        });
+        
+        console.log('Sample PDF export analytics created');
       }
 
       setIsLoading(false);
@@ -779,6 +841,115 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* PDF Export Analytics Section */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="p-2 bg-gradient-to-r from-orange-500/30 to-red-500/30 rounded-lg backdrop-blur-sm">
+            <Download className="h-6 w-6 text-orange-300" />
+          </div>
+          <h3 className="text-xl font-bold text-white">PDF Export Analytics</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl border border-orange-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">Total Exports</span>
+              <Download className="h-4 w-4 text-orange-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">{pdfExportAnalytics.getTotalExports()}</span>
+          </div>
+          
+          <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">Success Rate</span>
+              <CheckCircle className="h-4 w-4 text-green-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">{pdfExportAnalytics.getSuccessRate().toFixed(1)}%</span>
+          </div>
+          
+          <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">Avg File Size</span>
+              <BarChart className="h-4 w-4 text-blue-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">
+              {(pdfExportAnalytics.getAverageFileSize() / 1000000).toFixed(1)}MB
+            </span>
+          </div>
+          
+          <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">This Month</span>
+              <Calendar className="h-4 w-4 text-purple-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">
+              {pdfExportAnalytics.getExportsInRange(
+                new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                new Date()
+              ).length}
+            </span>
+          </div>
+        </div>
+        
+        {/* Popular Templates */}
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4">Most Popular Templates</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {pdfExportAnalytics.getPopularTemplates(3).map((template, index) => (
+              <div key={template.template} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      {index + 1}
+                    </div>
+                    <span className="text-sm font-medium text-white capitalize">{template.template}</span>
+                  </div>
+                  <span className="text-sm font-bold text-orange-400">{template.count}</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(template.count / Math.max(...pdfExportAnalytics.getPopularTemplates(3).map(t => t.count))) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Feature Usage */}
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4">Feature Usage</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {(() => {
+              const features = pdfExportAnalytics.getMostUsedFeatures();
+              const total = pdfExportAnalytics.getTotalExports();
+              return [
+                { name: 'Charts', count: features.charts, color: 'from-blue-500 to-indigo-500' },
+                { name: 'Market Analysis', count: features.marketAnalysis, color: 'from-green-500 to-emerald-500' },
+                { name: 'Recommendations', count: features.recommendations, color: 'from-purple-500 to-pink-500' }
+                             ].map((feature) => (
+                <div key={feature.name} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-white">{feature.name}</span>
+                    <span className="text-sm font-bold text-gray-300">{feature.count}</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className={`bg-gradient-to-r ${feature.color} h-2 rounded-full transition-all duration-300`}
+                      style={{ width: `${total > 0 ? (feature.count / total) * 100 : 0}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    {total > 0 ? Math.round((feature.count / total) * 100) : 0}% of exports
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         </div>
       </div>
