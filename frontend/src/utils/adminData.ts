@@ -92,48 +92,42 @@ class AdminDataManager {
 
   // Enhanced system health monitoring with real-time updates
   private updateSystemHealth(): void {
-    const now = new Date();
-
     // Simulate real system checks with more realistic data
     const apiStatus = this.checkAPIHealth();
     const databaseStatus = this.checkDatabaseHealth();
     const cacheStatus = this.checkCacheHealth();
-    
-    // Add performance metrics
-    const performanceMetrics = {
-      responseTime: this.getAverageResponseTime(),
-      errorRate: this.getErrorRate(),
-      throughput: this.getThroughput(),
-      memoryUsage: Math.round(Math.random() * 20 + 60),
-      cpuUsage: Math.round(Math.random() * 15 + 30)
-    };
+    const uptime = this.calculateUptime();
+    const lastBackup = this.getLastBackupTime();
+    const activeConnections = this.getActiveConnections();
+    const responseTime = this.getAverageResponseTime();
+    const errorRate = this.getErrorRate();
+    const throughput = this.getThroughput();
 
     const systemHealth = {
       apiStatus,
       databaseStatus,
       cacheStatus,
-      uptime: this.calculateUptime(),
-      lastBackup: this.getLastBackupTime(),
-      activeConnections: this.getActiveConnections(),
-      performance: performanceMetrics,
-      lastUpdated: now.toISOString()
+      uptime,
+      lastBackup,
+      activeConnections,
+      performance: {
+        responseTime,
+        errorRate,
+        throughput
+      }
     };
-
-    // Calculate performance metrics
-    const responseTime = this.getAverageResponseTime();
-    const errorRate = this.getErrorRate();
 
     localStorage.setItem(this.systemHealthKey, JSON.stringify(systemHealth));
 
     // Create notifications for system issues
-    if (apiStatus === 'error' || databaseStatus === 'error' || cacheStatus === 'error') {
-      this.createNotification('system', 'System health issue detected - immediate attention required', 'high');
-    } else if (apiStatus === 'warning' || databaseStatus === 'warning' || cacheStatus === 'warning') {
+    if (apiStatus === 'error' || databaseStatus === 'error') {
+      this.createNotification('system', 'System error detected - immediate attention required', 'high');
+    } else if (apiStatus === 'warning' || databaseStatus === 'warning') {
       this.createNotification('system', 'System performance warning - monitor closely', 'medium');
     }
 
-    // Create performance notifications
-    if (responseTime > 500) {
+    // Create notifications for performance issues
+    if (responseTime > 2000) {
       this.createNotification('system', 'High response time detected - performance optimization needed', 'medium');
     }
 
@@ -1003,40 +997,91 @@ class AdminDataManager {
   }
 
   // Enhanced activity checking with automatic notifications
-  private checkForNewActivities(): void {
-    const now = new Date();
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+  public checkForNewActivities(): void {
+    try {
+      const now = new Date();
+      const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
 
-    // Check for new calculations
-    const calculations = this.getCalculations();
-    const recentCalculations = calculations.filter(c => new Date(c.timestamp) > oneHourAgo);
-    
-    if (recentCalculations.length > 0) {
-      this.createNotification('user', `${recentCalculations.length} new calculation${recentCalculations.length > 1 ? 's' : ''} performed`, 'low');
-    }
+      // Check for new calculations
+      const recentCalculations = this.getCalculations().filter(calc => {
+        const calcTime = new Date(calc.timestamp);
+        return calcTime > fiveMinutesAgo && calcTime <= now;
+      });
 
-    // Check for new exports
-    const exports = this.getExports();
-    const recentExports = exports.filter(e => new Date(e.timestamp) > oneHourAgo);
-    
-    if (recentExports.length > 0) {
-      this.createNotification('user', `${recentExports.length} new export${recentExports.length > 1 ? 's' : ''} generated`, 'low');
-    }
+      if (recentCalculations.length > 0) {
+        this.createNotification(
+          'user',
+          `${recentCalculations.length} new calculation${recentCalculations.length > 1 ? 's' : ''} completed`,
+          'low'
+        );
+      }
 
-    // Check for new contact submissions
-    const submissions = this.getContactSubmissions();
-    const recentSubmissions = submissions.filter(s => new Date(s.timestamp) > oneHourAgo);
-    
-    if (recentSubmissions.length > 0) {
-      this.createNotification('support', `${recentSubmissions.length} new contact submission${recentSubmissions.length > 1 ? 's' : ''} received`, 'medium');
-    }
+      // Check for new exports
+      const recentExports = this.getExports().filter(exp => {
+        const expTime = new Date(exp.timestamp);
+        return expTime > fiveMinutesAgo && expTime <= now;
+      });
 
-    // Check for new users
-    const users = userManager.getAllUsers();
-    const recentUsers = users.filter(u => new Date(u.registrationDate) > oneHourAgo);
-    
-    if (recentUsers.length > 0) {
-      this.createNotification('user', `${recentUsers.length} new user${recentUsers.length > 1 ? 's' : ''} registered`, 'medium');
+      if (recentExports.length > 0) {
+        this.createNotification(
+          'user',
+          `${recentExports.length} new export${recentExports.length > 1 ? 's' : ''} generated`,
+          'low'
+        );
+      }
+
+      // Check for new contact submissions
+      const contactSubmissions = this.getContactSubmissions();
+      const recentSubmissions = contactSubmissions.filter(sub => {
+        const subTime = new Date(sub.timestamp);
+        return subTime > fiveMinutesAgo && subTime <= now;
+      });
+
+      if (recentSubmissions.length > 0) {
+        this.createNotification(
+          'support',
+          `${recentSubmissions.length} new contact submission${recentSubmissions.length > 1 ? 's' : ''} received`,
+          'medium'
+        );
+      }
+
+      // Check for new users
+      const allUsers = userManager.getAllUsers();
+      const recentUsers = allUsers.filter(user => {
+        const userCreated = new Date(user.registrationDate);
+        return userCreated > fiveMinutesAgo && userCreated <= now;
+      });
+
+      if (recentUsers.length > 0) {
+        this.createNotification(
+          'user',
+          `${recentUsers.length} new user${recentUsers.length > 1 ? 's' : ''} registered`,
+          'medium'
+        );
+      }
+
+      // Check for revenue milestones
+      const currentRevenue = this.calculateMonthlyRevenue();
+      if (currentRevenue > 50000 && currentRevenue % 10000 < 1000) {
+        this.createNotification(
+          'revenue',
+          `Revenue milestone reached: $${currentRevenue.toLocaleString()}`,
+          'medium'
+        );
+      }
+
+      // Check for system alerts
+      const health = this.getSystemHealth();
+      if (health.apiStatus === 'error' || health.databaseStatus === 'error') {
+        this.createNotification(
+          'system',
+          'Critical system issue detected - immediate attention required',
+          'high'
+        );
+      }
+
+    } catch (error) {
+      console.error('Error checking for new activities:', error);
     }
   }
 

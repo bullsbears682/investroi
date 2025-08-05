@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, 
@@ -45,16 +45,22 @@ const AdminDashboard: React.FC = () => {
   const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
   const [systemActionLoading, setSystemActionLoading] = useState<string | null>(null);
   const [realTimeActivity, setRealTimeActivity] = useState<Array<{ id: string; message: string; timestamp: string; type: string }>>([]);
+  const [refreshInterval, setRefreshInterval] = useState<number | null>(null);
 
-  // Load admin stats when dashboard becomes visible
-  useEffect(() => {
-    if (isVisible) {
+  // Enhanced data loading with better error handling
+  const loadDashboardData = useCallback(() => {
+    try {
       // Initialize sample data if needed
       adminDataManager.initializeSampleData();
       
       const stats = adminDataManager.getAdminStats();
       const submissions = contactStorage.getSubmissions();
       const allUsers = userManager.getAllUsers();
+      const allReports = adminDataManager.getReports();
+      const allNotifications = adminDataManager.getNotifications();
+      const allNotificationSettings = adminDataManager.getNotificationSettings();
+      const allSystemSettings = adminDataManager.getSystemSettings();
+      const health = adminDataManager.getSystemHealth();
       
       // Update stats with contact data
       stats.totalContacts = submissions.length;
@@ -63,25 +69,12 @@ const AdminDashboard: React.FC = () => {
       setAdminStats(stats);
       setContactSubmissions(submissions);
       setUsers(allUsers);
-
-      // Load reports
-      const allReports = adminDataManager.getReports();
       setReports(allReports);
-
-      // Load notifications
-      const allNotifications = adminDataManager.getNotifications();
       setNotifications(allNotifications);
-
-      // Load settings
-      const allNotificationSettings = adminDataManager.getNotificationSettings();
       setNotificationSettings(allNotificationSettings);
-
-      const allSystemSettings = adminDataManager.getSystemSettings();
       setSystemSettings(allSystemSettings);
-
-      // Load system health
-      const health = adminDataManager.getSystemHealth();
       setSystemHealth(health);
+      setLastActivityCheck(new Date());
 
       // Create welcome notification if this is the first time
       const existingNotifications = adminDataManager.getNotifications();
@@ -100,179 +93,87 @@ const AdminDashboard: React.FC = () => {
         return userCreated > oneHourAgo;
       });
 
-      // Set up real-time activity monitoring
-      const updateRealTimeActivity = () => {
-        const newNotifications = adminDataManager.getNotifications();
-        const recentNotifications = newNotifications.filter(n => 
-          new Date(n.timestamp) > new Date(Date.now() - 5 * 60 * 1000) // Last 5 minutes
-        );
-        
-        const activityItems = recentNotifications.map(n => ({
-          id: n.id,
-          message: n.message,
-          timestamp: n.timestamp,
-          type: n.type
-        }));
-        
-        setRealTimeActivity(activityItems);
-      };
-
-      // Initial update
-      updateRealTimeActivity();
-
-      // Set up interval for real-time updates
-      const activityInterval = setInterval(updateRealTimeActivity, 10000); // Update every 10 seconds
-
-      return () => {
-        clearInterval(activityInterval);
-      };
-
-      newUsers.forEach(user => {
+      if (newUsers.length > 0) {
         adminDataManager.createNotification(
           'user',
-          `New user registered: ${user.email}`,
+          `${newUsers.length} new user${newUsers.length > 1 ? 's' : ''} registered in the last hour`,
           'medium'
         );
-      });
+      }
 
       // Create notifications for new contact submissions
-      const newSubmissions = submissions.filter(submission => submission.status === 'new');
-      newSubmissions.forEach(submission => {
+      const newSubmissions = submissions.filter(s => s.status === 'new');
+      if (newSubmissions.length > 0) {
         adminDataManager.createNotification(
           'support',
-          `New contact form submission from ${submission.email}`,
+          `${newSubmissions.length} new contact submission${newSubmissions.length > 1 ? 's' : ''} require attention`,
           'medium'
         );
-      });
+      }
+
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      toast.error('Failed to load dashboard data');
     }
-  }, [isVisible]);
+  }, []);
 
-  // Real-time activity monitor
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      
-      // Update system health
-      const health = adminDataManager.getSystemHealth();
-      setSystemHealth(health);
-
-      // Check for new calculations (simulate real-time activity)
-      const recentCalculations = adminDataManager.getCalculations().filter(calc => {
-        const calcTime = new Date(calc.timestamp).getTime();
-        return calcTime > lastActivityCheck.getTime() && calcTime <= now.getTime();
-      });
-
-      recentCalculations.forEach(calc => {
-        adminDataManager.createNotification(
-          'system',
-          `New ROI calculation completed for ${calc.scenario} scenario`,
-          'low'
-        );
-      });
-
-      // Check for new exports
-      const recentExports = adminDataManager.getExports().filter(exp => {
-        const expTime = new Date(exp.timestamp).getTime();
-        return expTime > lastActivityCheck.getTime() && expTime <= now.getTime();
-      });
-
-      recentExports.forEach(exp => {
-        adminDataManager.createNotification(
-          'system',
-          `New PDF export generated using ${exp.template} template`,
-          'low'
-        );
-      });
-
-      // Check for system alerts
-      if (health.apiStatus === 'error' || health.databaseStatus === 'error') {
-        adminDataManager.createNotification(
-          'system',
-          'System error detected - immediate attention required',
-          'high'
-        );
-      }
-
-      // Check for revenue milestones
-      const currentRevenue = adminStats?.revenue || 0;
-      if (currentRevenue > 50000 && currentRevenue % 10000 < 1000) {
-        adminDataManager.createNotification(
-          'revenue',
-          `Revenue milestone achieved: $${currentRevenue.toLocaleString()}`,
-          'medium'
-        );
-      }
-
-      // Update notifications list
-      const updatedNotifications = adminDataManager.getNotifications();
-      setNotifications(updatedNotifications);
-
-      // Update admin stats
-      const stats = adminDataManager.getAdminStats();
-      setAdminStats(stats);
-
-      setLastActivityCheck(now);
-    }, 30000); // Check every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [isVisible, lastActivityCheck, adminStats]);
-
-  // Real-time updates interval
-  useEffect(() => {
-    if (!isVisible || !realTimeUpdates) return;
+  // Enhanced real-time updates with better performance
+  const startRealTimeUpdates = useCallback(() => {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
 
     const interval = setInterval(() => {
-      // Update system health
-      const health = adminDataManager.getSystemHealth();
-      setSystemHealth(health);
+      if (realTimeUpdates && isVisible) {
+        try {
+          // Update notifications and system health
+          const freshNotifications = adminDataManager.getNotifications();
+          const freshHealth = adminDataManager.getSystemHealth();
+          
+          setNotifications(freshNotifications);
+          setSystemHealth(freshHealth);
+          setLastActivityCheck(new Date());
 
-      // Update last activity check
-      setLastActivityCheck(new Date());
+          // Check for new activities and create notifications
+          adminDataManager.checkForNewActivities();
+          
+          // Update real-time activity feed
+          const recentActivity = adminDataManager.getRecentActivity();
+          const activityMessages = recentActivity.slice(0, 5).map(activity => ({
+            id: activity.id,
+            message: `${activity.type} by ${activity.user}`,
+            timestamp: activity.timestamp,
+            type: activity.type
+          }));
+          setRealTimeActivity(activityMessages);
 
-      // Create periodic notifications for system health
-      if (health.apiStatus === 'error' || health.databaseStatus === 'error') {
-        adminDataManager.createNotification(
-          'system',
-          'Critical system issue detected - immediate attention required',
-          'high'
-        );
+        } catch (error) {
+          console.error('Error in real-time update:', error);
+        }
       }
     }, 30000); // Update every 30 seconds
 
-    return () => clearInterval(interval);
-  }, [isVisible, realTimeUpdates]);
+    setRefreshInterval(interval);
+  }, [realTimeUpdates, isVisible]);
 
-  // Listen for broadcast notifications
+  // Load admin stats when dashboard becomes visible
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.BroadcastChannel) return;
+    if (isVisible) {
+      loadDashboardData();
+      startRealTimeUpdates();
+    }
+  }, [isVisible, loadDashboardData, startRealTimeUpdates]);
 
-    const channel = new BroadcastChannel('admin_notifications');
-    channel.onmessage = (event) => {
-      if (event.data.type === 'new_notification') {
-        // Refresh notifications
-        const updatedNotifications = adminDataManager.getNotifications();
-        setNotifications(updatedNotifications);
-        
-        // Show toast for new notification
-        const notification = event.data.notification;
-        toast.success(`New notification: ${notification.message}`, {
-          duration: 3000,
-          icon: notification.priority === 'high' ? '🚨' : notification.priority === 'medium' ? '📢' : 'ℹ️'
-        });
-      }
-    };
-
-    return () => channel.close();
-  }, []);
-
-  // Cleanup on unmount
+  // Cleanup interval on unmount
   useEffect(() => {
     return () => {
-      adminDataManager.cleanup();
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
     };
-  }, []);
+  }, [refreshInterval]);
+
+
 
   // Use real data or fallback to mock data
   const stats = adminStats || {
@@ -321,8 +222,6 @@ const AdminDashboard: React.FC = () => {
     }
   ];
 
-
-
   const popularScenarios = adminStats?.popularScenarios || [
     { name: 'E-commerce', usage: 456, growth: 12.5 },
     { name: 'SaaS', usage: 389, growth: 8.3 },
@@ -347,73 +246,54 @@ const AdminDashboard: React.FC = () => {
     { id: 'settings', name: 'Settings', icon: Settings }
   ];
 
-  // Load contact submissions
-  useEffect(() => {
-    if (isVisible) {
-      const submissions = contactStorage.getSubmissions();
-      setContactSubmissions(submissions);
-    }
-  }, [isVisible]);
-
-  // Update submission status
+  // Enhanced contact submission handlers with better feedback
   const updateSubmissionStatus = (id: string, status: ContactSubmission['status']) => {
-    contactStorage.updateSubmissionStatus(id, status);
-    const submissions = contactStorage.getSubmissions();
-    setContactSubmissions(submissions);
-  };
-
-  // Delete submission
-  const deleteSubmission = (id: string) => {
-    contactStorage.deleteSubmission(id);
-    const submissions = contactStorage.getSubmissions();
-    setContactSubmissions(submissions);
-    setSelectedSubmission(null);
-  };
-
-  // Real-time monitoring effect
-  useEffect(() => {
-    if (realTimeUpdates && isVisible) {
-      adminDataManager.startRealTimeMonitoring();
+    try {
+      contactStorage.updateSubmissionStatus(id, status);
+      const updatedSubmissions = contactStorage.getSubmissions();
+      setContactSubmissions(updatedSubmissions);
       
-      // Set up automatic refresh of dashboard data
-      const refreshInterval = setInterval(() => {
-        if (isVisible) {
-          // Refresh all data
-          const stats = adminDataManager.getAdminStats();
-          const submissions = contactStorage.getSubmissions();
-          const allUsers = userManager.getAllUsers();
-          const allReports = adminDataManager.getReports();
-          const allNotifications = adminDataManager.getNotifications();
-          const allNotificationSettings = adminDataManager.getNotificationSettings();
-          const allSystemSettings = adminDataManager.getSystemSettings();
-          const health = adminDataManager.getSystemHealth();
-          
-          // Update stats with contact data
-          stats.totalContacts = submissions.length;
-          stats.newContacts = submissions.filter(s => s.status === 'new').length;
-          
-          setAdminStats(stats);
-          setContactSubmissions(submissions);
-          setUsers(allUsers);
-          setReports(allReports);
-          setNotifications(allNotifications);
-          setNotificationSettings(allNotificationSettings);
-          setSystemSettings(allSystemSettings);
-          setSystemHealth(health);
-          setLastActivityCheck(new Date());
-        }
-      }, 30000); // Refresh every 30 seconds
+      // Update admin stats
+      const stats = adminDataManager.getAdminStats();
+      stats.totalContacts = updatedSubmissions.length;
+      stats.newContacts = updatedSubmissions.filter(s => s.status === 'new').length;
+      setAdminStats(stats);
       
-      return () => {
-        adminDataManager.stopRealTimeMonitoring();
-        clearInterval(refreshInterval);
-      };
-    } else {
-      adminDataManager.stopRealTimeMonitoring();
+      // Create notification
+      const submission = updatedSubmissions.find(s => s.id === id);
+      if (submission) {
+        adminDataManager.createNotification(
+          'support',
+          `Contact submission from ${submission.email} marked as ${status}`,
+          'medium'
+        );
+      }
+      
+      toast.success(`Submission status updated to ${status}`);
+    } catch (error) {
+      toast.error('Failed to update submission status');
     }
-  }, [realTimeUpdates, isVisible]);
+  };
 
-  // Enhanced report generation with better error handling and progress tracking
+  const deleteSubmission = (id: string) => {
+    try {
+      contactStorage.deleteSubmission(id);
+      const updatedSubmissions = contactStorage.getSubmissions();
+      setContactSubmissions(updatedSubmissions);
+      
+      // Update admin stats
+      const stats = adminDataManager.getAdminStats();
+      stats.totalContacts = updatedSubmissions.length;
+      stats.newContacts = updatedSubmissions.filter(s => s.status === 'new').length;
+      setAdminStats(stats);
+      
+      toast.success('Submission deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete submission');
+    }
+  };
+
+  // Enhanced report generation with better progress tracking
   const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
     setGeneratingReport(type);
     
@@ -523,56 +403,76 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteReport = (reportId: string) => {
-    adminDataManager.deleteReport(reportId);
-    const updatedReports = adminDataManager.getReports();
-    setReports(updatedReports);
-    toast.success('Report deleted successfully!');
+    try {
+      adminDataManager.deleteReport(reportId);
+      const updatedReports = adminDataManager.getReports();
+      setReports(updatedReports);
+      toast.success('Report deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete report');
+    }
   };
 
-  // Notification handlers
+  // Enhanced notification handlers with better state management
   const handleToggleNotificationSetting = (settingId: string, enabled: boolean) => {
-    adminDataManager.updateNotificationSetting(settingId, enabled);
-    const updatedSettings = adminDataManager.getNotificationSettings();
-    setNotificationSettings(updatedSettings);
-    
-    // Create notification for setting change
-    const setting = notificationSettings.find(s => s.id === settingId);
-    if (setting) {
-      adminDataManager.createNotification(
-        'system', 
-        `Notification setting "${setting.name}" ${enabled ? 'enabled' : 'disabled'}`, 
-        'low'
-      );
+    try {
+      adminDataManager.updateNotificationSetting(settingId, enabled);
+      const updatedSettings = adminDataManager.getNotificationSettings();
+      setNotificationSettings(updatedSettings);
+      
+      // Create notification for setting change
+      const setting = notificationSettings.find(s => s.id === settingId);
+      if (setting) {
+        adminDataManager.createNotification(
+          'system', 
+          `Notification setting "${setting.name}" ${enabled ? 'enabled' : 'disabled'}`, 
+          'low'
+        );
+      }
+      
+      toast.success(`Notification setting ${enabled ? 'enabled' : 'disabled'}`);
+    } catch (error) {
+      toast.error('Failed to update notification setting');
     }
-    
-    toast.success(`Notification setting ${enabled ? 'enabled' : 'disabled'}`);
   };
 
   const handleMarkNotificationAsRead = (notificationId: string) => {
-    adminDataManager.markNotificationAsRead(notificationId);
-    const updatedNotifications = adminDataManager.getNotifications();
-    setNotifications(updatedNotifications);
+    try {
+      adminDataManager.markNotificationAsRead(notificationId);
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+    } catch (error) {
+      toast.error('Failed to mark notification as read');
+    }
   };
 
   const handleMarkAllAsRead = () => {
-    notifications.forEach(notification => {
-      if (!notification.isRead) {
-        adminDataManager.markNotificationAsRead(notification.id);
-      }
-    });
-    const updatedNotifications = adminDataManager.getNotifications();
-    setNotifications(updatedNotifications);
-    toast.success('All notifications marked as read');
+    try {
+      notifications.forEach(notification => {
+        if (!notification.isRead) {
+          adminDataManager.markNotificationAsRead(notification.id);
+        }
+      });
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      toast.error('Failed to mark all notifications as read');
+    }
   };
 
   const handleDeleteNotification = (notificationId: string) => {
-    adminDataManager.deleteNotification(notificationId);
-    const updatedNotifications = adminDataManager.getNotifications();
-    setNotifications(updatedNotifications);
-    toast.success('Notification deleted');
+    try {
+      adminDataManager.deleteNotification(notificationId);
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+      toast.success('Notification deleted');
+    } catch (error) {
+      toast.error('Failed to delete notification');
+    }
   };
 
-  // System settings handlers
+  // Enhanced system settings handlers with better validation
   const handleToggleSystemSetting = (settingId: string, value: boolean | string) => {
     try {
       if (typeof value === 'boolean') {
@@ -712,6 +612,40 @@ const AdminDashboard: React.FC = () => {
       });
     } finally {
       setSystemActionLoading(null);
+    }
+  };
+
+  // Test all functionality
+  const handleTestAllFeatures = () => {
+    try {
+      // Test report generation
+      adminDataManager.generateReport('user', 'PDF').then(report => {
+        toast.success(`Test report "${report.name}" generated successfully`);
+      });
+
+      // Test notifications
+      adminDataManager.createNotification('system', 'Test notification - all systems operational', 'low');
+      adminDataManager.createNotification('user', 'Test user activity detected', 'medium');
+      adminDataManager.createNotification('revenue', 'Test revenue milestone reached', 'high');
+
+      // Test system settings
+      const settings = adminDataManager.getSystemSettings();
+      if (settings.length > 0) {
+        adminDataManager.updateSystemSetting(settings[0].id, !settings[0].value);
+      }
+
+      // Test notification settings
+      const notificationSettings = adminDataManager.getNotificationSettings();
+      if (notificationSettings.length > 0) {
+        adminDataManager.updateNotificationSetting(notificationSettings[0].id, !notificationSettings[0].enabled);
+      }
+
+      // Refresh all data
+      loadDashboardData();
+
+      toast.success('All features tested successfully! Check the dashboard for updates.');
+    } catch (error) {
+      toast.error('Error testing features');
     }
   };
 
@@ -2109,10 +2043,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
-                onClick={() => {
-                  adminDataManager.testAllFeatures();
-                  toast.success('All features tested successfully! Check console for details.');
-                }}
+                onClick={handleTestAllFeatures}
                 className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
                 title="Test All Features"
               >
