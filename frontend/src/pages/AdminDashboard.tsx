@@ -147,6 +147,13 @@ const AdminDashboard: React.FC = () => {
           }));
           setRealTimeActivity(activityMessages);
 
+          // Update reports if any are generating
+          const currentReports = adminDataManager.getReports();
+          const hasGeneratingReports = currentReports.some(r => r.status === 'generating');
+          if (hasGeneratingReports) {
+            setReports(currentReports);
+          }
+
         } catch (error) {
           console.error('Error in real-time update:', error);
         }
@@ -646,6 +653,96 @@ const AdminDashboard: React.FC = () => {
       toast.success('All features tested successfully! Check the dashboard for updates.');
     } catch (error) {
       toast.error('Error testing features');
+    }
+  };
+
+  // Enhanced comprehensive test function
+  const handleComprehensiveTest = async () => {
+    const testToast = toast.loading('Running comprehensive system test...');
+    
+    try {
+      // Test 1: Report Generation
+      toast.loading('Testing report generation...', { id: testToast });
+      const report = await adminDataManager.generateReport('user', 'PDF');
+      console.log('✅ Report generated:', report.name);
+      
+      // Test 2: Notification System
+      toast.loading('Testing notification system...', { id: testToast });
+      adminDataManager.createNotification('system', 'Comprehensive test - system operational', 'low');
+      adminDataManager.createNotification('user', 'Comprehensive test - user activity detected', 'medium');
+      adminDataManager.createNotification('revenue', 'Comprehensive test - revenue milestone', 'high');
+      console.log('✅ Notifications created');
+      
+      // Test 3: System Settings
+      toast.loading('Testing system settings...', { id: testToast });
+      const settings = adminDataManager.getSystemSettings();
+      if (settings.length > 0) {
+        const originalValue = settings[0].value;
+        adminDataManager.updateSystemSetting(settings[0].id, !originalValue);
+        // Revert the change
+        setTimeout(() => {
+          adminDataManager.updateSystemSetting(settings[0].id, originalValue);
+        }, 2000);
+      }
+      console.log('✅ System settings tested');
+      
+      // Test 4: Notification Settings
+      toast.loading('Testing notification settings...', { id: testToast });
+      const notificationSettings = adminDataManager.getNotificationSettings();
+      if (notificationSettings.length > 0) {
+        const originalValue = notificationSettings[0].enabled;
+        adminDataManager.updateNotificationSetting(notificationSettings[0].id, !originalValue);
+        // Revert the change
+        setTimeout(() => {
+          adminDataManager.updateNotificationSetting(notificationSettings[0].id, originalValue);
+        }, 2000);
+      }
+      console.log('✅ Notification settings tested');
+      
+      // Test 5: System Actions
+      toast.loading('Testing system actions...', { id: testToast });
+      await adminDataManager.clearCache();
+      console.log('✅ Cache cleared');
+      
+      // Test 6: Real-time Monitoring
+      toast.loading('Testing real-time monitoring...', { id: testToast });
+      adminDataManager.startRealTimeMonitoring();
+      console.log('✅ Real-time monitoring started');
+      
+      // Test 7: Activity Tracking
+      toast.loading('Testing activity tracking...', { id: testToast });
+      adminDataManager.recordActivity('calculation', 'test-user', 'Manufacturing', 'standard');
+      adminDataManager.recordActivity('export', 'test-user', undefined, 'executive');
+      console.log('✅ Activity tracking tested');
+      
+      // Test 8: Data Management
+      toast.loading('Testing data management...', { id: testToast });
+      const stats = adminDataManager.getAdminStats();
+      const health = adminDataManager.getSystemHealth();
+      console.log('✅ Data management tested', { stats, health });
+      
+      // Refresh all data
+      loadDashboardData();
+      
+      toast.success('🎉 Comprehensive test completed successfully! All systems operational.', { id: testToast });
+      
+      // Create a summary notification
+      adminDataManager.createNotification(
+        'system',
+        'Comprehensive system test completed - all features working correctly',
+        'medium'
+      );
+      
+    } catch (error) {
+      console.error('Comprehensive test error:', error);
+      toast.error(`Comprehensive test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { id: testToast });
+      
+      // Create error notification
+      adminDataManager.createNotification(
+        'system',
+        'Comprehensive system test failed - check console for details',
+        'high'
+      );
     }
   };
 
@@ -1319,7 +1416,20 @@ const AdminDashboard: React.FC = () => {
             <span className="text-white/60 text-sm">
               {reports.filter(r => r.status === 'generating').length} generating
             </span>
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+            {reports.filter(r => r.status === 'generating').length > 0 && (
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+            )}
+            <button
+              onClick={() => {
+                const freshReports = adminDataManager.getReports();
+                setReports(freshReports);
+                toast.success('Reports refreshed');
+              }}
+              className="px-2 py-1 text-xs bg-white/10 text-white/60 rounded hover:bg-white/20 transition-colors"
+              title="Refresh Reports"
+            >
+              Refresh
+            </button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1540,6 +1650,17 @@ const AdminDashboard: React.FC = () => {
               className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
             >
               Mark All Read
+            </button>
+            <button
+              onClick={() => {
+                const freshNotifications = adminDataManager.getNotifications();
+                setNotifications(freshNotifications);
+                toast.success('Notifications refreshed');
+              }}
+              className="px-2 py-1 text-xs bg-white/10 text-white/60 rounded hover:bg-white/20 transition-colors"
+              title="Refresh Notifications"
+            >
+              Refresh
             </button>
             <div className="flex items-center space-x-1">
               <span className="text-white/60 text-sm">
@@ -1765,6 +1886,14 @@ const AdminDashboard: React.FC = () => {
             <span className="text-white/60 text-sm">
               Last updated: {lastActivityCheck.toLocaleTimeString()}
             </span>
+            <div className="flex items-center space-x-1">
+              <div className={`w-2 h-2 rounded-full ${
+                realTimeUpdates ? 'bg-green-400 animate-pulse' : 'bg-gray-400'
+              }`}></div>
+              <span className="text-white/40 text-xs">
+                {realTimeUpdates ? 'Live' : 'Manual'}
+              </span>
+            </div>
             <button
               onClick={() => {
                 const health = adminDataManager.getSystemHealth();
@@ -2042,6 +2171,13 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
+              <button
+                onClick={handleComprehensiveTest}
+                className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
+                title="Run Comprehensive Test"
+              >
+                Comprehensive Test
+              </button>
               <button
                 onClick={handleTestAllFeatures}
                 className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"

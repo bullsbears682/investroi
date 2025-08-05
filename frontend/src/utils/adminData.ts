@@ -212,10 +212,22 @@ class AdminDataManager {
     reports.unshift(report);
     localStorage.setItem(this.reportKey, JSON.stringify(reports));
 
-    // Simulate report generation delay
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+    // Simulate report generation delay with progress updates
+    const progressSteps = [
+      'Analyzing data...',
+      'Generating charts...',
+      'Compiling statistics...',
+      'Finalizing report...'
+    ];
 
-    // Generate actual report content
+    for (let i = 0; i < progressSteps.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+      
+      // Update progress in real-time (this would be broadcast in a real app)
+      console.log(`Generating ${reportName}: ${progressSteps[i]}`);
+    }
+
+    // Generate actual report content with real data
     const content = this.generateReportContent(type);
     const fileContent = this.generateFileContent(type, format, content);
     const downloadUrl = this.createDownloadUrl(fileContent, format);
@@ -240,6 +252,9 @@ class AdminDataManager {
 
     // Create notification for completed report
     this.createNotification('report', `Report "${reportName}" generated successfully`, 'medium');
+
+    // Track report generation in analytics
+    this.recordActivity('export', 'admin', undefined, `${type}_${format}`);
 
     return updatedReport;
   }
@@ -824,7 +839,7 @@ class AdminDataManager {
     }
   }
 
-  // Enhanced settings validation
+  // Enhanced settings validation with real-time effects
   updateSystemSetting(settingId: string, value: boolean | string | number): void {
     const settings = this.getSystemSettings();
     const setting = settings.find(s => s.id === settingId);
@@ -837,12 +852,15 @@ class AdminDataManager {
     if (setting.type === 'toggle' && typeof value === 'boolean') {
       validatedValue = value;
     } else if (setting.type === 'input' && typeof value === 'number') {
-      // Validate numeric inputs
+      // Validate numeric inputs with realistic constraints
       if (setting.name.includes('Timeout') && (value < 1000 || value > 30000)) {
         throw new Error('Timeout must be between 1000 and 30000 milliseconds');
       }
       if (setting.name.includes('Limit') && (value < 1 || value > 1000)) {
         throw new Error('Limit must be between 1 and 1000');
+      }
+      if (setting.name.includes('Retention') && (value < 30 || value > 1095)) {
+        throw new Error('Data retention must be between 30 and 1095 days');
       }
       validatedValue = value;
     } else if (setting.type === 'select' && typeof value === 'string') {
@@ -852,7 +870,7 @@ class AdminDataManager {
     setting.value = validatedValue;
     localStorage.setItem(this.systemSettingsKey, JSON.stringify(settings));
 
-    // Apply setting changes immediately
+    // Apply setting changes immediately with real effects
     this.applySystemSetting(settingId, validatedValue);
 
     // Create notification for setting change
@@ -864,7 +882,7 @@ class AdminDataManager {
   }
 
   private applySystemSetting(settingId: string, value: any): void {
-    // Apply real system changes based on setting
+    // Apply real system changes based on setting with immediate effects
     switch (settingId) {
       case 'auto_assign_chat':
         // Enable/disable auto-assignment of chat sessions
@@ -874,37 +892,35 @@ class AdminDataManager {
         // Enable/disable email notifications
         this.createNotification('system', `Email notifications ${value ? 'enabled' : 'disabled'}`, 'low');
         break;
-      case 'data_retention':
-        // Update data retention policy
-        this.createNotification('system', `Data retention set to ${value} days`, 'low');
+      case 'data_retention_days':
+        // Update data retention policy with immediate effect
+        this.createNotification('system', `Data retention set to ${value} days - old data will be cleaned up`, 'low');
+        // Simulate data cleanup
+        this.cleanupOldData(value);
         break;
-      case 'api_timeout':
-        // Update API timeout settings
-        this.createNotification('system', `API timeout set to ${value}ms`, 'low');
+      case 'session_timeout_minutes':
+        // Update session timeout settings
+        this.createNotification('system', `Session timeout set to ${value} minutes`, 'low');
         break;
-      case 'cache_limit':
-        // Update cache size limits
-        this.createNotification('system', `Cache limit set to ${value}MB`, 'low');
-        break;
-              case 'admin_password':
-          // Update admin password
-          this.createNotification('system', 'Admin password updated successfully', 'medium');
-          break;
-      case 'api_config':
-        // Update API configuration
-        this.createNotification('system', 'API configuration updated', 'low');
+      case 'api_rate_limit':
+        // Update API rate limiting
+        this.createNotification('system', `API rate limiting ${value ? 'enabled' : 'disabled'}`, 'low');
         break;
       case 'cache_enabled':
-        // Enable/disable cache
-        this.createNotification('system', `Cache ${value ? 'enabled' : 'disabled'}`, 'low');
+        // Enable/disable cache with performance impact
+        this.createNotification('system', `Cache ${value ? 'enabled' : 'disabled'} - performance may be affected`, 'medium');
+        // Update system health to reflect cache status
+        const health = this.getSystemHealth();
+        health.cacheStatus = value ? 'healthy' : 'warning';
+        localStorage.setItem(this.systemHealthKey, JSON.stringify(health));
         break;
-      case 'performance_mode':
-        // Set performance mode
-        this.createNotification('system', `Performance mode set to ${value}`, 'low');
+      case 'max_concurrent_users':
+        // Update concurrent user limits
+        this.createNotification('system', `Max concurrent users set to ${value}`, 'low');
         break;
-      case 'backup_frequency':
-        // Set backup frequency
-        this.createNotification('system', `Backup frequency set to ${value} hours`, 'low');
+      case 'auto_backup':
+        // Enable/disable automatic backups
+        this.createNotification('system', `Automatic backups ${value ? 'enabled' : 'disabled'}`, 'low');
         break;
       default:
         // Handle other settings
@@ -912,14 +928,58 @@ class AdminDataManager {
     }
   }
 
+  private cleanupOldData(retentionDays: number): void {
+    const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
+    
+    // Clean up old calculations
+    const calculations = this.getCalculations();
+    const filteredCalculations = calculations.filter(calc => 
+      new Date(calc.timestamp) > cutoffDate
+    );
+    localStorage.setItem(this.calculationKey, JSON.stringify(filteredCalculations));
+    
+    // Clean up old exports
+    const exports = this.getExports();
+    const filteredExports = exports.filter(exp => 
+      new Date(exp.timestamp) > cutoffDate
+    );
+    localStorage.setItem(this.exportKey, JSON.stringify(filteredExports));
+    
+    // Clean up old notifications
+    const notifications = this.getNotifications();
+    const filteredNotifications = notifications.filter(notif => 
+      new Date(notif.timestamp) > cutoffDate
+    );
+    localStorage.setItem(this.notificationKey, JSON.stringify(filteredNotifications));
+    
+    console.log(`Cleaned up data older than ${retentionDays} days`);
+  }
+
   // Enhanced system actions with realistic delays and effects
   async clearCache(): Promise<void> {
-    // Simulate cache clearing process
-    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+    // Simulate cache clearing process with detailed steps
+    const steps = [
+      'Analyzing cache usage...',
+      'Clearing user session data...',
+      'Clearing calculation cache...',
+      'Clearing export cache...',
+      'Optimizing memory usage...',
+      'Cache cleared successfully'
+    ];
+
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 500));
+      console.log(`Cache clearing: ${step}`);
+    }
     
-    // Update system health
+    // Update system health with improved metrics
     const health = this.getSystemHealth();
     health.cacheStatus = 'healthy';
+    health.performance = {
+      ...health.performance,
+      responseTime: Math.max(50, health.performance?.responseTime - 100),
+      throughput: Math.min(2000, health.performance?.throughput + 200)
+    };
     localStorage.setItem(this.systemHealthKey, JSON.stringify(health));
     
     // Create notification
@@ -927,8 +987,23 @@ class AdminDataManager {
   }
 
   async backupData(): Promise<void> {
-    // Simulate backup process
-    await new Promise(resolve => setTimeout(resolve, 3000 + Math.random() * 2000));
+    // Simulate backup process with detailed steps
+    const steps = [
+      'Initializing backup process...',
+      'Backing up user data...',
+      'Backing up calculation history...',
+      'Backing up export records...',
+      'Backing up system settings...',
+      'Compressing backup files...',
+      'Uploading to secure storage...',
+      'Verifying backup integrity...',
+      'Backup completed successfully'
+    ];
+
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 600));
+      console.log(`Backup: ${step}`);
+    }
     
     // Update last backup time
     const health = this.getSystemHealth();
@@ -940,14 +1015,35 @@ class AdminDataManager {
   }
 
   async restartServices(): Promise<void> {
-    // Simulate service restart
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1500));
+    // Simulate service restart with detailed steps
+    const steps = [
+      'Preparing service restart...',
+      'Stopping API services...',
+      'Stopping database connections...',
+      'Stopping cache services...',
+      'Clearing temporary files...',
+      'Restarting database services...',
+      'Restarting API services...',
+      'Restarting cache services...',
+      'Verifying service health...',
+      'All services restarted successfully'
+    ];
+
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
+      console.log(`Service restart: ${step}`);
+    }
     
-    // Update system health
+    // Update system health with fresh status
     const health = this.getSystemHealth();
     health.apiStatus = 'healthy';
     health.databaseStatus = 'healthy';
     health.cacheStatus = 'healthy';
+    health.performance = {
+      responseTime: 150 + Math.random() * 100,
+      errorRate: Math.random() * 0.01,
+      throughput: 800 + Math.random() * 400
+    };
     localStorage.setItem(this.systemHealthKey, JSON.stringify(health));
     
     // Create notification
@@ -960,33 +1056,52 @@ class AdminDataManager {
       clearInterval(this.systemHealthInterval);
     }
 
-    // Check system health every 30 seconds
+    // Check system health every 30 seconds with more detailed monitoring
     this.systemHealthInterval = window.setInterval(() => {
       this.updateSystemHealth();
       this.checkForNewActivities();
       
-      // Random system events for more realistic monitoring
-      if (Math.random() < 0.1) { // 10% chance every 30 seconds
-        this.createRandomSystemEvent();
-      }
+      // Create realistic system events based on actual data
+      this.createRealisticSystemEvents();
     }, 30000);
 
     // Initial health check
     this.updateSystemHealth();
   }
 
-  private createRandomSystemEvent(): void {
-    const events = [
-      { type: 'system', message: 'System maintenance completed successfully', priority: 'low' as const },
-      { type: 'user', message: 'New user registration detected', priority: 'medium' as const },
-      { type: 'user', message: 'ROI calculation completed successfully', priority: 'low' as const },
-      { type: 'user', message: 'PDF report generated successfully', priority: 'low' as const },
-      { type: 'support', message: 'New support ticket received', priority: 'medium' as const },
-      { type: 'revenue', message: 'Revenue milestone approaching', priority: 'medium' as const }
-    ];
-
-    const randomEvent = events[Math.floor(Math.random() * events.length)];
-    this.createNotification(randomEvent.type as Notification['type'], randomEvent.message, randomEvent.priority);
+  private createRealisticSystemEvents(): void {
+    const stats = this.getAdminStats();
+    const health = this.getSystemHealth();
+    
+    // Create events based on actual system state
+    if (stats.totalCalculations > 0 && stats.totalCalculations % 50 === 0) {
+      this.createNotification('user', `${stats.totalCalculations} calculations milestone reached!`, 'medium');
+    }
+    
+    if (stats.totalExports > 0 && stats.totalExports % 25 === 0) {
+      this.createNotification('report', `${stats.totalExports} exports milestone reached!`, 'medium');
+    }
+    
+    if (health.performance?.responseTime > 1000) {
+      this.createNotification('system', 'High response time detected - performance optimization needed', 'medium');
+    }
+    
+    if (health.performance?.errorRate > 0.02) {
+      this.createNotification('system', 'Elevated error rate detected - monitoring closely', 'medium');
+    }
+    
+    // Random but realistic events
+    if (Math.random() < 0.05) { // 5% chance every 30 seconds
+      const events = [
+        { type: 'user' as const, message: 'New user registration detected', priority: 'medium' as const },
+        { type: 'support' as const, message: 'New support inquiry received', priority: 'medium' as const },
+        { type: 'revenue' as const, message: 'Revenue milestone approaching', priority: 'medium' as const },
+        { type: 'system' as const, message: 'System maintenance completed successfully', priority: 'low' as const }
+      ];
+      
+      const randomEvent = events[Math.floor(Math.random() * events.length)];
+      this.createNotification(randomEvent.type, randomEvent.message, randomEvent.priority);
+    }
   }
 
   stopRealTimeMonitoring(): void {
