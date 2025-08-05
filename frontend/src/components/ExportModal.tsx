@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { generatePDF, PDFExportData } from '../utils/pdfExport';
+import { adminDataManager } from '../utils/adminData';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -96,6 +97,10 @@ const ExportModal: React.FC<ExportModalProps> = ({
       };
 
       await generatePDF(exportData);
+      
+      // Record the export for admin dashboard
+      adminDataManager.recordExport(exportOptions.template);
+      
       toast.success('PDF exported successfully!');
       onClose();
     } catch (error) {

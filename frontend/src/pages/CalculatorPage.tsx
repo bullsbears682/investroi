@@ -26,6 +26,7 @@ import MarketAnalysis from '../components/MarketAnalysis';
 
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
+import { adminDataManager } from '../utils/adminData';
 
 const CalculatorPage: React.FC = () => {
 
@@ -274,6 +275,10 @@ const CalculatorPage: React.FC = () => {
           mini_scenario_id: selectedMiniScenario,
           country_code: formData.country_code || 'US'
         };
+
+        // Record the calculation for admin dashboard
+        const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
+        adminDataManager.recordCalculation(scenarioName);
 
         console.log('Sending calculation request to API...');
         

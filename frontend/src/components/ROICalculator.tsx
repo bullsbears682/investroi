@@ -16,6 +16,7 @@ import {
 import ExportModal from './ExportModal';
 import { getResearchBasedMarketData } from '../utils/marketResearchData';
 
+
 interface ROICalculatorProps {
   onCalculate: (data: any) => void;
   isLoading: boolean;

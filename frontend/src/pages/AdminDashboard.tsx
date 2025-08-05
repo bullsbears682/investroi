@@ -18,6 +18,7 @@ import {
   Mail
 } from 'lucide-react';
 import { contactStorage, ContactSubmission } from '../utils/contactStorage';
+import { adminDataManager, AdminStats } from '../utils/adminData';
 
 const AdminDashboard: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,9 +27,25 @@ const AdminDashboard: React.FC = () => {
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
 
-  // Mock data for admin dashboard
-  const stats = {
+  // Load admin stats when dashboard becomes visible
+  useEffect(() => {
+    if (isVisible) {
+      const stats = adminDataManager.getAdminStats();
+      const submissions = contactStorage.getSubmissions();
+      
+      // Update stats with contact data
+      stats.totalContacts = submissions.length;
+      stats.newContacts = submissions.filter(s => s.status === 'new').length;
+      
+      setAdminStats(stats);
+      setContactSubmissions(submissions);
+    }
+  }, [isVisible]);
+
+  // Use real data or fallback to mock data
+  const stats = adminStats || {
     totalUsers: 1247,
     activeUsers: 892,
     totalCalculations: 3456,
@@ -39,7 +56,7 @@ const AdminDashboard: React.FC = () => {
     newContacts: contactSubmissions.filter(s => s.status === 'new').length
   };
 
-  const recentActivity = [
+  const recentActivity = adminStats?.recentActivity || [
     {
       id: 1,
       type: 'calculation',
@@ -74,7 +91,7 @@ const AdminDashboard: React.FC = () => {
     }
   ];
 
-  const systemHealth = {
+  const systemHealth = adminStats?.systemHealth || {
     apiStatus: 'healthy',
     databaseStatus: 'healthy',
     cacheStatus: 'healthy',
@@ -83,7 +100,7 @@ const AdminDashboard: React.FC = () => {
     activeConnections: 45
   };
 
-  const popularScenarios = [
+  const popularScenarios = adminStats?.popularScenarios || [
     { name: 'E-commerce', usage: 456, growth: 12.5 },
     { name: 'SaaS', usage: 389, growth: 8.3 },
     { name: 'Freelancer', usage: 234, growth: 15.7 },
@@ -91,7 +108,7 @@ const AdminDashboard: React.FC = () => {
     { name: 'Startup', usage: 167, growth: 22.1 }
   ];
 
-  const exportStats = [
+  const exportStats = adminStats?.exportStats || [
     { template: 'Standard', count: 567, percentage: 45.9 },
     { template: 'Executive', count: 423, percentage: 34.3 },
     { template: 'Detailed', count: 244, percentage: 19.8 }
@@ -358,7 +375,10 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
               <p className="text-white/60 text-xs sm:text-sm ml-2 flex-shrink-0">
-                {activity.timestamp.split(' ')[1]}
+                {new Date(activity.timestamp).toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
               </p>
             </div>
           ))}
