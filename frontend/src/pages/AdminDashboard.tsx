@@ -25,6 +25,7 @@ const AdminDashboard: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
   // Mock data for admin dashboard
   const stats = {
@@ -126,14 +127,136 @@ const AdminDashboard: React.FC = () => {
     setSelectedSubmission(null);
   };
 
+  const renderMetricModal = () => {
+    if (!selectedMetric) return null;
+
+    const modalData = {
+      'totalUsers': {
+        title: 'Total Users',
+        icon: Users,
+        color: 'text-blue-400',
+        bgColor: 'bg-blue-500/20',
+        details: [
+          { label: 'Total Registered', value: '1,247' },
+          { label: 'Active This Month', value: '892' },
+          { label: 'New This Week', value: '156' },
+          { label: 'Growth Rate', value: '+23.5%' }
+        ],
+        description: 'Complete user base including all registered accounts across all platforms.'
+      },
+      'activeUsers': {
+        title: 'Active Users',
+        icon: Activity,
+        color: 'text-green-400',
+        bgColor: 'bg-green-500/20',
+        details: [
+          { label: 'Currently Online', value: '892' },
+          { label: 'This Week', value: '1,134' },
+          { label: 'This Month', value: '1,089' },
+          { label: 'Engagement Rate', value: '71.5%' }
+        ],
+        description: 'Users who have been active in the last 30 days.'
+      },
+      'totalCalculations': {
+        title: 'Total Calculations',
+        icon: Calculator,
+        color: 'text-purple-400',
+        bgColor: 'bg-purple-500/20',
+        details: [
+          { label: 'Total Calculations', value: '3,456' },
+          { label: 'This Week', value: '234' },
+          { label: 'This Month', value: '1,567' },
+          { label: 'Success Rate', value: '98.2%' }
+        ],
+        description: 'All ROI calculations performed across all business scenarios.'
+      },
+      'revenue': {
+        title: 'Revenue',
+        icon: DollarSign,
+        color: 'text-yellow-400',
+        bgColor: 'bg-yellow-500/20',
+        details: [
+          { label: 'Total Revenue', value: '$45,600' },
+          { label: 'This Month', value: '$12,400' },
+          { label: 'This Week', value: '$3,200' },
+          { label: 'Growth', value: '+18.3%' }
+        ],
+        description: 'Total revenue generated from premium features and subscriptions.'
+      },
+      'totalContacts': {
+        title: 'Contact Submissions',
+        icon: Mail,
+        color: 'text-purple-400',
+        bgColor: 'bg-purple-500/20',
+        details: [
+          { label: 'Total Submissions', value: contactSubmissions.length.toString() },
+          { label: 'New Today', value: contactSubmissions.filter(s => 
+            new Date(s.timestamp).toDateString() === new Date().toDateString()
+          ).length.toString() },
+          { label: 'This Week', value: contactSubmissions.filter(s => 
+            new Date(s.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          ).length.toString() },
+          { label: 'Response Rate', value: '94.2%' }
+        ],
+        description: 'All contact form submissions and customer inquiries.'
+      }
+    };
+
+    const data = modalData[selectedMetric as keyof typeof modalData];
+    if (!data) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        onClick={() => setSelectedMetric(null)}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${data.bgColor}`}>
+                <data.icon className={`w-5 h-5 ${data.color}`} />
+              </div>
+              <h2 className="text-xl font-bold text-white">{data.title}</h2>
+            </div>
+            <button
+              onClick={() => setSelectedMetric(null)}
+              className="text-white/60 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <p className="text-white/70 mb-6">{data.description}</p>
+
+          <div className="space-y-3">
+            {data.details.map((detail, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <span className="text-white/60 text-sm">{detail.label}</span>
+                <span className="text-white font-medium">{detail.value}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
   const renderOverview = () => (
     <div className="space-y-4 sm:space-y-6">
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6 cursor-pointer hover:bg-white/20 transition-all"
+          onClick={() => setSelectedMetric('totalUsers')}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -148,7 +271,8 @@ const AdminDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6 cursor-pointer hover:bg-white/20 transition-all"
+          onClick={() => setSelectedMetric('activeUsers')}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -163,7 +287,8 @@ const AdminDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6 cursor-pointer hover:bg-white/20 transition-all"
+          onClick={() => setSelectedMetric('totalCalculations')}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -178,7 +303,8 @@ const AdminDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6 cursor-pointer hover:bg-white/20 transition-all"
+          onClick={() => setSelectedMetric('revenue')}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -193,7 +319,8 @@ const AdminDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6 cursor-pointer hover:bg-white/20 transition-all"
+          onClick={() => setSelectedMetric('totalContacts')}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -210,7 +337,7 @@ const AdminDashboard: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.5 }}
         className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Activity</h3>
@@ -619,6 +746,9 @@ const AdminDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {renderContent()}
       </div>
+
+      {/* Metric Modal */}
+      {renderMetricModal()}
     </div>
   );
 };
