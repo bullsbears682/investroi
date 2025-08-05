@@ -18,7 +18,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { contactStorage, ContactSubmission } from '../utils/contactStorage';
-import { adminDataManager, AdminStats } from '../utils/adminData';
+import { adminDataManager, AdminStats, Report, Notification, NotificationSetting, SystemSetting } from '../utils/adminData';
 import { userManager, User } from '../utils/userManagement';
 
 import { toast } from 'react-hot-toast';
@@ -35,6 +35,11 @@ const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showChat, setShowChat] = useState(false);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([]);
+  const [systemSettings, setSystemSettings] = useState<SystemSetting[]>([]);
+  const [generatingReport, setGeneratingReport] = useState<string | null>(null);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -50,6 +55,21 @@ const AdminDashboard: React.FC = () => {
       setAdminStats(stats);
       setContactSubmissions(submissions);
       setUsers(allUsers);
+
+      // Load reports
+      const allReports = adminDataManager.getReports();
+      setReports(allReports);
+
+      // Load notifications
+      const allNotifications = adminDataManager.getNotifications();
+      setNotifications(allNotifications);
+
+      // Load settings
+      const allNotificationSettings = adminDataManager.getNotificationSettings();
+      setNotificationSettings(allNotificationSettings);
+
+      const allSystemSettings = adminDataManager.getSystemSettings();
+      setSystemSettings(allSystemSettings);
     }
   }, [isVisible]);
 
@@ -147,6 +167,89 @@ const AdminDashboard: React.FC = () => {
     const submissions = contactStorage.getSubmissions();
     setContactSubmissions(submissions);
     setSelectedSubmission(null);
+  };
+
+  // Report handlers
+  const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
+    setGeneratingReport(type);
+    try {
+      const report = await adminDataManager.generateReport(type, format);
+      const updatedReports = adminDataManager.getReports();
+      setReports(updatedReports);
+      toast.success(`Report "${report.name}" generated successfully!`);
+    } catch (error) {
+      toast.error('Failed to generate report. Please try again.');
+    } finally {
+      setGeneratingReport(null);
+    }
+  };
+
+  const handleDownloadReport = (report: Report) => {
+    if (report.downloadUrl) {
+      const link = document.createElement('a');
+      link.href = report.downloadUrl;
+      link.download = `${report.name}.${report.format.toLowerCase()}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Report downloaded successfully!');
+    } else {
+      toast.error('Download URL not available');
+    }
+  };
+
+  const handleDeleteReport = (reportId: string) => {
+    adminDataManager.deleteReport(reportId);
+    const updatedReports = adminDataManager.getReports();
+    setReports(updatedReports);
+    toast.success('Report deleted successfully!');
+  };
+
+  // Notification handlers
+  const handleToggleNotificationSetting = (settingId: string, enabled: boolean) => {
+    adminDataManager.updateNotificationSetting(settingId, enabled);
+    const updatedSettings = adminDataManager.getNotificationSettings();
+    setNotificationSettings(updatedSettings);
+    toast.success(`Notification setting ${enabled ? 'enabled' : 'disabled'}`);
+  };
+
+  const handleMarkNotificationAsRead = (notificationId: string) => {
+    adminDataManager.markNotificationAsRead(notificationId);
+    const updatedNotifications = adminDataManager.getNotifications();
+    setNotifications(updatedNotifications);
+  };
+
+  const handleMarkAllAsRead = () => {
+    notifications.forEach(notification => {
+      if (!notification.isRead) {
+        adminDataManager.markNotificationAsRead(notification.id);
+      }
+    });
+    const updatedNotifications = adminDataManager.getNotifications();
+    setNotifications(updatedNotifications);
+    toast.success('All notifications marked as read');
+  };
+
+  const handleDeleteNotification = (notificationId: string) => {
+    adminDataManager.deleteNotification(notificationId);
+    const updatedNotifications = adminDataManager.getNotifications();
+    setNotifications(updatedNotifications);
+    toast.success('Notification deleted');
+  };
+
+  // System settings handlers
+  const handleToggleSystemSetting = (settingId: string, value: boolean) => {
+    adminDataManager.updateSystemSetting(settingId, value);
+    const updatedSettings = adminDataManager.getSystemSettings();
+    setSystemSettings(updatedSettings);
+    toast.success('Setting updated successfully');
+  };
+
+  const handleUpdateSystemSetting = (settingId: string, value: number) => {
+    adminDataManager.updateSystemSetting(settingId, value);
+    const updatedSettings = adminDataManager.getSystemSettings();
+    setSystemSettings(updatedSettings);
+    toast.success('Setting updated successfully');
   };
 
   const renderMetricModal = () => {
@@ -774,65 +877,34 @@ const AdminDashboard: React.FC = () => {
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Generate Reports</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-blue-400" />
+          {[
+            { type: 'user', name: 'User Analytics', description: 'User growth, engagement, and activity patterns', icon: BarChart3, color: 'blue' },
+            { type: 'calculation', name: 'Calculation Reports', description: 'ROI calculations, popular scenarios, and trends', icon: Calculator, color: 'green' },
+            { type: 'export', name: 'Export Analytics', description: 'PDF export statistics and template usage', icon: FileText, color: 'purple' },
+            { type: 'support', name: 'Support Reports', description: 'Chat sessions, response times, and satisfaction', icon: Mail, color: 'yellow' },
+            { type: 'system', name: 'System Health', description: 'Performance metrics and system status', icon: Activity, color: 'red' },
+            { type: 'revenue', name: 'Revenue Reports', description: 'Revenue tracking and financial analytics', icon: DollarSign, color: 'indigo' }
+          ].map((reportType) => (
+            <button
+              key={reportType.type}
+              onClick={() => handleGenerateReport(reportType.type as Report['type'], 'PDF')}
+              disabled={generatingReport === reportType.type}
+              className="bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-4 text-left transition-colors"
+            >
+              <div className="flex items-center space-x-3 mb-2">
+                <div className={`w-8 h-8 bg-${reportType.color}-500/20 rounded-lg flex items-center justify-center`}>
+                  <reportType.icon className={`w-4 h-4 text-${reportType.color}-400`} />
+                </div>
+                <span className="text-white font-medium">{reportType.name}</span>
+                {generatingReport === reportType.type && (
+                  <div className="ml-auto">
+                    <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
-              <span className="text-white font-medium">User Analytics</span>
-            </div>
-            <p className="text-white/60 text-sm">User growth, engagement, and activity patterns</p>
-          </button>
-          
-          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                <Calculator className="w-4 h-4 text-green-400" />
-              </div>
-              <span className="text-white font-medium">Calculation Reports</span>
-            </div>
-            <p className="text-white/60 text-sm">ROI calculations, popular scenarios, and trends</p>
-          </button>
-          
-          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                <FileText className="w-4 h-4 text-purple-400" />
-              </div>
-              <span className="text-white font-medium">Export Analytics</span>
-            </div>
-            <p className="text-white/60 text-sm">PDF export statistics and template usage</p>
-          </button>
-          
-          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                <Mail className="w-4 h-4 text-yellow-400" />
-              </div>
-              <span className="text-white font-medium">Support Reports</span>
-            </div>
-            <p className="text-white/60 text-sm">Chat sessions, response times, and satisfaction</p>
-          </button>
-          
-          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                <Activity className="w-4 h-4 text-red-400" />
-              </div>
-              <span className="text-white font-medium">System Health</span>
-            </div>
-            <p className="text-white/60 text-sm">Performance metrics and system status</p>
-          </button>
-          
-          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-indigo-400" />
-              </div>
-              <span className="text-white font-medium">Revenue Reports</span>
-            </div>
-            <p className="text-white/60 text-sm">Revenue tracking and financial analytics</p>
-          </button>
+              <p className="text-white/60 text-sm">{reportType.description}</p>
+            </button>
+          ))}
         </div>
       </motion.div>
 
@@ -845,27 +917,52 @@ const AdminDashboard: React.FC = () => {
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Reports</h3>
         <div className="space-y-3">
-          {[
-            { name: 'Weekly User Analytics', date: '2025-01-15', type: 'PDF', size: '2.3 MB' },
-            { name: 'Monthly Revenue Report', date: '2025-01-10', type: 'Excel', size: '1.8 MB' },
-            { name: 'Q4 System Performance', date: '2025-01-05', type: 'PDF', size: '3.1 MB' },
-            { name: 'Support Metrics Report', date: '2025-01-01', type: 'CSV', size: '0.9 MB' }
-          ].map((report, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-blue-400" />
+          {reports.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="w-12 h-12 text-white/40 mx-auto mb-3" />
+              <p className="text-white/60 text-sm">No reports generated yet</p>
+              <p className="text-white/40 text-xs mt-1">Generate your first report above</p>
+            </div>
+          ) : (
+            reports.map((report) => (
+              <div key={report.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-medium text-sm">{report.name}</p>
+                    <p className="text-white/60 text-xs">
+                      {new Date(report.createdAt).toLocaleDateString()} • {report.format} • {report.size}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-white font-medium text-sm">{report.name}</p>
-                  <p className="text-white/60 text-xs">{report.date} • {report.type} • {report.size}</p>
+                <div className="flex items-center space-x-2">
+                  {report.status === 'completed' ? (
+                    <button
+                      onClick={() => handleDownloadReport(report)}
+                      className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                    >
+                      Download
+                    </button>
+                  ) : report.status === 'generating' ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-blue-400 text-sm">Generating...</span>
+                    </div>
+                  ) : (
+                    <span className="text-red-400 text-sm">Failed</span>
+                  )}
+                  <button
+                    onClick={() => handleDeleteReport(report.id)}
+                    className="text-red-400 hover:text-red-300 text-sm transition-colors"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-              <button className="text-blue-400 hover:text-blue-300 text-sm transition-colors">
-                Download
-              </button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </motion.div>
     </div>
@@ -881,21 +978,18 @@ const AdminDashboard: React.FC = () => {
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Notification Settings</h3>
         <div className="space-y-4">
-          {[
-            { name: 'New User Registration', description: 'Get notified when new users sign up', enabled: true },
-            { name: 'High Priority Support', description: 'Immediate alerts for urgent chat requests', enabled: true },
-            { name: 'System Alerts', description: 'Server status and performance notifications', enabled: false },
-            { name: 'Weekly Reports', description: 'Automated weekly summary emails', enabled: true },
-            { name: 'Revenue Milestones', description: 'Revenue goal achievement notifications', enabled: false }
-          ].map((setting, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+          {notificationSettings.map((setting) => (
+            <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
               <div>
                 <p className="text-white font-medium text-sm">{setting.name}</p>
                 <p className="text-white/60 text-xs">{setting.description}</p>
               </div>
-              <button className={`w-12 h-6 rounded-full transition-colors ${
-                setting.enabled ? 'bg-blue-500' : 'bg-white/20'
-              }`}>
+              <button 
+                onClick={() => handleToggleNotificationSetting(setting.id, !setting.enabled)}
+                className={`w-12 h-6 rounded-full transition-colors ${
+                  setting.enabled ? 'bg-blue-500' : 'bg-white/20'
+                }`}
+              >
                 <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
                   setting.enabled ? 'translate-x-6' : 'translate-x-1'
                 }`} />
@@ -912,33 +1006,65 @@ const AdminDashboard: React.FC = () => {
         transition={{ delay: 0.1 }}
         className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
       >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Notifications</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg sm:text-xl font-semibold text-white">Recent Notifications</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">
+              {notifications.filter(n => !n.isRead).length} unread
+            </span>
+            <button
+              onClick={handleMarkAllAsRead}
+              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+            >
+              Mark all as read
+            </button>
+          </div>
+        </div>
         <div className="space-y-3">
-          {[
-            { type: 'user', message: 'New user registered: john.doe@example.com', time: '2 minutes ago', unread: true },
-            { type: 'support', message: 'High priority chat request from Sarah Johnson', time: '5 minutes ago', unread: true },
-            { type: 'system', message: 'System performance is optimal', time: '1 hour ago', unread: false },
-            { type: 'revenue', message: 'Monthly revenue target achieved!', time: '2 hours ago', unread: false },
-            { type: 'report', message: 'Weekly analytics report is ready', time: '1 day ago', unread: false }
-          ].map((notification, index) => (
-            <div key={index} className={`flex items-center space-x-3 p-3 rounded-lg ${
-              notification.unread ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-white/5'
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                notification.type === 'user' ? 'bg-green-400' :
-                notification.type === 'support' ? 'bg-red-400' :
-                notification.type === 'system' ? 'bg-blue-400' :
-                notification.type === 'revenue' ? 'bg-yellow-400' : 'bg-purple-400'
-              }`} />
-              <div className="flex-1">
-                <p className="text-white text-sm">{notification.message}</p>
-                <p className="text-white/60 text-xs">{notification.time}</p>
-              </div>
-              {notification.unread && (
-                <div className="w-2 h-2 bg-blue-400 rounded-full" />
-              )}
+          {notifications.length === 0 ? (
+            <div className="text-center py-8">
+              <Activity className="w-12 h-12 text-white/40 mx-auto mb-3" />
+              <p className="text-white/60 text-sm">No notifications yet</p>
+              <p className="text-white/40 text-xs mt-1">Notifications will appear here</p>
             </div>
-          ))}
+          ) : (
+            notifications.map((notification) => (
+              <div 
+                key={notification.id} 
+                className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                  notification.isRead ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
+                }`}
+                onClick={() => handleMarkNotificationAsRead(notification.id)}
+              >
+                <div className={`w-2 h-2 rounded-full ${
+                  notification.type === 'user' ? 'bg-green-400' :
+                  notification.type === 'support' ? 'bg-red-400' :
+                  notification.type === 'system' ? 'bg-blue-400' :
+                  notification.type === 'revenue' ? 'bg-yellow-400' : 'bg-purple-400'
+                }`} />
+                <div className="flex-1">
+                  <p className="text-white text-sm">{notification.message}</p>
+                  <p className="text-white/60 text-xs">
+                    {new Date(notification.timestamp).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {!notification.isRead && (
+                    <div className="w-2 h-2 bg-blue-400 rounded-full" />
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteNotification(notification.id);
+                    }}
+                    className="text-red-400 hover:text-red-300 text-sm transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </motion.div>
     </div>
@@ -954,35 +1080,35 @@ const AdminDashboard: React.FC = () => {
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">General Settings</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <div>
-              <p className="text-white font-medium text-sm">Auto-assign Chat Sessions</p>
-              <p className="text-white/60 text-xs">Automatically assign new chat sessions to available admins</p>
-            </div>
-            <button className="w-12 h-6 bg-blue-500 rounded-full">
-              <div className="w-4 h-4 bg-white rounded-full translate-x-6" />
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <div>
-              <p className="text-white font-medium text-sm">Email Notifications</p>
-              <p className="text-white/60 text-xs">Receive email alerts for important events</p>
-            </div>
-            <button className="w-12 h-6 bg-blue-500 rounded-full">
-              <div className="w-4 h-4 bg-white rounded-full translate-x-6" />
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <div>
-              <p className="text-white font-medium text-sm">Data Retention</p>
-              <p className="text-white/60 text-xs">Keep user data for 90 days</p>
-            </div>
-            <button className="w-12 h-6 bg-white/20 rounded-full">
-              <div className="w-4 h-4 bg-white rounded-full translate-x-1" />
-            </button>
-          </div>
+          {systemSettings
+            .filter(setting => setting.category === 'general')
+            .map((setting) => (
+              <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div>
+                  <p className="text-white font-medium text-sm">{setting.name}</p>
+                  <p className="text-white/60 text-xs">{setting.description}</p>
+                </div>
+                {setting.type === 'toggle' ? (
+                  <button 
+                    onClick={() => handleToggleSystemSetting(setting.id, !setting.value as boolean)}
+                    className={`w-12 h-6 rounded-full transition-colors ${
+                      setting.value ? 'bg-blue-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                      setting.value ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                ) : (
+                  <input
+                    type="number"
+                    value={setting.value as number}
+                    onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
+                    className="w-20 bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
+                  />
+                )}
+              </div>
+            ))}
         </div>
       </motion.div>
 
@@ -995,41 +1121,35 @@ const AdminDashboard: React.FC = () => {
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Security Settings</h3>
         <div className="space-y-4">
-          <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                <Shield className="w-4 h-4 text-red-400" />
+          {systemSettings
+            .filter(setting => setting.category === 'security')
+            .map((setting) => (
+              <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                <div>
+                  <p className="text-white font-medium text-sm">{setting.name}</p>
+                  <p className="text-white/60 text-xs">{setting.description}</p>
+                </div>
+                {setting.type === 'toggle' ? (
+                  <button 
+                    onClick={() => handleToggleSystemSetting(setting.id, !setting.value as boolean)}
+                    className={`w-12 h-6 rounded-full transition-colors ${
+                      setting.value ? 'bg-blue-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                      setting.value ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                ) : (
+                  <input
+                    type="number"
+                    value={setting.value as number}
+                    onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
+                    className="w-20 bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
+                  />
+                )}
               </div>
-              <div>
-                <p className="text-white font-medium text-sm">Change Admin Password</p>
-                <p className="text-white/60 text-xs">Update your admin account password</p>
-              </div>
-            </div>
-          </button>
-          
-          <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                <Activity className="w-4 h-4 text-yellow-400" />
-              </div>
-              <div>
-                <p className="text-white font-medium text-sm">View Login History</p>
-                <p className="text-white/60 text-xs">Check recent admin login activity</p>
-              </div>
-            </div>
-          </button>
-          
-          <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <Settings className="w-4 h-4 text-blue-400" />
-              </div>
-              <div>
-                <p className="text-white font-medium text-sm">API Configuration</p>
-                <p className="text-white/60 text-xs">Manage API keys and integrations</p>
-              </div>
-            </div>
-          </button>
+            ))}
         </div>
       </motion.div>
 
