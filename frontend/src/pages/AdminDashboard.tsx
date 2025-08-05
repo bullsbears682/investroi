@@ -43,6 +43,7 @@ const AdminDashboard: React.FC = () => {
   const [realTimeUpdates, setRealTimeUpdates] = useState<boolean>(true);
   const [systemHealth, setSystemHealth] = useState<any>(null);
   const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
+  const [systemActionLoading, setSystemActionLoading] = useState<string | null>(null);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -535,6 +536,89 @@ const AdminDashboard: React.FC = () => {
       toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
+
+  // System action handlers
+  const handleClearCache = async () => {
+    setSystemActionLoading('cache');
+    try {
+      await adminDataManager.clearCache();
+      toast.success('Cache cleared successfully!');
+      
+      // Refresh system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+      setLastActivityCheck(new Date());
+    } catch (error) {
+      toast.error(`Failed to clear cache: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setSystemActionLoading(null);
+    }
+  };
+
+  const handleBackupData = async () => {
+    setSystemActionLoading('backup');
+    try {
+      await adminDataManager.backupData();
+      toast.success('Data backup completed successfully!');
+      
+      // Refresh system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+      setLastActivityCheck(new Date());
+    } catch (error) {
+      toast.error(`Failed to backup data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setSystemActionLoading(null);
+    }
+  };
+
+  const handleRestartServices = async () => {
+    setSystemActionLoading('restart');
+    try {
+      await adminDataManager.restartServices();
+      toast.success('Services restarted successfully!');
+      
+      // Refresh system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+      setLastActivityCheck(new Date());
+    } catch (error) {
+      toast.error(`Failed to restart services: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setSystemActionLoading(null);
+    }
+  };
+
+  // Real-time monitoring effect
+  useEffect(() => {
+    if (realTimeUpdates && isVisible) {
+      adminDataManager.startRealTimeMonitoring();
+      
+      return () => {
+        adminDataManager.stopRealTimeMonitoring();
+      };
+    } else {
+      adminDataManager.stopRealTimeMonitoring();
+    }
+  }, [realTimeUpdates, isVisible]);
+
+  // Auto-refresh notifications and reports when real-time updates are enabled
+  useEffect(() => {
+    if (!realTimeUpdates || !isVisible) return;
+
+    const interval = setInterval(() => {
+      const updatedNotifications = adminDataManager.getNotifications();
+      const updatedReports = adminDataManager.getReports();
+      const updatedHealth = adminDataManager.getSystemHealth();
+      
+      setNotifications(updatedNotifications);
+      setReports(updatedReports);
+      setSystemHealth(updatedHealth);
+      setLastActivityCheck(new Date());
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [realTimeUpdates, isVisible]);
 
   const renderMetricModal = () => {
     if (!selectedMetric) return null;
@@ -1646,14 +1730,47 @@ const AdminDashboard: React.FC = () => {
         <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-white mb-4">System Actions</h3>
           <div className="space-y-3">
-            <button className="w-full px-4 py-2 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors">
-              Clear Cache
+            <button 
+              onClick={handleClearCache}
+              disabled={systemActionLoading === 'cache'}
+              className="w-full px-4 py-2 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {systemActionLoading === 'cache' ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+                  <span>Clearing...</span>
+                </>
+              ) : (
+                <span>Clear Cache</span>
+              )}
             </button>
-            <button className="w-full px-4 py-2 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors">
-              Backup Data
+            <button 
+              onClick={handleBackupData}
+              disabled={systemActionLoading === 'backup'}
+              className="w-full px-4 py-2 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {systemActionLoading === 'backup' ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-400"></div>
+                  <span>Backing up...</span>
+                </>
+              ) : (
+                <span>Backup Data</span>
+              )}
             </button>
-            <button className="w-full px-4 py-2 text-sm bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 transition-colors">
-              Restart Services
+            <button 
+              onClick={handleRestartServices}
+              disabled={systemActionLoading === 'restart'}
+              className="w-full px-4 py-2 text-sm bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            >
+              {systemActionLoading === 'restart' ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-400"></div>
+                  <span>Restarting...</span>
+                </>
+              ) : (
+                <span>Restart Services</span>
+              )}
             </button>
           </div>
         </div>
