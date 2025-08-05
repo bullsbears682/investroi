@@ -2092,20 +2092,6 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
-                onClick={handleComprehensiveTest}
-                className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
-                title="Run Comprehensive Test"
-              >
-                1
-              </button>
-              <button
-                onClick={handleComprehensiveTest}
-                className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
-                title="Test All Features"
-              >
-                2
-              </button>
-              <button
                 onClick={() => setShowLogout(true)}
                 className="text-white/60 hover:text-white transition-colors p-2"
                 title="Logout Admin"
@@ -2153,6 +2139,28 @@ const AdminDashboard: React.FC = () => {
             )}
             <span className="font-medium">Menu</span>
           </button>
+        </div>
+      </div>
+
+      {/* Test Buttons - Below Header */}
+      <div className="bg-white/5 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center space-x-4 py-3">
+            <button
+              onClick={handleComprehensiveTest}
+              className="px-4 py-2 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
+              title="Run Comprehensive Test"
+            >
+              1
+            </button>
+            <button
+              onClick={handleComprehensiveTest}
+              className="px-4 py-2 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+              title="Test All Features"
+            >
+              2
+            </button>
+          </div>
         </div>
       </div>
 
