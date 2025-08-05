@@ -595,25 +595,28 @@ const AdminDashboard: React.FC = () => {
         {/* Header */}
         <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg">
-                    <Shield className="h-8 w-8 text-white" />
+            <div className="flex items-center justify-between h-16 sm:h-20">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl shadow-lg">
+                    <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin Dashboard</h1>
-                    <p className="text-sm text-gray-300">Manage your investment platform</p>
+                  <div className="hidden sm:block">
+                    <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin Dashboard</h1>
+                    <p className="text-xs sm:text-sm text-gray-300">Manage your investment platform</p>
+                  </div>
+                  <div className="sm:hidden">
+                    <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin</h1>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <button
                   onClick={loadRealData}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white/10 text-gray-300 rounded-xl hover:bg-white/20 transition-all duration-300 shadow-md border border-white/20 backdrop-blur-sm"
+                  className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-white/10 text-gray-300 rounded-lg sm:rounded-xl hover:bg-white/20 transition-all duration-300 shadow-md border border-white/20 backdrop-blur-sm text-xs sm:text-sm"
                 >
-                  <RefreshCw className="h-4 w-4" />
-                  <span className="font-medium">Refresh</span>
+                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="font-medium hidden sm:inline">Refresh</span>
                 </button>
               </div>
             </div>
@@ -623,21 +626,21 @@ const AdminDashboard: React.FC = () => {
         {/* Navigation */}
         <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="flex space-x-8 overflow-x-auto">
+            <nav className="flex space-x-4 sm:space-x-6 lg:space-x-8 overflow-x-auto pb-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 py-6 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-300 ${
+                    className={`flex items-center space-x-2 py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-300 min-w-fit ${
                       activeTab === tab.id
                         ? 'border-blue-400 text-blue-300'
                         : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span>{tab.label}</span>
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="hidden sm:inline">{tab.label}</span>
                   </button>
                 );
               })}
