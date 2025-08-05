@@ -1376,7 +1376,7 @@ const AdminDashboard: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-white/10 text-gray-300 rounded-lg sm:rounded-xl hover:bg-white/20 transition-all duration-300 shadow-md border border-white/20 backdrop-blur-sm text-xs sm:text-sm relative"
+                    className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-blue-500/20 text-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-500/30 transition-all duration-300 shadow-md border border-blue-400/30 backdrop-blur-sm text-xs sm:text-sm relative"
                   >
                     <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span className="font-medium hidden sm:inline">Notifications</span>
@@ -1477,6 +1477,15 @@ const AdminDashboard: React.FC = () => {
                 >
                   <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span className="font-medium hidden sm:inline">Refresh</span>
+                </button>
+                
+                {/* Test Notification Button */}
+                <button
+                  onClick={() => addNotification('info', 'Test Notification', 'This is a test notification', { test: true })}
+                  className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-green-500/20 text-green-300 rounded-lg sm:rounded-xl hover:bg-green-500/30 transition-all duration-300 shadow-md border border-green-400/30 backdrop-blur-sm text-xs sm:text-sm"
+                >
+                  <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="font-medium hidden sm:inline">Test</span>
                 </button>
               </div>
             </div>
