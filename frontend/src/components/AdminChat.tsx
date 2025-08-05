@@ -120,27 +120,27 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl w-full max-w-6xl h-[80vh] flex flex-col"
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl w-full max-w-5xl h-[70vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/20">
+        <div className="flex items-center justify-between p-4 border-b border-white/20">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-blue-400" />
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Live Chat Support</h2>
-              <p className="text-white/60 text-sm">
+              <h2 className="text-lg font-bold text-white">Chat Conversations</h2>
+              <p className="text-white/60 text-xs">
                 {sessions.filter(s => s.status === 'active').length} active • {sessions.filter(s => s.status === 'waiting').length} waiting
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors"
+            className="text-white/60 hover:text-white transition-colors p-1"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -173,13 +173,13 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
 
             {/* Sessions List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {activeTab === 'sessions' ? (
-                sessions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageSquare className="w-12 h-12 text-white/40 mx-auto mb-4" />
-                    <p className="text-white/60">No chat sessions yet</p>
-                  </div>
-                ) : (
+                           {activeTab === 'sessions' ? (
+               sessions.length === 0 ? (
+                 <div className="text-center py-6">
+                   <MessageSquare className="w-10 h-10 text-white/40 mx-auto mb-3" />
+                   <p className="text-white/60 text-sm">No conversations yet</p>
+                 </div>
+               ) : (
                   sessions.map((session) => (
                     <div
                       key={session.id}
@@ -240,21 +240,21 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
                     </div>
                   ))
                 )
-              ) : (
-                <div className="space-y-3">
-                  {chatSystem.getRecentMessages(10).map((message) => (
-                    <div key={message.id} className="p-3 bg-white/5 rounded-lg">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-white font-medium text-sm">
-                          {message.isAdmin ? 'Admin' : message.userName}
-                        </span>
-                        <span className="text-white/60 text-xs">{formatTime(message.timestamp)}</span>
-                      </div>
-                      <p className="text-white/80 text-sm">{message.message}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+                           ) : (
+               <div className="space-y-2">
+                 {chatSystem.getRecentMessages(8).map((message) => (
+                   <div key={message.id} className="p-2 bg-white/5 rounded-lg">
+                     <div className="flex items-center justify-between mb-1">
+                       <span className="text-white font-medium text-xs">
+                         {message.isAdmin ? 'Admin' : message.userName}
+                       </span>
+                       <span className="text-white/60 text-xs">{formatTime(message.timestamp)}</span>
+                     </div>
+                     <p className="text-white/80 text-xs">{message.message}</p>
+                   </div>
+                 ))}
+               </div>
+             )}
             </div>
           </div>
 
@@ -262,37 +262,37 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
           <div className="flex-1 flex flex-col">
             {selectedSession ? (
               <>
-                {/* Chat Header */}
-                <div className="p-4 border-b border-white/20">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium">
-                          {selectedSession.userName.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="text-white font-medium">{selectedSession.userName}</h3>
-                        <p className="text-white/60 text-sm">{selectedSession.userEmail}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-xs px-2 py-1 rounded-full ${getSessionStatusColor(selectedSession.status)}`}>
-                        {selectedSession.status}
-                      </span>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(selectedSession.userEmail);
-                          toast.success('Email copied to clipboard!');
-                        }}
-                        className="text-white/60 hover:text-white transition-colors"
-                        title="Copy email"
-                      >
-                        <Mail className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                                 {/* Chat Header */}
+                 <div className="p-3 border-b border-white/20">
+                   <div className="flex items-center justify-between">
+                     <div className="flex items-center space-x-2">
+                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                         <span className="text-white font-medium text-sm">
+                           {selectedSession.userName.charAt(0).toUpperCase()}
+                         </span>
+                       </div>
+                       <div>
+                         <h3 className="text-white font-medium text-sm">{selectedSession.userName}</h3>
+                         <p className="text-white/60 text-xs">{selectedSession.userEmail}</p>
+                       </div>
+                     </div>
+                     <div className="flex items-center space-x-2">
+                       <span className={`text-xs px-2 py-1 rounded-full ${getSessionStatusColor(selectedSession.status)}`}>
+                         {selectedSession.status}
+                       </span>
+                       <button
+                         onClick={() => {
+                           navigator.clipboard.writeText(selectedSession.userEmail);
+                           toast.success('Email copied!');
+                         }}
+                         className="text-white/60 hover:text-white transition-colors p-1"
+                         title="Copy email"
+                       >
+                         <Mail className="w-3 h-3" />
+                       </button>
+                     </div>
+                   </div>
+                 </div>
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -321,35 +321,35 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input */}
-                <div className="p-4 border-t border-white/20">
-                  <div className="flex space-x-3">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      placeholder="Type your message..."
-                      className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-                    />
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={!newMessage.trim()}
-                      className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-4 py-3 rounded-xl transition-colors"
-                    >
-                      <Send className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                                 {/* Message Input */}
+                 <div className="p-3 border-t border-white/20">
+                   <div className="flex space-x-2">
+                     <input
+                       type="text"
+                       value={newMessage}
+                       onChange={(e) => setNewMessage(e.target.value)}
+                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                       placeholder="Type your response..."
+                       className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+                     />
+                     <button
+                       onClick={handleSendMessage}
+                       disabled={!newMessage.trim()}
+                       className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg transition-colors"
+                     >
+                       <Send className="w-3 h-3" />
+                     </button>
+                   </div>
+                 </div>
               </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <MessageSquare className="w-16 h-16 text-white/40 mx-auto mb-4" />
-                  <p className="text-white/60">Select a chat session to start messaging</p>
-                </div>
-              </div>
-            )}
+                         ) : (
+               <div className="flex-1 flex items-center justify-center">
+                 <div className="text-center">
+                   <MessageSquare className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                   <p className="text-white/60 text-sm">Select a conversation to respond</p>
+                 </div>
+               </div>
+             )}
           </div>
         </div>
       </motion.div>
