@@ -11,7 +11,7 @@ The admin dashboard provides comprehensive administrative controls for the Inves
 - **Password:** admin123
 
 ### How to Access
-1. Navigate to `/admin-panel-2025` in your browser
+1. Navigate to `/admin` in your browser
 2. Enter the admin credentials when prompted
 3. Once authenticated, you'll have access to the full admin dashboard
 
@@ -96,7 +96,7 @@ The admin dashboard provides comprehensive administrative controls for the Inves
 - `contactStorage.ts`: Contact form data management
 
 ### Routes
-- `/admin-panel-2025`: Protected admin dashboard route
+- `/admin`: Protected admin dashboard route
 
 ## Demo Features
 

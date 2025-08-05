@@ -78,9 +78,9 @@ const Header: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
-                  to="/admin-panel-2025"
+                  to="/admin"
                   className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive('/admin-panel-2025')
+                    isActive('/admin')
                       ? 'text-purple-400 bg-purple-400/20'
                       : 'text-purple-300 hover:text-purple-400 hover:bg-purple-400/10'
                   }`}
@@ -144,10 +144,10 @@ const Header: React.FC = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Link
-                    to="/admin-panel-2025"
+                    to="/admin"
                     onClick={() => setIsMenuOpen(false)}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-base font-medium transition-all ${
-                      isActive('/admin-panel-2025')
+                      isActive('/admin')
                         ? 'text-purple-400 bg-purple-400/20'
                         : 'text-purple-300 hover:text-purple-400 hover:bg-white/10'
                     }`}

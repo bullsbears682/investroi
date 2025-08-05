@@ -81,7 +81,7 @@ function App() {
                       <Route path="/privacy" element={<PrivacyPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/terms" element={<TermsPage />} />
-                      <Route path="/admin-panel-2025" element={<ProtectedAdminRoute />} />
+                      <Route path="/admin" element={<ProtectedAdminRoute />} />
                     </Routes>
                   </main>
                   
