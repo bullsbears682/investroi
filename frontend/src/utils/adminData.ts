@@ -294,19 +294,24 @@ class AdminDataManager {
       <html>
         <head>
           <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+            body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #ffffff; }
+            .header { text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px; }
             .section { margin: 20px 0; }
-            .metric { display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f5f5f5; }
+            .metric { display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #2d2d2d; border-radius: 5px; }
             table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
+            th, td { border: 1px solid #4a4a4a; padding: 8px; text-align: left; }
+            th { background-color: #3b82f6; color: white; }
+            .chart { margin: 20px 0; padding: 15px; background: #2d2d2d; border-radius: 8px; }
+            .highlight { color: #10b981; font-weight: bold; }
+            .warning { color: #f59e0b; font-weight: bold; }
+            .error { color: #ef4444; font-weight: bold; }
           </style>
         </head>
         <body>
           <div class="header">
             <h1>${this.getReportTitle(type)}</h1>
             <p>Generated on ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}</p>
+            <p>InvestWise Pro - Professional ROI Analysis Platform</p>
           </div>
     `;
 
@@ -315,58 +320,191 @@ class AdminDataManager {
       case 'user':
         body = `
           <div class="section">
-            <h2>User Analytics</h2>
+            <h2>📊 User Analytics Overview</h2>
             <div class="metric">
               <span>Total Users:</span>
-              <span>${content.totalUsers}</span>
+              <span class="highlight">${content.totalUsers.toLocaleString()}</span>
             </div>
             <div class="metric">
               <span>Active Users:</span>
-              <span>${content.activeUsers}</span>
+              <span class="highlight">${content.activeUsers.toLocaleString()}</span>
             </div>
             <div class="metric">
               <span>Growth Rate:</span>
-              <span>${content.userGrowth}</span>
+              <span class="highlight">${content.userGrowth}</span>
             </div>
+            <div class="metric">
+              <span>New Registrations:</span>
+              <span class="highlight">${content.newRegistrations.toLocaleString()}</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2>📈 User Engagement</h2>
+            <div class="metric">
+              <span>Daily Active Users:</span>
+              <span>${content.userEngagement.dailyActive.toLocaleString()}</span>
+            </div>
+            <div class="metric">
+              <span>Weekly Active Users:</span>
+              <span>${content.userEngagement.weeklyActive.toLocaleString()}</span>
+            </div>
+            <div class="metric">
+              <span>Retention Rate:</span>
+              <span class="highlight">${content.userEngagement.retentionRate}%</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2>🎯 Top Scenarios</h2>
+            <table>
+              <thead>
+                <tr><th>Scenario</th><th>Usage Count</th><th>Growth</th></tr>
+              </thead>
+              <tbody>
+                ${content.topScenarios.map((s: any) => `
+                  <tr>
+                    <td>${s.name}</td>
+                    <td>${s.usage.toLocaleString()}</td>
+                    <td class="highlight">+${s.growth}%</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
           </div>
         `;
         break;
       case 'calculation':
         body = `
           <div class="section">
-            <h2>Calculation Reports</h2>
+            <h2>🧮 Calculation Analytics</h2>
             <div class="metric">
               <span>Total Calculations:</span>
-              <span>${content.totalCalculations}</span>
+              <span class="highlight">${content.totalCalculations.toLocaleString()}</span>
             </div>
             <div class="metric">
               <span>Average ROI:</span>
-              <span>${content.averageROI}</span>
+              <span class="highlight">${content.averageROI}</span>
             </div>
             <div class="metric">
-              <span>Most Popular Scenario:</span>
-              <span>${content.mostPopularScenario}</span>
+              <span>Success Rate:</span>
+              <span class="highlight">${content.successRate}%</span>
             </div>
+            <div class="metric">
+              <span>Average Calculation Time:</span>
+              <span>${content.averageCalculationTime}</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2>📊 Scenario Breakdown</h2>
+            <table>
+              <thead>
+                <tr><th>Scenario</th><th>Calculations</th><th>Percentage</th></tr>
+              </thead>
+              <tbody>
+                ${Object.entries(content.calculationsByScenario).map(([scenario, count]: [string, any]) => `
+                  <tr>
+                    <td>${scenario}</td>
+                    <td>${count.toLocaleString()}</td>
+                    <td>${((count / content.totalCalculations) * 100).toFixed(1)}%</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
           </div>
         `;
         break;
       case 'revenue':
         body = `
           <div class="section">
-            <h2>Revenue Analysis</h2>
+            <h2>💰 Revenue Analysis</h2>
             <div class="metric">
               <span>Total Revenue:</span>
-              <span>$${content.totalRevenue.toLocaleString()}</span>
+              <span class="highlight">$${content.totalRevenue.toLocaleString()}</span>
+            </div>
+            <div class="metric">
+              <span>Monthly Revenue:</span>
+              <span class="highlight">$${content.monthlyRevenue.toLocaleString()}</span>
             </div>
             <div class="metric">
               <span>Monthly Growth:</span>
-              <span>${content.monthlyGrowth}</span>
+              <span class="highlight">${content.monthlyGrowth}</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2>📈 Revenue Sources</h2>
+            <table>
+              <thead>
+                <tr><th>Source</th><th>Amount</th><th>Percentage</th></tr>
+              </thead>
+              <tbody>
+                ${content.revenueSources.map((source: any) => `
+                  <tr>
+                    <td>${source.source}</td>
+                    <td>$${source.amount.toLocaleString()}</td>
+                    <td>${((source.amount / content.monthlyRevenue) * 100).toFixed(1)}%</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="section">
+            <h2>🔮 Revenue Projections</h2>
+            <div class="metric">
+              <span>Next Month:</span>
+              <span class="highlight">$${content.projections.nextMonth.toLocaleString()}</span>
+            </div>
+            <div class="metric">
+              <span>Next Quarter:</span>
+              <span class="highlight">$${content.projections.nextQuarter.toLocaleString()}</span>
+            </div>
+          </div>
+        `;
+        break;
+      case 'system':
+        body = `
+          <div class="section">
+            <h2>⚙️ System Health Overview</h2>
+            <div class="metric">
+              <span>API Status:</span>
+              <span class="${content.systemHealth.apiStatus === 'healthy' ? 'highlight' : 'error'}">${content.systemHealth.apiStatus.toUpperCase()}</span>
+            </div>
+            <div class="metric">
+              <span>Database Status:</span>
+              <span class="${content.systemHealth.databaseStatus === 'healthy' ? 'highlight' : 'error'}">${content.systemHealth.databaseStatus.toUpperCase()}</span>
+            </div>
+            <div class="metric">
+              <span>Cache Status:</span>
+              <span class="${content.systemHealth.cacheStatus === 'healthy' ? 'highlight' : 'error'}">${content.systemHealth.cacheStatus.toUpperCase()}</span>
+            </div>
+            <div class="metric">
+              <span>Uptime:</span>
+              <span class="highlight">${content.uptime}</span>
+            </div>
+          </div>
+          
+          <div class="section">
+            <h2>📊 Performance Metrics</h2>
+            <div class="metric">
+              <span>Average Response Time:</span>
+              <span>${content.performance.averageResponseTime}</span>
+            </div>
+            <div class="metric">
+              <span>Error Rate:</span>
+              <span class="${parseFloat(content.performance.errorRate) > 0.05 ? 'error' : 'highlight'}">${content.performance.errorRate}</span>
+            </div>
+            <div class="metric">
+              <span>Throughput:</span>
+              <span>${content.performance.throughput}</span>
             </div>
           </div>
         `;
         break;
       default:
-        body = `<div class="section"><h2>Report Data</h2><pre>${JSON.stringify(content, null, 2)}</pre></div>`;
+        body = `<div class="section"><h2>📋 Report Data</h2><pre>${JSON.stringify(content, null, 2)}</pre></div>`;
     }
 
     const footer = `
@@ -380,7 +518,8 @@ class AdminDataManager {
   private generateCSVContent(type: Report['type'], content: any): string {
     const now = new Date();
     let csv = `Report: ${this.getReportTitle(type)}\n`;
-    csv += `Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}\n\n`;
+    csv += `Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}\n`;
+    csv += `Platform: InvestWise Pro ROI Calculator\n\n`;
 
     switch (type) {
       case 'user':
@@ -388,17 +527,48 @@ class AdminDataManager {
         csv += `Total Users,${content.totalUsers}\n`;
         csv += `Active Users,${content.activeUsers}\n`;
         csv += `Growth Rate,${content.userGrowth}\n`;
+        csv += `New Registrations,${content.newRegistrations}\n`;
+        csv += `Daily Active Users,${content.userEngagement.dailyActive}\n`;
+        csv += `Weekly Active Users,${content.userEngagement.weeklyActive}\n`;
+        csv += `Retention Rate,${content.userEngagement.retentionRate}%\n\n`;
+        csv += `Top Scenarios\n`;
+        csv += `Scenario,Usage Count,Growth\n`;
+        content.topScenarios.forEach((s: any) => {
+          csv += `${s.name},${s.usage},${s.growth}%\n`;
+        });
         break;
       case 'calculation':
         csv += `Metric,Value\n`;
         csv += `Total Calculations,${content.totalCalculations}\n`;
         csv += `Average ROI,${content.averageROI}\n`;
-        csv += `Most Popular Scenario,${content.mostPopularScenario}\n`;
+        csv += `Success Rate,${content.successRate}%\n`;
+        csv += `Average Calculation Time,${content.averageCalculationTime}\n\n`;
+        csv += `Scenario Breakdown\n`;
+        csv += `Scenario,Calculations,Percentage\n`;
+        Object.entries(content.calculationsByScenario).forEach(([scenario, count]: [string, any]) => {
+          csv += `${scenario},${count},${((count / content.totalCalculations) * 100).toFixed(1)}%\n`;
+        });
         break;
       case 'revenue':
         csv += `Metric,Value\n`;
         csv += `Total Revenue,$${content.totalRevenue}\n`;
-        csv += `Monthly Growth,${content.monthlyGrowth}\n`;
+        csv += `Monthly Revenue,$${content.monthlyRevenue}\n`;
+        csv += `Monthly Growth,${content.monthlyGrowth}\n\n`;
+        csv += `Revenue Sources\n`;
+        csv += `Source,Amount,Percentage\n`;
+        content.revenueSources.forEach((source: any) => {
+          csv += `${source.source},$${source.amount},${((source.amount / content.monthlyRevenue) * 100).toFixed(1)}%\n`;
+        });
+        break;
+      case 'system':
+        csv += `Metric,Value\n`;
+        csv += `API Status,${content.systemHealth.apiStatus}\n`;
+        csv += `Database Status,${content.systemHealth.databaseStatus}\n`;
+        csv += `Cache Status,${content.systemHealth.cacheStatus}\n`;
+        csv += `Uptime,${content.uptime}\n`;
+        csv += `Average Response Time,${content.performance.averageResponseTime}\n`;
+        csv += `Error Rate,${content.performance.errorRate}\n`;
+        csv += `Throughput,${content.performance.throughput}\n`;
         break;
       default:
         csv += `Data\n`;

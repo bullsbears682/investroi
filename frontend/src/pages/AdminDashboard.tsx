@@ -168,7 +168,7 @@ const AdminDashboard: React.FC = () => {
     }
   }, []);
 
-  // Enhanced report generation with better error handling and progress tracking
+  // Enhanced report generation with real-time progress
   const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
     try {
       setGeneratingReport(type);
@@ -209,7 +209,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Enhanced system actions with better feedback
+  // Enhanced system actions with real progress tracking
   const handleClearCache = async () => {
     try {
       setSystemActionLoading('cache');
@@ -1260,13 +1260,13 @@ const AdminDashboard: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
-            { type: 'user' as const, name: 'User Analytics', icon: Users, color: 'text-blue-400' },
-            { type: 'calculation' as const, name: 'Calculation Reports', icon: Calculator, color: 'text-purple-400' },
-            { type: 'export' as const, name: 'Export Analytics', icon: FileText, color: 'text-green-400' },
-            { type: 'support' as const, name: 'Support Reports', icon: MessageSquare, color: 'text-orange-400' },
-            { type: 'system' as const, name: 'System Health', icon: Activity, color: 'text-red-400' },
-            { type: 'revenue' as const, name: 'Revenue Reports', icon: DollarSign, color: 'text-yellow-400' }
-          ].map(({ type, name, icon: Icon, color }) => (
+            { type: 'user' as const, name: 'User Analytics', icon: Users, color: 'text-blue-400', description: 'User registration, activity, and engagement metrics' },
+            { type: 'calculation' as const, name: 'Calculation Reports', icon: Calculator, color: 'text-purple-400', description: 'ROI calculation statistics and trends' },
+            { type: 'export' as const, name: 'Export Analytics', icon: FileText, color: 'text-green-400', description: 'PDF export usage and template preferences' },
+            { type: 'support' as const, name: 'Support Reports', icon: MessageSquare, color: 'text-orange-400', description: 'Contact submissions and support metrics' },
+            { type: 'system' as const, name: 'System Health', icon: Activity, color: 'text-red-400', description: 'System performance and health monitoring' },
+            { type: 'revenue' as const, name: 'Revenue Reports', icon: DollarSign, color: 'text-yellow-400', description: 'Revenue analysis and projections' }
+          ].map(({ type, name, icon: Icon, color, description }) => (
             <div key={type} className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
@@ -1280,6 +1280,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
               </div>
+              <p className="text-white/60 text-sm mb-3">{description}</p>
               <div className="space-y-2">
                 {['PDF', 'Excel', 'CSV'].map((format) => (
                   <button
@@ -1694,6 +1695,15 @@ const AdminDashboard: React.FC = () => {
                   />
                   <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
                 </label>
+              ) : setting.type === 'input' ? (
+                <input
+                  type="number"
+                  value={setting.value as number}
+                  onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
+                  className="w-24 px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
+                  min="1"
+                  max="1440"
+                />
               ) : (
                 <button className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors">
                   Configure
