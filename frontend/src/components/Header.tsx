@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calculator, Info, Shield, Target, TrendingUp } from 'lucide-react';
+import { Menu, X, Calculator, Info, Shield, Target, TrendingUp, Settings } from 'lucide-react';
+import { userManager } from '../utils/userManagement';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    // Initialize admin user if not exists
+    userManager.initializeAdmin();
+    
+    // Check if current user is admin
+    const adminStatus = userManager.isCurrentUserAdmin();
+    setIsAdmin(adminStatus);
+  }, []);
 
   const navigation = [
     { name: 'Home', href: '/', icon: Calculator },
@@ -59,6 +70,26 @@ const Header: React.FC = () => {
                 </Link>
               </motion.div>
             ))}
+            
+            {/* Admin Link - Only visible to admins */}
+            {isAdmin && (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  to="/admin-panel-2025"
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isActive('/admin-panel-2025')
+                      ? 'text-purple-400 bg-purple-400/20'
+                      : 'text-purple-300 hover:text-purple-400 hover:bg-purple-400/10'
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Admin</span>
+                </Link>
+              </motion.div>
+            )}
           </nav>
 
           {/* Mobile menu button */}
@@ -105,6 +136,27 @@ const Header: React.FC = () => {
                   </Link>
                 </motion.div>
               ))}
+              
+              {/* Admin Link - Only visible to admins */}
+              {isAdmin && (
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Link
+                    to="/admin-panel-2025"
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-base font-medium transition-all ${
+                      isActive('/admin-panel-2025')
+                        ? 'text-purple-400 bg-purple-400/20'
+                        : 'text-purple-300 hover:text-purple-400 hover:bg-white/10'
+                    }`}
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span>Admin</span>
+                  </Link>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         )}

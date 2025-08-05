@@ -23,9 +23,9 @@ import { userManager, User } from '../utils/userManagement';
 
 import { toast } from 'react-hot-toast';
 import AdminChat from '../components/AdminChat';
+import AdminLogout from '../components/AdminLogout';
 
 const AdminDashboard: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<ContactSubmission[]>([]);
@@ -44,6 +44,7 @@ const AdminDashboard: React.FC = () => {
   const [systemHealth, setSystemHealth] = useState<any>(null);
   const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
   const [systemActionLoading, setSystemActionLoading] = useState<string | null>(null);
+  const [showLogout, setShowLogout] = useState(false);
 
   // Enhanced data loading with better error handling and real-time updates
   const loadDashboardData = useCallback(() => {
@@ -1971,12 +1972,10 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Load admin stats when dashboard becomes visible
+  // Load admin stats when dashboard mounts
   useEffect(() => {
-    if (isVisible) {
-      loadDashboardData();
-    }
-  }, [isVisible, loadDashboardData]);
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -2075,26 +2074,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  if (!isVisible) {
-    return (
-      <div className="min-h-screen pt-20 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-sm w-full"
-        >
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">Admin Access</h1>
-          <p className="text-white/60 mb-8 text-sm sm:text-base">Enter admin credentials to continue</p>
-          <button
-            onClick={() => setIsVisible(true)}
-            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all"
-          >
-            Access Dashboard
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen pt-20">
@@ -2126,8 +2106,9 @@ const AdminDashboard: React.FC = () => {
                 Test Features
               </button>
               <button
-                onClick={() => setIsVisible(false)}
+                onClick={() => setShowLogout(true)}
                 className="text-white/60 hover:text-white transition-colors p-2"
+                title="Logout Admin"
               >
                 <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
@@ -2241,6 +2222,11 @@ const AdminDashboard: React.FC = () => {
         isOpen={showChat} 
         onClose={() => setShowChat(false)} 
       />
+
+      {/* Admin Logout */}
+      {showLogout && (
+        <AdminLogout onCancel={() => setShowLogout(false)} />
+      )}
     </div>
   );
 };
