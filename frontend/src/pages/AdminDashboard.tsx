@@ -49,17 +49,35 @@ const AdminDashboard: React.FC = () => {
   // Enhanced data loading with better error handling and real-time updates
   const loadDashboardData = useCallback(() => {
     try {
+      console.log('Loading dashboard data...');
+      
       // Initialize sample data if needed
       adminDataManager.initializeSampleData();
+      console.log('Sample data initialized');
       
       const stats = adminDataManager.getAdminStats();
+      console.log('Admin stats loaded:', stats);
+      
       const submissions = contactStorage.getSubmissions();
+      console.log('Contact submissions loaded:', submissions.length);
+      
       const allUsers = userManager.getAllUsers();
+      console.log('Users loaded:', allUsers.length);
+      
       const allReports = adminDataManager.getReports();
+      console.log('Reports loaded:', allReports.length);
+      
       const allNotifications = adminDataManager.getNotifications();
+      console.log('Notifications loaded:', allNotifications.length);
+      
       const allNotificationSettings = adminDataManager.getNotificationSettings();
+      console.log('Notification settings loaded:', allNotificationSettings.length);
+      
       const allSystemSettings = adminDataManager.getSystemSettings();
+      console.log('System settings loaded:', allSystemSettings.length);
+      
       const health = adminDataManager.getSystemHealth();
+      console.log('System health loaded:', health);
       
       // Update stats with contact data
       stats.totalContacts = submissions.length;
@@ -165,7 +183,30 @@ const AdminDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
-      toast.error('Failed to load dashboard data');
+      toast.error(`Failed to load dashboard data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Set default data to prevent complete failure
+      setAdminStats({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalCalculations: 0,
+        totalExports: 0,
+        revenue: 0,
+        growthRate: 0,
+        totalContacts: 0,
+        newContacts: 0,
+        popularScenarios: [],
+        exportStats: [],
+        recentActivity: [],
+        systemHealth: {
+          apiStatus: 'error',
+          databaseStatus: 'error',
+          cacheStatus: 'error',
+          uptime: '0 days',
+          lastBackup: 'Never',
+          activeConnections: 0
+        }
+      });
     }
   }, []);
 
