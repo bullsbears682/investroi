@@ -108,6 +108,12 @@ const AdminDashboard: React.FC = () => {
       const contactData = contactStorage.getSubmissions();
       console.log('Loaded contacts:', contactData);
       
+      // Add IDs to contact form submissions if they don't have them
+      const contactsWithIds = contactData.map((contact, index) => ({
+        ...contact,
+        id: contact.id || `contact-form-${Date.now()}-${index}`
+      }));
+      
       // Load chat messages and convert them to contact format
       const chatSessions = chatSystem.getAllSessions();
       const chatMessages = chatSessions.map(session => {
@@ -125,7 +131,7 @@ const AdminDashboard: React.FC = () => {
       });
       
       // Combine regular contacts and chat messages
-      const allContacts = [...contactData, ...chatMessages];
+      const allContacts = [...contactsWithIds, ...chatMessages];
       console.log('All contacts including chat:', allContacts);
       
       // If no contacts exist, create some sample data
@@ -166,7 +172,14 @@ const AdminDashboard: React.FC = () => {
             status: session.status === 'active' ? 'read' : session.status === 'waiting' ? 'new' : 'replied'
           };
         });
-        const updatedAllContacts = [...updatedContactData, ...updatedChatMessages];
+        
+        // Add IDs to contact form submissions
+        const updatedContactsWithIds = updatedContactData.map((contact, index) => ({
+          ...contact,
+          id: contact.id || `contact-form-${Date.now()}-${index}`
+        }));
+        
+        const updatedAllContacts = [...updatedContactsWithIds, ...updatedChatMessages];
         setContacts(updatedAllContacts || []);
         console.log('Sample contacts created:', updatedAllContacts);
       } else {
@@ -324,17 +337,26 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleReply = (contactId: string) => {
+    console.log('Reply clicked for contact ID:', contactId);
     setReplyingTo(contactId);
     setShowReplyForm(contactId);
     setReplyMessage('');
   };
 
   const handleSendReply = () => {
-    if (!replyMessage.trim() || !replyingTo) return;
+    console.log('Send reply clicked. Message:', replyMessage, 'Contact ID:', replyingTo);
+    if (!replyMessage.trim() || !replyingTo) {
+      console.log('Reply validation failed');
+      return;
+    }
 
     // Find the contact being replied to
     const contact = contacts.find(c => c.id === replyingTo);
-    if (!contact) return;
+    console.log('Found contact:', contact);
+    if (!contact) {
+      console.log('Contact not found');
+      return;
+    }
 
     // Create reply object
     const reply = {
@@ -345,10 +367,13 @@ const AdminDashboard: React.FC = () => {
       status: 'sent'
     };
 
+    console.log('Created reply object:', reply);
+
     // Store reply in localStorage
     const replies = JSON.parse(localStorage.getItem('admin_replies') || '[]');
     replies.push(reply);
     localStorage.setItem('admin_replies', JSON.stringify(replies));
+    console.log('Stored replies in localStorage');
 
     // Update contact status
     const updatedContacts = contacts.map(c => 
@@ -357,6 +382,7 @@ const AdminDashboard: React.FC = () => {
         : c
     );
     setContacts(updatedContacts);
+    console.log('Updated contacts state');
 
     // Clear reply form
     setReplyMessage('');
@@ -726,7 +752,7 @@ const AdminDashboard: React.FC = () => {
         {contacts.length > 0 ? (
           <div className="space-y-4">
             {contacts.map((contact, index) => (
-              <div key={index} className="border border-white/20 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:bg-white/5 transition-all duration-300 hover:shadow-lg backdrop-blur-sm">
+              <div key={contact.id || index} className="border border-white/20 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:bg-white/5 transition-all duration-300 hover:shadow-lg backdrop-blur-sm">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between space-y-3 sm:space-y-0">
                   <div className="flex-1">
                     <div className="flex items-start space-x-3 mb-3">
