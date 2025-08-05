@@ -20,11 +20,14 @@ import {
   Zap,
   Star,
   Target,
-  BarChart
+  BarChart,
+  Calculator,
+  Calendar
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { contactStorage } from '../utils/contactStorage';
 import { chatSystem } from '../utils/chatSystem';
+import { calculatorAnalytics } from '../utils/calculatorAnalytics';
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -164,6 +167,54 @@ const AdminDashboard: React.FC = () => {
         console.log('Sample contacts created:', updatedAllContacts);
       } else {
         setContacts(allContacts || []);
+      }
+
+      // Load calculator analytics data
+      const calculatorData = calculatorAnalytics.getAllAnalytics();
+      console.log('Loaded calculator analytics:', calculatorData);
+      
+      // If no calculator data exists, create some sample data for demonstration
+      if (!calculatorData || calculatorData.length === 0) {
+        console.log('No calculator analytics found, creating sample data...');
+        // Create sample calculator usage data
+        calculatorAnalytics.trackCalculation({
+          scenarioId: 1,
+          scenarioName: 'E-commerce Business',
+          miniScenarioName: 'Online Store',
+          userId: 'sample-user-1',
+          userEmail: 'john@example.com',
+          initialInvestment: 50000,
+          expectedReturn: 75000,
+          roiPercentage: 50,
+          riskLevel: 'Medium',
+          marketConditions: 'Bull'
+        });
+        calculatorAnalytics.trackCalculation({
+          scenarioId: 2,
+          scenarioName: 'SaaS Platform',
+          miniScenarioName: 'Subscription Service',
+          userId: 'sample-user-2',
+          userEmail: 'sarah@example.com',
+          initialInvestment: 100000,
+          expectedReturn: 180000,
+          roiPercentage: 80,
+          riskLevel: 'High',
+          marketConditions: 'Neutral'
+        });
+        calculatorAnalytics.trackCalculation({
+          scenarioId: 1,
+          scenarioName: 'E-commerce Business',
+          miniScenarioName: 'Dropshipping',
+          userId: 'sample-user-3',
+          userEmail: 'mike@example.com',
+          initialInvestment: 25000,
+          expectedReturn: 40000,
+          roiPercentage: 60,
+          riskLevel: 'Low',
+          marketConditions: 'Bull'
+        });
+        
+        console.log('Sample calculator analytics created');
       }
 
       setIsLoading(false);
@@ -664,6 +715,70 @@ const AdminDashboard: React.FC = () => {
               <span className="text-sm text-gray-300">Avg Response Time</span>
               <span className="text-sm font-bold text-blue-400">2.3 hours</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Calculator Analytics Section */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="p-2 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-lg backdrop-blur-sm">
+            <BarChart className="h-6 w-6 text-green-300" />
+          </div>
+          <h3 className="text-xl font-bold text-white">Calculator Analytics</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">Total Calculations</span>
+              <Calculator className="h-4 w-4 text-green-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">{calculatorAnalytics.getTotalCalculations()}</span>
+          </div>
+          
+          <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">Average ROI</span>
+              <TrendingUp className="h-4 w-4 text-blue-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">{calculatorAnalytics.getAverageROI().toFixed(1)}%</span>
+          </div>
+          
+          <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/20">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-300">This Month</span>
+              <Calendar className="h-4 w-4 text-purple-400" />
+            </div>
+            <span className="text-2xl font-bold text-white">
+              {calculatorAnalytics.getCalculationsInRange(
+                new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                new Date()
+              ).length}
+            </span>
+          </div>
+        </div>
+        
+        {/* Popular Scenarios */}
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4">Most Popular Scenarios</h4>
+          <div className="space-y-3">
+            {calculatorAnalytics.getPopularScenarios(5).map((scenario, index) => (
+              <div key={scenario.scenarioId} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">{scenario.scenarioName}</p>
+                    <p className="text-xs text-gray-400">{scenario.count} calculations</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm font-bold text-green-400">{scenario.count}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
