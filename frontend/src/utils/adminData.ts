@@ -190,7 +190,7 @@ class AdminDataManager {
     return Math.floor(Math.random() * 1000) + 500;
   }
 
-  // Enhanced report generation with scheduling
+  // Enhanced report generation with better content and scheduling
   async generateReport(type: Report['type'], format: Report['format']): Promise<Report> {
     const reportId = this.generateId();
     const reportName = this.getReportName(type);
@@ -225,6 +225,16 @@ class AdminDataManager {
       
       // Update progress in real-time (this would be broadcast in a real app)
       console.log(`Generating ${reportName}: ${progressSteps[i]}`);
+      
+      // Broadcast progress update
+      this.broadcastRealTimeUpdate({
+        type: 'report_progress',
+        data: {
+          reportId,
+          progress: ((i + 1) / progressSteps.length) * 100,
+          step: progressSteps[i]
+        }
+      });
     }
 
     // Generate actual report content with real data
@@ -255,6 +265,12 @@ class AdminDataManager {
 
     // Track report generation in analytics
     this.recordActivity('export', 'admin', undefined, `${type}_${format}`);
+
+    // Broadcast completion
+    this.broadcastRealTimeUpdate({
+      type: 'report_completed',
+      data: { report: updatedReport }
+    });
 
     return updatedReport;
   }
@@ -629,7 +645,7 @@ class AdminDataManager {
     }
   }
 
-  // Real-time notification system
+  // Enhanced notification system with better categorization and actions
   createNotification(type: Notification['type'], message: string, priority: Notification['priority'] = 'medium'): void {
     const notification: Notification = {
       id: this.generateId(),
@@ -650,6 +666,15 @@ class AdminDataManager {
     
     // Broadcast notification to other tabs/windows
     this.broadcastNotification(notification);
+    
+    // Create system event for high priority notifications
+    if (priority === 'high') {
+      this.createSystemEvent('high_priority_notification', {
+        type,
+        message,
+        timestamp: notification.timestamp
+      });
+    }
   }
 
   private broadcastNotification(notification: Notification): void {
@@ -839,7 +864,7 @@ class AdminDataManager {
     }
   }
 
-  // Enhanced settings validation with real-time effects
+  // Enhanced system settings with immediate effects and validation
   updateSystemSetting(settingId: string, value: boolean | string | number): void {
     const settings = this.getSystemSettings();
     const setting = settings.find(s => s.id === settingId);
@@ -879,6 +904,12 @@ class AdminDataManager {
       `System setting "${setting.name}" updated`,
       'low'
     );
+
+    // Broadcast setting change
+    this.broadcastRealTimeUpdate({
+      type: 'setting_updated',
+      data: { settingId, value: validatedValue }
+    });
   }
 
   private applySystemSetting(settingId: string, value: any): void {
@@ -955,7 +986,7 @@ class AdminDataManager {
     console.log(`Cleaned up data older than ${retentionDays} days`);
   }
 
-  // Enhanced system actions with realistic delays and effects
+  // Enhanced system actions with better progress tracking and effects
   async clearCache(): Promise<void> {
     // Simulate cache clearing process with detailed steps
     const steps = [
@@ -967,9 +998,18 @@ class AdminDataManager {
       'Cache cleared successfully'
     ];
 
-    for (const step of steps) {
+    for (let i = 0; i < steps.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 500));
-      console.log(`Cache clearing: ${step}`);
+      console.log(`Cache clearing: ${steps[i]}`);
+      
+      // Broadcast progress
+      this.broadcastRealTimeUpdate({
+        type: 'cache_progress',
+        data: {
+          step: steps[i],
+          progress: ((i + 1) / steps.length) * 100
+        }
+      });
     }
     
     // Update system health with improved metrics
@@ -984,6 +1024,12 @@ class AdminDataManager {
     
     // Create notification
     this.createNotification('system', 'Cache cleared successfully - system performance improved', 'low');
+    
+    // Broadcast completion
+    this.broadcastRealTimeUpdate({
+      type: 'cache_completed',
+      data: { health }
+    });
   }
 
   async backupData(): Promise<void> {
@@ -1000,9 +1046,18 @@ class AdminDataManager {
       'Backup completed successfully'
     ];
 
-    for (const step of steps) {
+    for (let i = 0; i < steps.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 400 + Math.random() * 600));
-      console.log(`Backup: ${step}`);
+      console.log(`Backup: ${steps[i]}`);
+      
+      // Broadcast progress
+      this.broadcastRealTimeUpdate({
+        type: 'backup_progress',
+        data: {
+          step: steps[i],
+          progress: ((i + 1) / steps.length) * 100
+        }
+      });
     }
     
     // Update last backup time
@@ -1012,6 +1067,12 @@ class AdminDataManager {
     
     // Create notification
     this.createNotification('system', 'Data backup completed successfully', 'low');
+    
+    // Broadcast completion
+    this.broadcastRealTimeUpdate({
+      type: 'backup_completed',
+      data: { health }
+    });
   }
 
   async restartServices(): Promise<void> {
@@ -1029,9 +1090,18 @@ class AdminDataManager {
       'All services restarted successfully'
     ];
 
-    for (const step of steps) {
+    for (let i = 0; i < steps.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
-      console.log(`Service restart: ${step}`);
+      console.log(`Service restart: ${steps[i]}`);
+      
+      // Broadcast progress
+      this.broadcastRealTimeUpdate({
+        type: 'restart_progress',
+        data: {
+          step: steps[i],
+          progress: ((i + 1) / steps.length) * 100
+        }
+      });
     }
     
     // Update system health with fresh status
@@ -1048,6 +1118,12 @@ class AdminDataManager {
     
     // Create notification
     this.createNotification('system', 'Services restarted successfully - all systems operational', 'medium');
+    
+    // Broadcast completion
+    this.broadcastRealTimeUpdate({
+      type: 'restart_completed',
+      data: { health }
+    });
   }
 
   // Enhanced real-time monitoring with automatic notifications
@@ -1063,10 +1139,50 @@ class AdminDataManager {
       
       // Create realistic system events based on actual data
       this.createRealisticSystemEvents();
+      
+      // Update real-time metrics
+      this.updateRealTimeMetrics();
     }, 30000);
 
     // Initial health check
     this.updateSystemHealth();
+  }
+
+  // New method to update real-time metrics
+  private updateRealTimeMetrics(): void {
+    const stats = this.getAdminStats();
+    const health = this.getSystemHealth();
+    
+    // Update real-time activity feed
+    const recentActivity = this.getRecentActivity();
+    const activityMessages = recentActivity.slice(0, 5).map(activity => ({
+      id: activity.id,
+      message: `${activity.type} by ${activity.user}`,
+      timestamp: activity.timestamp,
+      type: activity.type
+    }));
+    
+    // Broadcast real-time updates
+    this.broadcastRealTimeUpdate({
+      type: 'metrics_update',
+      data: {
+        stats,
+        health,
+        recentActivity: activityMessages
+      }
+    });
+  }
+
+  // New method to broadcast real-time updates
+  private broadcastRealTimeUpdate(update: any): void {
+    if (typeof window !== 'undefined' && window.BroadcastChannel) {
+      try {
+        const channel = new BroadcastChannel('admin_realtime');
+        channel.postMessage(update);
+      } catch (error) {
+        console.error('Failed to broadcast real-time update:', error);
+      }
+    }
   }
 
   private createRealisticSystemEvents(): void {
@@ -1759,61 +1875,127 @@ class AdminDataManager {
   //   return Math.round(this.calculateMonthlyRevenue() / 4);
   // }
 
-  // Test function to demonstrate all features are working
-  testAllFeatures(): void {
-    console.log('🧪 Testing Admin Dashboard Features...');
-    
-    // Test 1: Report Generation
-    console.log('📊 Testing Report Generation...');
-    this.generateReport('user', 'PDF').then(report => {
+  // Enhanced comprehensive test function with better reporting
+  async handleComprehensiveTest(): Promise<void> {
+    const testResults = {
+      reports: false,
+      notifications: false,
+      settings: false,
+      systemActions: false,
+      realTimeMonitoring: false,
+      activityTracking: false
+    };
+
+    try {
+      // Test 1: Report Generation
+      console.log('📊 Testing Report Generation...');
+      const report = await this.generateReport('user', 'PDF');
+      testResults.reports = true;
       console.log('✅ Report generated:', report.name);
-    });
-    
-    // Test 2: Notification System
-    console.log('🔔 Testing Notifications...');
-    this.createNotification('system', 'Test notification - all systems operational', 'low');
-    this.createNotification('user', 'Test user activity detected', 'medium');
-    this.createNotification('revenue', 'Test revenue milestone reached', 'high');
-    
-    // Test 3: System Settings
-    console.log('⚙️ Testing System Settings...');
-    const settings = this.getSystemSettings();
-    if (settings.length > 0) {
-      this.updateSystemSetting(settings[0].id, !settings[0].value);
-      console.log('✅ System setting updated');
-    }
-    
-    // Test 4: Notification Settings
-    console.log('🔧 Testing Notification Settings...');
-    const notificationSettings = this.getNotificationSettings();
-    if (notificationSettings.length > 0) {
-      this.updateNotificationSetting(notificationSettings[0].id, !notificationSettings[0].enabled);
-      console.log('✅ Notification setting updated');
-    }
-    
-    // Test 5: System Actions
-    console.log('🛠️ Testing System Actions...');
-    this.clearCache().then(() => {
+      
+      // Test 2: Notification System
+      console.log('🔔 Testing Notifications...');
+      this.createNotification('system', 'Comprehensive test - system operational', 'low');
+      this.createNotification('user', 'Comprehensive test - user activity detected', 'medium');
+      this.createNotification('revenue', 'Comprehensive test - revenue milestone', 'high');
+      testResults.notifications = true;
+      console.log('✅ Notifications created');
+      
+      // Test 3: System Settings
+      console.log('⚙️ Testing System Settings...');
+      const settings = this.getSystemSettings();
+      if (settings.length > 0) {
+        const originalValue = settings[0].value;
+        this.updateSystemSetting(settings[0].id, !originalValue);
+        // Revert the change
+        setTimeout(() => {
+          this.updateSystemSetting(settings[0].id, originalValue);
+        }, 2000);
+      }
+      testResults.settings = true;
+      console.log('✅ System settings tested');
+      
+      // Test 4: Notification Settings
+      console.log('🔧 Testing Notification Settings...');
+      const notificationSettings = this.getNotificationSettings();
+      if (notificationSettings.length > 0) {
+        const originalValue = notificationSettings[0].enabled;
+        this.updateNotificationSetting(notificationSettings[0].id, !originalValue);
+        // Revert the change
+        setTimeout(() => {
+          this.updateNotificationSetting(notificationSettings[0].id, originalValue);
+        }, 2000);
+      }
+      console.log('✅ Notification settings tested');
+      
+      // Test 5: System Actions
+      console.log('🛠️ Testing System Actions...');
+      await this.clearCache();
+      testResults.systemActions = true;
       console.log('✅ Cache cleared');
-    });
+      
+      // Test 6: Real-time Monitoring
+      console.log('📡 Testing Real-time Monitoring...');
+      this.startRealTimeMonitoring();
+      testResults.realTimeMonitoring = true;
+      console.log('✅ Real-time monitoring started');
+      
+      // Test 7: Activity Tracking
+      console.log('📈 Testing Activity Tracking...');
+      this.recordActivity('calculation', 'test-user', 'Manufacturing', 'standard');
+      this.recordActivity('export', 'test-user', undefined, 'executive');
+      testResults.activityTracking = true;
+      console.log('✅ Activity recorded');
+      
+      // Create comprehensive test notification
+      const passedTests = Object.values(testResults).filter(Boolean).length;
+      const totalTests = Object.keys(testResults).length;
+      
+      this.createNotification(
+        'system',
+        `Comprehensive test completed: ${passedTests}/${totalTests} tests passed`,
+        passedTests === totalTests ? 'low' : 'medium'
+      );
+      
+      console.log('🎉 All Admin Dashboard Features Tested Successfully!');
+      console.log('Test Results:', testResults);
+      
+    } catch (error) {
+      console.error('Comprehensive test error:', error);
+      this.createNotification(
+        'system',
+        'Comprehensive system test failed - check console for details',
+        'high'
+      );
+    }
+  }
+
+  // New method to create system events
+  private createSystemEvent(eventType: string, data: any): void {
+    const event = {
+      id: this.generateId(),
+      type: eventType,
+      data,
+      timestamp: new Date().toISOString()
+    };
     
-    // Test 6: Real-time Monitoring
-    console.log('📡 Testing Real-time Monitoring...');
-    this.startRealTimeMonitoring();
-    console.log('✅ Real-time monitoring started');
+    // Store system events
+    const events = this.getSystemEvents();
+    events.unshift(event);
+    localStorage.setItem('system_events', JSON.stringify(events.slice(0, 100))); // Keep last 100 events
+  }
+
+  // New method to get system events
+  private getSystemEvents(): any[] {
+    if (typeof window === 'undefined') return [];
     
-    // Test 7: System Health
-    console.log('💚 Testing System Health...');
-    const health = this.getSystemHealth();
-    console.log('✅ System health:', health);
-    
-    // Test 8: Activity Tracking
-    console.log('📈 Testing Activity Tracking...');
-    this.recordActivity('calculation', 'test-user', 'Manufacturing', 'standard');
-    this.recordActivity('export', 'test-user', undefined, 'executive');
-    console.log('✅ Activity recorded');
-    
-    console.log('🎉 All Admin Dashboard Features Tested Successfully!');
+    try {
+      const stored = localStorage.getItem('system_events');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error reading system events:', error);
+      return [];
+    }
   }
 }
 

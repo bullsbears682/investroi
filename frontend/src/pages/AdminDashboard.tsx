@@ -180,7 +180,440 @@ const AdminDashboard: React.FC = () => {
     };
   }, [refreshInterval]);
 
+  // Enhanced comprehensive test function
+  const handleComprehensiveTest = async () => {
+    const testToast = toast.loading('Running comprehensive system test...');
+    
+    try {
+      // Test 1: Report Generation
+      toast.loading('Testing report generation...', { id: testToast });
+      const report = await adminDataManager.generateReport('user', 'PDF');
+      console.log('✅ Report generated:', report.name);
+      
+      // Test 2: Notification System
+      toast.loading('Testing notification system...', { id: testToast });
+      adminDataManager.createNotification('system', 'Comprehensive test - system operational', 'low');
+      adminDataManager.createNotification('user', 'Comprehensive test - user activity detected', 'medium');
+      adminDataManager.createNotification('revenue', 'Comprehensive test - revenue milestone', 'high');
+      console.log('✅ Notifications created');
+      
+      // Test 3: System Settings
+      toast.loading('Testing system settings...', { id: testToast });
+      const settings = adminDataManager.getSystemSettings();
+      if (settings.length > 0) {
+        const originalValue = settings[0].value;
+        adminDataManager.updateSystemSetting(settings[0].id, !originalValue);
+        // Revert the change
+        setTimeout(() => {
+          adminDataManager.updateSystemSetting(settings[0].id, originalValue);
+        }, 2000);
+      }
+      console.log('✅ System settings tested');
+      
+      // Test 4: Notification Settings
+      toast.loading('Testing notification settings...', { id: testToast });
+      const notificationSettings = adminDataManager.getNotificationSettings();
+      if (notificationSettings.length > 0) {
+        const originalValue = notificationSettings[0].enabled;
+        adminDataManager.updateNotificationSetting(notificationSettings[0].id, !originalValue);
+        // Revert the change
+        setTimeout(() => {
+          adminDataManager.updateNotificationSetting(notificationSettings[0].id, originalValue);
+        }, 2000);
+      }
+      console.log('✅ Notification settings tested');
+      
+      // Test 5: System Actions
+      toast.loading('Testing system actions...', { id: testToast });
+      await adminDataManager.clearCache();
+      console.log('✅ Cache cleared');
+      
+      // Test 6: Real-time Monitoring
+      toast.loading('Testing real-time monitoring...', { id: testToast });
+      adminDataManager.startRealTimeMonitoring();
+      console.log('✅ Real-time monitoring started');
+      
+      // Test 7: Activity Tracking
+      toast.loading('Testing activity tracking...', { id: testToast });
+      adminDataManager.recordActivity('calculation', 'test-user', 'Manufacturing', 'standard');
+      adminDataManager.recordActivity('export', 'test-user', undefined, 'executive');
+      console.log('✅ Activity tracking tested');
+      
+      // Test 8: Data Management
+      toast.loading('Testing data management...', { id: testToast });
+      const stats = adminDataManager.getAdminStats();
+      const health = adminDataManager.getSystemHealth();
+      console.log('✅ Data management tested', { stats, health });
+      
+      // Refresh all data
+      loadDashboardData();
+      
+      toast.success('🎉 Comprehensive test completed successfully! All systems operational.', { id: testToast });
+      
+      // Create a summary notification
+      adminDataManager.createNotification(
+        'system',
+        'Comprehensive system test completed - all features working correctly',
+        'medium'
+      );
+      
+    } catch (error) {
+      console.error('Comprehensive test error:', error);
+      toast.error(`Comprehensive test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { id: testToast });
+      
+      // Create error notification
+      adminDataManager.createNotification(
+        'system',
+        'Comprehensive system test failed - check console for details',
+        'high'
+      );
+    }
+  };
 
+  // Enhanced real-time updates listener
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.BroadcastChannel) {
+      const channel = new BroadcastChannel('admin_realtime');
+      
+      const handleMessage = (event: MessageEvent) => {
+        const { type, data } = event.data;
+        
+        switch (type) {
+          case 'metrics_update':
+            // Update real-time metrics
+            if (data.stats) {
+              setAdminStats(data.stats);
+            }
+            if (data.health) {
+              setSystemHealth(data.health);
+            }
+            if (data.recentActivity) {
+              setRealTimeActivity(data.recentActivity);
+            }
+            break;
+            
+          case 'report_progress':
+            // Update report generation progress
+            toast.loading(`Generating report: ${data.step}`, { id: 'report-progress' });
+            break;
+            
+          case 'report_completed':
+            // Report generation completed
+            toast.success(`Report "${data.report.name}" generated successfully!`, { id: 'report-progress' });
+            const updatedReports = adminDataManager.getReports();
+            setReports(updatedReports);
+            break;
+            
+          case 'cache_progress':
+            // Cache clearing progress
+            toast.loading(`Cache clearing: ${data.step}`, { id: 'cache-progress' });
+            break;
+            
+          case 'cache_completed':
+            // Cache clearing completed
+            toast.success('Cache cleared successfully!', { id: 'cache-progress' });
+            if (data.health) {
+              setSystemHealth(data.health);
+            }
+            break;
+            
+          case 'backup_progress':
+            // Backup progress
+            toast.loading(`Backup: ${data.step}`, { id: 'backup-progress' });
+            break;
+            
+          case 'backup_completed':
+            // Backup completed
+            toast.success('Backup completed successfully!', { id: 'backup-progress' });
+            if (data.health) {
+              setSystemHealth(data.health);
+            }
+            break;
+            
+          case 'restart_progress':
+            // Service restart progress
+            toast.loading(`Service restart: ${data.step}`, { id: 'restart-progress' });
+            break;
+            
+          case 'restart_completed':
+            // Service restart completed
+            toast.success('Services restarted successfully!', { id: 'restart-progress' });
+            if (data.health) {
+              setSystemHealth(data.health);
+            }
+            break;
+            
+          case 'setting_updated':
+            // System setting updated
+            toast.success('Setting updated successfully');
+            break;
+            
+          case 'new_notification':
+            // New notification received
+            const updatedNotifications = adminDataManager.getNotifications();
+            setNotifications(updatedNotifications);
+            break;
+        }
+      };
+      
+      channel.addEventListener('message', handleMessage);
+      
+      return () => {
+        channel.removeEventListener('message', handleMessage);
+        channel.close();
+      };
+    }
+  }, []);
+
+  // Enhanced report generation with better progress tracking
+  const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
+    setGeneratingReport(type);
+    
+    // Show progress toast with more detailed status
+    const progressToast = toast.loading(`Generating ${type} report in ${format} format...`);
+    
+    try {
+      const report = await adminDataManager.generateReport(type, format);
+      const updatedReports = adminDataManager.getReports();
+      setReports(updatedReports);
+      
+      // Update progress toast to success with more details
+      toast.success(`Report "${report.name}" (${report.size}) generated successfully!`, {
+        id: progressToast
+      });
+      
+      // Create notification for successful report generation
+      adminDataManager.createNotification(
+        'report',
+        `Report "${report.name}" generated and ready for download`,
+        'medium'
+      );
+      
+      // Auto-refresh reports list
+      setTimeout(() => {
+        const freshReports = adminDataManager.getReports();
+        setReports(freshReports);
+      }, 1000);
+      
+    } catch (error) {
+      // Update progress toast to error with more details
+      toast.error(`Failed to generate ${type} report: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
+      
+      // Create notification for failed report generation
+      adminDataManager.createNotification(
+        'report',
+        `Failed to generate ${type} report - please try again`,
+        'high'
+      );
+    } finally {
+      setGeneratingReport(null);
+    }
+  };
+
+  // Enhanced system actions with better progress tracking
+  const handleClearCache = async () => {
+    setSystemActionLoading('cache');
+    
+    // Show detailed progress
+    const progressToast = toast.loading('Clearing system cache...');
+    
+    try {
+      await adminDataManager.clearCache();
+      
+      // Update toast with success
+      toast.success('Cache cleared successfully - system performance improved!', {
+        id: progressToast
+      });
+      
+      // Refresh system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+      setLastActivityCheck(new Date());
+      
+      // Create notification
+      adminDataManager.createNotification('system', 'System cache cleared successfully', 'low');
+      
+    } catch (error) {
+      toast.error(`Failed to clear cache: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
+    } finally {
+      setSystemActionLoading(null);
+    }
+  };
+
+  const handleBackupData = async () => {
+    setSystemActionLoading('backup');
+    
+    // Show detailed progress
+    const progressToast = toast.loading('Creating data backup...');
+    
+    try {
+      await adminDataManager.backupData();
+      
+      // Update toast with success
+      toast.success('Data backup completed successfully!', {
+        id: progressToast
+      });
+      
+      // Refresh system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+      setLastActivityCheck(new Date());
+      
+      // Create notification
+      adminDataManager.createNotification('system', 'Data backup completed successfully', 'low');
+      
+    } catch (error) {
+      toast.error(`Failed to backup data: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
+    } finally {
+      setSystemActionLoading(null);
+    }
+  };
+
+  const handleRestartServices = async () => {
+    setSystemActionLoading('restart');
+    
+    // Show detailed progress
+    const progressToast = toast.loading('Restarting system services...');
+    
+    try {
+      await adminDataManager.restartServices();
+      
+      // Update toast with success
+      toast.success('Services restarted successfully - all systems operational!', {
+        id: progressToast
+      });
+      
+      // Refresh system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+      setLastActivityCheck(new Date());
+      
+      // Create notification
+      adminDataManager.createNotification('system', 'Services restarted successfully', 'medium');
+      
+    } catch (error) {
+      toast.error(`Failed to restart services: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
+    } finally {
+      setSystemActionLoading(null);
+    }
+  };
+
+  // Enhanced notification handlers with better state management
+  const handleToggleNotificationSetting = (settingId: string, enabled: boolean) => {
+    try {
+      adminDataManager.updateNotificationSetting(settingId, enabled);
+      const updatedSettings = adminDataManager.getNotificationSettings();
+      setNotificationSettings(updatedSettings);
+      
+      // Create notification for setting change
+      const setting = notificationSettings.find(s => s.id === settingId);
+      if (setting) {
+        adminDataManager.createNotification(
+          'system', 
+          `Notification setting "${setting.name}" ${enabled ? 'enabled' : 'disabled'}`, 
+          'low'
+        );
+      }
+      
+      toast.success(`Notification setting ${enabled ? 'enabled' : 'disabled'}`);
+    } catch (error) {
+      toast.error('Failed to update notification setting');
+    }
+  };
+
+  // Enhanced system settings handlers with better validation
+  const handleToggleSystemSetting = (settingId: string, value: boolean | string) => {
+    try {
+      if (typeof value === 'boolean') {
+        adminDataManager.updateSystemSetting(settingId, value);
+      } else {
+        adminDataManager.updateSystemSetting(settingId, value);
+      }
+      const updatedSettings = adminDataManager.getSystemSettings();
+      setSystemSettings(updatedSettings);
+      
+      // Create notification for setting change
+      const setting = systemSettings.find(s => s.id === settingId);
+      if (setting) {
+        adminDataManager.createNotification(
+          'system', 
+          `System setting "${setting.name}" ${typeof value === 'boolean' ? (value ? 'enabled' : 'disabled') : 'updated'}`, 
+          'low'
+        );
+      }
+      
+      toast.success('Setting updated successfully');
+    } catch (error) {
+      toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleUpdateSystemSetting = (settingId: string, value: number) => {
+    try {
+      adminDataManager.updateSystemSetting(settingId, value);
+      const updatedSettings = adminDataManager.getSystemSettings();
+      setSystemSettings(updatedSettings);
+      
+      // Create notification for setting change
+      const setting = systemSettings.find(s => s.id === settingId);
+      if (setting) {
+        adminDataManager.createNotification(
+          'system', 
+          `System setting "${setting.name}" updated to ${value}`, 
+          'low'
+        );
+      }
+      
+      toast.success('Setting updated successfully');
+    } catch (error) {
+      toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  // Enhanced notification handlers with better state management
+  const handleMarkNotificationAsRead = (notificationId: string) => {
+    try {
+      adminDataManager.markNotificationAsRead(notificationId);
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+    } catch (error) {
+      toast.error('Failed to mark notification as read');
+    }
+  };
+
+  const handleMarkAllAsRead = () => {
+    try {
+      notifications.forEach(notification => {
+        if (!notification.isRead) {
+          adminDataManager.markNotificationAsRead(notification.id);
+        }
+      });
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      toast.error('Failed to mark all notifications as read');
+    }
+  };
+
+  const handleDeleteNotification = (notificationId: string) => {
+    try {
+      adminDataManager.deleteNotification(notificationId);
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+      toast.success('Notification deleted');
+    } catch (error) {
+      toast.error('Failed to delete notification');
+    }
+  };
 
   // Use real data or fallback to mock data
   const stats = adminStats || {
@@ -300,53 +733,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Enhanced report generation with better progress tracking
-  const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
-    setGeneratingReport(type);
-    
-    // Show progress toast with more detailed status
-    const progressToast = toast.loading(`Generating ${type} report in ${format} format...`);
-    
-    try {
-      const report = await adminDataManager.generateReport(type, format);
-      const updatedReports = adminDataManager.getReports();
-      setReports(updatedReports);
-      
-      // Update progress toast to success with more details
-      toast.success(`Report "${report.name}" (${report.size}) generated successfully!`, {
-        id: progressToast
-      });
-      
-      // Create notification for successful report generation
-      adminDataManager.createNotification(
-        'report',
-        `Report "${report.name}" generated and ready for download`,
-        'medium'
-      );
-      
-      // Auto-refresh reports list
-      setTimeout(() => {
-        const freshReports = adminDataManager.getReports();
-        setReports(freshReports);
-      }, 1000);
-      
-    } catch (error) {
-      // Update progress toast to error with more details
-      toast.error(`Failed to generate ${type} report: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        id: progressToast
-      });
-      
-      // Create notification for failed report generation
-      adminDataManager.createNotification(
-        'report',
-        `Failed to generate ${type} report - please try again`,
-        'high'
-      );
-    } finally {
-      setGeneratingReport(null);
-    }
-  };
-
   // Enhanced download with better error handling and file validation
   const handleDownloadReport = (report: Report) => {
     if (!report.downloadUrl) {
@@ -420,331 +806,9 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Enhanced notification handlers with better state management
-  const handleToggleNotificationSetting = (settingId: string, enabled: boolean) => {
-    try {
-      adminDataManager.updateNotificationSetting(settingId, enabled);
-      const updatedSettings = adminDataManager.getNotificationSettings();
-      setNotificationSettings(updatedSettings);
-      
-      // Create notification for setting change
-      const setting = notificationSettings.find(s => s.id === settingId);
-      if (setting) {
-        adminDataManager.createNotification(
-          'system', 
-          `Notification setting "${setting.name}" ${enabled ? 'enabled' : 'disabled'}`, 
-          'low'
-        );
-      }
-      
-      toast.success(`Notification setting ${enabled ? 'enabled' : 'disabled'}`);
-    } catch (error) {
-      toast.error('Failed to update notification setting');
-    }
-  };
 
-  const handleMarkNotificationAsRead = (notificationId: string) => {
-    try {
-      adminDataManager.markNotificationAsRead(notificationId);
-      const updatedNotifications = adminDataManager.getNotifications();
-      setNotifications(updatedNotifications);
-    } catch (error) {
-      toast.error('Failed to mark notification as read');
-    }
-  };
 
-  const handleMarkAllAsRead = () => {
-    try {
-      notifications.forEach(notification => {
-        if (!notification.isRead) {
-          adminDataManager.markNotificationAsRead(notification.id);
-        }
-      });
-      const updatedNotifications = adminDataManager.getNotifications();
-      setNotifications(updatedNotifications);
-      toast.success('All notifications marked as read');
-    } catch (error) {
-      toast.error('Failed to mark all notifications as read');
-    }
-  };
 
-  const handleDeleteNotification = (notificationId: string) => {
-    try {
-      adminDataManager.deleteNotification(notificationId);
-      const updatedNotifications = adminDataManager.getNotifications();
-      setNotifications(updatedNotifications);
-      toast.success('Notification deleted');
-    } catch (error) {
-      toast.error('Failed to delete notification');
-    }
-  };
-
-  // Enhanced system settings handlers with better validation
-  const handleToggleSystemSetting = (settingId: string, value: boolean | string) => {
-    try {
-      if (typeof value === 'boolean') {
-        adminDataManager.updateSystemSetting(settingId, value);
-      } else {
-        adminDataManager.updateSystemSetting(settingId, value);
-      }
-      const updatedSettings = adminDataManager.getSystemSettings();
-      setSystemSettings(updatedSettings);
-      
-      // Create notification for setting change
-      const setting = systemSettings.find(s => s.id === settingId);
-      if (setting) {
-        adminDataManager.createNotification(
-          'system', 
-          `System setting "${setting.name}" ${typeof value === 'boolean' ? (value ? 'enabled' : 'disabled') : 'updated'}`, 
-          'low'
-        );
-      }
-      
-      toast.success('Setting updated successfully');
-    } catch (error) {
-      toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  };
-
-  const handleUpdateSystemSetting = (settingId: string, value: number) => {
-    try {
-      adminDataManager.updateSystemSetting(settingId, value);
-      const updatedSettings = adminDataManager.getSystemSettings();
-      setSystemSettings(updatedSettings);
-      
-      // Create notification for setting change
-      const setting = systemSettings.find(s => s.id === settingId);
-      if (setting) {
-        adminDataManager.createNotification(
-          'system', 
-          `System setting "${setting.name}" updated to ${value}`, 
-          'low'
-        );
-      }
-      
-      toast.success('Setting updated successfully');
-    } catch (error) {
-      toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  };
-
-  // Enhanced system actions with better feedback and validation
-  const handleClearCache = async () => {
-    setSystemActionLoading('cache');
-    
-    // Show detailed progress
-    const progressToast = toast.loading('Clearing system cache...');
-    
-    try {
-      await adminDataManager.clearCache();
-      
-      // Update toast with success
-      toast.success('Cache cleared successfully - system performance improved!', {
-        id: progressToast
-      });
-      
-      // Refresh system health
-      const health = adminDataManager.getSystemHealth();
-      setSystemHealth(health);
-      setLastActivityCheck(new Date());
-      
-      // Create notification
-      adminDataManager.createNotification('system', 'System cache cleared successfully', 'low');
-      
-    } catch (error) {
-      toast.error(`Failed to clear cache: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        id: progressToast
-      });
-    } finally {
-      setSystemActionLoading(null);
-    }
-  };
-
-  const handleBackupData = async () => {
-    setSystemActionLoading('backup');
-    
-    // Show detailed progress
-    const progressToast = toast.loading('Creating data backup...');
-    
-    try {
-      await adminDataManager.backupData();
-      
-      // Update toast with success
-      toast.success('Data backup completed successfully!', {
-        id: progressToast
-      });
-      
-      // Refresh system health
-      const health = adminDataManager.getSystemHealth();
-      setSystemHealth(health);
-      setLastActivityCheck(new Date());
-      
-      // Create notification
-      adminDataManager.createNotification('system', 'Data backup completed successfully', 'low');
-      
-    } catch (error) {
-      toast.error(`Failed to backup data: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        id: progressToast
-      });
-    } finally {
-      setSystemActionLoading(null);
-    }
-  };
-
-  const handleRestartServices = async () => {
-    setSystemActionLoading('restart');
-    
-    // Show detailed progress
-    const progressToast = toast.loading('Restarting system services...');
-    
-    try {
-      await adminDataManager.restartServices();
-      
-      // Update toast with success
-      toast.success('Services restarted successfully - all systems operational!', {
-        id: progressToast
-      });
-      
-      // Refresh system health
-      const health = adminDataManager.getSystemHealth();
-      setSystemHealth(health);
-      setLastActivityCheck(new Date());
-      
-      // Create notification
-      adminDataManager.createNotification('system', 'Services restarted successfully', 'medium');
-      
-    } catch (error) {
-      toast.error(`Failed to restart services: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        id: progressToast
-      });
-    } finally {
-      setSystemActionLoading(null);
-    }
-  };
-
-  // Test all functionality
-  const handleTestAllFeatures = () => {
-    try {
-      // Test report generation
-      adminDataManager.generateReport('user', 'PDF').then(report => {
-        toast.success(`Test report "${report.name}" generated successfully`);
-      });
-
-      // Test notifications
-      adminDataManager.createNotification('system', 'Test notification - all systems operational', 'low');
-      adminDataManager.createNotification('user', 'Test user activity detected', 'medium');
-      adminDataManager.createNotification('revenue', 'Test revenue milestone reached', 'high');
-
-      // Test system settings
-      const settings = adminDataManager.getSystemSettings();
-      if (settings.length > 0) {
-        adminDataManager.updateSystemSetting(settings[0].id, !settings[0].value);
-      }
-
-      // Test notification settings
-      const notificationSettings = adminDataManager.getNotificationSettings();
-      if (notificationSettings.length > 0) {
-        adminDataManager.updateNotificationSetting(notificationSettings[0].id, !notificationSettings[0].enabled);
-      }
-
-      // Refresh all data
-      loadDashboardData();
-
-      toast.success('All features tested successfully! Check the dashboard for updates.');
-    } catch (error) {
-      toast.error('Error testing features');
-    }
-  };
-
-  // Enhanced comprehensive test function
-  const handleComprehensiveTest = async () => {
-    const testToast = toast.loading('Running comprehensive system test...');
-    
-    try {
-      // Test 1: Report Generation
-      toast.loading('Testing report generation...', { id: testToast });
-      const report = await adminDataManager.generateReport('user', 'PDF');
-      console.log('✅ Report generated:', report.name);
-      
-      // Test 2: Notification System
-      toast.loading('Testing notification system...', { id: testToast });
-      adminDataManager.createNotification('system', 'Comprehensive test - system operational', 'low');
-      adminDataManager.createNotification('user', 'Comprehensive test - user activity detected', 'medium');
-      adminDataManager.createNotification('revenue', 'Comprehensive test - revenue milestone', 'high');
-      console.log('✅ Notifications created');
-      
-      // Test 3: System Settings
-      toast.loading('Testing system settings...', { id: testToast });
-      const settings = adminDataManager.getSystemSettings();
-      if (settings.length > 0) {
-        const originalValue = settings[0].value;
-        adminDataManager.updateSystemSetting(settings[0].id, !originalValue);
-        // Revert the change
-        setTimeout(() => {
-          adminDataManager.updateSystemSetting(settings[0].id, originalValue);
-        }, 2000);
-      }
-      console.log('✅ System settings tested');
-      
-      // Test 4: Notification Settings
-      toast.loading('Testing notification settings...', { id: testToast });
-      const notificationSettings = adminDataManager.getNotificationSettings();
-      if (notificationSettings.length > 0) {
-        const originalValue = notificationSettings[0].enabled;
-        adminDataManager.updateNotificationSetting(notificationSettings[0].id, !originalValue);
-        // Revert the change
-        setTimeout(() => {
-          adminDataManager.updateNotificationSetting(notificationSettings[0].id, originalValue);
-        }, 2000);
-      }
-      console.log('✅ Notification settings tested');
-      
-      // Test 5: System Actions
-      toast.loading('Testing system actions...', { id: testToast });
-      await adminDataManager.clearCache();
-      console.log('✅ Cache cleared');
-      
-      // Test 6: Real-time Monitoring
-      toast.loading('Testing real-time monitoring...', { id: testToast });
-      adminDataManager.startRealTimeMonitoring();
-      console.log('✅ Real-time monitoring started');
-      
-      // Test 7: Activity Tracking
-      toast.loading('Testing activity tracking...', { id: testToast });
-      adminDataManager.recordActivity('calculation', 'test-user', 'Manufacturing', 'standard');
-      adminDataManager.recordActivity('export', 'test-user', undefined, 'executive');
-      console.log('✅ Activity tracking tested');
-      
-      // Test 8: Data Management
-      toast.loading('Testing data management...', { id: testToast });
-      const stats = adminDataManager.getAdminStats();
-      const health = adminDataManager.getSystemHealth();
-      console.log('✅ Data management tested', { stats, health });
-      
-      // Refresh all data
-      loadDashboardData();
-      
-      toast.success('🎉 Comprehensive test completed successfully! All systems operational.', { id: testToast });
-      
-      // Create a summary notification
-      adminDataManager.createNotification(
-        'system',
-        'Comprehensive system test completed - all features working correctly',
-        'medium'
-      );
-      
-    } catch (error) {
-      console.error('Comprehensive test error:', error);
-      toast.error(`Comprehensive test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, { id: testToast });
-      
-      // Create error notification
-      adminDataManager.createNotification(
-        'system',
-        'Comprehensive system test failed - check console for details',
-        'high'
-      );
-    }
-  };
 
   const renderMetricModal = () => {
     if (!selectedMetric) return null;
@@ -2179,7 +2243,7 @@ const AdminDashboard: React.FC = () => {
                 Comprehensive Test
               </button>
               <button
-                onClick={handleTestAllFeatures}
+                onClick={handleComprehensiveTest}
                 className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
                 title="Test All Features"
               >
