@@ -1,15 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   MessageSquare, 
   Send, 
-  Users, 
-  Clock, 
-  CheckCircle, 
   X, 
-  AlertCircle,
-  User,
-  Phone,
   Mail
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -112,14 +106,7 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
     });
   };
 
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+
 
   if (!isOpen) return null;
 

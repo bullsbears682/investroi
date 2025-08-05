@@ -22,6 +22,7 @@ import MarketResearchPage from './pages/MarketResearchPage';
 import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
 import AdminDashboard from './pages/AdminDashboard';
+import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 
 // Store
@@ -89,6 +90,9 @@ function App() {
 
                 {/* Cookie consent */}
                 <CookieConsent />
+                
+                {/* Live Chat Button */}
+                <ChatButton />
               </div>
             </div>
           </Router>

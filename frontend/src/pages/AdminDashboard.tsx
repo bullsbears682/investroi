@@ -15,12 +15,13 @@ import {
   Target,
   Menu,
   X,
-  Mail
+  Mail,
+  MessageSquare
 } from 'lucide-react';
 import { contactStorage, ContactSubmission } from '../utils/contactStorage';
 import { adminDataManager, AdminStats } from '../utils/adminData';
 import { userManager, User } from '../utils/userManagement';
-import { chatSystem } from '../utils/chatSystem';
+
 import { toast } from 'react-hot-toast';
 import AdminChat from '../components/AdminChat';
 
@@ -885,6 +886,13 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
+                onClick={() => setShowChat(true)}
+                className="text-white/60 hover:text-white transition-colors p-2"
+                title="Live Chat Support"
+              >
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+              <button
                 onClick={() => setIsVisible(false)}
                 className="text-white/60 hover:text-white transition-colors p-2"
               >
@@ -973,6 +981,12 @@ const AdminDashboard: React.FC = () => {
 
       {/* Metric Modal */}
       {renderMetricModal()}
+
+      {/* Admin Chat */}
+      <AdminChat 
+        isOpen={showChat} 
+        onClose={() => setShowChat(false)} 
+      />
     </div>
   );
 };
