@@ -317,10 +317,12 @@ const AdminDashboard: React.FC = () => {
 
       // Load notifications
       const storedNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
+      console.log('Loaded notifications:', storedNotifications);
       setNotifications(storedNotifications);
       
       // Create sample notifications if none exist
       if (storedNotifications.length === 0) {
+        console.log('Creating sample notifications...');
         const sampleNotifications = [
           {
             id: '1',
@@ -361,6 +363,7 @@ const AdminDashboard: React.FC = () => {
         ];
         setNotifications(sampleNotifications);
         localStorage.setItem('admin_notifications', JSON.stringify(sampleNotifications));
+        console.log('Sample notifications created:', sampleNotifications);
       }
 
       setIsLoading(false);
@@ -521,7 +524,9 @@ const AdminDashboard: React.FC = () => {
   };
 
   const getUnreadCount = () => {
-    return notifications.filter(notification => !notification.read).length;
+    const unreadCount = notifications.filter(notification => !notification.read).length;
+    console.log('Unread notifications count:', unreadCount, 'Total notifications:', notifications.length);
+    return unreadCount;
   };
 
   const renderOverview = () => (
