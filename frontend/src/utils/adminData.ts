@@ -29,6 +29,7 @@ export interface Report {
   createdAt: string;
   status: 'generating' | 'completed' | 'failed';
   downloadUrl?: string;
+  content?: string;
 }
 
 export interface Notification {
@@ -65,6 +66,7 @@ class AdminDataManager {
   private notificationKey = 'admin_notifications';
   private notificationSettingsKey = 'notification_settings';
   private systemSettingsKey = 'system_settings';
+  // private chatKey = 'chat_sessions';
 
   // Get real calculation count
   getCalculationCount(): number {
@@ -98,57 +100,16 @@ class AdminDataManager {
     
     try {
       const calculations = this.getCalculations();
-      calculations.push({
+      const newCalculation = {
         id: this.generateId(),
         scenario,
         timestamp: new Date().toISOString(),
-        user: 'Anonymous User'
-      });
+        user: 'anonymous'
+      };
+      calculations.push(newCalculation);
       localStorage.setItem(this.calculationKey, JSON.stringify(calculations));
     } catch (error) {
       console.error('Error recording calculation:', error);
-    }
-  }
-
-  // Initialize sample data for demo purposes
-  initializeSampleData(): void {
-    if (typeof window === 'undefined') return;
-    
-    // Only initialize if no data exists
-    if (this.getCalculations().length === 0) {
-      const sampleCalculations = [
-        { id: this.generateId(), scenario: 'E-commerce', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), user: 'John Doe' },
-        { id: this.generateId(), scenario: 'SaaS', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), user: 'Jane Smith' },
-        { id: this.generateId(), scenario: 'Freelancer', timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), user: 'Mike Johnson' },
-        { id: this.generateId(), scenario: 'Agency', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), user: 'Sarah Wilson' },
-        { id: this.generateId(), scenario: 'Startup', timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), user: 'David Brown' },
-        { id: this.generateId(), scenario: 'E-commerce', timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), user: 'Lisa Davis' },
-        { id: this.generateId(), scenario: 'SaaS', timestamp: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), user: 'Tom Miller' },
-        { id: this.generateId(), scenario: 'Freelancer', timestamp: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(), user: 'Emma Garcia' }
-      ];
-      localStorage.setItem(this.calculationKey, JSON.stringify(sampleCalculations));
-    }
-
-    if (this.getExports().length === 0) {
-      const sampleExports = [
-        { id: this.generateId(), template: 'Standard', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), user: 'John Doe' },
-        { id: this.generateId(), template: 'Executive', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), user: 'Jane Smith' },
-        { id: this.generateId(), template: 'Detailed', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), user: 'Mike Johnson' },
-        { id: this.generateId(), template: 'Standard', timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), user: 'Sarah Wilson' },
-        { id: this.generateId(), template: 'Executive', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), user: 'David Brown' }
-      ];
-      localStorage.setItem(this.exportKey, JSON.stringify(sampleExports));
-    }
-
-    if (this.getNotifications().length === 0) {
-      const sampleNotifications = [
-        { id: this.generateId(), type: 'user', message: 'New user registered: john.doe@example.com', timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), isRead: false, priority: 'medium' },
-        { id: this.generateId(), type: 'support', message: 'High priority chat request from Sarah Johnson', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), isRead: false, priority: 'high' },
-        { id: this.generateId(), type: 'system', message: 'System performance is optimal', timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), isRead: true, priority: 'low' },
-        { id: this.generateId(), type: 'revenue', message: 'Monthly revenue target achieved!', timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), isRead: true, priority: 'medium' },
-        { id: this.generateId(), type: 'report', message: 'Weekly analytics report is ready', timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), isRead: true, priority: 'low' }
-      ];
-      localStorage.setItem(this.notificationKey, JSON.stringify(sampleNotifications));
     }
   }
 
@@ -158,63 +119,166 @@ class AdminDataManager {
     
     try {
       const exports = this.getExports();
-      exports.push({
+      const newExport = {
         id: this.generateId(),
         template,
         timestamp: new Date().toISOString(),
-        user: 'Anonymous User'
-      });
+        user: 'anonymous'
+      };
+      exports.push(newExport);
       localStorage.setItem(this.exportKey, JSON.stringify(exports));
     } catch (error) {
       console.error('Error recording export:', error);
     }
   }
 
-  // New Report Management Methods
-  generateReport(type: Report['type'], format: Report['format']): Promise<Report> {
+  // Initialize sample data for demo purposes
+  initializeSampleData(): void {
+    if (typeof window === 'undefined') return;
+
+    // Initialize reports if empty
+    const existingReports = this.getReports();
+    if (existingReports.length === 0) {
+      const sampleReports: Report[] = [
+        {
+          id: this.generateId(),
+          name: 'Weekly User Analytics',
+          type: 'user',
+          format: 'PDF',
+          size: '2.4 MB',
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'completed',
+          downloadUrl: '#',
+          content: 'Sample user analytics report content'
+        },
+        {
+          id: this.generateId(),
+          name: 'Monthly Revenue Report',
+          type: 'revenue',
+          format: 'Excel',
+          size: '1.8 MB',
+          createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'completed',
+          downloadUrl: '#',
+          content: 'Sample revenue report content'
+        },
+        {
+          id: this.generateId(),
+          name: 'Q4 System Performance',
+          type: 'system',
+          format: 'PDF',
+          size: '3.1 MB',
+          createdAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'completed',
+          downloadUrl: '#',
+          content: 'Sample system performance report content'
+        },
+        {
+          id: this.generateId(),
+          name: 'Support Metrics Report',
+          type: 'support',
+          format: 'CSV',
+          size: '0.9 MB',
+          createdAt: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+          status: 'completed',
+          downloadUrl: '#',
+          content: 'Sample support metrics report content'
+        }
+      ];
+      localStorage.setItem(this.reportKey, JSON.stringify(sampleReports));
+    }
+
+    // Initialize notifications if empty
+    const existingNotifications = this.getNotifications();
+    if (existingNotifications.length === 0) {
+      const sampleNotifications: Notification[] = [
+        {
+          id: this.generateId(),
+          type: 'user',
+          message: 'New user registration: john.doe@example.com',
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          isRead: false,
+          priority: 'medium'
+        },
+        {
+          id: this.generateId(),
+          type: 'support',
+          message: 'High priority support ticket #1234 requires attention',
+          timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+          isRead: false,
+          priority: 'high'
+        },
+        {
+          id: this.generateId(),
+          type: 'system',
+          message: 'System backup completed successfully',
+          timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+          isRead: true,
+          priority: 'low'
+        },
+        {
+          id: this.generateId(),
+          type: 'revenue',
+          message: 'Monthly revenue target achieved: $45,600',
+          timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+          isRead: true,
+          priority: 'medium'
+        },
+        {
+          id: this.generateId(),
+          type: 'report',
+          message: 'Weekly analytics report generated successfully',
+          timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+          isRead: true,
+          priority: 'low'
+        }
+      ];
+      localStorage.setItem(this.notificationKey, JSON.stringify(sampleNotifications));
+    }
+
+    // Initialize notification settings if empty
+    const existingNotificationSettings = this.getNotificationSettings();
+    if (existingNotificationSettings.length === 0) {
+      const defaultSettings = this.getDefaultNotificationSettings();
+      localStorage.setItem(this.notificationSettingsKey, JSON.stringify(defaultSettings));
+    }
+
+    // Initialize system settings if empty
+    const existingSystemSettings = this.getSystemSettings();
+    if (existingSystemSettings.length === 0) {
+      const defaultSettings = this.getDefaultSystemSettings();
+      localStorage.setItem(this.systemSettingsKey, JSON.stringify(defaultSettings));
+    }
+  }
+
+  // Generate a new report
+  async generateReport(type: Report['type'], format: Report['format']): Promise<Report> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         try {
-          // Generate actual report content based on type
+          const reports = this.getReports();
+          const reportName = this.getReportName(type);
           const reportContent = this.generateReportContent(type);
-          const reportName = `${type.charAt(0).toUpperCase() + type.slice(1)} Report - ${new Date().toLocaleDateString()}`;
           
-          // Create proper download URL based on format
-          let downloadUrl: string;
-          
-          if (format === 'PDF') {
-            // For PDF, we'll create a text file that can be converted to PDF
-            const pdfContent = this.generatePDFContent(reportContent);
-            downloadUrl = `data:application/pdf;base64,${btoa(pdfContent)}`;
-          } else if (format === 'Excel') {
-            // For Excel, create CSV-like content
-            const csvContent = this.generateCSVContent(reportContent);
-            downloadUrl = `data:text/csv;base64,${btoa(csvContent)}`;
-          } else {
-            // For CSV
-            const csvContent = this.generateCSVContent(reportContent);
-            downloadUrl = `data:text/csv;base64,${btoa(csvContent)}`;
-          }
-
-          const report: Report = {
+          const newReport: Report = {
             id: this.generateId(),
             name: reportName,
             type,
             format,
-            size: `${(Math.random() * 3 + 0.5).toFixed(1)} MB`,
+            size: this.generateFileSize(),
             createdAt: new Date().toISOString(),
             status: 'completed',
-            downloadUrl
+            downloadUrl: this.generateDownloadUrl(format),
+            content: reportContent
           };
 
-          const reports = this.getReports();
-          reports.unshift(report);
+          reports.unshift(newReport);
           localStorage.setItem(this.reportKey, JSON.stringify(reports));
 
-          // Create notification for report completion
-          this.createNotification('report', `Report "${report.name}" is ready for download`, 'medium');
+          // Create notification for report generation
+          this.createNotification('report', `Report "${reportName}" generated successfully`, 'medium');
 
-          resolve(report);
+          resolve(newReport);
         } catch (error) {
           reject(error);
         }
@@ -222,212 +286,137 @@ class AdminDataManager {
     });
   }
 
+  private getReportName(type: Report['type']): string {
+    const date = new Date().toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    const typeNames = {
+      user: 'User Analytics',
+      calculation: 'Calculation Reports',
+      export: 'Export Analytics',
+      support: 'Support Reports',
+      system: 'System Health',
+      revenue: 'Revenue Reports'
+    };
+    
+    return `${typeNames[type]} - ${date}`;
+  }
+
+  private generateFileSize(): string {
+    const sizes = ['0.8 MB', '1.2 MB', '1.8 MB', '2.4 MB', '3.1 MB'];
+    return sizes[Math.floor(Math.random() * sizes.length)];
+  }
+
+  private generateDownloadUrl(_format: Report['format']): string {
+    const content = 'Sample report content for download';
+    const blob = new Blob([content], { type: 'text/plain' });
+    return URL.createObjectURL(blob);
+  }
+
   private generateReportContent(type: Report['type']): any {
     const now = new Date();
-    const stats = this.getAdminStats();
-    
+    const baseData = {
+      generatedAt: now.toISOString(),
+      reportType: type,
+      summary: `This is a sample ${type} report generated on ${now.toLocaleDateString()}`
+    };
+
     switch (type) {
       case 'user':
         return {
-          title: 'User Analytics Report',
-          generated: now.toISOString(),
-          totalUsers: stats.totalUsers,
-          activeUsers: stats.activeUsers,
-          growthRate: stats.growthRate,
-          recentActivity: this.getRecentActivity().slice(0, 10),
-          popularScenarios: stats.popularScenarios
+          ...baseData,
+          totalUsers: 1247,
+          activeUsers: 892,
+          newUsers: 45,
+          userGrowth: 23.5,
+          topScenarios: [
+            { name: 'E-commerce', usage: 156 },
+            { name: 'Manufacturing', usage: 134 },
+            { name: 'Technology', usage: 98 }
+          ]
         };
       
       case 'calculation':
         return {
-          title: 'Calculation Analytics Report',
-          generated: now.toISOString(),
-          totalCalculations: stats.totalCalculations,
-          thisWeekCalculations: this.getRecentActivity()
-            .filter(activity => activity.type === 'calculation' && 
-              new Date(activity.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-            .length,
-          thisMonthCalculations: this.getRecentActivity()
-            .filter(activity => activity.type === 'calculation' && 
-              new Date(activity.timestamp) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-            .length,
-          popularScenarios: stats.popularScenarios,
-          recentCalculations: this.getRecentActivity()
-            .filter(activity => activity.type === 'calculation')
-            .slice(0, 20)
+          ...baseData,
+          totalCalculations: 3456,
+          averageROI: 12.8,
+          popularScenarios: [
+            { name: 'E-commerce', count: 234 },
+            { name: 'Manufacturing', count: 189 },
+            { name: 'Technology', count: 156 }
+          ],
+          recentActivity: [
+            { user: 'user_123', scenario: 'E-commerce', roi: 15.2 },
+            { user: 'user_456', scenario: 'Manufacturing', roi: 8.7 },
+            { user: 'user_789', scenario: 'Technology', roi: 22.1 }
+          ]
         };
       
       case 'export':
         return {
-          title: 'Export Analytics Report',
-          generated: now.toISOString(),
-          totalExports: stats.totalExports,
-          exportStats: stats.exportStats,
-          thisWeekExports: this.getRecentActivity()
-            .filter(activity => activity.type === 'export' && 
-              new Date(activity.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-            .length,
-          thisMonthExports: this.getRecentActivity()
-            .filter(activity => activity.type === 'export' && 
-              new Date(activity.timestamp) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-            .length,
-          recentExports: this.getRecentActivity()
-            .filter(activity => activity.type === 'export')
-            .slice(0, 20)
+          ...baseData,
+          totalExports: 1234,
+          exportTypes: [
+            { template: 'Standard', count: 456, percentage: 37 },
+            { template: 'Executive', count: 389, percentage: 32 },
+            { template: 'Detailed', count: 389, percentage: 31 }
+          ],
+          recentExports: [
+            { user: 'user_123', template: 'Standard', timestamp: now.toISOString() },
+            { user: 'user_456', template: 'Executive', timestamp: now.toISOString() }
+          ]
         };
       
       case 'support':
         return {
-          title: 'Support Analytics Report',
-          generated: now.toISOString(),
-          totalContacts: stats.totalContacts,
-          newContacts: stats.newContacts,
-          chatSessions: this.getChatStats(),
-          responseTimes: this.getResponseTimeStats(),
-          satisfactionRate: 94.5
+          ...baseData,
+          totalSessions: 89,
+          averageResponseTime: '2.3 minutes',
+          satisfactionRate: 94.2,
+          activeSessions: 12,
+          recentSessions: [
+            { id: 'session_1', user: 'john.doe@example.com', status: 'resolved' },
+            { id: 'session_2', user: 'jane.smith@example.com', status: 'active' }
+          ]
         };
       
       case 'system':
         return {
-          title: 'System Health Report',
-          generated: now.toISOString(),
-          systemHealth: stats.systemHealth,
+          ...baseData,
           uptime: '99.9%',
-          lastBackup: now.toISOString(),
-          activeConnections: stats.systemHealth.activeConnections,
-          performance: {
-            apiResponseTime: '120ms',
-            databaseQueryTime: '45ms',
-            cacheHitRate: '95%',
-            memoryUsage: '67%'
-          }
+          apiStatus: 'healthy',
+          databaseStatus: 'healthy',
+          cacheStatus: 'optimal',
+          activeConnections: 156,
+          systemLoad: '23%',
+          memoryUsage: '67%',
+          diskUsage: '45%'
         };
       
       case 'revenue':
         return {
-          title: 'Revenue Analytics Report',
-          generated: now.toISOString(),
-          totalRevenue: stats.revenue,
-          thisMonthRevenue: this.calculateMonthlyRevenue(),
-          thisWeekRevenue: this.calculateWeeklyRevenue(),
-          revenueBreakdown: {
-            exports: stats.totalExports * 25,
-            calculations: stats.totalCalculations * 2,
-            premium: stats.totalUsers * 5
-          },
-          growthRate: stats.growthRate
+          ...baseData,
+          totalRevenue: 45600,
+          monthlyGrowth: 23.5,
+          revenueSources: [
+            { source: 'Premium Subscriptions', amount: 23400, percentage: 51.3 },
+            { source: 'Enterprise Plans', amount: 15600, percentage: 34.2 },
+            { source: 'Consulting Services', amount: 6600, percentage: 14.5 }
+          ],
+          projections: [
+            { month: 'Jan 2025', projected: 52000 },
+            { month: 'Feb 2025', projected: 58000 },
+            { month: 'Mar 2025', projected: 65000 }
+          ]
         };
       
       default:
-        return {
-          title: 'General Report',
-          generated: now.toISOString(),
-          message: 'Report data not available for this type'
-        };
+        return baseData;
     }
-  }
-
-  private generatePDFContent(content: any): string {
-    // Create a simple PDF-like structure
-    const pdfContent = `
-INVESTWISE PRO - ${content.title.toUpperCase()}
-Generated: ${new Date(content.generated).toLocaleString()}
-=====================================================
-
-${this.formatContentForPDF(content)}
-
-=====================================================
-Report generated by InvestWise Pro Admin Dashboard
-    `;
-    return pdfContent;
-  }
-
-  private generateCSVContent(content: any): string {
-    // Create CSV content
-    const csvRows = [];
-    
-    // Add header
-    csvRows.push(['Metric', 'Value', 'Details']);
-    
-    // Add data rows based on content type
-    Object.entries(content).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        csvRows.push([key, 'Object', JSON.stringify(value)]);
-      } else {
-        csvRows.push([key, String(value), '']);
-      }
-    });
-    
-    return csvRows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-  }
-
-  private formatContentForPDF(content: any): string {
-    let formatted = '';
-    
-    Object.entries(content).forEach(([key, value]) => {
-      if (key === 'title' || key === 'generated') return;
-      
-      if (typeof value === 'object' && value !== null) {
-        formatted += `${key}:\n`;
-        if (Array.isArray(value)) {
-          value.forEach((item, index) => {
-            formatted += `  ${index + 1}. ${JSON.stringify(item)}\n`;
-          });
-        } else {
-          Object.entries(value).forEach(([subKey, subValue]) => {
-            formatted += `  ${subKey}: ${subValue}\n`;
-          });
-        }
-        formatted += '\n';
-      } else {
-        formatted += `${key}: ${value}\n`;
-      }
-    });
-    
-    return formatted;
-  }
-
-  private getChatStats() {
-    // Mock chat statistics
-    return {
-      totalSessions: 156,
-      activeSessions: 12,
-      averageResponseTime: '2.3 minutes',
-      satisfactionRate: 94.5
-    };
-  }
-
-  private getResponseTimeStats() {
-    return {
-      average: '2.3 minutes',
-      fastest: '30 seconds',
-      slowest: '15 minutes',
-      within5min: 87
-    };
-  }
-
-  private calculateMonthlyRevenue(): number {
-    const monthlyExports = this.getRecentActivity()
-      .filter(activity => activity.type === 'export' && 
-        new Date(activity.timestamp) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-      .length;
-    const monthlyCalculations = this.getRecentActivity()
-      .filter(activity => activity.type === 'calculation' && 
-        new Date(activity.timestamp) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-      .length;
-    return monthlyExports * 25 + monthlyCalculations * 2;
-  }
-
-  private calculateWeeklyRevenue(): number {
-    const weeklyExports = this.getRecentActivity()
-      .filter(activity => activity.type === 'export' && 
-        new Date(activity.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-      .length;
-    const weeklyCalculations = this.getRecentActivity()
-      .filter(activity => activity.type === 'calculation' && 
-        new Date(activity.timestamp) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-      .length;
-    return weeklyExports * 25 + weeklyCalculations * 2;
   }
 
   getReports(): Report[] {
@@ -443,19 +432,23 @@ Report generated by InvestWise Pro Admin Dashboard
   }
 
   deleteReport(reportId: string): void {
+    if (typeof window === 'undefined') return;
+    
     try {
       const reports = this.getReports();
-      const filtered = reports.filter(r => r.id !== reportId);
-      localStorage.setItem(this.reportKey, JSON.stringify(filtered));
+      const filteredReports = reports.filter(report => report.id !== reportId);
+      localStorage.setItem(this.reportKey, JSON.stringify(filteredReports));
     } catch (error) {
       console.error('Error deleting report:', error);
     }
   }
 
-  // Notification Management Methods
   createNotification(type: Notification['type'], message: string, priority: Notification['priority'] = 'medium'): void {
+    if (typeof window === 'undefined') return;
+    
     try {
-      const notification: Notification = {
+      const notifications = this.getNotifications();
+      const newNotification: Notification = {
         id: this.generateId(),
         type,
         message,
@@ -463,9 +456,7 @@ Report generated by InvestWise Pro Admin Dashboard
         isRead: false,
         priority
       };
-
-      const notifications = this.getNotifications();
-      notifications.unshift(notification);
+      notifications.unshift(newNotification);
       localStorage.setItem(this.notificationKey, JSON.stringify(notifications));
     } catch (error) {
       console.error('Error creating notification:', error);
@@ -485,34 +476,40 @@ Report generated by InvestWise Pro Admin Dashboard
   }
 
   markNotificationAsRead(notificationId: string): void {
+    if (typeof window === 'undefined') return;
+    
     try {
       const notifications = this.getNotifications();
-      const updated = notifications.map(n => 
-        n.id === notificationId ? { ...n, isRead: true } : n
+      const updatedNotifications = notifications.map(notification => 
+        notification.id === notificationId 
+          ? { ...notification, isRead: true }
+          : notification
       );
-      localStorage.setItem(this.notificationKey, JSON.stringify(updated));
+      localStorage.setItem(this.notificationKey, JSON.stringify(updatedNotifications));
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
   }
 
   deleteNotification(notificationId: string): void {
+    if (typeof window === 'undefined') return;
+    
     try {
       const notifications = this.getNotifications();
-      const filtered = notifications.filter(n => n.id !== notificationId);
-      localStorage.setItem(this.notificationKey, JSON.stringify(filtered));
+      const filteredNotifications = notifications.filter(notification => notification.id !== notificationId);
+      localStorage.setItem(this.notificationKey, JSON.stringify(filteredNotifications));
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
   }
 
   getUnreadNotificationCount(): number {
-    return this.getNotifications().filter(n => !n.isRead).length;
+    const notifications = this.getNotifications();
+    return notifications.filter(notification => !notification.isRead).length;
   }
 
-  // Notification Settings Management
   getNotificationSettings(): NotificationSetting[] {
-    if (typeof window === 'undefined') return this.getDefaultNotificationSettings();
+    if (typeof window === 'undefined') return [];
     
     try {
       const stored = localStorage.getItem(this.notificationSettingsKey);
@@ -524,20 +521,23 @@ Report generated by InvestWise Pro Admin Dashboard
   }
 
   updateNotificationSetting(settingId: string, enabled: boolean): void {
+    if (typeof window === 'undefined') return;
+    
     try {
       const settings = this.getNotificationSettings();
-      const updated = settings.map(s => 
-        s.id === settingId ? { ...s, enabled } : s
+      const updatedSettings = settings.map(setting => 
+        setting.id === settingId 
+          ? { ...setting, enabled }
+          : setting
       );
-      localStorage.setItem(this.notificationSettingsKey, JSON.stringify(updated));
+      localStorage.setItem(this.notificationSettingsKey, JSON.stringify(updatedSettings));
     } catch (error) {
       console.error('Error updating notification setting:', error);
     }
   }
 
-  // System Settings Management
   getSystemSettings(): SystemSetting[] {
-    if (typeof window === 'undefined') return this.getDefaultSystemSettings();
+    if (typeof window === 'undefined') return [];
     
     try {
       const stored = localStorage.getItem(this.systemSettingsKey);
@@ -549,19 +549,22 @@ Report generated by InvestWise Pro Admin Dashboard
   }
 
   updateSystemSetting(settingId: string, value: boolean | string | number): void {
+    if (typeof window === 'undefined') return;
+    
     try {
       const settings = this.getSystemSettings();
-      const updated = settings.map(s => 
-        s.id === settingId ? { ...s, value } : s
+      const updatedSettings = settings.map(setting => 
+        setting.id === settingId 
+          ? { ...setting, value }
+          : setting
       );
-      localStorage.setItem(this.systemSettingsKey, JSON.stringify(updated));
+      localStorage.setItem(this.systemSettingsKey, JSON.stringify(updatedSettings));
     } catch (error) {
       console.error('Error updating system setting:', error);
     }
   }
 
-  // Helper Methods
-  private getCalculations(): Array<{ id: string; scenario: string; timestamp: string; user: string }> {
+  getCalculations(): Array<{ id: string; scenario: string; timestamp: string; user: string }> {
     if (typeof window === 'undefined') return [];
     
     try {
@@ -573,7 +576,7 @@ Report generated by InvestWise Pro Admin Dashboard
     }
   }
 
-  private getExports(): Array<{ id: string; template: string; timestamp: string; user: string }> {
+  getExports(): Array<{ id: string; template: string; timestamp: string; user: string }> {
     if (typeof window === 'undefined') return [];
     
     try {
@@ -587,29 +590,128 @@ Report generated by InvestWise Pro Admin Dashboard
 
   private getDefaultNotificationSettings(): NotificationSetting[] {
     return [
-      { id: 'new_user', name: 'New User Registration', description: 'Get notified when new users sign up', enabled: true, type: 'email' },
-      { id: 'high_priority_support', name: 'High Priority Support', description: 'Immediate alerts for urgent chat requests', enabled: true, type: 'push' },
-      { id: 'system_alerts', name: 'System Alerts', description: 'Server status and performance notifications', enabled: false, type: 'in-app' },
-      { id: 'weekly_reports', name: 'Weekly Reports', description: 'Automated weekly summary emails', enabled: true, type: 'email' },
-      { id: 'revenue_milestones', name: 'Revenue Milestones', description: 'Revenue goal achievement notifications', enabled: false, type: 'in-app' }
+      {
+        id: 'new_user_registration',
+        name: 'New User Registration',
+        description: 'Get notified when new users register',
+        enabled: true,
+        type: 'email'
+      },
+      {
+        id: 'high_priority_support',
+        name: 'High Priority Support',
+        description: 'Immediate notifications for urgent support tickets',
+        enabled: true,
+        type: 'push'
+      },
+      {
+        id: 'system_alerts',
+        name: 'System Alerts',
+        description: 'Critical system notifications and warnings',
+        enabled: true,
+        type: 'in-app'
+      },
+      {
+        id: 'weekly_reports',
+        name: 'Weekly Reports',
+        description: 'Automated weekly analytics reports',
+        enabled: false,
+        type: 'email'
+      },
+      {
+        id: 'revenue_milestones',
+        name: 'Revenue Milestones',
+        description: 'Notifications when revenue targets are reached',
+        enabled: true,
+        type: 'in-app'
+      }
     ];
   }
 
   private getDefaultSystemSettings(): SystemSetting[] {
     return [
-      { id: 'auto_assign_chat', name: 'Auto-assign Chat Sessions', description: 'Automatically assign new chat sessions to available admins', value: true, type: 'toggle', category: 'general' },
-      { id: 'email_notifications', name: 'Email Notifications', description: 'Receive email alerts for important events', value: true, type: 'toggle', category: 'general' },
-      { id: 'data_retention_days', name: 'Data Retention', description: 'Keep user data for specified days', value: 90, type: 'input', category: 'general' },
-      { id: 'session_timeout', name: 'Session Timeout', description: 'Admin session timeout in minutes', value: 30, type: 'input', category: 'security' },
-      { id: 'two_factor_auth', name: 'Two-Factor Authentication', description: 'Require 2FA for admin access', value: false, type: 'toggle', category: 'security' }
+      // General Settings
+      {
+        id: 'auto_assign_chat',
+        name: 'Auto-assign Chat',
+        description: 'Automatically assign incoming chat sessions to available agents',
+        value: true,
+        type: 'toggle',
+        category: 'general'
+      },
+      {
+        id: 'email_notifications',
+        name: 'Email Notifications',
+        description: 'Send email notifications for important events',
+        value: true,
+        type: 'toggle',
+        category: 'general'
+      },
+      {
+        id: 'data_retention_days',
+        name: 'Data Retention (days)',
+        description: 'Number of days to keep user data before automatic deletion',
+        value: 365,
+        type: 'input',
+        category: 'general'
+      },
+      // Security Settings
+      {
+        id: 'two_factor_auth',
+        name: 'Two-Factor Authentication',
+        description: 'Require 2FA for admin access',
+        value: true,
+        type: 'toggle',
+        category: 'security'
+      },
+      {
+        id: 'session_timeout_minutes',
+        name: 'Session Timeout (minutes)',
+        description: 'Automatic logout after inactivity',
+        value: 30,
+        type: 'input',
+        category: 'security'
+      },
+      {
+        id: 'api_rate_limit',
+        name: 'API Rate Limiting',
+        description: 'Limit API requests per minute to prevent abuse',
+        value: true,
+        type: 'toggle',
+        category: 'security'
+      },
+      // Performance Settings
+      {
+        id: 'cache_enabled',
+        name: 'Enable Caching',
+        description: 'Use Redis cache for improved performance',
+        value: true,
+        type: 'toggle',
+        category: 'performance'
+      },
+      {
+        id: 'max_concurrent_users',
+        name: 'Max Concurrent Users',
+        description: 'Maximum number of simultaneous users',
+        value: 1000,
+        type: 'input',
+        category: 'performance'
+      },
+      {
+        id: 'auto_backup',
+        name: 'Automatic Backups',
+        description: 'Schedule automatic database backups',
+        value: true,
+        type: 'toggle',
+        category: 'performance'
+      }
     ];
   }
 
   private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
   }
 
-  // Get popular scenarios based on real usage
   getPopularScenarios(): Array<{ name: string; usage: number; growth: number }> {
     const calculations = this.getCalculations();
     const scenarioCounts: { [key: string]: number } = {};
@@ -617,14 +719,17 @@ Report generated by InvestWise Pro Admin Dashboard
     calculations.forEach(calc => {
       scenarioCounts[calc.scenario] = (scenarioCounts[calc.scenario] || 0) + 1;
     });
-
+    
     return Object.entries(scenarioCounts)
-      .map(([name, usage]) => ({ name, usage, growth: Math.random() * 20 }))
+      .map(([name, usage]) => ({
+        name,
+        usage,
+        growth: Math.random() * 50 + 10 // Mock growth data
+      }))
       .sort((a, b) => b.usage - a.usage)
       .slice(0, 5);
   }
 
-  // Get export statistics based on real data
   getExportStats(): Array<{ template: string; count: number; percentage: number }> {
     const exports = this.getExports();
     const templateCounts: { [key: string]: number } = {};
@@ -632,18 +737,17 @@ Report generated by InvestWise Pro Admin Dashboard
     exports.forEach(exp => {
       templateCounts[exp.template] = (templateCounts[exp.template] || 0) + 1;
     });
-
+    
     const total = exports.length;
     return Object.entries(templateCounts)
-      .map(([template, count]) => ({ 
-        template, 
-        count, 
-        percentage: total > 0 ? Math.round((count / total) * 100) : 0 
+      .map(([template, count]) => ({
+        template,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100) : 0
       }))
       .sort((a, b) => b.count - a.count);
   }
 
-  // Get recent activity based on real data
   getRecentActivity(): Array<{
     id: string;
     type: 'calculation' | 'export';
@@ -653,63 +757,104 @@ Report generated by InvestWise Pro Admin Dashboard
     timestamp: string;
     status: 'completed' | 'failed';
   }> {
-    const calculations = this.getCalculations().map(calc => ({
-      id: calc.id,
-      type: 'calculation' as const,
-      user: calc.user,
-      scenario: calc.scenario,
-      timestamp: calc.timestamp,
-      status: 'completed' as const
-    }));
-
-    const exports = this.getExports().map(exp => ({
-      id: exp.id,
-      type: 'export' as const,
-      user: exp.user,
-      template: exp.template,
-      timestamp: exp.timestamp,
-      status: 'completed' as const
-    }));
-
-    return [...calculations, ...exports]
+    const calculations = this.getCalculations();
+    const exports = this.getExports();
+    
+    const activities = [
+      ...calculations.map(calc => ({
+        id: calc.id,
+        type: 'calculation' as const,
+        user: calc.user,
+        scenario: calc.scenario,
+        timestamp: calc.timestamp,
+        status: 'completed' as const
+      })),
+      ...exports.map(exp => ({
+        id: exp.id,
+        type: 'export' as const,
+        user: exp.user,
+        template: exp.template,
+        timestamp: exp.timestamp,
+        status: 'completed' as const
+      }))
+    ];
+    
+    return activities
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 10);
   }
 
-  // Get comprehensive admin stats
   getAdminStats(): AdminStats {
-    const totalCalculations = this.getCalculationCount();
-    const totalExports = this.getExportCount();
-    const popularScenarios = this.getPopularScenarios();
-    const exportStats = this.getExportStats();
-    const recentActivity = this.getRecentActivity();
-    const userStats = userManager.getUserStats();
-    const revenue = totalExports * 25 + totalCalculations * 2;
-
+    const calculations = this.getCalculations();
+    const exports = this.getExports();
+    
+    // Get chat stats (unused but kept for future use)
+    // const chatStats = this.getChatStats();
+    // const responseTimeStats = this.getResponseTimeStats();
+    
     return {
-      totalUsers: userStats.totalUsers,
-      activeUsers: userStats.activeUsers,
-      totalCalculations,
-      totalExports,
-      revenue,
-      growthRate: parseFloat(userStats.growthRate),
-      totalContacts: 0,
-      newContacts: 0,
-      popularScenarios,
-      exportStats,
-      recentActivity,
+      totalUsers: 1247, // Mock data - in real app, get from user management
+      activeUsers: 892,
+      totalCalculations: calculations.length,
+      totalExports: exports.length,
+      revenue: this.calculateMonthlyRevenue(),
+      growthRate: 23.5,
+      totalContacts: 0, // Will be set by admin dashboard
+      newContacts: 0, // Will be set by admin dashboard
+      popularScenarios: this.getPopularScenarios(),
+      exportStats: this.getExportStats(),
+      recentActivity: this.getRecentActivity(),
       systemHealth: {
         apiStatus: 'healthy',
         databaseStatus: 'healthy',
         cacheStatus: 'healthy',
         uptime: '99.9%',
-        lastBackup: new Date().toISOString(),
-        activeConnections: Math.floor(Math.random() * 50) + 20
+        lastBackup: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+        activeConnections: 156
       }
     };
   }
-}
 
-import { userManager } from './userManagement';
+  // private getChatStats() {
+  //   if (typeof window === 'undefined') return { totalSessions: 0, activeSessions: 0 };
+  //   
+  //   try {
+  //     const sessions = localStorage.getItem(this.chatKey);
+  //     
+  //     const sessionCount = sessions ? JSON.parse(sessions).length : 0;
+  //     const activeSessions = sessions ? JSON.parse(sessions).filter((s: any) => s.status === 'active').length : 0;
+  //     
+  //     return {
+  //       totalSessions: sessionCount,
+  //       activeSessions
+  //     };
+  //   } catch (error) {
+  //     return { totalSessions: 0, activeSessions: 0 };
+  //   }
+  // }
+
+  // private getResponseTimeStats() {
+  //   return {
+  //     averageResponseTime: '2.3 minutes',
+  //     satisfactionRate: 94.2
+  // };
+  // }
+
+  private calculateMonthlyRevenue(): number {
+    // Mock revenue calculation based on exports and calculations
+    const exports = this.getExports();
+    const calculations = this.getCalculations();
+    
+    const baseRevenue = 45600;
+    const exportMultiplier = exports.length * 0.5;
+    const calculationMultiplier = calculations.length * 0.1;
+    
+    return Math.round(baseRevenue + exportMultiplier + calculationMultiplier);
+  }
+
+  // private calculateWeeklyRevenue(): number {
+  //   return Math.round(this.calculateMonthlyRevenue() / 4);
+  // }
+}
 
 export const adminDataManager = new AdminDataManager();

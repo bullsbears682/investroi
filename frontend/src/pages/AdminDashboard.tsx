@@ -40,6 +40,7 @@ const AdminDashboard: React.FC = () => {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([]);
   const [systemSettings, setSystemSettings] = useState<SystemSetting[]>([]);
   const [generatingReport, setGeneratingReport] = useState<string | null>(null);
+  const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -73,8 +74,88 @@ const AdminDashboard: React.FC = () => {
 
       const allSystemSettings = adminDataManager.getSystemSettings();
       setSystemSettings(allSystemSettings);
+
+      // Create welcome notification if this is the first time
+      const existingNotifications = adminDataManager.getNotifications();
+      if (existingNotifications.length === 0) {
+        adminDataManager.createNotification(
+          'system',
+          'Admin dashboard accessed successfully. All systems are operational.',
+          'low'
+        );
+      }
+
+      // Create notifications for new users (if any)
+      const newUsers = allUsers.filter(user => {
+        const userCreated = new Date(user.registrationDate);
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        return userCreated > oneHourAgo;
+      });
+
+      newUsers.forEach(user => {
+        adminDataManager.createNotification(
+          'user',
+          `New user registered: ${user.email}`,
+          'medium'
+        );
+      });
+
+      // Create notifications for new contact submissions
+      const newSubmissions = submissions.filter(submission => submission.status === 'new');
+      newSubmissions.forEach(submission => {
+        adminDataManager.createNotification(
+          'support',
+          `New contact form submission from ${submission.email}`,
+          'medium'
+        );
+      });
     }
   }, [isVisible]);
+
+  // Real-time activity monitor
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      
+      // Check for new calculations (simulate real-time activity)
+      const recentCalculations = adminDataManager.getCalculations().filter(calc => {
+        const calcTime = new Date(calc.timestamp).getTime();
+        return calcTime > lastActivityCheck.getTime() && calcTime <= now.getTime();
+      });
+
+      recentCalculations.forEach(calc => {
+        adminDataManager.createNotification(
+          'system',
+          `New ROI calculation completed for ${calc.scenario} scenario`,
+          'low'
+        );
+      });
+
+      // Check for new exports
+      const recentExports = adminDataManager.getExports().filter(exp => {
+        const expTime = new Date(exp.timestamp).getTime();
+        return expTime > lastActivityCheck.getTime() && expTime <= now.getTime();
+      });
+
+      recentExports.forEach(exp => {
+        adminDataManager.createNotification(
+          'system',
+          `New PDF export generated using ${exp.template} template`,
+          'low'
+        );
+      });
+
+      // Update notifications list
+      const updatedNotifications = adminDataManager.getNotifications();
+      setNotifications(updatedNotifications);
+
+      setLastActivityCheck(now);
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [isVisible, lastActivityCheck]);
 
   // Use real data or fallback to mock data
   const stats = adminStats || {
@@ -206,6 +287,9 @@ const AdminDashboard: React.FC = () => {
         link.click();
         document.body.removeChild(link);
         
+        // Create notification for successful download
+        adminDataManager.createNotification('report', `Report "${report.name}" downloaded successfully`, 'medium');
+        
         toast.success(`Report "${report.name}" downloaded successfully!`);
       } catch (error) {
         console.error('Download error:', error);
@@ -228,6 +312,17 @@ const AdminDashboard: React.FC = () => {
     adminDataManager.updateNotificationSetting(settingId, enabled);
     const updatedSettings = adminDataManager.getNotificationSettings();
     setNotificationSettings(updatedSettings);
+    
+    // Create notification for setting change
+    const setting = notificationSettings.find(s => s.id === settingId);
+    if (setting) {
+      adminDataManager.createNotification(
+        'system', 
+        `Notification setting "${setting.name}" ${enabled ? 'enabled' : 'disabled'}`, 
+        'low'
+      );
+    }
+    
     toast.success(`Notification setting ${enabled ? 'enabled' : 'disabled'}`);
   };
 
@@ -260,6 +355,17 @@ const AdminDashboard: React.FC = () => {
     adminDataManager.updateSystemSetting(settingId, value);
     const updatedSettings = adminDataManager.getSystemSettings();
     setSystemSettings(updatedSettings);
+    
+    // Create notification for setting change
+    const setting = systemSettings.find(s => s.id === settingId);
+    if (setting) {
+      adminDataManager.createNotification(
+        'system', 
+        `System setting "${setting.name}" ${value ? 'enabled' : 'disabled'}`, 
+        'low'
+      );
+    }
+    
     toast.success('Setting updated successfully');
   };
 
@@ -267,6 +373,17 @@ const AdminDashboard: React.FC = () => {
     adminDataManager.updateSystemSetting(settingId, value);
     const updatedSettings = adminDataManager.getSystemSettings();
     setSystemSettings(updatedSettings);
+    
+    // Create notification for setting change
+    const setting = systemSettings.find(s => s.id === settingId);
+    if (setting) {
+      adminDataManager.createNotification(
+        'system', 
+        `System setting "${setting.name}" updated to ${value}`, 
+        'low'
+      );
+    }
+    
     toast.success('Setting updated successfully');
   };
 
@@ -1213,6 +1330,33 @@ const AdminDashboard: React.FC = () => {
             <p className="text-green-400 text-xs">↗ 2.3s avg</p>
           </div>
         </div>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Active Connections</span>
+              <span className="text-white font-semibold">{adminStats?.systemHealth.activeConnections || 156}</span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Last Backup</span>
+              <span className="text-white text-sm">
+                {adminStats?.systemHealth.lastBackup ? 
+                  new Date(adminStats.systemHealth.lastBackup).toLocaleDateString() : 
+                  'N/A'
+                }
+              </span>
+            </div>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Total Reports</span>
+              <span className="text-white font-semibold">{reports.length}</span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Unread Notifications</span>
+              <span className="text-white font-semibold">{notifications.filter(n => !n.isRead).length}</span>
+            </div>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
@@ -1277,6 +1421,20 @@ const AdminDashboard: React.FC = () => {
                 <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <span className="text-white/60 text-xs sm:text-sm hidden sm:block">Admin Mode</span>
+              <div className="relative">
+                <button
+                  onClick={() => setActiveTab('notifications')}
+                  className="text-white/60 hover:text-white transition-colors p-2 relative"
+                  title="View Notifications"
+                >
+                  <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
+                  {notifications.filter(n => !n.isRead).length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {notifications.filter(n => !n.isRead).length}
+                    </span>
+                  )}
+                </button>
+              </div>
               <button
                 onClick={() => setShowChat(true)}
                 className="text-white/60 hover:text-white transition-colors p-2"
