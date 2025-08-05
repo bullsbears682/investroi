@@ -98,11 +98,15 @@ class AdminDataManager {
     const apiStatus = this.checkAPIHealth();
     const databaseStatus = this.checkDatabaseHealth();
     const cacheStatus = this.checkCacheHealth();
-
-    // Calculate performance metrics
-    const responseTime = this.getAverageResponseTime();
-    const errorRate = this.getErrorRate();
-    const throughput = this.getThroughput();
+    
+    // Add performance metrics
+    const performanceMetrics = {
+      responseTime: this.getAverageResponseTime(),
+      errorRate: this.getErrorRate(),
+      throughput: this.getThroughput(),
+      memoryUsage: Math.round(Math.random() * 20 + 60),
+      cpuUsage: Math.round(Math.random() * 15 + 30)
+    };
 
     const systemHealth = {
       apiStatus,
@@ -111,13 +115,13 @@ class AdminDataManager {
       uptime: this.calculateUptime(),
       lastBackup: this.getLastBackupTime(),
       activeConnections: this.getActiveConnections(),
-      performance: {
-        responseTime,
-        errorRate,
-        throughput
-      },
+      performance: performanceMetrics,
       lastUpdated: now.toISOString()
     };
+
+    // Calculate performance metrics
+    const responseTime = this.getAverageResponseTime();
+    const errorRate = this.getErrorRate();
 
     localStorage.setItem(this.systemHealthKey, JSON.stringify(systemHealth));
 
@@ -704,6 +708,41 @@ class AdminDataManager {
         this.createNotification('user', `${newUsers.length} new user${newUsers.length > 1 ? 's' : ''} registered`, 'medium');
       }
     }
+
+    // Create performance alerts
+    const health = this.getSystemHealth();
+    if (health.performance?.responseTime > 800) {
+      this.createNotification('system', 'High response time detected - performance optimization needed', 'medium');
+    }
+
+    if (health.performance?.errorRate > 0.05) {
+      this.createNotification('system', 'High error rate detected - system stability compromised', 'high');
+    }
+
+    // Create activity milestone notifications
+    const calculations = this.getCalculationCount();
+    if (calculations > 0 && calculations % 100 === 0) {
+      this.createNotification('user', `${calculations} calculations completed - milestone reached!`, 'medium');
+    }
+
+    const exports = this.getExportCount();
+    if (exports > 0 && exports % 50 === 0) {
+      this.createNotification('user', `${exports} reports exported - milestone reached!`, 'medium');
+    }
+
+    // Create weekly summary notifications (once per week)
+    const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const weeklyNotifications = recentNotifications.filter(n => 
+      n.message.includes('Weekly summary') && new Date(n.timestamp) > lastWeek
+    );
+    
+    if (weeklyNotifications.length === 0) {
+      const stats = this.getAdminStats();
+      this.createNotification('system', 
+        `Weekly summary: ${stats.totalUsers} users, ${stats.totalCalculations} calculations, $${stats.revenue.toLocaleString()} revenue`, 
+        'low'
+      );
+    }
   }
 
   getNotifications(): Notification[] {
@@ -931,10 +970,29 @@ class AdminDataManager {
     this.systemHealthInterval = window.setInterval(() => {
       this.updateSystemHealth();
       this.checkForNewActivities();
+      
+      // Random system events for more realistic monitoring
+      if (Math.random() < 0.1) { // 10% chance every 30 seconds
+        this.createRandomSystemEvent();
+      }
     }, 30000);
 
     // Initial health check
     this.updateSystemHealth();
+  }
+
+  private createRandomSystemEvent(): void {
+    const events = [
+      { type: 'system', message: 'System maintenance completed successfully', priority: 'low' as const },
+      { type: 'user', message: 'New user registration detected', priority: 'medium' as const },
+      { type: 'user', message: 'ROI calculation completed successfully', priority: 'low' as const },
+      { type: 'user', message: 'PDF report generated successfully', priority: 'low' as const },
+      { type: 'support', message: 'New support ticket received', priority: 'medium' as const },
+      { type: 'revenue', message: 'Revenue milestone approaching', priority: 'medium' as const }
+    ];
+
+    const randomEvent = events[Math.floor(Math.random() * events.length)];
+    this.createNotification(randomEvent.type as Notification['type'], randomEvent.message, randomEvent.priority);
   }
 
   stopRealTimeMonitoring(): void {

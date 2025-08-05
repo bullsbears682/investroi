@@ -44,6 +44,7 @@ const AdminDashboard: React.FC = () => {
   const [systemHealth, setSystemHealth] = useState<any>(null);
   const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
   const [systemActionLoading, setSystemActionLoading] = useState<string | null>(null);
+  const [realTimeActivity, setRealTimeActivity] = useState<Array<{ id: string; message: string; timestamp: string; type: string }>>([]);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -98,6 +99,33 @@ const AdminDashboard: React.FC = () => {
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
         return userCreated > oneHourAgo;
       });
+
+      // Set up real-time activity monitoring
+      const updateRealTimeActivity = () => {
+        const newNotifications = adminDataManager.getNotifications();
+        const recentNotifications = newNotifications.filter(n => 
+          new Date(n.timestamp) > new Date(Date.now() - 5 * 60 * 1000) // Last 5 minutes
+        );
+        
+        const activityItems = recentNotifications.map(n => ({
+          id: n.id,
+          message: n.message,
+          timestamp: n.timestamp,
+          type: n.type
+        }));
+        
+        setRealTimeActivity(activityItems);
+      };
+
+      // Initial update
+      updateRealTimeActivity();
+
+      // Set up interval for real-time updates
+      const activityInterval = setInterval(updateRealTimeActivity, 10000); // Update every 10 seconds
+
+      return () => {
+        clearInterval(activityInterval);
+      };
 
       newUsers.forEach(user => {
         adminDataManager.createNotification(
@@ -955,6 +983,51 @@ const AdminDashboard: React.FC = () => {
               </p>
             </div>
           ))}
+        </div>
+      </motion.div>
+
+      {/* Real-time Activity Feed */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg sm:text-xl font-semibold text-white">Real-time Activity</h3>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+            <span className="text-white/60 text-sm">Live Updates</span>
+          </div>
+        </div>
+        <div className="space-y-3 max-h-60 overflow-y-auto">
+          {realTimeActivity.length === 0 ? (
+            <div className="text-center py-8">
+              <Activity className="w-12 h-12 text-white/20 mx-auto mb-3" />
+              <p className="text-white/60">No real-time activity yet</p>
+              <p className="text-white/40 text-sm mt-1">Activity will appear here as it happens</p>
+            </div>
+          ) : (
+            realTimeActivity.map((activity) => (
+              <div key={activity.id} className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-white text-sm">{activity.message}</p>
+                  <p className="text-white/60 text-xs">
+                    {new Date(activity.timestamp).toLocaleTimeString()}
+                  </p>
+                </div>
+                <span className={`px-2 py-1 text-xs rounded ${
+                  activity.type === 'system' ? 'bg-red-500/20 text-red-400' :
+                  activity.type === 'user' ? 'bg-blue-500/20 text-blue-400' :
+                  activity.type === 'revenue' ? 'bg-yellow-500/20 text-yellow-400' :
+                  'bg-green-500/20 text-green-400'
+                }`}>
+                  {activity.type}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </motion.div>
     </div>
@@ -2029,6 +2102,10 @@ const AdminDashboard: React.FC = () => {
             <div className="flex items-center space-x-3 sm:space-x-4">
               <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               <h1 className="text-xl sm:text-2xl font-bold text-white">Admin Dashboard</h1>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-white/60 text-sm">Live</span>
+              </div>
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
