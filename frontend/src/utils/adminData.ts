@@ -66,6 +66,8 @@ class AdminDataManager {
   private notificationKey = 'admin_notifications';
   private notificationSettingsKey = 'notification_settings';
   private systemSettingsKey = 'system_settings';
+  private systemHealthKey = 'system_health';
+  private lastActivityKey = 'last_activity';
   // private chatKey = 'chat_sessions';
 
   // Get real calculation count
@@ -251,39 +253,98 @@ class AdminDataManager {
     }
   }
 
-  // Generate a new report
-  async generateReport(type: Report['type'], format: Report['format']): Promise<Report> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        try {
-          const reports = this.getReports();
-          const reportName = this.getReportName(type);
-          const reportContent = this.generateReportContent(type);
-          
-          const newReport: Report = {
-            id: this.generateId(),
-            name: reportName,
-            type,
-            format,
-            size: this.generateFileSize(),
-            createdAt: new Date().toISOString(),
-            status: 'completed',
-            downloadUrl: this.generateDownloadUrl(format),
-            content: reportContent
-          };
-
-          reports.unshift(newReport);
-          localStorage.setItem(this.reportKey, JSON.stringify(reports));
-
-          // Create notification for report generation
-          this.createNotification('report', `Report "${reportName}" generated successfully`, 'medium');
-
-          resolve(newReport);
-        } catch (error) {
-          reject(error);
+  // Enhanced system health monitoring
+  getSystemHealth() {
+    if (typeof window === 'undefined') {
+      return {
+        apiStatus: 'healthy' as const,
+        databaseStatus: 'healthy' as const,
+        cacheStatus: 'healthy' as const,
+        uptime: '99.9%',
+        lastBackup: new Date().toISOString(),
+        activeConnections: 156,
+        performance: {
+          responseTime: Math.random() * 1000 + 500, // 500-1500ms
+          errorRate: Math.random() * 0.02, // 0-2%
+          throughput: Math.random() * 1000 + 500 // requests per minute
         }
-      }, 2000); // Simulate processing time
-    });
+      };
+    }
+
+    try {
+      const stored = localStorage.getItem(this.systemHealthKey);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error('Error reading system health:', error);
+    }
+
+    // Generate realistic system health data
+    const health = {
+      apiStatus: this.getRandomStatus(),
+      databaseStatus: this.getRandomStatus(),
+      cacheStatus: this.getRandomStatus(),
+      uptime: `${(95 + Math.random() * 5).toFixed(1)}%`,
+      lastBackup: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+      activeConnections: Math.floor(Math.random() * 200) + 50,
+      performance: {
+        responseTime: Math.random() * 1000 + 500,
+        errorRate: Math.random() * 0.02,
+        throughput: Math.random() * 1000 + 500
+      }
+    };
+
+    localStorage.setItem(this.systemHealthKey, JSON.stringify(health));
+    return health;
+  }
+
+  private getRandomStatus(): 'healthy' | 'warning' | 'error' {
+    const rand = Math.random();
+    if (rand > 0.9) return 'error';
+    if (rand > 0.7) return 'warning';
+    return 'healthy';
+  }
+
+  // Enhanced report generation with more realistic data
+  async generateReport(type: Report['type'], format: Report['format']): Promise<Report> {
+    const reportId = this.generateId();
+    const name = this.getReportName(type);
+    const size = this.generateFileSize();
+    const downloadUrl = this.generateDownloadUrl(format);
+    const content = this.generateReportContent(type);
+
+    const report: Report = {
+      id: reportId,
+      name,
+      type,
+      format,
+      size,
+      createdAt: new Date().toISOString(),
+      status: 'generating',
+      downloadUrl,
+      content
+    };
+
+    // Simulate report generation delay
+    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+
+    // Update report status to completed
+    report.status = 'completed';
+
+    // Store the report
+    const reports = this.getReports();
+    reports.unshift(report);
+    localStorage.setItem(this.reportKey, JSON.stringify(reports));
+
+    // Create notification for report generation
+    this.createNotification(
+      'report',
+      `Report "${name}" generated successfully`,
+      'medium'
+    );
+
+    return report;
   }
 
   private getReportName(type: Report['type']): string {
@@ -316,104 +377,93 @@ class AdminDataManager {
     return URL.createObjectURL(blob);
   }
 
+  // Enhanced report content generation
   private generateReportContent(type: Report['type']): any {
     const now = new Date();
     const baseData = {
       generatedAt: now.toISOString(),
-      reportType: type,
-      summary: `This is a sample ${type} report generated on ${now.toLocaleDateString()}`
+      period: {
+        start: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        end: now.toISOString()
+      }
     };
 
     switch (type) {
       case 'user':
         return {
           ...baseData,
-          totalUsers: 1247,
-          activeUsers: 892,
-          newUsers: 45,
-          userGrowth: 23.5,
-          topScenarios: [
-            { name: 'E-commerce', usage: 156 },
-            { name: 'Manufacturing', usage: 134 },
-            { name: 'Technology', usage: 98 }
-          ]
+          totalUsers: this.getCalculationCount() + Math.floor(Math.random() * 100),
+          activeUsers: Math.floor(Math.random() * 50) + 10,
+          newRegistrations: Math.floor(Math.random() * 20) + 5,
+          userGrowth: (Math.random() * 20 + 5).toFixed(1) + '%',
+          topScenarios: this.getPopularScenarios().slice(0, 5),
+          userActivity: this.getRecentActivity().slice(0, 10)
         };
-      
+
       case 'calculation':
         return {
           ...baseData,
-          totalCalculations: 3456,
-          averageROI: 12.8,
-          popularScenarios: [
-            { name: 'E-commerce', count: 234 },
-            { name: 'Manufacturing', count: 189 },
-            { name: 'Technology', count: 156 }
-          ],
-          recentActivity: [
-            { user: 'user_123', scenario: 'E-commerce', roi: 15.2 },
-            { user: 'user_456', scenario: 'Manufacturing', roi: 8.7 },
-            { user: 'user_789', scenario: 'Technology', roi: 22.1 }
-          ]
+          totalCalculations: this.getCalculationCount(),
+          averageROI: (Math.random() * 15 + 5).toFixed(2) + '%',
+          mostPopularScenario: this.getPopularScenarios()[0]?.name || 'Manufacturing',
+          calculationTrends: this.getRecentActivity().filter(a => a.type === 'calculation').slice(0, 10),
+          scenarioBreakdown: this.getPopularScenarios()
         };
-      
+
       case 'export':
         return {
           ...baseData,
-          totalExports: 1234,
-          exportTypes: [
-            { template: 'Standard', count: 456, percentage: 37 },
-            { template: 'Executive', count: 389, percentage: 32 },
-            { template: 'Detailed', count: 389, percentage: 31 }
-          ],
-          recentExports: [
-            { user: 'user_123', template: 'Standard', timestamp: now.toISOString() },
-            { user: 'user_456', template: 'Executive', timestamp: now.toISOString() }
-          ]
+          totalExports: this.getExportCount(),
+          exportStats: this.getExportStats(),
+          mostUsedTemplate: this.getExportStats()[0]?.template || 'Standard',
+          exportTrends: this.getRecentActivity().filter(a => a.type === 'export').slice(0, 10)
         };
-      
+
       case 'support':
         return {
           ...baseData,
-          totalSessions: 89,
-          averageResponseTime: '2.3 minutes',
-          satisfactionRate: 94.2,
-          activeSessions: 12,
-          recentSessions: [
-            { id: 'session_1', user: 'john.doe@example.com', status: 'resolved' },
-            { id: 'session_2', user: 'jane.smith@example.com', status: 'active' }
-          ]
+          totalChatSessions: Math.floor(Math.random() * 50) + 10,
+          averageResponseTime: Math.floor(Math.random() * 300) + 60 + ' seconds',
+          satisfactionRate: (Math.random() * 20 + 80).toFixed(1) + '%',
+          commonIssues: [
+            'ROI calculation questions',
+            'PDF export issues',
+            'Account registration',
+            'Scenario selection'
+          ],
+          supportTrends: this.getRecentActivity().slice(0, 10)
         };
-      
+
       case 'system':
         return {
           ...baseData,
-          uptime: '99.9%',
-          apiStatus: 'healthy',
-          databaseStatus: 'healthy',
-          cacheStatus: 'optimal',
-          activeConnections: 156,
-          systemLoad: '23%',
-          memoryUsage: '67%',
-          diskUsage: '45%'
+          systemHealth: this.getSystemHealth(),
+          uptime: (95 + Math.random() * 5).toFixed(1) + '%',
+          performance: {
+            averageResponseTime: Math.floor(Math.random() * 1000) + 500 + 'ms',
+            errorRate: (Math.random() * 2).toFixed(2) + '%',
+            throughput: Math.floor(Math.random() * 1000) + 500 + ' req/min'
+          },
+          recentErrors: [],
+          systemAlerts: []
         };
-      
+
       case 'revenue':
         return {
           ...baseData,
-          totalRevenue: 45600,
-          monthlyGrowth: 23.5,
+          totalRevenue: this.calculateMonthlyRevenue(),
+          monthlyGrowth: (Math.random() * 30 + 10).toFixed(1) + '%',
           revenueSources: [
-            { source: 'Premium Subscriptions', amount: 23400, percentage: 51.3 },
-            { source: 'Enterprise Plans', amount: 15600, percentage: 34.2 },
-            { source: 'Consulting Services', amount: 6600, percentage: 14.5 }
+            { source: 'Premium Subscriptions', amount: this.calculateMonthlyRevenue() * 0.6 },
+            { source: 'Enterprise Licenses', amount: this.calculateMonthlyRevenue() * 0.3 },
+            { source: 'Consulting Services', amount: this.calculateMonthlyRevenue() * 0.1 }
           ],
-          projections: [
-            { month: 'Jan 2025', projected: 52000 },
-            { month: 'Feb 2025', projected: 58000 },
-            { month: 'Mar 2025', projected: 65000 }
-          ]
+          projections: {
+            nextMonth: this.calculateMonthlyRevenue() * (1 + Math.random() * 0.2),
+            nextQuarter: this.calculateMonthlyRevenue() * (1 + Math.random() * 0.5)
+          }
         };
-      
+
       default:
         return baseData;
     }
@@ -443,23 +493,60 @@ class AdminDataManager {
     }
   }
 
+  // Enhanced notification system with real-time triggers
   createNotification(type: Notification['type'], message: string, priority: Notification['priority'] = 'medium'): void {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      const notifications = this.getNotifications();
-      const newNotification: Notification = {
-        id: this.generateId(),
-        type,
-        message,
-        timestamp: new Date().toISOString(),
-        isRead: false,
-        priority
-      };
-      notifications.unshift(newNotification);
-      localStorage.setItem(this.notificationKey, JSON.stringify(notifications));
-    } catch (error) {
-      console.error('Error creating notification:', error);
+    const notification: Notification = {
+      id: this.generateId(),
+      type,
+      message,
+      timestamp: new Date().toISOString(),
+      isRead: false,
+      priority,
+      actionUrl: this.getActionUrl(type)
+    };
+
+    const notifications = this.getNotifications();
+    notifications.unshift(notification);
+    localStorage.setItem(this.notificationKey, JSON.stringify(notifications));
+
+    // Trigger real-time updates if needed
+    this.checkNotificationTriggers(type, message);
+  }
+
+  private getActionUrl(type: Notification['type']): string | undefined {
+    switch (type) {
+      case 'user':
+        return '/admin?tab=users';
+      case 'support':
+        return '/admin?tab=contacts';
+      case 'system':
+        return '/admin?tab=settings';
+      case 'revenue':
+        return '/admin?tab=analytics';
+      case 'report':
+        return '/admin?tab=reports';
+      default:
+        return undefined;
+    }
+  }
+
+  private checkNotificationTriggers(type: Notification['type'], message: string): void {
+    // Check for high-priority triggers
+    if (type === 'system' && message.includes('error')) {
+      this.createNotification('system', 'System error detected - immediate attention required', 'high');
+    }
+
+    if (type === 'user' && message.includes('new user')) {
+      // Check if we should create a welcome notification
+      const settings = this.getNotificationSettings();
+      const welcomeSetting = settings.find(s => s.name === 'New User Registration');
+      if (welcomeSetting?.enabled) {
+        this.createNotification('user', 'New user registration - welcome email sent', 'medium');
+      }
+    }
+
+    if (type === 'revenue' && message.includes('milestone')) {
+      this.createNotification('revenue', 'Revenue milestone achieved!', 'high');
     }
   }
 
@@ -548,20 +635,40 @@ class AdminDataManager {
     }
   }
 
+  // Enhanced settings validation
   updateSystemSetting(settingId: string, value: boolean | string | number): void {
-    if (typeof window === 'undefined') return;
+    const settings = this.getSystemSettings();
+    const setting = settings.find(s => s.id === settingId);
     
-    try {
-      const settings = this.getSystemSettings();
-      const updatedSettings = settings.map(setting => 
-        setting.id === settingId 
-          ? { ...setting, value }
-          : setting
-      );
-      localStorage.setItem(this.systemSettingsKey, JSON.stringify(updatedSettings));
-    } catch (error) {
-      console.error('Error updating system setting:', error);
+    if (!setting) return;
+
+    // Validate the value based on setting type
+    let validatedValue = value;
+    
+    if (setting.type === 'toggle' && typeof value === 'boolean') {
+      validatedValue = value;
+    } else if (setting.type === 'input' && typeof value === 'number') {
+      // Validate numeric inputs
+      if (setting.name.includes('Timeout') && (value < 1000 || value > 30000)) {
+        throw new Error('Timeout must be between 1000 and 30000 milliseconds');
+      }
+      if (setting.name.includes('Limit') && (value < 1 || value > 1000)) {
+        throw new Error('Limit must be between 1 and 1000');
+      }
+      validatedValue = value;
+    } else if (setting.type === 'select' && typeof value === 'string') {
+      validatedValue = value;
     }
+
+    setting.value = validatedValue;
+    localStorage.setItem(this.systemSettingsKey, JSON.stringify(settings));
+
+    // Create notification for setting change
+    this.createNotification(
+      'system',
+      `System setting "${setting.name}" updated`,
+      'low'
+    );
   }
 
   getCalculations(): Array<{ id: string; scenario: string; timestamp: string; user: string }> {
@@ -855,6 +962,29 @@ class AdminDataManager {
   // private calculateWeeklyRevenue(): number {
   //   return Math.round(this.calculateMonthlyRevenue() / 4);
   // }
+
+  // Enhanced activity tracking
+  recordActivity(type: 'calculation' | 'export', user: string, scenario?: string, template?: string): void {
+    const activity = {
+      id: this.generateId(),
+      type,
+      user,
+      scenario,
+      template,
+      timestamp: new Date().toISOString(),
+      status: 'completed' as const
+    };
+
+    const activities = this.getRecentActivity();
+    activities.unshift(activity);
+    
+    // Keep only last 100 activities
+    if (activities.length > 100) {
+      activities.splice(100);
+    }
+
+    localStorage.setItem(this.lastActivityKey, JSON.stringify(activities));
+  }
 }
 
 export const adminDataManager = new AdminDataManager();

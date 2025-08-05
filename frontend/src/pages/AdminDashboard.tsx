@@ -41,6 +41,8 @@ const AdminDashboard: React.FC = () => {
   const [systemSettings, setSystemSettings] = useState<SystemSetting[]>([]);
   const [generatingReport, setGeneratingReport] = useState<string | null>(null);
   const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
+  const [systemHealth, setSystemHealth] = useState<any>(null);
+  const [realTimeUpdates, setRealTimeUpdates] = useState<boolean>(true);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -74,6 +76,10 @@ const AdminDashboard: React.FC = () => {
 
       const allSystemSettings = adminDataManager.getSystemSettings();
       setSystemSettings(allSystemSettings);
+
+      // Load system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
 
       // Create welcome notification if this is the first time
       const existingNotifications = adminDataManager.getNotifications();
@@ -119,6 +125,10 @@ const AdminDashboard: React.FC = () => {
     const interval = setInterval(() => {
       const now = new Date();
       
+      // Update system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+
       // Check for new calculations (simulate real-time activity)
       const recentCalculations = adminDataManager.getCalculations().filter(calc => {
         const calcTime = new Date(calc.timestamp).getTime();
@@ -147,15 +157,38 @@ const AdminDashboard: React.FC = () => {
         );
       });
 
+      // Check for system alerts
+      if (health.apiStatus === 'error' || health.databaseStatus === 'error') {
+        adminDataManager.createNotification(
+          'system',
+          'System error detected - immediate attention required',
+          'high'
+        );
+      }
+
+      // Check for revenue milestones
+      const currentRevenue = adminStats?.revenue || 0;
+      if (currentRevenue > 50000 && currentRevenue % 10000 < 1000) {
+        adminDataManager.createNotification(
+          'revenue',
+          `Revenue milestone achieved: $${currentRevenue.toLocaleString()}`,
+          'medium'
+        );
+      }
+
       // Update notifications list
       const updatedNotifications = adminDataManager.getNotifications();
       setNotifications(updatedNotifications);
+
+      // Update admin stats
+      const stats = adminDataManager.getAdminStats();
+      setAdminStats(stats);
 
       setLastActivityCheck(now);
     }, 30000); // Check every 30 seconds
 
     return () => clearInterval(interval);
-  }, [isVisible, lastActivityCheck]);
+  }, [isVisible, lastActivityCheck, adminStats]);
 
   // Use real data or fallback to mock data
   const stats = adminStats || {
@@ -256,47 +289,96 @@ const AdminDashboard: React.FC = () => {
   // Report handlers
   const handleGenerateReport = async (type: Report['type'], format: Report['format']) => {
     setGeneratingReport(type);
+    
+    // Show progress toast
+    const progressToast = toast.loading(`Generating ${type} report...`);
+    
     try {
       const report = await adminDataManager.generateReport(type, format);
       const updatedReports = adminDataManager.getReports();
       setReports(updatedReports);
-      toast.success(`Report "${report.name}" generated successfully!`);
+      
+      // Update progress toast to success
+      toast.success(`Report "${report.name}" generated successfully!`, {
+        id: progressToast
+      });
+      
+      // Create notification for successful report generation
+      adminDataManager.createNotification(
+        'report',
+        `Report "${report.name}" generated and ready for download`,
+        'medium'
+      );
+      
     } catch (error) {
-      toast.error('Failed to generate report. Please try again.');
+      // Update progress toast to error
+      toast.error(`Failed to generate report: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+        id: progressToast
+      });
+      
+      // Create notification for failed report generation
+      adminDataManager.createNotification(
+        'report',
+        `Failed to generate ${type} report - please try again`,
+        'high'
+      );
     } finally {
       setGeneratingReport(null);
     }
   };
 
   const handleDownloadReport = (report: Report) => {
-    if (report.downloadUrl) {
-      try {
-        const link = document.createElement('a');
-        link.href = report.downloadUrl;
-        
-        // Set proper filename with correct extension
-        let extension = report.format.toLowerCase();
-        if (report.format === 'Excel') {
-          extension = 'csv'; // Excel format creates CSV content
-        }
-        
-        link.download = `${report.name.replace(/[^a-zA-Z0-9\s-]/g, '')}.${extension}`;
-        link.style.display = 'none';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Create notification for successful download
-        adminDataManager.createNotification('report', `Report "${report.name}" downloaded successfully`, 'medium');
-        
-        toast.success(`Report "${report.name}" downloaded successfully!`);
-      } catch (error) {
-        console.error('Download error:', error);
-        toast.error('Failed to download report. Please try again.');
-      }
-    } else {
+    if (!report.downloadUrl) {
       toast.error('Download URL not available');
+      return;
+    }
+
+    try {
+      // Show download progress
+      const downloadToast = toast.loading(`Downloading ${report.name}...`);
+      
+      const link = document.createElement('a');
+      link.href = report.downloadUrl;
+      
+      // Set proper filename with correct extension
+      let extension = report.format.toLowerCase();
+      if (report.format === 'Excel') {
+        extension = 'csv'; // Excel format creates CSV content
+      }
+      
+      const filename = `${report.name.replace(/[^a-zA-Z0-9\s-]/g, '')}.${extension}`;
+      link.download = filename;
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Update toast to success
+      toast.success(`Report "${report.name}" downloaded successfully!`, {
+        id: downloadToast
+      });
+      
+      // Create notification for successful download
+      adminDataManager.createNotification(
+        'report', 
+        `Report "${report.name}" downloaded successfully`, 
+        'medium'
+      );
+      
+      // Track download in analytics
+      adminDataManager.recordActivity('export', 'admin', undefined, report.type);
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error(`Failed to download report: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Create notification for failed download
+      adminDataManager.createNotification(
+        'report',
+        `Failed to download report "${report.name}"`,
+        'high'
+      );
     }
   };
 
@@ -352,39 +434,47 @@ const AdminDashboard: React.FC = () => {
 
   // System settings handlers
   const handleToggleSystemSetting = (settingId: string, value: boolean) => {
-    adminDataManager.updateSystemSetting(settingId, value);
-    const updatedSettings = adminDataManager.getSystemSettings();
-    setSystemSettings(updatedSettings);
-    
-    // Create notification for setting change
-    const setting = systemSettings.find(s => s.id === settingId);
-    if (setting) {
-      adminDataManager.createNotification(
-        'system', 
-        `System setting "${setting.name}" ${value ? 'enabled' : 'disabled'}`, 
-        'low'
-      );
+    try {
+      adminDataManager.updateSystemSetting(settingId, value);
+      const updatedSettings = adminDataManager.getSystemSettings();
+      setSystemSettings(updatedSettings);
+      
+      // Create notification for setting change
+      const setting = systemSettings.find(s => s.id === settingId);
+      if (setting) {
+        adminDataManager.createNotification(
+          'system', 
+          `System setting "${setting.name}" ${value ? 'enabled' : 'disabled'}`, 
+          'low'
+        );
+      }
+      
+      toast.success('Setting updated successfully');
+    } catch (error) {
+      toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-    
-    toast.success('Setting updated successfully');
   };
 
   const handleUpdateSystemSetting = (settingId: string, value: number) => {
-    adminDataManager.updateSystemSetting(settingId, value);
-    const updatedSettings = adminDataManager.getSystemSettings();
-    setSystemSettings(updatedSettings);
-    
-    // Create notification for setting change
-    const setting = systemSettings.find(s => s.id === settingId);
-    if (setting) {
-      adminDataManager.createNotification(
-        'system', 
-        `System setting "${setting.name}" updated to ${value}`, 
-        'low'
-      );
+    try {
+      adminDataManager.updateSystemSetting(settingId, value);
+      const updatedSettings = adminDataManager.getSystemSettings();
+      setSystemSettings(updatedSettings);
+      
+      // Create notification for setting change
+      const setting = systemSettings.find(s => s.id === settingId);
+      if (setting) {
+        adminDataManager.createNotification(
+          'system', 
+          `System setting "${setting.name}" updated to ${value}`, 
+          'low'
+        );
+      }
+      
+      toast.success('Setting updated successfully');
+    } catch (error) {
+      toast.error(`Failed to update setting: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-    
-    toast.success('Setting updated successfully');
   };
 
   const renderMetricModal = () => {
@@ -1215,6 +1305,24 @@ const AdminDashboard: React.FC = () => {
       >
         <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">General Settings</h3>
         <div className="space-y-4">
+          {/* Real-time updates toggle */}
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <div>
+              <p className="text-white font-medium text-sm">Real-time Updates</p>
+              <p className="text-white/60 text-xs">Enable live system monitoring and alerts</p>
+            </div>
+            <button 
+              onClick={() => setRealTimeUpdates(!realTimeUpdates)}
+              className={`w-12 h-6 rounded-full transition-colors ${
+                realTimeUpdates ? 'bg-blue-500' : 'bg-white/20'
+              }`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                realTimeUpdates ? 'translate-x-6' : 'translate-x-1'
+              }`} />
+            </button>
+          </div>
+          
           {systemSettings
             .filter(setting => setting.category === 'general')
             .map((setting) => (
@@ -1300,26 +1408,59 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white/5 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-white/60 text-sm">API Status</span>
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className={`w-2 h-2 rounded-full ${
+                systemHealth?.apiStatus === 'healthy' ? 'bg-green-400' :
+                systemHealth?.apiStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+              }`} />
             </div>
-            <p className="text-white font-semibold text-lg">Healthy</p>
-            <p className="text-green-400 text-xs">↗ 99.9% uptime</p>
+            <p className="text-white font-semibold text-lg">
+              {systemHealth?.apiStatus === 'healthy' ? 'Healthy' :
+               systemHealth?.apiStatus === 'warning' ? 'Warning' : 'Error'}
+            </p>
+            <p className={`text-xs ${
+              systemHealth?.apiStatus === 'healthy' ? 'text-green-400' :
+              systemHealth?.apiStatus === 'warning' ? 'text-yellow-400' : 'text-red-400'
+            }`}>
+              ↗ {systemHealth?.uptime || '99.9%'} uptime
+            </p>
           </div>
           <div className="bg-white/5 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-white/60 text-sm">Database</span>
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className={`w-2 h-2 rounded-full ${
+                systemHealth?.databaseStatus === 'healthy' ? 'bg-green-400' :
+                systemHealth?.databaseStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+              }`} />
             </div>
-            <p className="text-white font-semibold text-lg">Connected</p>
-            <p className="text-green-400 text-xs">↗ 100% reliability</p>
+            <p className="text-white font-semibold text-lg">
+              {systemHealth?.databaseStatus === 'healthy' ? 'Connected' :
+               systemHealth?.databaseStatus === 'warning' ? 'Warning' : 'Error'}
+            </p>
+            <p className={`text-xs ${
+              systemHealth?.databaseStatus === 'healthy' ? 'text-green-400' :
+              systemHealth?.databaseStatus === 'warning' ? 'text-yellow-400' : 'text-red-400'
+            }`}>
+              ↗ 100% reliability
+            </p>
           </div>
           <div className="bg-white/5 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-white/60 text-sm">Cache</span>
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
+              <div className={`w-2 h-2 rounded-full ${
+                systemHealth?.cacheStatus === 'healthy' ? 'bg-green-400' :
+                systemHealth?.cacheStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+              }`} />
             </div>
-            <p className="text-white font-semibold text-lg">Optimal</p>
-            <p className="text-green-400 text-xs">↗ 95% hit rate</p>
+            <p className="text-white font-semibold text-lg">
+              {systemHealth?.cacheStatus === 'healthy' ? 'Optimal' :
+               systemHealth?.cacheStatus === 'warning' ? 'Warning' : 'Error'}
+            </p>
+            <p className={`text-xs ${
+              systemHealth?.cacheStatus === 'healthy' ? 'text-green-400' :
+              systemHealth?.cacheStatus === 'warning' ? 'text-yellow-400' : 'text-red-400'
+            }`}>
+              ↗ 95% hit rate
+            </p>
           </div>
           <div className="bg-white/5 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
@@ -1327,21 +1468,34 @@ const AdminDashboard: React.FC = () => {
               <div className="w-2 h-2 bg-green-400 rounded-full" />
             </div>
             <p className="text-white font-semibold text-lg">Fast</p>
-            <p className="text-green-400 text-xs">↗ 2.3s avg</p>
+            <p className="text-green-400 text-xs">
+              ↗ {systemHealth?.performance?.responseTime ? 
+                `${Math.round(systemHealth.performance.responseTime)}ms avg` : 
+                '2.3s avg'}
+            </p>
           </div>
         </div>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white/5 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-white/60 text-sm">Active Connections</span>
-              <span className="text-white font-semibold">{adminStats?.systemHealth.activeConnections || 156}</span>
+              <span className="text-white font-semibold">{systemHealth?.activeConnections || 156}</span>
             </div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-white/60 text-sm">Last Backup</span>
               <span className="text-white text-sm">
-                {adminStats?.systemHealth.lastBackup ? 
-                  new Date(adminStats.systemHealth.lastBackup).toLocaleDateString() : 
+                {systemHealth?.lastBackup ? 
+                  new Date(systemHealth.lastBackup).toLocaleDateString() : 
                   'N/A'
+                }
+              </span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Error Rate</span>
+              <span className="text-white text-sm">
+                {systemHealth?.performance?.errorRate ? 
+                  `${(systemHealth.performance.errorRate * 100).toFixed(2)}%` : 
+                  '0.5%'
                 }
               </span>
             </div>
