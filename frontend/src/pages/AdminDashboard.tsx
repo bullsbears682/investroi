@@ -606,7 +606,7 @@ const AdminDashboard: React.FC = () => {
                     <p className="text-xs sm:text-sm text-gray-300">Manage your investment platform</p>
                   </div>
                   <div className="sm:hidden">
-                    <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin</h1>
+                    <h1 className="text-base font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin</h1>
                   </div>
                 </div>
               </div>
