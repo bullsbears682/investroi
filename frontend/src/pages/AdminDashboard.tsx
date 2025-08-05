@@ -10,7 +10,6 @@ import {
   Shield,
   EyeOff,
   Activity,
-  CheckCircle,
   DollarSign,
   Target,
   Menu,
@@ -101,14 +100,7 @@ const AdminDashboard: React.FC = () => {
     }
   ];
 
-  const systemHealth = adminStats?.systemHealth || {
-    apiStatus: 'healthy',
-    databaseStatus: 'healthy',
-    cacheStatus: 'healthy',
-    uptime: '99.9%',
-    lastBackup: '2025-01-15 02:00',
-    activeConnections: 45
-  };
+
 
   const popularScenarios = adminStats?.popularScenarios || [
     { name: 'E-commerce', usage: 456, growth: 12.5 },
@@ -129,7 +121,9 @@ const AdminDashboard: React.FC = () => {
     { id: 'analytics', name: 'Analytics', icon: TrendingUp },
     { id: 'users', name: 'Users', icon: Users },
     { id: 'contacts', name: 'Contacts', icon: Mail },
-    { id: 'system', name: 'System', icon: Settings }
+    { id: 'reports', name: 'Reports', icon: FileText },
+    { id: 'notifications', name: 'Notifications', icon: Activity },
+    { id: 'settings', name: 'Settings', icon: Settings }
   ];
 
   // Load contact submissions
@@ -768,68 +762,317 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 
-  const renderSystem = () => (
+
+
+  const renderReports = () => (
     <div className="space-y-4 sm:space-y-6">
-      {/* System Health */}
+      {/* Report Generation */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
       >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">System Health</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <span className="text-white text-sm sm:text-base">API Status</span>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-green-400 text-xs sm:text-sm">Healthy</span>
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Generate Reports</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-blue-400" />
+              </div>
+              <span className="text-white font-medium">User Analytics</span>
             </div>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <span className="text-white text-sm sm:text-base">Database</span>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-green-400 text-xs sm:text-sm">Healthy</span>
+            <p className="text-white/60 text-sm">User growth, engagement, and activity patterns</p>
+          </button>
+          
+          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <Calculator className="w-4 h-4 text-green-400" />
+              </div>
+              <span className="text-white font-medium">Calculation Reports</span>
             </div>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <span className="text-white text-sm sm:text-base">Cache</span>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-green-400 text-xs sm:text-sm">Healthy</span>
+            <p className="text-white/60 text-sm">ROI calculations, popular scenarios, and trends</p>
+          </button>
+          
+          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <FileText className="w-4 h-4 text-purple-400" />
+              </div>
+              <span className="text-white font-medium">Export Analytics</span>
             </div>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <span className="text-white text-sm sm:text-base">Uptime</span>
-            <span className="text-white font-medium text-sm sm:text-base">{systemHealth.uptime}</span>
-          </div>
+            <p className="text-white/60 text-sm">PDF export statistics and template usage</p>
+          </button>
+          
+          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                <Mail className="w-4 h-4 text-yellow-400" />
+              </div>
+              <span className="text-white font-medium">Support Reports</span>
+            </div>
+            <p className="text-white/60 text-sm">Chat sessions, response times, and satisfaction</p>
+          </button>
+          
+          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                <Activity className="w-4 h-4 text-red-400" />
+              </div>
+              <span className="text-white font-medium">System Health</span>
+            </div>
+            <p className="text-white/60 text-sm">Performance metrics and system status</p>
+          </button>
+          
+          <button className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-left transition-colors">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-indigo-400" />
+              </div>
+              <span className="text-white font-medium">Revenue Reports</span>
+            </div>
+            <p className="text-white/60 text-sm">Revenue tracking and financial analytics</p>
+          </button>
         </div>
       </motion.div>
 
-      {/* System Info */}
+      {/* Recent Reports */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
       >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">System Information</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className="p-3 bg-white/5 rounded-lg">
-            <p className="text-white/60 text-xs sm:text-sm">Active Connections</p>
-            <p className="text-white font-medium text-sm sm:text-base">{systemHealth.activeConnections}</p>
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Reports</h3>
+        <div className="space-y-3">
+          {[
+            { name: 'Weekly User Analytics', date: '2025-01-15', type: 'PDF', size: '2.3 MB' },
+            { name: 'Monthly Revenue Report', date: '2025-01-10', type: 'Excel', size: '1.8 MB' },
+            { name: 'Q4 System Performance', date: '2025-01-05', type: 'PDF', size: '3.1 MB' },
+            { name: 'Support Metrics Report', date: '2025-01-01', type: 'CSV', size: '0.9 MB' }
+          ].map((report, index) => (
+            <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-white font-medium text-sm">{report.name}</p>
+                  <p className="text-white/60 text-xs">{report.date} • {report.type} • {report.size}</p>
+                </div>
+              </div>
+              <button className="text-blue-400 hover:text-blue-300 text-sm transition-colors">
+                Download
+              </button>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+
+  const renderNotifications = () => (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Notification Settings */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Notification Settings</h3>
+        <div className="space-y-4">
+          {[
+            { name: 'New User Registration', description: 'Get notified when new users sign up', enabled: true },
+            { name: 'High Priority Support', description: 'Immediate alerts for urgent chat requests', enabled: true },
+            { name: 'System Alerts', description: 'Server status and performance notifications', enabled: false },
+            { name: 'Weekly Reports', description: 'Automated weekly summary emails', enabled: true },
+            { name: 'Revenue Milestones', description: 'Revenue goal achievement notifications', enabled: false }
+          ].map((setting, index) => (
+            <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+              <div>
+                <p className="text-white font-medium text-sm">{setting.name}</p>
+                <p className="text-white/60 text-xs">{setting.description}</p>
+              </div>
+              <button className={`w-12 h-6 rounded-full transition-colors ${
+                setting.enabled ? 'bg-blue-500' : 'bg-white/20'
+              }`}>
+                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                  setting.enabled ? 'translate-x-6' : 'translate-x-1'
+                }`} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Recent Notifications */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Notifications</h3>
+        <div className="space-y-3">
+          {[
+            { type: 'user', message: 'New user registered: john.doe@example.com', time: '2 minutes ago', unread: true },
+            { type: 'support', message: 'High priority chat request from Sarah Johnson', time: '5 minutes ago', unread: true },
+            { type: 'system', message: 'System performance is optimal', time: '1 hour ago', unread: false },
+            { type: 'revenue', message: 'Monthly revenue target achieved!', time: '2 hours ago', unread: false },
+            { type: 'report', message: 'Weekly analytics report is ready', time: '1 day ago', unread: false }
+          ].map((notification, index) => (
+            <div key={index} className={`flex items-center space-x-3 p-3 rounded-lg ${
+              notification.unread ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-white/5'
+            }`}>
+              <div className={`w-2 h-2 rounded-full ${
+                notification.type === 'user' ? 'bg-green-400' :
+                notification.type === 'support' ? 'bg-red-400' :
+                notification.type === 'system' ? 'bg-blue-400' :
+                notification.type === 'revenue' ? 'bg-yellow-400' : 'bg-purple-400'
+              }`} />
+              <div className="flex-1">
+                <p className="text-white text-sm">{notification.message}</p>
+                <p className="text-white/60 text-xs">{notification.time}</p>
+              </div>
+              {notification.unread && (
+                <div className="w-2 h-2 bg-blue-400 rounded-full" />
+              )}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+
+  const renderSettings = () => (
+    <div className="space-y-4 sm:space-y-6">
+      {/* General Settings */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">General Settings</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <div>
+              <p className="text-white font-medium text-sm">Auto-assign Chat Sessions</p>
+              <p className="text-white/60 text-xs">Automatically assign new chat sessions to available admins</p>
+            </div>
+            <button className="w-12 h-6 bg-blue-500 rounded-full">
+              <div className="w-4 h-4 bg-white rounded-full translate-x-6" />
+            </button>
           </div>
-          <div className="p-3 bg-white/5 rounded-lg">
-            <p className="text-white/60 text-xs sm:text-sm">Last Backup</p>
-            <p className="text-white font-medium text-xs sm:text-sm">{systemHealth.lastBackup}</p>
+          
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <div>
+              <p className="text-white font-medium text-sm">Email Notifications</p>
+              <p className="text-white/60 text-xs">Receive email alerts for important events</p>
+            </div>
+            <button className="w-12 h-6 bg-blue-500 rounded-full">
+              <div className="w-4 h-4 bg-white rounded-full translate-x-6" />
+            </button>
           </div>
-          <div className="p-3 bg-white/5 rounded-lg">
-            <p className="text-white/60 text-xs sm:text-sm">Growth Rate</p>
-            <p className="text-white font-medium text-sm sm:text-base">+{stats.growthRate}%</p>
+          
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <div>
+              <p className="text-white font-medium text-sm">Data Retention</p>
+              <p className="text-white/60 text-xs">Keep user data for 90 days</p>
+            </div>
+            <button className="w-12 h-6 bg-white/20 rounded-full">
+              <div className="w-4 h-4 bg-white rounded-full translate-x-1" />
+            </button>
           </div>
-          <div className="p-3 bg-white/5 rounded-lg">
-            <p className="text-white/60 text-xs sm:text-sm">Total Exports</p>
-            <p className="text-white font-medium text-sm sm:text-base">{stats.totalExports.toLocaleString()}</p>
+        </div>
+      </motion.div>
+
+      {/* Security Settings */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Security Settings</h3>
+        <div className="space-y-4">
+          <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                <Shield className="w-4 h-4 text-red-400" />
+              </div>
+              <div>
+                <p className="text-white font-medium text-sm">Change Admin Password</p>
+                <p className="text-white/60 text-xs">Update your admin account password</p>
+              </div>
+            </div>
+          </button>
+          
+          <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                <Activity className="w-4 h-4 text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-white font-medium text-sm">View Login History</p>
+                <p className="text-white/60 text-xs">Check recent admin login activity</p>
+              </div>
+            </div>
+          </button>
+          
+          <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left transition-colors">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <Settings className="w-4 h-4 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-white font-medium text-sm">API Configuration</p>
+                <p className="text-white/60 text-xs">Manage API keys and integrations</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </motion.div>
+
+      {/* System Health */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
+      >
+        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">System Health</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">API Status</span>
+              <div className="w-2 h-2 bg-green-400 rounded-full" />
+            </div>
+            <p className="text-white font-semibold text-lg">Healthy</p>
+            <p className="text-green-400 text-xs">↗ 99.9% uptime</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Database</span>
+              <div className="w-2 h-2 bg-green-400 rounded-full" />
+            </div>
+            <p className="text-white font-semibold text-lg">Connected</p>
+            <p className="text-green-400 text-xs">↗ 100% reliability</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Cache</span>
+              <div className="w-2 h-2 bg-green-400 rounded-full" />
+            </div>
+            <p className="text-white font-semibold text-lg">Optimal</p>
+            <p className="text-green-400 text-xs">↗ 95% hit rate</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/60 text-sm">Performance</span>
+              <div className="w-2 h-2 bg-green-400 rounded-full" />
+            </div>
+            <p className="text-white font-semibold text-lg">Fast</p>
+            <p className="text-green-400 text-xs">↗ 2.3s avg</p>
           </div>
         </div>
       </motion.div>
@@ -846,8 +1089,12 @@ const AdminDashboard: React.FC = () => {
         return renderUsers();
       case 'contacts':
         return renderContacts();
-      case 'system':
-        return renderSystem();
+      case 'reports':
+        return renderReports();
+      case 'notifications':
+        return renderNotifications();
+      case 'settings':
+        return renderSettings();
       default:
         return renderOverview();
     }
