@@ -20,7 +20,9 @@ import {
 import { contactStorage, ContactSubmission } from '../utils/contactStorage';
 import { adminDataManager, AdminStats } from '../utils/adminData';
 import { userManager, User } from '../utils/userManagement';
+import { chatSystem } from '../utils/chatSystem';
 import { toast } from 'react-hot-toast';
+import AdminChat from '../components/AdminChat';
 
 const AdminDashboard: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -32,6 +34,7 @@ const AdminDashboard: React.FC = () => {
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showChat, setShowChat] = useState(false);
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
