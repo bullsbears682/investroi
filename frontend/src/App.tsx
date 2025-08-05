@@ -21,6 +21,7 @@ import TaxInfoPage from './pages/TaxInfoPage';
 import MarketResearchPage from './pages/MarketResearchPage';
 import ContactPage from './pages/ContactPage';
 import TermsPage from './pages/TermsPage';
+import AdminDashboard from './pages/AdminDashboard';
 import CookieConsent from './components/CookieConsent';
 
 // Store
@@ -79,6 +80,7 @@ function App() {
                       <Route path="/privacy" element={<PrivacyPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/terms" element={<TermsPage />} />
+                      <Route path="/admin-panel-2025" element={<AdminDashboard />} />
                     </Routes>
                   </main>
                   
