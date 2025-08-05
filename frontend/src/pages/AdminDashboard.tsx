@@ -1925,8 +1925,8 @@ const AdminDashboard: React.FC = () => {
           );
         }
 
-        // Start real-time monitoring
-        adminDataManager.startRealTimeMonitoring();
+        // Start real-time monitoring (disabled to prevent infinite recursion)
+        // adminDataManager.startRealTimeMonitoring();
 
         // Set up real-time updates listener
         if (typeof window !== 'undefined' && window.BroadcastChannel) {
