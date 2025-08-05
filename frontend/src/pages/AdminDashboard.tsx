@@ -886,19 +886,19 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-3 sm:space-x-4">
               <button
-                onClick={() => setShowChat(true)}
-                className="text-white/60 hover:text-white transition-colors p-2"
-                title="Live Chat Support"
-              >
-                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button
                 onClick={() => setIsVisible(false)}
                 className="text-white/60 hover:text-white transition-colors p-2"
               >
                 <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <span className="text-white/60 text-xs sm:text-sm hidden sm:block">Admin Mode</span>
+              <button
+                onClick={() => setShowChat(true)}
+                className="text-white/60 hover:text-white transition-colors p-2"
+                title="Chat Conversations"
+              >
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
             </div>
           </div>
         </div>
