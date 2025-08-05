@@ -328,7 +328,7 @@ const AdminDashboard: React.FC = () => {
             id: '1',
             type: 'info',
             title: 'New User Registration',
-            message: 'John Smith registered for an account',
+            message: 'John Smith (john@example.com) has registered for an account. Welcome to InvestWise Pro!',
             data: { userId: 'john@example.com', action: 'registration' },
             timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
             read: false
@@ -337,7 +337,7 @@ const AdminDashboard: React.FC = () => {
             id: '2',
             type: 'warning',
             title: 'New Contact Message',
-            message: 'Alice Cooper sent a message about investment questions',
+            message: 'Alice Cooper sent a message: "I have a question about ROI calculations for my business. Can you help me understand the different scenarios?"',
             data: { contactId: 'alice@example.com', action: 'contact' },
             timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
             read: false
@@ -346,7 +346,7 @@ const AdminDashboard: React.FC = () => {
             id: '3',
             type: 'success',
             title: 'ROI Calculation Completed',
-            message: 'User completed a calculation for E-commerce Business',
+            message: 'User completed a calculation for "E-commerce Business" scenario. Total ROI: 45.2%',
             data: { scenarioId: 1, action: 'calculation' },
             timestamp: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
             read: true
@@ -355,9 +355,18 @@ const AdminDashboard: React.FC = () => {
             id: '4',
             type: 'error',
             title: 'PDF Export Failed',
-            message: 'Failed to generate PDF report for user',
+            message: 'Failed to generate PDF report for Sarah Johnson. Error: Network timeout. Please try again.',
             data: { userId: 'sarah@example.com', action: 'export_failed' },
             timestamp: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
+            read: false
+          },
+          {
+            id: '5',
+            type: 'success',
+            title: 'Live Chat Started',
+            message: 'Mike Wilson started a live chat session. They need help with investment planning.',
+            data: { userId: 'mike@example.com', action: 'chat_started' },
+            timestamp: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
             read: false
           }
         ];
@@ -1389,81 +1398,106 @@ const AdminDashboard: React.FC = () => {
                   
                   {/* Notification Dropdown */}
                   {showNotifications && (
-                    <div className="notification-dropdown absolute right-0 mt-2 w-80 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl z-50">
+                    <div className="notification-dropdown absolute right-0 mt-2 w-96 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl z-50">
+                      {/* Header */}
                       <div className="p-4 border-b border-white/20">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold text-white">Notifications</h3>
+                          <div className="flex items-center space-x-2">
+                            <Bell className="h-5 w-5 text-blue-400" />
+                            <h3 className="text-sm font-semibold text-white">Notifications</h3>
+                            {getUnreadCount() > 0 && (
+                              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                                {getUnreadCount()}
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={markAllNotificationsAsRead}
-                              className="text-xs text-blue-400 hover:text-blue-300"
+                              className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-500/20"
                             >
                               Mark all read
                             </button>
                             <button
                               onClick={clearAllNotifications}
-                              className="text-xs text-red-400 hover:text-red-300"
+                              className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/20"
                             >
                               Clear all
                             </button>
                           </div>
                         </div>
                       </div>
+                      
+                      {/* Notifications List */}
                       <div className="max-h-96 overflow-y-auto">
                         {notifications.length > 0 ? (
-                          <div className="p-2">
+                          <div className="p-2 space-y-2">
                             {notifications.map((notification) => (
                               <div
                                 key={notification.id}
-                                className={`p-3 rounded-lg mb-2 transition-all duration-200 ${
+                                className={`p-4 rounded-lg transition-all duration-200 border ${
                                   notification.read 
-                                    ? 'bg-white/5 border border-white/10' 
-                                    : 'bg-blue-500/10 border border-blue-400/20'
+                                    ? 'bg-white/5 border-white/10' 
+                                    : 'bg-blue-500/10 border-blue-400/20'
                                 }`}
                               >
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <div className="flex items-center space-x-2 mb-1">
-                                      <div className={`w-2 h-2 rounded-full ${
-                                        notification.type === 'info' ? 'bg-blue-400' :
-                                        notification.type === 'success' ? 'bg-green-400' :
-                                        notification.type === 'warning' ? 'bg-yellow-400' :
-                                        'bg-red-400'
-                                      }`}></div>
-                                      <h4 className="text-sm font-medium text-white">{notification.title}</h4>
-                                      {!notification.read && (
-                                        <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
-                                      )}
-                                    </div>
-                                    <p className="text-xs text-gray-300 mb-2">{notification.message}</p>
-                                    <p className="text-xs text-gray-400">
-                                      {new Date(notification.timestamp).toLocaleString()}
-                                    </p>
+                                {/* Notification Header */}
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center space-x-2">
+                                    <div className={`w-3 h-3 rounded-full ${
+                                      notification.type === 'info' ? 'bg-blue-400' :
+                                      notification.type === 'success' ? 'bg-green-400' :
+                                      notification.type === 'warning' ? 'bg-yellow-400' :
+                                      'bg-red-400'
+                                    }`}></div>
+                                    <h4 className="text-sm font-semibold text-white">{notification.title}</h4>
+                                    {!notification.read && (
+                                      <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+                                    )}
                                   </div>
                                   <div className="flex items-center space-x-1">
                                     {!notification.read && (
                                       <button
                                         onClick={() => markNotificationAsRead(notification.id)}
-                                        className="text-xs text-blue-400 hover:text-blue-300"
+                                        className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-500/20"
                                       >
                                         Mark read
                                       </button>
                                     )}
                                     <button
                                       onClick={() => deleteNotification(notification.id)}
-                                      className="text-xs text-red-400 hover:text-red-300"
+                                      className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/20"
                                     >
                                       ×
                                     </button>
                                   </div>
                                 </div>
+                                
+                                {/* Notification Message */}
+                                <p className="text-sm text-gray-300 mb-2 leading-relaxed">{notification.message}</p>
+                                
+                                {/* Notification Footer */}
+                                <div className="flex items-center justify-between">
+                                  <p className="text-xs text-gray-400">
+                                    {new Date(notification.timestamp).toLocaleString()}
+                                  </p>
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    notification.type === 'info' ? 'bg-blue-500/20 text-blue-300' :
+                                    notification.type === 'success' ? 'bg-green-500/20 text-green-300' :
+                                    notification.type === 'warning' ? 'bg-yellow-500/20 text-yellow-300' :
+                                    'bg-red-500/20 text-red-300'
+                                  }`}>
+                                    {notification.type.toUpperCase()}
+                                  </span>
+                                </div>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="p-4 text-center">
-                            <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-300">No notifications</p>
+                          <div className="p-8 text-center">
+                            <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-sm text-gray-300 font-medium">No notifications</p>
+                            <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
                           </div>
                         )}
                       </div>
