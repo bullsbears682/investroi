@@ -137,26 +137,41 @@ class AdminDataManager {
   }
 
   private checkAPIHealth(): 'healthy' | 'warning' | 'error' {
-    // Simulate API health check
+    // Simulate API health check with more realistic patterns
     const random = Math.random();
-    if (random > 0.9) return 'error';
-    if (random > 0.7) return 'warning';
+    const timeOfDay = new Date().getHours();
+    
+    // Higher chance of issues during peak hours (9-17)
+    const peakHourMultiplier = (timeOfDay >= 9 && timeOfDay <= 17) ? 1.5 : 0.5;
+    
+    if (random > 0.95 * peakHourMultiplier) return 'error';
+    if (random > 0.85 * peakHourMultiplier) return 'warning';
     return 'healthy';
   }
 
   private checkDatabaseHealth(): 'healthy' | 'warning' | 'error' {
-    // Simulate database health check
+    // Simulate database health check with realistic patterns
     const random = Math.random();
-    if (random > 0.95) return 'error';
-    if (random > 0.8) return 'warning';
+    const calculations = this.getCalculations().length;
+    
+    // Higher chance of issues with high load
+    const loadMultiplier = calculations > 1000 ? 1.3 : 1.0;
+    
+    if (random > 0.97 * loadMultiplier) return 'error';
+    if (random > 0.85 * loadMultiplier) return 'warning';
     return 'healthy';
   }
 
   private checkCacheHealth(): 'healthy' | 'warning' | 'error' {
     // Simulate cache health check
     const random = Math.random();
-    if (random > 0.92) return 'error';
-    if (random > 0.75) return 'warning';
+    const exports = this.getExports().length;
+    
+    // Cache issues more likely with high export activity
+    const activityMultiplier = exports > 500 ? 1.2 : 1.0;
+    
+    if (random > 0.93 * activityMultiplier) return 'error';
+    if (random > 0.78 * activityMultiplier) return 'warning';
     return 'healthy';
   }
 
@@ -170,24 +185,61 @@ class AdminDataManager {
 
   private getLastBackupTime(): string {
     const now = new Date();
-    const backupTime = new Date(now.getTime() - Math.random() * 24 * 60 * 60 * 1000);
+    // More realistic backup times (every 6-12 hours)
+    const backupTime = new Date(now.getTime() - (Math.random() * 6 + 2) * 60 * 60 * 1000);
     return backupTime.toISOString();
   }
 
   private getActiveConnections(): number {
-    return Math.floor(Math.random() * 50) + 10;
+    const baseConnections = 15;
+    const timeOfDay = new Date().getHours();
+    const dayOfWeek = new Date().getDay();
+    
+    // More connections during business hours and weekdays
+    let multiplier = 1.0;
+    if (timeOfDay >= 9 && timeOfDay <= 17) multiplier = 2.5;
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) multiplier *= 1.3;
+    
+    return Math.floor(baseConnections * multiplier + Math.random() * 20);
   }
 
   private getAverageResponseTime(): number {
-    return Math.floor(Math.random() * 500) + 200;
+    const baseTime = 150;
+    const calculations = this.getCalculations().length;
+    const exports = this.getExports().length;
+    
+    // Response time increases with load
+    const loadFactor = (calculations + exports) / 1000;
+    const timeOfDay = new Date().getHours();
+    const peakHourMultiplier = (timeOfDay >= 9 && timeOfDay <= 17) ? 1.5 : 0.8;
+    
+    return Math.floor(baseTime + (loadFactor * 50) + (Math.random() * 200) * peakHourMultiplier);
   }
 
   private getErrorRate(): number {
-    return Math.random() * 2;
+    const baseRate = 0.005; // 0.5%
+    const calculations = this.getCalculations().length;
+    const exports = this.getExports().length;
+    
+    // Error rate increases with system load
+    const loadFactor = (calculations + exports) / 2000;
+    const timeOfDay = new Date().getHours();
+    const peakHourMultiplier = (timeOfDay >= 9 && timeOfDay <= 17) ? 1.3 : 0.7;
+    
+    return Math.min(0.05, baseRate + (loadFactor * 0.01) + (Math.random() * 0.02) * peakHourMultiplier);
   }
 
   private getThroughput(): number {
-    return Math.floor(Math.random() * 1000) + 500;
+    const baseThroughput = 800;
+    const calculations = this.getCalculations().length;
+    const exports = this.getExports().length;
+    
+    // Throughput increases with activity
+    const activityFactor = (calculations + exports) / 500;
+    const timeOfDay = new Date().getHours();
+    const peakHourMultiplier = (timeOfDay >= 9 && timeOfDay <= 17) ? 1.4 : 0.9;
+    
+    return Math.floor(baseThroughput + (activityFactor * 200) + (Math.random() * 400) * peakHourMultiplier);
   }
 
   // Enhanced report generation with better content and scheduling
@@ -1326,30 +1378,38 @@ class AdminDataManager {
 
   private updateRealTimeMetrics(): void {
     const now = new Date();
+    const timeOfDay = now.getHours();
+    const dayOfWeek = now.getDay();
     
-    // Simulate realistic metric changes
-    const activityChance = Math.random();
+    // More realistic activity patterns based on time and day
+    const isBusinessHours = timeOfDay >= 9 && timeOfDay <= 17;
+    const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+    const activityMultiplier = isBusinessHours && isWeekday ? 3.0 : 0.5;
     
-    if (activityChance > 0.7) {
-      // Simulate new user registration
-      const newUser = {
-        id: this.generateId(),
-        name: `User${Math.floor(Math.random() * 1000)}`,
-        email: `user${Math.floor(Math.random() * 1000)}@example.com`,
-        registrationDate: now.toISOString(),
-        lastActive: now.toISOString()
-      };
-      
-      // Add to user manager
-      userManager.registerUser(newUser.name, newUser.email, 'password123');
-      
-      // Create notification
-      this.createNotification('user', `New user registered: ${newUser.name}`, 'low');
-    }
+    const activityChance = Math.random() * activityMultiplier;
     
     if (activityChance > 0.8) {
-      // Simulate new calculation
-      const scenarios = ['Manufacturing', 'Retail', 'Technology', 'Healthcare', 'Finance'];
+      // Simulate new user registration (more likely during business hours)
+      if (isBusinessHours && isWeekday) {
+        const newUser = {
+          id: this.generateId(),
+          name: `User${Math.floor(Math.random() * 1000)}`,
+          email: `user${Math.floor(Math.random() * 1000)}@example.com`,
+          registrationDate: now.toISOString(),
+          lastActive: now.toISOString()
+        };
+        
+        // Add to user manager
+        userManager.registerUser(newUser.name, newUser.email, 'password123');
+        
+        // Create notification
+        this.createNotification('user', `New user registered: ${newUser.name}`, 'low');
+      }
+    }
+    
+    if (activityChance > 0.6) {
+      // Simulate new calculation (more likely during business hours)
+      const scenarios = ['Manufacturing', 'Retail', 'Technology', 'Healthcare', 'Finance', 'E-commerce', 'SaaS', 'Agency'];
       const randomScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
       this.recordCalculation(randomScenario);
       
@@ -1359,21 +1419,33 @@ class AdminDataManager {
       }
     }
     
-    if (activityChance > 0.85) {
-      // Simulate new export
+    if (activityChance > 0.7) {
+      // Simulate new export (more likely during business hours)
       const templates = ['Standard', 'Executive', 'Detailed'];
       const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
       this.recordExport(randomTemplate);
+      
+      // Create notification for premium exports
+      if (randomTemplate === 'Executive' || randomTemplate === 'Detailed') {
+        this.createNotification('report', `Premium ${randomTemplate} report exported`, 'medium');
+      }
     }
     
-    // Update system health randomly
-    if (activityChance > 0.95) {
+    // Update system health based on actual load
+    if (activityChance > 0.9) {
       this.updateSystemHealth();
     }
   }
 
   private createRealisticSystemEvents(): void {
-    const eventChance = Math.random();
+    const now = new Date();
+    const timeOfDay = now.getHours();
+    const dayOfWeek = now.getDay();
+    
+    // More realistic event timing
+    const isBusinessHours = timeOfDay >= 9 && timeOfDay <= 17;
+    const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+    const eventChance = Math.random() * (isBusinessHours && isWeekday ? 2.0 : 0.3);
     
     if (eventChance > 0.98) {
       // Rare system event
@@ -1381,7 +1453,9 @@ class AdminDataManager {
         { type: 'system' as const, message: 'Database backup completed successfully', priority: 'low' as const },
         { type: 'system' as const, message: 'Cache cleared for performance optimization', priority: 'low' as const },
         { type: 'revenue' as const, message: 'Monthly revenue target achieved', priority: 'medium' as const },
-        { type: 'support' as const, message: 'New support ticket received', priority: 'medium' as const }
+        { type: 'support' as const, message: 'New support ticket received', priority: 'medium' as const },
+        { type: 'system' as const, message: 'System maintenance completed', priority: 'low' as const },
+        { type: 'user' as const, message: 'User engagement milestone reached', priority: 'medium' as const }
       ];
       
       const randomEvent = events[Math.floor(Math.random() * events.length)];
@@ -1476,6 +1550,23 @@ class AdminDataManager {
         this.createNotification(
           'system',
           'Critical system issue detected - immediate attention required',
+          'high'
+        );
+      }
+
+      // Check for performance alerts
+      if (health.performance?.responseTime > 800) {
+        this.createNotification(
+          'system',
+          'High response time detected - performance optimization needed',
+          'medium'
+        );
+      }
+
+      if (health.performance?.errorRate > 0.05) {
+        this.createNotification(
+          'system',
+          'High error rate detected - system stability compromised',
           'high'
         );
       }
