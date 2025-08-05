@@ -40,9 +40,9 @@ const AdminDashboard: React.FC = () => {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([]);
   const [systemSettings, setSystemSettings] = useState<SystemSetting[]>([]);
   const [generatingReport, setGeneratingReport] = useState<string | null>(null);
-  const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
-  const [systemHealth, setSystemHealth] = useState<any>(null);
   const [realTimeUpdates, setRealTimeUpdates] = useState<boolean>(true);
+  const [systemHealth, setSystemHealth] = useState<any>(null);
+  const [lastActivityCheck, setLastActivityCheck] = useState<Date>(new Date());
 
   // Load admin stats when dashboard becomes visible
   useEffect(() => {
@@ -189,6 +189,61 @@ const AdminDashboard: React.FC = () => {
 
     return () => clearInterval(interval);
   }, [isVisible, lastActivityCheck, adminStats]);
+
+  // Real-time updates interval
+  useEffect(() => {
+    if (!isVisible || !realTimeUpdates) return;
+
+    const interval = setInterval(() => {
+      // Update system health
+      const health = adminDataManager.getSystemHealth();
+      setSystemHealth(health);
+
+      // Update last activity check
+      setLastActivityCheck(new Date());
+
+      // Create periodic notifications for system health
+      if (health.apiStatus === 'error' || health.databaseStatus === 'error') {
+        adminDataManager.createNotification(
+          'system',
+          'Critical system issue detected - immediate attention required',
+          'high'
+        );
+      }
+    }, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [isVisible, realTimeUpdates]);
+
+  // Listen for broadcast notifications
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.BroadcastChannel) return;
+
+    const channel = new BroadcastChannel('admin_notifications');
+    channel.onmessage = (event) => {
+      if (event.data.type === 'new_notification') {
+        // Refresh notifications
+        const updatedNotifications = adminDataManager.getNotifications();
+        setNotifications(updatedNotifications);
+        
+        // Show toast for new notification
+        const notification = event.data.notification;
+        toast.success(`New notification: ${notification.message}`, {
+          duration: 3000,
+          icon: notification.priority === 'high' ? '🚨' : notification.priority === 'medium' ? '📢' : 'ℹ️'
+        });
+      }
+    };
+
+    return () => channel.close();
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      adminDataManager.cleanup();
+    };
+  }, []);
 
   // Use real data or fallback to mock data
   const stats = adminStats || {
@@ -433,9 +488,13 @@ const AdminDashboard: React.FC = () => {
   };
 
   // System settings handlers
-  const handleToggleSystemSetting = (settingId: string, value: boolean) => {
+  const handleToggleSystemSetting = (settingId: string, value: boolean | string) => {
     try {
-      adminDataManager.updateSystemSetting(settingId, value);
+      if (typeof value === 'boolean') {
+        adminDataManager.updateSystemSetting(settingId, value);
+      } else {
+        adminDataManager.updateSystemSetting(settingId, value);
+      }
       const updatedSettings = adminDataManager.getSystemSettings();
       setSystemSettings(updatedSettings);
       
@@ -444,7 +503,7 @@ const AdminDashboard: React.FC = () => {
       if (setting) {
         adminDataManager.createNotification(
           'system', 
-          `System setting "${setting.name}" ${value ? 'enabled' : 'disabled'}`, 
+          `System setting "${setting.name}" ${typeof value === 'boolean' ? (value ? 'enabled' : 'disabled') : 'updated'}`, 
           'low'
         );
       }
@@ -1093,94 +1152,90 @@ const AdminDashboard: React.FC = () => {
 
 
   const renderReports = () => (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Report Generation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Generate Reports</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="space-y-6">
+      {/* Generate Reports */}
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Generate Reports</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
-            { type: 'user', name: 'User Analytics', description: 'User growth, engagement, and activity patterns', icon: BarChart3, color: 'blue' },
-            { type: 'calculation', name: 'Calculation Reports', description: 'ROI calculations, popular scenarios, and trends', icon: Calculator, color: 'green' },
-            { type: 'export', name: 'Export Analytics', description: 'PDF export statistics and template usage', icon: FileText, color: 'purple' },
-            { type: 'support', name: 'Support Reports', description: 'Chat sessions, response times, and satisfaction', icon: Mail, color: 'yellow' },
-            { type: 'system', name: 'System Health', description: 'Performance metrics and system status', icon: Activity, color: 'red' },
-            { type: 'revenue', name: 'Revenue Reports', description: 'Revenue tracking and financial analytics', icon: DollarSign, color: 'indigo' }
-          ].map((reportType) => (
-            <button
-              key={reportType.type}
-              onClick={() => handleGenerateReport(reportType.type as Report['type'], 'PDF')}
-              disabled={generatingReport === reportType.type}
-              className="bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg p-4 text-left transition-colors"
-            >
-              <div className="flex items-center space-x-3 mb-2">
-                <div className={`w-8 h-8 bg-${reportType.color}-500/20 rounded-lg flex items-center justify-center`}>
-                  <reportType.icon className={`w-4 h-4 text-${reportType.color}-400`} />
+            { type: 'user' as const, name: 'User Analytics', icon: Users, color: 'text-blue-400' },
+            { type: 'calculation' as const, name: 'Calculation Reports', icon: Calculator, color: 'text-purple-400' },
+            { type: 'export' as const, name: 'Export Analytics', icon: FileText, color: 'text-green-400' },
+            { type: 'support' as const, name: 'Support Reports', icon: MessageSquare, color: 'text-orange-400' },
+            { type: 'system' as const, name: 'System Health', icon: Activity, color: 'text-red-400' },
+            { type: 'revenue' as const, name: 'Revenue Reports', icon: DollarSign, color: 'text-yellow-400' }
+          ].map(({ type, name, icon: Icon, color }) => (
+            <div key={type} className="bg-white/5 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <Icon className={`w-5 h-5 ${color}`} />
+                  <span className="text-white font-medium">{name}</span>
                 </div>
-                <span className="text-white font-medium">{reportType.name}</span>
-                {generatingReport === reportType.type && (
-                  <div className="ml-auto">
-                    <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                  </div>
+                {generatingReport === type && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 )}
               </div>
-              <p className="text-white/60 text-sm">{reportType.description}</p>
-            </button>
+              <div className="space-y-2">
+                {['PDF', 'Excel', 'CSV'].map((format) => (
+                  <button
+                    key={format}
+                    onClick={() => handleGenerateReport(type, format as any)}
+                    disabled={generatingReport === type}
+                    className="w-full text-left px-3 py-2 text-sm bg-white/10 hover:bg-white/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Generate {format}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Recent Reports */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Reports</h3>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">Recent Reports</h3>
+          <span className="text-white/60 text-sm">{reports.length} reports</span>
+        </div>
         <div className="space-y-3">
           {reports.length === 0 ? (
-            <div className="text-center py-8">
-              <FileText className="w-12 h-12 text-white/40 mx-auto mb-3" />
-              <p className="text-white/60 text-sm">No reports generated yet</p>
-              <p className="text-white/40 text-xs mt-1">Generate your first report above</p>
-            </div>
+            <p className="text-white/60 text-center py-8">No reports generated yet</p>
           ) : (
             reports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+              <div key={report.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-blue-400" />
+                  <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                    {report.status === 'generating' ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : (
+                      <FileText className="w-5 h-5 text-white" />
+                    )}
                   </div>
                   <div>
-                    <p className="text-white font-medium text-sm">{report.name}</p>
-                    <p className="text-white/60 text-xs">
-                      {new Date(report.createdAt).toLocaleDateString()} • {report.format} • {report.size}
+                    <p className="text-white font-medium">{report.name}</p>
+                    <p className="text-white/60 text-sm">
+                      {report.format} • {report.size} • {new Date(report.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {report.status === 'completed' ? (
+                  {report.status === 'completed' && report.downloadUrl && (
                     <button
                       onClick={() => handleDownloadReport(report)}
-                      className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                      className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
                     >
                       Download
                     </button>
-                  ) : report.status === 'generating' ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-blue-400 text-sm">Generating...</span>
-                    </div>
-                  ) : (
-                    <span className="text-red-400 text-sm">Failed</span>
+                  )}
+                  {report.status === 'generating' && (
+                    <span className="px-3 py-1 text-sm bg-yellow-500/20 text-yellow-400 rounded">
+                      Generating...
+                    </span>
                   )}
                   <button
                     onClick={() => handleDeleteReport(report.id)}
-                    className="text-red-400 hover:text-red-300 text-sm transition-colors"
+                    className="px-3 py-1 text-sm bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
                   >
                     Delete
                   </button>
@@ -1189,329 +1244,437 @@ const AdminDashboard: React.FC = () => {
             ))
           )}
         </div>
-      </motion.div>
+      </div>
+
+      {/* Report Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">Total Reports</p>
+              <p className="text-2xl font-bold text-white">{reports.length}</p>
+            </div>
+            <FileText className="w-8 h-8 text-blue-400" />
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">This Month</p>
+              <p className="text-2xl font-bold text-white">
+                {reports.filter(r => new Date(r.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}
+              </p>
+            </div>
+            <TrendingUp className="w-8 h-8 text-green-400" />
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">Most Popular</p>
+              <p className="text-2xl font-bold text-white">
+                {(() => {
+                  const typeCounts = reports.reduce((acc, report) => {
+                    acc[report.type] = (acc[report.type] || 0) + 1;
+                    return acc;
+                  }, {} as Record<string, number>);
+                  const mostPopular = Object.entries(typeCounts).sort(([,a], [,b]) => b - a)[0];
+                  return mostPopular ? mostPopular[0].charAt(0).toUpperCase() + mostPopular[0].slice(1) : 'N/A';
+                })()}
+              </p>
+            </div>
+            <BarChart3 className="w-8 h-8 text-purple-400" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   const renderNotifications = () => (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* Notification Settings */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Notification Settings</h3>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Notification Settings</h3>
         <div className="space-y-4">
           {notificationSettings.map((setting) => (
-            <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
               <div>
-                <p className="text-white font-medium text-sm">{setting.name}</p>
-                <p className="text-white/60 text-xs">{setting.description}</p>
+                <p className="text-white font-medium">{setting.name}</p>
+                <p className="text-white/60 text-sm">{setting.description}</p>
               </div>
-              <button 
-                onClick={() => handleToggleNotificationSetting(setting.id, !setting.enabled)}
-                className={`w-12 h-6 rounded-full transition-colors ${
-                  setting.enabled ? 'bg-blue-500' : 'bg-white/20'
-                }`}
-              >
-                <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                  setting.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`} />
-              </button>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={setting.enabled}
+                  onChange={(e) => handleToggleNotificationSetting(setting.id, e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+              </label>
             </div>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Recent Notifications */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg sm:text-xl font-semibold text-white">Recent Notifications</h3>
+          <h3 className="text-lg font-semibold text-white">Recent Notifications</h3>
           <div className="flex items-center space-x-2">
+            <button
+              onClick={handleMarkAllAsRead}
+              className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors"
+            >
+              Mark All Read
+            </button>
             <span className="text-white/60 text-sm">
               {notifications.filter(n => !n.isRead).length} unread
             </span>
-            <button
-              onClick={handleMarkAllAsRead}
-              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-            >
-              Mark all as read
-            </button>
           </div>
         </div>
         <div className="space-y-3">
           {notifications.length === 0 ? (
-            <div className="text-center py-8">
-              <Activity className="w-12 h-12 text-white/40 mx-auto mb-3" />
-              <p className="text-white/60 text-sm">No notifications yet</p>
-              <p className="text-white/40 text-xs mt-1">Notifications will appear here</p>
-            </div>
+            <p className="text-white/60 text-center py-8">No notifications yet</p>
           ) : (
             notifications.map((notification) => (
-              <div 
-                key={notification.id} 
-                className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
+              <div
+                key={notification.id}
+                className={`p-4 rounded-lg transition-colors ${
                   notification.isRead ? 'bg-white/5' : 'bg-blue-500/10 border border-blue-500/20'
                 }`}
-                onClick={() => handleMarkNotificationAsRead(notification.id)}
               >
-                <div className={`w-2 h-2 rounded-full ${
-                  notification.type === 'user' ? 'bg-green-400' :
-                  notification.type === 'support' ? 'bg-red-400' :
-                  notification.type === 'system' ? 'bg-blue-400' :
-                  notification.type === 'revenue' ? 'bg-yellow-400' : 'bg-purple-400'
-                }`} />
-                <div className="flex-1">
-                  <p className="text-white text-sm">{notification.message}</p>
-                  <p className="text-white/60 text-xs">
-                    {new Date(notification.timestamp).toLocaleString()}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  {!notification.isRead && (
-                    <div className="w-2 h-2 bg-blue-400 rounded-full" />
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteNotification(notification.id);
-                    }}
-                    className="text-red-400 hover:text-red-300 text-sm transition-colors"
-                  >
-                    Delete
-                  </button>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3">
+                    <div className={`w-2 h-2 rounded-full mt-2 ${
+                      notification.priority === 'high' ? 'bg-red-400' :
+                      notification.priority === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                    }`}></div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium">{notification.message}</p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <span className="text-white/60 text-sm">
+                          {new Date(notification.timestamp).toLocaleString()}
+                        </span>
+                        <span className={`px-2 py-1 text-xs rounded ${
+                          notification.type === 'user' ? 'bg-blue-500/20 text-blue-400' :
+                          notification.type === 'support' ? 'bg-orange-500/20 text-orange-400' :
+                          notification.type === 'system' ? 'bg-red-500/20 text-red-400' :
+                          notification.type === 'revenue' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-purple-500/20 text-purple-400'
+                        }`}>
+                          {notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
+                        </span>
+                        {!notification.isRead && (
+                          <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-400 rounded">
+                            New
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {!notification.isRead && (
+                      <button
+                        onClick={() => handleMarkNotificationAsRead(notification.id)}
+                        className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                      >
+                        Mark Read
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteNotification(notification.id)}
+                      className="text-red-400 hover:text-red-300 text-sm transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
           )}
         </div>
-      </motion.div>
+      </div>
+
+      {/* Notification Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">Total</p>
+              <p className="text-2xl font-bold text-white">{notifications.length}</p>
+            </div>
+            <Mail className="w-8 h-8 text-blue-400" />
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">Unread</p>
+              <p className="text-2xl font-bold text-white">
+                {notifications.filter(n => !n.isRead).length}
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">High Priority</p>
+              <p className="text-2xl font-bold text-white">
+                {notifications.filter(n => n.priority === 'high').length}
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+              <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white/60 text-sm">Today</p>
+              <p className="text-2xl font-bold text-white">
+                {notifications.filter(n => 
+                  new Date(n.timestamp).toDateString() === new Date().toDateString()
+                ).length}
+              </p>
+            </div>
+            <TrendingUp className="w-8 h-8 text-green-400" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   const renderSettings = () => (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6">
       {/* General Settings */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">General Settings</h3>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">General Settings</h3>
         <div className="space-y-4">
-          {/* Real-time updates toggle */}
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <div>
-              <p className="text-white font-medium text-sm">Real-time Updates</p>
-              <p className="text-white/60 text-xs">Enable live system monitoring and alerts</p>
-            </div>
-            <button 
-              onClick={() => setRealTimeUpdates(!realTimeUpdates)}
-              className={`w-12 h-6 rounded-full transition-colors ${
-                realTimeUpdates ? 'bg-blue-500' : 'bg-white/20'
-              }`}
-            >
-              <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                realTimeUpdates ? 'translate-x-6' : 'translate-x-1'
-              }`} />
-            </button>
-          </div>
-          
-          {systemSettings
-            .filter(setting => setting.category === 'general')
-            .map((setting) => (
-              <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                <div>
-                  <p className="text-white font-medium text-sm">{setting.name}</p>
-                  <p className="text-white/60 text-xs">{setting.description}</p>
-                </div>
-                {setting.type === 'toggle' ? (
-                  <button 
-                    onClick={() => handleToggleSystemSetting(setting.id, !setting.value as boolean)}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      setting.value ? 'bg-blue-500' : 'bg-white/20'
-                    }`}
-                  >
-                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                      setting.value ? 'translate-x-6' : 'translate-x-1'
-                    }`} />
-                  </button>
-                ) : (
-                  <input
-                    type="number"
-                    value={setting.value as number}
-                    onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
-                    className="w-20 bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
-                  />
-                )}
+          {systemSettings.filter(s => s.category === 'general').map((setting) => (
+            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+              <div>
+                <p className="text-white font-medium">{setting.name}</p>
+                <p className="text-white/60 text-sm">{setting.description}</p>
               </div>
-            ))}
+              {setting.type === 'toggle' ? (
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={setting.value as boolean}
+                    onChange={(e) => handleToggleSystemSetting(setting.id, e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                </label>
+              ) : setting.type === 'input' ? (
+                <input
+                  type="number"
+                  value={setting.value as number}
+                  onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
+                  className="w-24 px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
+                  min="1"
+                  max="1000"
+                />
+              ) : (
+                <select
+                  value={setting.value as string}
+                  onChange={(e) => handleToggleSystemSetting(setting.id, e.target.value)}
+                  className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
+                >
+                  <option value="enabled">Enabled</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              )}
+            </div>
+          ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Security Settings */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">Security Settings</h3>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Security Settings</h3>
         <div className="space-y-4">
-          {systemSettings
-            .filter(setting => setting.category === 'security')
-            .map((setting) => (
-              <div key={setting.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                <div>
-                  <p className="text-white font-medium text-sm">{setting.name}</p>
-                  <p className="text-white/60 text-xs">{setting.description}</p>
-                </div>
-                {setting.type === 'toggle' ? (
-                  <button 
-                    onClick={() => handleToggleSystemSetting(setting.id, !setting.value as boolean)}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      setting.value ? 'bg-blue-500' : 'bg-white/20'
-                    }`}
-                  >
-                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                      setting.value ? 'translate-x-6' : 'translate-x-1'
-                    }`} />
-                  </button>
-                ) : (
-                  <input
-                    type="number"
-                    value={setting.value as number}
-                    onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
-                    className="w-20 bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
-                  />
-                )}
+          {systemSettings.filter(s => s.category === 'security').map((setting) => (
+            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+              <div>
+                <p className="text-white font-medium">{setting.name}</p>
+                <p className="text-white/60 text-sm">{setting.description}</p>
               </div>
-            ))}
+              {setting.type === 'toggle' ? (
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={setting.value as boolean}
+                    onChange={(e) => handleToggleSystemSetting(setting.id, e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                </label>
+              ) : (
+                <button className="px-3 py-1 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors">
+                  Configure
+                </button>
+              )}
+            </div>
+          ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* System Health */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 sm:p-6"
-      >
-        <h3 className="text-lg sm:text-xl font-semibold text-white mb-4">System Health</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white/5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">API Status</span>
-              <div className={`w-2 h-2 rounded-full ${
-                systemHealth?.apiStatus === 'healthy' ? 'bg-green-400' :
-                systemHealth?.apiStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
-              }`} />
-            </div>
-            <p className="text-white font-semibold text-lg">
-              {systemHealth?.apiStatus === 'healthy' ? 'Healthy' :
-               systemHealth?.apiStatus === 'warning' ? 'Warning' : 'Error'}
-            </p>
-            <p className={`text-xs ${
-              systemHealth?.apiStatus === 'healthy' ? 'text-green-400' :
-              systemHealth?.apiStatus === 'warning' ? 'text-yellow-400' : 'text-red-400'
-            }`}>
-              ↗ {systemHealth?.uptime || '99.9%'} uptime
-            </p>
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-white">System Health</h3>
+          <div className="flex items-center space-x-2">
+            <span className="text-white/60 text-sm">
+              Last updated: {lastActivityCheck.toLocaleTimeString()}
+            </span>
+            <button
+              onClick={() => {
+                const health = adminDataManager.getSystemHealth();
+                setSystemHealth(health);
+                setLastActivityCheck(new Date());
+                toast.success('System health refreshed');
+              }}
+              className="px-3 py-1 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+            >
+              Refresh
+            </button>
           </div>
-          <div className="bg-white/5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Database</span>
-              <div className={`w-2 h-2 rounded-full ${
-                systemHealth?.databaseStatus === 'healthy' ? 'bg-green-400' :
-                systemHealth?.databaseStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
-              }`} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {systemHealth && (
+            <>
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-medium">API Status</span>
+                  <div className={`w-3 h-3 rounded-full ${
+                    systemHealth.apiStatus === 'healthy' ? 'bg-green-400' :
+                    systemHealth.apiStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`}></div>
+                </div>
+                <p className="text-white/60 text-sm capitalize">{systemHealth.apiStatus}</p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-medium">Database</span>
+                  <div className={`w-3 h-3 rounded-full ${
+                    systemHealth.databaseStatus === 'healthy' ? 'bg-green-400' :
+                    systemHealth.databaseStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`}></div>
+                </div>
+                <p className="text-white/60 text-sm capitalize">{systemHealth.databaseStatus}</p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white font-medium">Cache</span>
+                  <div className={`w-3 h-3 rounded-full ${
+                    systemHealth.cacheStatus === 'healthy' ? 'bg-green-400' :
+                    systemHealth.cacheStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`}></div>
+                </div>
+                <p className="text-white/60 text-sm capitalize">{systemHealth.cacheStatus}</p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <span className="text-white font-medium">Uptime</span>
+                <p className="text-white/60 text-sm">{systemHealth.uptime}</p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <span className="text-white font-medium">Active Connections</span>
+                <p className="text-white/60 text-sm">{systemHealth.activeConnections}</p>
+              </div>
+              <div className="bg-white/5 rounded-lg p-4">
+                <span className="text-white font-medium">Response Time</span>
+                <p className="text-white/60 text-sm">{systemHealth.performance?.responseTime}ms</p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Performance Settings */}
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Performance Settings</h3>
+        <div className="space-y-4">
+          {systemSettings.filter(s => s.category === 'performance').map((setting) => (
+            <div key={setting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+              <div>
+                <p className="text-white font-medium">{setting.name}</p>
+                <p className="text-white/60 text-sm">{setting.description}</p>
+              </div>
+              {setting.type === 'toggle' ? (
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={setting.value as boolean}
+                    onChange={(e) => handleToggleSystemSetting(setting.id, e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                </label>
+              ) : setting.type === 'input' ? (
+                <input
+                  type="number"
+                  value={setting.value as number}
+                  onChange={(e) => handleUpdateSystemSetting(setting.id, parseInt(e.target.value))}
+                  className="w-24 px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
+                  min="1000"
+                  max="30000"
+                />
+              ) : (
+                <select
+                  value={setting.value as string}
+                  onChange={(e) => handleToggleSystemSetting(setting.id, e.target.value)}
+                  className="px-3 py-1 bg-white/10 border border-white/20 rounded text-white text-sm focus:outline-none focus:border-blue-400"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              )}
             </div>
-            <p className="text-white font-semibold text-lg">
-              {systemHealth?.databaseStatus === 'healthy' ? 'Connected' :
-               systemHealth?.databaseStatus === 'warning' ? 'Warning' : 'Error'}
-            </p>
-            <p className={`text-xs ${
-              systemHealth?.databaseStatus === 'healthy' ? 'text-green-400' :
-              systemHealth?.databaseStatus === 'warning' ? 'text-yellow-400' : 'text-red-400'
-            }`}>
-              ↗ 100% reliability
-            </p>
+          ))}
+        </div>
+      </div>
+
+      {/* System Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">System Actions</h3>
+          <div className="space-y-3">
+            <button className="w-full px-4 py-2 text-sm bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 transition-colors">
+              Clear Cache
+            </button>
+            <button className="w-full px-4 py-2 text-sm bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors">
+              Backup Data
+            </button>
+            <button className="w-full px-4 py-2 text-sm bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 transition-colors">
+              Restart Services
+            </button>
           </div>
-          <div className="bg-white/5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Cache</span>
-              <div className={`w-2 h-2 rounded-full ${
-                systemHealth?.cacheStatus === 'healthy' ? 'bg-green-400' :
-                systemHealth?.cacheStatus === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
-              }`} />
-            </div>
-            <p className="text-white font-semibold text-lg">
-              {systemHealth?.cacheStatus === 'healthy' ? 'Optimal' :
-               systemHealth?.cacheStatus === 'warning' ? 'Warning' : 'Error'}
-            </p>
-            <p className={`text-xs ${
-              systemHealth?.cacheStatus === 'healthy' ? 'text-green-400' :
-              systemHealth?.cacheStatus === 'warning' ? 'text-yellow-400' : 'text-red-400'
-            }`}>
-              ↗ 95% hit rate
-            </p>
-          </div>
-          <div className="bg-white/5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Performance</span>
-              <div className="w-2 h-2 bg-green-400 rounded-full" />
-            </div>
-            <p className="text-white font-semibold text-lg">Fast</p>
-            <p className="text-green-400 text-xs">
-              ↗ {systemHealth?.performance?.responseTime ? 
-                `${Math.round(systemHealth.performance.responseTime)}ms avg` : 
-                '2.3s avg'}
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Real-time Updates</h3>
+          <div className="space-y-3">
+            <label className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={realTimeUpdates}
+                onChange={(e) => setRealTimeUpdates(e.target.checked)}
+                className="w-4 h-4 text-blue-500 bg-white/10 border-white/20 rounded focus:ring-blue-400"
+              />
+              <span className="text-white text-sm">Enable real-time monitoring</span>
+            </label>
+            <p className="text-white/60 text-xs">
+              Real-time updates refresh system health and notifications every 30 seconds
             </p>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white/5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Active Connections</span>
-              <span className="text-white font-semibold">{systemHealth?.activeConnections || 156}</span>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Last Backup</span>
-              <span className="text-white text-sm">
-                {systemHealth?.lastBackup ? 
-                  new Date(systemHealth.lastBackup).toLocaleDateString() : 
-                  'N/A'
-                }
-              </span>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Error Rate</span>
-              <span className="text-white text-sm">
-                {systemHealth?.performance?.errorRate ? 
-                  `${(systemHealth.performance.errorRate * 100).toFixed(2)}%` : 
-                  '0.5%'
-                }
-              </span>
-            </div>
-          </div>
-          <div className="bg-white/5 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Total Reports</span>
-              <span className="text-white font-semibold">{reports.length}</span>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/60 text-sm">Unread Notifications</span>
-              <span className="text-white font-semibold">{notifications.filter(n => !n.isRead).length}</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 
