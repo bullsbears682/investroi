@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, HardDrive, Download, CheckCircle, Trash2, RefreshCw, X, Eye } from 'lucide-react';
+import { ArrowLeft, HardDrive, Download, CheckCircle, Trash2, RefreshCw, X, Eye, AlertCircle } from 'lucide-react';
 
 interface Backup {
   timestamp: number;
@@ -24,6 +24,11 @@ const AdminBackups: React.FC = () => {
   const [backups, setBackups] = useState<Backup[]>([]);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [backupToDelete, setBackupToDelete] = useState<Backup | null>(null);
+  const [backupToRestore, setBackupToRestore] = useState<Backup | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadBackups();
@@ -40,14 +45,86 @@ const AdminBackups: React.FC = () => {
     }
   };
 
-  const handleRestoreBackup = (backup: Backup) => {
-    console.log('Restoring backup:', backup.backupId);
-    // Here you would implement actual restore logic
+  const handleRestoreBackup = async (backup: Backup) => {
+    setBackupToRestore(backup);
+    setIsRestoreModalOpen(true);
   };
 
-  const handleDeleteBackup = (backupId: string) => {
-    console.log('Deleting backup:', backupId);
-    // Here you would implement actual delete logic
+  const confirmRestoreBackup = async () => {
+    if (!backupToRestore) return;
+
+    setIsLoading(true);
+    try {
+      // Simulate restore process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Parse backup data and restore to localStorage
+      const backupData = JSON.parse(backupToRestore.data);
+      
+      // Restore users
+      if (backupData.users) {
+        localStorage.setItem('registered_users', JSON.stringify(backupData.users));
+      }
+      
+      // Restore contacts
+      if (backupData.contacts) {
+        localStorage.setItem('adminContacts', JSON.stringify(backupData.contacts));
+      }
+      
+      // Restore chat messages
+      if (backupData.chatMessages) {
+        localStorage.setItem('chatMessages', JSON.stringify(backupData.chatMessages));
+      }
+      
+      // Restore other data
+      if (backupData.otherData) {
+        Object.keys(backupData.otherData).forEach(key => {
+          localStorage.setItem(key, JSON.stringify(backupData.otherData[key]));
+        });
+      }
+
+      // Show success message
+      alert('Backup restored successfully! The application data has been updated.');
+      
+      // Refresh the page to show restored data
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Failed to restore backup:', error);
+      alert('Failed to restore backup. Please try again.');
+    } finally {
+      setIsLoading(false);
+      setIsRestoreModalOpen(false);
+      setBackupToRestore(null);
+    }
+  };
+
+  const handleDeleteBackup = (backup: Backup) => {
+    setBackupToDelete(backup);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteBackup = () => {
+    if (!backupToDelete) return;
+
+    try {
+      // Remove backup from localStorage
+      const updatedBackups = backups.filter(b => b.backupId !== backupToDelete.backupId);
+      localStorage.setItem('databaseBackups', JSON.stringify(updatedBackups));
+      
+      // Update state
+      setBackups(updatedBackups);
+      
+      // Show success message
+      alert('Backup deleted successfully!');
+      
+    } catch (error) {
+      console.error('Failed to delete backup:', error);
+      alert('Failed to delete backup. Please try again.');
+    } finally {
+      setIsDeleteModalOpen(false);
+      setBackupToDelete(null);
+    }
   };
 
   const handleDownloadBackup = (backup: Backup) => {
@@ -60,7 +137,8 @@ const AdminBackups: React.FC = () => {
           version: '1.0'
         },
         metadata: backup.metadata,
-        checksum: backup.checksum
+        checksum: backup.checksum,
+        data: backup.data // Include the actual backup data
       };
 
       const dataStr = JSON.stringify(backupData, null, 2);
@@ -68,13 +146,18 @@ const AdminBackups: React.FC = () => {
       const url = window.URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `backup-${backup.backupId}.json`;
+      link.download = `backup-${backup.backupId}-${new Date(backup.timestamp).toISOString().split('T')[0]}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      // Show success message
+      alert('Backup downloaded successfully!');
+      
     } catch (error) {
       console.error('Failed to download backup:', error);
+      alert('Failed to download backup. Please try again.');
     }
   };
 
@@ -86,6 +169,10 @@ const AdminBackups: React.FC = () => {
   const closeModal = () => {
     setSelectedBackup(null);
     setIsDetailsModalOpen(false);
+    setIsDeleteModalOpen(false);
+    setIsRestoreModalOpen(false);
+    setBackupToDelete(null);
+    setBackupToRestore(null);
   };
 
   return (
@@ -275,7 +362,7 @@ const AdminBackups: React.FC = () => {
                         <RefreshCw size={16} />
                       </button>
                       <button
-                        onClick={() => handleDeleteBackup(backup.backupId)}
+                        onClick={() => handleDeleteBackup(backup)}
                         className="p-2 text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-white/10"
                         title="Delete Backup"
                       >
@@ -333,29 +420,125 @@ const AdminBackups: React.FC = () => {
                   <span className="text-white/60 text-sm">Integrity Checksum:</span>
                   <p className="text-white font-mono text-xs sm:text-sm break-all">{selectedBackup.metadata.integrityChecksum}</p>
                 </div>
-                <div className="flex space-x-3 pt-4">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
                   <button
                     onClick={() => handleDownloadBackup(selectedBackup)}
-                    className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
                   >
                     <Download size={16} />
                     <span>Download</span>
                   </button>
                   <button
                     onClick={() => handleRestoreBackup(selectedBackup)}
-                    className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
                   >
                     <RefreshCw size={16} />
                     <span>Restore</span>
                   </button>
                   <button
-                    onClick={() => handleDeleteBackup(selectedBackup.backupId)}
-                    className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    onClick={() => handleDeleteBackup(selectedBackup)}
+                    className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
                   >
                     <Trash2 size={16} />
                     <span>Delete</span>
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {isDeleteModalOpen && backupToDelete && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 w-full max-w-md">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-red-500/20 p-2 rounded-lg">
+                  <AlertCircle className="text-red-400" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white">Delete Backup</h3>
+                  <p className="text-white/60 text-sm">This action cannot be undone.</p>
+                </div>
+              </div>
+              <div className="text-white mb-6">
+                <p>Are you sure you want to delete this backup?</p>
+                <p className="text-white/60 mt-2">
+                  <strong>Backup ID:</strong> {backupToDelete.backupId}<br />
+                  <strong>Date:</strong> {new Date(backupToDelete.timestamp).toLocaleString()}<br />
+                  <strong>Size:</strong> {backupToDelete.metadata.compressedSize}
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                <button
+                  onClick={confirmDeleteBackup}
+                  className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                >
+                  <Trash2 size={16} />
+                  <span>Delete Backup</span>
+                </button>
+                <button
+                  onClick={closeModal}
+                  className="flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                >
+                  <span>Cancel</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Restore Confirmation Modal */}
+        {isRestoreModalOpen && backupToRestore && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 w-full max-w-md">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-green-500/20 p-2 rounded-lg">
+                  <RefreshCw className="text-green-400" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white">Restore Backup</h3>
+                  <p className="text-white/60 text-sm">This will overwrite current data.</p>
+                </div>
+              </div>
+              <div className="text-white mb-6">
+                <p>Are you sure you want to restore this backup?</p>
+                <p className="text-white/60 mt-2">
+                  <strong>Backup ID:</strong> {backupToRestore.backupId}<br />
+                  <strong>Date:</strong> {new Date(backupToRestore.timestamp).toLocaleString()}<br />
+                  <strong>Records:</strong> {backupToRestore.metadata.totalRecords}
+                </p>
+                <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                  <p className="text-yellow-400 text-sm">
+                    <strong>Warning:</strong> This will replace all current application data with the backup data.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                <button
+                  onClick={confirmRestoreBackup}
+                  disabled={isLoading}
+                  className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                >
+                  {isLoading ? (
+                    <>
+                      <RefreshCw size={16} className="animate-spin" />
+                      <span>Restoring...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={16} />
+                      <span>Restore Backup</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={closeModal}
+                  disabled={isLoading}
+                  className="flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                >
+                  <span>Cancel</span>
+                </button>
               </div>
             </div>
           </div>
