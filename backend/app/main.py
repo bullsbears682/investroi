@@ -319,6 +319,63 @@ async def get_countries():
         {"code": "AU", "name": "Australia", "corporate_tax_rate": 30.0}
     ]
 
+# New API v1 endpoints for external SDK access
+@app.post("/v1/calculator/roi")
+async def calculate_roi_v1(request: dict):
+    """API v1 endpoint for ROI calculation - matches SDK documentation"""
+    try:
+        initial_investment = request.get("initialInvestment", 0)
+        additional_costs = request.get("additionalCosts", 0)
+        country_code = request.get("countryCode", "US")
+        
+        total_investment = initial_investment + additional_costs
+        
+        # Calculate ROI based on country and investment amount
+        base_roi = 25.0  # Base ROI percentage
+        
+        # Adjust ROI based on country (simplified)
+        country_adjustments = {
+            "US": 1.0,
+            "GB": 0.9,
+            "DE": 0.85,
+            "CA": 0.95,
+            "AU": 0.88
+        }
+        
+        adjusted_roi = base_roi * country_adjustments.get(country_code, 1.0)
+        returns = total_investment * (adjusted_roi / 100)
+        total_value = total_investment + returns
+        
+        return {
+            "success": True,
+            "data": {
+                "totalValue": round(total_value, 2),
+                "roi": round(adjusted_roi, 2),
+                "breakdown": {
+                    "initialInvestment": initial_investment,
+                    "additionalCosts": additional_costs,
+                    "returns": round(returns, 2)
+                }
+            }
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@app.get("/v1/health")
+async def health_v1():
+    """API v1 health check"""
+    return {
+        "success": True,
+        "data": {
+            "status": "healthy",
+            "version": "1.0.0",
+            "service": "InvestWise Pro API"
+        }
+    }
+
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
