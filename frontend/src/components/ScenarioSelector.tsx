@@ -187,7 +187,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden z-50 max-h-[500px] overflow-y-auto"
+                className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden z-[9999] max-h-[500px] overflow-y-auto"
               >
                 {/* Search */}
                 <div className="p-3 border-b border-white/10">
@@ -332,7 +332,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden z-50 max-h-96 overflow-y-auto"
+                  className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden z-[9999] max-h-96 overflow-y-auto"
                 >
                   <div className="p-2">
                     {miniScenarios.map((miniScenario) => (
