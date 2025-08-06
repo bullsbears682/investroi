@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, DollarSign, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
+import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 
 interface Analytics {
@@ -55,29 +55,10 @@ const AdminAnalytics: React.FC = () => {
       const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
       const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
       
-      // Calculate realistic revenue based on user activity and engagement
-      const activeUsers = allUsers.filter(user => user.totalCalculations > 0 || user.totalExports > 0);
-      const premiumUsers = allUsers.filter(user => user.totalCalculations > 5 || user.totalExports > 2);
-      const highlyEngagedUsers = allUsers.filter(user => user.totalCalculations > 10 || user.totalExports > 5);
+      // Note: No actual payment system exists - this is a demo application
+      // Revenue calculation removed since there's no real subscription/payment functionality
+      const revenue = 0; // No real revenue since no payment system exists
       
-      // Realistic revenue model:
-      // - Free tier: 0 revenue (most users)
-      // - Basic tier ($9.99/month): Users with moderate activity
-      // - Premium tier ($29.99/month): Highly engaged users
-      // - Enterprise tier ($99.99/month): Power users
-      
-      const basicTierRevenue = premiumUsers.length * 9.99;
-      const premiumTierRevenue = highlyEngagedUsers.length * 29.99;
-      const enterpriseTierRevenue = allUsers.filter(user => user.totalCalculations > 20 || user.totalExports > 10).length * 99.99;
-      
-      const totalRevenue = basicTierRevenue + premiumTierRevenue + enterpriseTierRevenue;
-      
-      // Alternative: Calculate revenue based on usage (freemium model)
-      const usageBasedRevenue = totalCalculations * 0.10 + totalExports * 2.50; // $0.10 per calculation, $2.50 per export
-      
-      // Use the higher of the two models
-      const revenue = Math.max(totalRevenue, usageBasedRevenue);
-
       // Calculate real growth rate based on user registration dates
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -326,11 +307,12 @@ const AdminAnalytics: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm font-medium">Revenue</p>
-                <p className="text-3xl font-bold text-white">${analytics.revenue.toFixed(2)}</p>
+                <p className="text-white/60 text-sm font-medium">User Engagement</p>
+                <p className="text-3xl font-bold text-white">{analytics.totalCalculations + analytics.totalExports}</p>
+                <p className="text-white/40 text-xs">Total Actions</p>
               </div>
               <div className="bg-yellow-500/20 p-3 rounded-xl">
-                <DollarSign className="text-yellow-400" size={24} />
+                <Activity className="text-yellow-400" size={24} />
               </div>
             </div>
           </div>
