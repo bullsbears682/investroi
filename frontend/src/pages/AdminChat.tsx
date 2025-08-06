@@ -33,6 +33,11 @@ const AdminChat: React.FC<AdminChatProps> = () => {
   const loadSessions = () => {
     try {
       const allSessions = chatSystem.getAllSessions();
+      console.log('Real chat sessions loaded:', allSessions);
+      console.log('Total sessions:', allSessions.length);
+      console.log('Waiting sessions:', allSessions.filter(s => s.status === 'waiting').length);
+      console.log('Active sessions:', allSessions.filter(s => s.status === 'active').length);
+      console.log('Closed sessions:', allSessions.filter(s => s.status === 'closed').length);
       setSessions(allSessions);
     } catch (error) {
       console.error('Failed to load chat sessions:', error);
@@ -42,6 +47,8 @@ const AdminChat: React.FC<AdminChatProps> = () => {
   const loadMessages = (sessionId: string) => {
     try {
       const sessionMessages = chatSystem.getSessionMessages(sessionId);
+      console.log('Real messages loaded for session', sessionId, ':', sessionMessages);
+      console.log('Total messages in session:', sessionMessages.length);
       setMessages(sessionMessages);
     } catch (error) {
       console.error('Failed to load messages:', error);
@@ -182,6 +189,9 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                 <MessageCircle size={28} />
                 <span>Live Chat Management</span>
               </h1>
+              <div className="text-white/60 text-sm">
+                Total: {sessions.length} | Waiting: {sessions.filter(s => s.status === 'waiting').length} | Active: {sessions.filter(s => s.status === 'active').length} | Closed: {sessions.filter(s => s.status === 'closed').length}
+              </div>
             </div>
           </div>
         </div>
@@ -189,7 +199,19 @@ const AdminChat: React.FC<AdminChatProps> = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
+        {/* Debug Info */}
+        <div className="mb-4 p-4 bg-white/5 backdrop-blur-xl rounded-lg border border-white/20">
+          <h3 className="text-white font-medium mb-2">Real Data Debug Info:</h3>
+          <div className="text-white/80 text-sm space-y-1">
+            <div>LocalStorage Sessions: {localStorage.getItem('chat_sessions') ? JSON.parse(localStorage.getItem('chat_sessions')!).length : 0}</div>
+            <div>Loaded Sessions: {sessions.length}</div>
+            <div>Selected Session: {selectedSession?.id || 'None'}</div>
+            <div>Messages in Selected: {messages.length}</div>
+            <div>LocalStorage Keys: {Object.keys(localStorage).filter(key => key.startsWith('chat_')).join(', ')}</div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-300px)]">
           {/* Sessions List */}
           <div className="lg:col-span-1 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
             {/* Tab Navigation */}
