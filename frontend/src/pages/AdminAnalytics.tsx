@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, DollarSign, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
+import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 
 interface Analytics {
@@ -8,7 +8,6 @@ interface Analytics {
   activeUsers: number;
   totalCalculations: number;
   totalExports: number;
-  revenue: number;
   growthRate: number;
   monthlyGrowth: number;
   conversionRate: number;
@@ -32,7 +31,6 @@ const AdminAnalytics: React.FC = () => {
     activeUsers: 0,
     totalCalculations: 0,
     totalExports: 0,
-    revenue: 0,
     growthRate: 0,
     monthlyGrowth: 0,
     conversionRate: 0,
@@ -54,9 +52,6 @@ const AdminAnalytics: React.FC = () => {
       // Calculate real analytics from actual data
       const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
       const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
-      
-      // Revenue is $0 since no payment system exists in this demo application
-      const revenue = 0;
       
       // Calculate real growth rate based on user registration dates
       const now = new Date();
@@ -94,7 +89,6 @@ const AdminAnalytics: React.FC = () => {
         activeUsers: activeUsers.length,
         totalCalculations,
         totalExports,
-        revenue,
         growthRate: Math.round(growthRate * 10) / 10,
         monthlyGrowth: Math.round(monthlyGrowth * 10) / 10,
         conversionRate: Math.round(conversionRate * 10) / 10,
@@ -306,11 +300,11 @@ const AdminAnalytics: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm font-medium">Revenue</p>
-                <p className="text-3xl font-bold text-white">${analytics.revenue}</p>
+                <p className="text-white/60 text-sm font-medium">User Engagement</p>
+                <p className="text-3xl font-bold text-white">{analytics.totalCalculations + analytics.totalExports}</p>
               </div>
               <div className="bg-yellow-500/20 p-3 rounded-xl">
-                <DollarSign className="text-yellow-400" size={24} />
+                <Activity className="text-yellow-400" size={24} />
               </div>
             </div>
           </div>

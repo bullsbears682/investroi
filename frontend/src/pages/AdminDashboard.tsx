@@ -68,7 +68,6 @@ interface Analytics {
   activeUsers: number;
   totalCalculations: number;
   totalExports: number;
-  revenue: number;
   growthRate: number;
   monthlyGrowth: number;
   conversionRate: number;
@@ -83,7 +82,6 @@ const AdminDashboard: React.FC = () => {
     activeUsers: 0,
     totalCalculations: 0,
     totalExports: 0,
-    revenue: 0,
     growthRate: 0,
     monthlyGrowth: 0,
     conversionRate: 0,
@@ -162,9 +160,6 @@ const AdminDashboard: React.FC = () => {
       const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
       const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
       
-      // Revenue is $0 since no payment system exists in this demo application
-      const revenue = 0;
-
       // Calculate real growth rate based on user registration dates
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -204,7 +199,6 @@ const AdminDashboard: React.FC = () => {
         activeUsers: activeUsers.length,
         totalCalculations,
         totalExports,
-        revenue,
         growthRate: Math.round(growthRate * 10) / 10, // Round to 1 decimal
         monthlyGrowth: Math.round(monthlyGrowth * 10) / 10,
         conversionRate: Math.round(conversionRate * 10) / 10,
@@ -1866,9 +1860,29 @@ const AdminDashboard: React.FC = () => {
                 <div class="label">Reports exported</div>
               </div>
               <div class="stat-card">
-                <h3>Revenue</h3>
-                <div class="value">$${adminStats.revenue.toFixed(2)}</div>
-                <div class="label">Estimated revenue</div>
+                <h3>User Engagement</h3>
+                <div class="value">${adminStats.totalCalculations + adminStats.totalExports}</div>
+                <div class="label">Total actions</div>
+              </div>
+              <div class="stat-card">
+                <h3>Growth Rate</h3>
+                <div class="value">${adminStats.growthRate}%</div>
+                <div class="label">Monthly growth rate</div>
+              </div>
+              <div class="stat-card">
+                <h3>Conversion Rate</h3>
+                <div class="value">${adminStats.conversionRate}%</div>
+                <div class="label">Percentage of active users</div>
+              </div>
+              <div class="stat-card">
+                <h3>Average Session Time</h3>
+                <div class="value">${adminStats.averageSessionTime} min</div>
+                <div class="label">Average time spent per user</div>
+              </div>
+              <div class="stat-card">
+                <h3>Bounce Rate</h3>
+                <div class="value">${adminStats.bounceRate}%</div>
+                <div class="label">Percentage of users who leave after one page</div>
               </div>
               <div class="stat-card">
                 <h3>Live Chats</h3>
