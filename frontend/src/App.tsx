@@ -33,6 +33,7 @@ import AdminAnalytics from './pages/AdminAnalytics';
 import AdminData from './pages/AdminData';
 import AdminSystem from './pages/AdminSystem';
 import AdminBackups from './pages/AdminBackups';
+import AdminChat from './pages/AdminChat';
 
 
 // Store
@@ -113,6 +114,7 @@ function App() {
                         <Route path="/admin/data" element={<AdminData />} />
                         <Route path="/admin/system" element={<AdminSystem />} />
                         <Route path="/admin/backups" element={<AdminBackups />} />
+                        <Route path="/admin/chat" element={<AdminChat />} />
                       </Routes>
                     </main>
                     

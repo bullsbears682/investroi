@@ -6,7 +6,8 @@ import {
   AnalyticsIcon,
   UsersIcon,
   ShieldIcon,
-  HardDriveIcon
+  HardDriveIcon,
+  MessageSquareIcon
 } from './icons/CustomIcons';
 
 interface AdminMenuProps {
@@ -47,6 +48,12 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onToggle }) => {
       href: '/admin/backups',
       icon: HardDriveIcon,
       description: 'Database backups and restore'
+    },
+    {
+      name: 'Chat',
+      href: '/admin/chat',
+      icon: MessageSquareIcon,
+      description: 'Real-time chat interface'
     }
   ];
 
