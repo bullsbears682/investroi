@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Calculator, Info, Shield, Target, TrendingUp } from 'lucide-react';
+import { X } from 'lucide-react';
 import Logo from './Logo';
+import { 
+  HomeIcon, 
+  CalculatorIcon, 
+  AnalyticsIcon, 
+  UsersIcon, 
+  SettingsIcon, 
+  ShieldIcon, 
+  TargetIcon, 
+  TrendingUpIcon,
+  MenuIcon,
+  XIcon
+} from './icons/CustomIcons';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
   const navigation = [
-    { name: 'Home', href: '/', icon: Calculator },
-    { name: 'Business Scenarios', href: '/scenarios', icon: Target },
-    { name: 'ROI Calculator', href: '/calculator', icon: TrendingUp },
-    { name: 'About', href: '/about', icon: Info },
-    { name: 'Privacy', href: '/privacy', icon: Shield }
+    { name: 'Home', href: '/', icon: HomeIcon },
+    { name: 'Calculator', href: '/calculator', icon: CalculatorIcon },
+    { name: 'Analytics', href: '/analytics', icon: AnalyticsIcon },
+    { name: 'Users', href: '/users', icon: UsersIcon },
+    { name: 'Settings', href: '/settings', icon: SettingsIcon },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (href: string) => location.pathname === href;
 
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/20"
+      className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -38,42 +50,34 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {navigation.map((item) => (
-              <motion.div
-                key={item.name}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+            {navigation.map((item) => {
+              const IconComponent = item.icon;
+              return (
                 <Link
+                  key={item.name}
                   to={item.href}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive(item.href)
-                      ? 'text-blue-400 bg-blue-400/20'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/70 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <IconComponent size={18} className="flex-shrink-0" />
                   <span>{item.name}</span>
                 </Link>
-              </motion.div>
-            ))}
-            
-
+              );
+            })}
           </nav>
 
           {/* Mobile menu button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-all"
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </motion.button>
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white/70 hover:text-white p-2"
+            >
+              <MenuIcon size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -82,31 +86,27 @@ const Header: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-white/20"
+            className="md:hidden"
           >
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navigation.map((item) => (
-                <motion.div
-                  key={item.name}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white/5 rounded-lg mt-2">
+              {navigation.map((item) => {
+                const IconComponent = item.icon;
+                return (
                   <Link
+                    key={item.name}
                     to={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-base font-medium transition-all ${
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
                       isActive(item.href)
-                        ? 'text-blue-400 bg-blue-400/20'
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/70 hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <IconComponent size={20} className="flex-shrink-0" />
                     <span>{item.name}</span>
                   </Link>
-                </motion.div>
-              ))}
-              
-
+                );
+              })}
             </div>
           </motion.div>
         )}

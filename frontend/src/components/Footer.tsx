@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Mail, Twitter, Linkedin, Github } from 'lucide-react';
+import { MailIcon, PhoneIcon } from './icons/CustomIcons';
 import Logo from './Logo';
 
 const Footer: React.FC = () => {
@@ -9,73 +9,61 @@ const Footer: React.FC = () => {
 
   const footerLinks = {
     product: [
-      { name: 'ROI Calculator', href: '/calculator' },
-      { name: 'Business Scenarios', href: '/scenarios' },
-      { name: 'Market Analysis', href: '/scenarios' },
-      { name: 'PDF Reports', href: '/calculator' }
+      { name: 'Calculator', href: '/calculator' },
+      { name: 'Analytics', href: '/analytics' },
+      { name: 'Scenarios', href: '/scenarios' },
+      { name: 'Guide', href: '/guide' },
     ],
     company: [
-      { name: 'About Us', href: '/about' },
-      { name: 'Privacy Policy', href: '/privacy' },
-      { name: 'Terms of Service', href: '/terms' },
-      { name: 'Contact', href: '/contact' }
+      { name: 'About', href: '/about' },
+      { name: 'Contact', href: '/contact' },
+      { name: 'Privacy', href: '/privacy' },
+      { name: 'Terms', href: '/terms' },
     ],
-    resources: [
-      { name: 'Investment Guide', href: '/investment-guide' },
-      { name: 'Tax Information', href: '/tax-info' },
-      { name: 'Market Research', href: '/market-research' },
-      { name: 'Risk Assessment', href: '/calculator' }
-    ]
+    support: [
+      { name: 'Help Center', href: '/help' },
+      { name: 'Documentation', href: '/docs' },
+      { name: 'API', href: '/api' },
+      { name: 'Status', href: '/status' },
+    ],
   };
 
   const socialLinks = [
-    { name: 'Email', href: 'mailto:contact@investwisepro.com', icon: Mail },
-    { name: 'Twitter', href: 'https://twitter.com/investwisepro', icon: Twitter },
-    { name: 'LinkedIn', href: 'https://linkedin.com/company/investwisepro', icon: Linkedin },
-    { name: 'GitHub', href: 'https://github.com/investwisepro', icon: Github }
+    { name: 'Email', href: 'mailto:contact@investwisepro.com', icon: MailIcon },
+    { name: 'Phone', href: 'tel:+1234567890', icon: PhoneIcon },
   ];
 
   return (
-    <footer className="bg-white/10 backdrop-blur-lg border-t border-white/20 mt-20">
+    <motion.footer
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="bg-white/5 backdrop-blur-xl border-t border-white/10 mt-16"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand Section */}
+          {/* Brand */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             className="col-span-1 md:col-span-1"
           >
             <div className="flex items-center space-x-2 mb-4">
               <Logo size="md" showText={false} />
               <span className="text-xl font-bold text-white">InvestWise Pro</span>
             </div>
-            <p className="text-white/70 text-sm mb-4">
-              Advanced ROI calculator with real-world business scenarios, comprehensive market analysis, and professional reporting tools.
+            <p className="text-white/60 text-sm leading-relaxed">
+              Advanced investment analysis and ROI calculations for professionals and individuals.
+              Make informed decisions with our comprehensive financial tools.
             </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <motion.a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white/70 hover:text-white transition-all"
-                >
-                  <social.icon className="w-4 h-4" />
-                </motion.a>
-              ))}
-            </div>
           </motion.div>
 
           {/* Product Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="col-span-1"
           >
             <h3 className="text-white font-semibold mb-4">Product</h3>
@@ -84,7 +72,7 @@ const Footer: React.FC = () => {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors"
+                    className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
                   >
                     {link.name}
                   </Link>
@@ -96,9 +84,8 @@ const Footer: React.FC = () => {
           {/* Company Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className="col-span-1"
           >
             <h3 className="text-white font-semibold mb-4">Company</h3>
@@ -107,7 +94,7 @@ const Footer: React.FC = () => {
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors"
+                    className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
                   >
                     {link.name}
                   </Link>
@@ -116,21 +103,20 @@ const Footer: React.FC = () => {
             </ul>
           </motion.div>
 
-          {/* Resources Links */}
+          {/* Support Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="col-span-1"
           >
-            <h3 className="text-white font-semibold mb-4">Resources</h3>
+            <h3 className="text-white font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
-              {footerLinks.resources.map((link) => (
+              {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-white/70 hover:text-white text-sm transition-colors"
+                    className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
                   >
                     {link.name}
                   </Link>
@@ -142,32 +128,36 @@ const Footer: React.FC = () => {
 
         {/* Bottom Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="border-t border-white/20 mt-8 pt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="border-t border-white/10 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-white/60 text-sm">
-              © {currentYear} InvestWise Pro. All rights reserved.
-            </div>
-            
-            <div className="flex items-center space-x-6 text-sm">
-              <Link to="/privacy" className="text-white/60 hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="text-white/60 hover:text-white transition-colors">
-                Terms of Service
-              </Link>
-              <Link to="/contact" className="text-white/60 hover:text-white transition-colors">
-                Contact
-              </Link>
-            </div>
+          {/* Copyright */}
+          <div className="text-white/60 text-sm mb-4 md:mb-0">
+            © {currentYear} InvestWise Pro. All rights reserved.
+          </div>
+
+          {/* Social Links */}
+          <div className="flex space-x-4">
+            {socialLinks.map((link) => {
+              const IconComponent = link.icon;
+              return (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-white/60 hover:text-white transition-colors duration-200"
+                >
+                  <IconComponent size={20} />
+                </motion.a>
+              );
+            })}
           </div>
         </motion.div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 
