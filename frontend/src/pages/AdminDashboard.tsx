@@ -24,7 +24,6 @@ import {
   Menu,
   X,
   Sparkles,
-  Crown,
   Zap
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
@@ -572,25 +571,25 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'users' && (
-          <div className="space-y-4 lg:space-y-6">
+          <div className="space-y-6 lg:space-y-8">
             {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
                   <input
                     type="text"
                     placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 text-sm"
+                    className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-purple-500/50 text-sm font-medium"
                   />
                 </div>
               </div>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 text-sm"
+                className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-purple-500/50 text-sm font-medium"
               >
                 <option value="all">All Users</option>
                 <option value="active">Active Users</option>
@@ -599,122 +598,137 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Users List - Mobile Optimized */}
-            <div className="space-y-3 lg:hidden">
+            <div className="space-y-4 lg:hidden">
               {filteredUsers.map((user) => (
                 <motion.div
                   key={user.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
+                  className="group relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">{user.name.charAt(0)}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                          <span className="text-white text-lg font-bold">{user.name.charAt(0)}</span>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold text-white">{user.name}</div>
+                          <div className="text-white/60 text-sm">{user.email}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-sm font-medium text-white">{user.name}</div>
-                        <div className="text-xs text-white/60">{user.email}</div>
+                      <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                        user.status === 'active' 
+                          ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
+                          : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                      }`}>
+                        {user.status}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm text-white/60 mb-4">
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <div className="text-white font-medium">Calculations</div>
+                        <div className="text-2xl font-bold text-white">{user.totalCalculations}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <div className="text-white font-medium">Exports</div>
+                        <div className="text-2xl font-bold text-white">{user.totalExports}</div>
                       </div>
                     </div>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.status === 'active' 
-                        ? 'bg-green-500/20 text-green-300' 
-                        : 'bg-red-500/20 text-red-300'
-                    }`}>
-                      {user.status}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-white/60 mb-3">
-                    <div>Calculations: {user.totalCalculations}</div>
-                    <div>Exports: {user.totalExports}</div>
-                    <div>Last Active: {new Date(user.lastActive).toLocaleDateString()}</div>
-                  </div>
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      onClick={() => handleUserAction('viewed', user.id)}
-                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-                    >
-                      <Eye className="w-4 h-4 text-blue-400" />
-                    </button>
-                    <button
-                      onClick={() => handleUserAction('edited', user.id)}
-                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-                    >
-                      <Edit className="w-4 h-4 text-green-400" />
-                    </button>
-                    <button
-                      onClick={() => handleUserAction('deleted', user.id)}
-                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-400" />
-                    </button>
+                    <div className="text-sm text-white/60 mb-4">
+                      Last Active: {new Date(user.lastActive).toLocaleDateString()}
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        onClick={() => handleUserAction('viewed', user.id)}
+                        className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+                      >
+                        <Eye className="w-5 h-5 text-blue-400" />
+                      </button>
+                      <button
+                        onClick={() => handleUserAction('edited', user.id)}
+                        className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+                      >
+                        <Edit className="w-5 h-5 text-green-400" />
+                      </button>
+                      <button
+                        onClick={() => handleUserAction('deleted', user.id)}
+                        className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+                      >
+                        <Trash2 className="w-5 h-5 text-red-400" />
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
             </div>
 
             {/* Users Table - Desktop */}
-            <div className="hidden lg:block bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
+            <div className="hidden lg:block bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-white/10">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">User</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">Calculations</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">Exports</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">Last Active</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">Actions</th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold text-white/60 uppercase tracking-wider">User</th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold text-white/60 uppercase tracking-wider">Calculations</th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold text-white/60 uppercase tracking-wider">Exports</th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold text-white/60 uppercase tracking-wider">Last Active</th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold text-white/60 uppercase tracking-wider">Status</th>
+                      <th className="px-8 py-4 text-left text-xs font-semibold text-white/60 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-white/5">
-                        <td className="px-6 py-4 whitespace-nowrap">
+                      <tr key={user.id} className="hover:bg-white/5 transition-all">
+                        <td className="px-8 py-6 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-sm font-medium">{user.name.charAt(0)}</span>
+                            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                              <span className="text-white text-lg font-bold">{user.name.charAt(0)}</span>
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-white">{user.name}</div>
-                              <div className="text-sm text-white/60">{user.email}</div>
+                              <div className="text-lg font-semibold text-white">{user.name}</div>
+                              <div className="text-white/60">{user.email}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{user.totalCalculations}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{user.totalExports}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/60">
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <div className="text-2xl font-bold text-white">{user.totalCalculations}</div>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <div className="text-2xl font-bold text-white">{user.totalExports}</div>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap text-white/60">
                           {new Date(user.lastActive).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
                             user.status === 'active' 
-                              ? 'bg-green-500/20 text-green-300' 
-                              : 'bg-red-500/20 text-red-300'
+                              ? 'bg-green-500/20 text-green-300 border border-green-500/30' 
+                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
                           }`}>
                             {user.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-8 py-6 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleUserAction('viewed', user.id)}
-                              className="text-blue-400 hover:text-blue-300"
+                              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-5 h-5 text-blue-400" />
                             </button>
                             <button
                               onClick={() => handleUserAction('edited', user.id)}
-                              className="text-green-400 hover:text-green-300"
+                              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-5 h-5 text-green-400" />
                             </button>
                             <button
                               onClick={() => handleUserAction('deleted', user.id)}
-                              className="text-red-400 hover:text-red-300"
+                              className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-5 h-5 text-red-400" />
                             </button>
                           </div>
                         </td>
@@ -728,81 +742,86 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'contacts' && (
-          <div className="space-y-4 lg:space-y-6">
+          <div className="space-y-6 lg:space-y-8">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
                 <input
                   type="text"
                   placeholder="Search contacts..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 text-sm"
+                  className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-purple-500/50 text-sm font-medium"
                 />
               </div>
             </div>
 
             {/* Contacts List */}
-            <div className="space-y-3 lg:space-y-4">
+            <div className="space-y-4">
               {filteredContacts.map((contact) => (
                 <motion.div
                   key={contact.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                  className="group relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 lg:p-8 hover:scale-105 transition-all duration-300"
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2 lg:mb-2">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm font-medium">{contact.name.charAt(0)}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <div className="relative">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-4 mb-4">
+                          <div className="w-14 h-14 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                            <span className="text-white text-xl font-bold">{contact.name.charAt(0)}</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl lg:text-2xl font-bold text-white">{contact.name}</h3>
+                            <p className="text-white/60 text-lg">{contact.email}</p>
+                          </div>
+                          <span className={`inline-flex px-4 py-2 text-sm font-semibold rounded-full ${
+                            contact.status === 'new' 
+                              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                              : contact.status === 'read'
+                              ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                              : 'bg-green-500/20 text-green-300 border border-green-500/30'
+                          }`}>
+                            {contact.status}
+                          </span>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-base lg:text-lg font-medium text-white">{contact.name}</h3>
-                          <p className="text-white/60 text-sm">{contact.email}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-6 mb-4 text-sm text-white/60">
+                          <div className="flex items-center space-x-2 bg-white/5 rounded-xl p-3">
+                            <Phone className="w-5 h-5" />
+                            <span className="font-medium">{contact.phone}</span>
+                          </div>
+                          <div className="flex items-center space-x-2 bg-white/5 rounded-xl p-3">
+                            <Calendar className="w-5 h-5" />
+                            <span className="font-medium">{new Date(contact.date).toLocaleDateString()}</span>
+                          </div>
                         </div>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          contact.status === 'new' 
-                            ? 'bg-blue-500/20 text-blue-300'
-                            : contact.status === 'read'
-                            ? 'bg-yellow-500/20 text-yellow-300'
-                            : 'bg-green-500/20 text-green-300'
-                        }`}>
-                          {contact.status}
-                        </span>
+                        <div className="bg-white/5 rounded-xl p-4">
+                          <p className="text-white/80 text-lg leading-relaxed">{contact.message}</p>
+                        </div>
                       </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mb-3 text-sm text-white/60">
-                        <div className="flex items-center space-x-1">
-                          <Phone className="w-4 h-4" />
-                          <span>{contact.phone}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{new Date(contact.date).toLocaleDateString()}</span>
-                        </div>
+                      <div className="flex justify-end space-x-3 mt-6 lg:mt-0 lg:ml-6">
+                        <button
+                          onClick={() => handleContactAction('viewed', contact.id)}
+                          className="p-4 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+                        >
+                          <Eye className="w-6 h-6 text-blue-400" />
+                        </button>
+                        <button
+                          onClick={() => handleContactAction('replied', contact.id)}
+                          className="p-4 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+                        >
+                          <Mail className="w-6 h-6 text-green-400" />
+                        </button>
+                        <button
+                          onClick={() => handleContactAction('deleted', contact.id)}
+                          className="p-4 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
+                        >
+                          <Trash2 className="w-6 h-6 text-red-400" />
+                        </button>
                       </div>
-                      <p className="text-white/80 text-sm lg:text-base">{contact.message}</p>
-                    </div>
-                    <div className="flex justify-end space-x-2 mt-3 lg:mt-0 lg:ml-4">
-                      <button
-                        onClick={() => handleContactAction('viewed', contact.id)}
-                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-                      >
-                        <Eye className="w-4 h-4 text-blue-400" />
-                      </button>
-                      <button
-                        onClick={() => handleContactAction('replied', contact.id)}
-                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-                      >
-                        <Mail className="w-4 h-4 text-green-400" />
-                      </button>
-                      <button
-                        onClick={() => handleContactAction('deleted', contact.id)}
-                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-400" />
-                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -812,21 +831,25 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'analytics' && (
-          <div className="space-y-6 lg:space-y-8">
+          <div className="space-y-8 lg:space-y-10">
             {/* Advanced Analytics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Monthly Growth</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.monthlyGrowth}%</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Monthly Growth</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.monthlyGrowth}%</p>
+                    <p className="text-green-400 text-sm font-medium">+5% from last month</p>
                   </div>
-                  <TrendingUp className="w-6 h-6 lg:w-8 lg:h-8 text-green-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <TrendingUp className="w-8 h-8 text-green-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -834,14 +857,18 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Conversion Rate</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.conversionRate}%</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Conversion Rate</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.conversionRate}%</p>
+                    <p className="text-green-400 text-sm font-medium">+2% from last month</p>
                   </div>
-                  <Target className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <Target className="w-8 h-8 text-blue-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -849,14 +876,18 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Avg Session Time</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.averageSessionTime}m</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Avg Session Time</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.averageSessionTime}m</p>
+                    <p className="text-green-400 text-sm font-medium">+1m from last month</p>
                   </div>
-                  <Clock className="w-6 h-6 lg:w-8 lg:h-8 text-purple-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <Clock className="w-8 h-8 text-purple-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -864,29 +895,39 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Bounce Rate</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.bounceRate}%</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Bounce Rate</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.bounceRate}%</p>
+                    <p className="text-red-400 text-sm font-medium">-3% from last month</p>
                   </div>
-                  <AlertTriangle className="w-6 h-6 lg:w-8 lg:h-8 text-orange-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <AlertTriangle className="w-8 h-8 text-orange-400" />
+                  </div>
                 </div>
               </motion.div>
             </div>
 
             {/* Analytics Charts Placeholder */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-blue-500/20 to-indigo-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
-                <h3 className="text-base lg:text-lg font-medium text-white mb-4">User Growth</h3>
-                <div className="h-48 lg:h-64 bg-white/5 rounded-lg flex items-center justify-center">
-                  <p className="text-white/60 text-sm lg:text-base">Chart placeholder - User growth over time</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative">
+                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">User Growth</h3>
+                  <div className="h-64 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                    <div className="text-center">
+                      <BarChart3 className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                      <p className="text-white/60 text-lg">Chart placeholder - User growth over time</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
 
@@ -894,11 +935,17 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
-                <h3 className="text-base lg:text-lg font-medium text-white mb-4">Revenue Analytics</h3>
-                <div className="h-48 lg:h-64 bg-white/5 rounded-lg flex items-center justify-center">
-                  <p className="text-white/60 text-sm lg:text-base">Chart placeholder - Revenue trends</p>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative">
+                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">Revenue Analytics</h3>
+                  <div className="h-64 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                    <div className="text-center">
+                      <DollarSign className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                      <p className="text-white/60 text-lg">Chart placeholder - Revenue trends</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -906,40 +953,52 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'settings' && (
-          <div className="space-y-4 lg:space-y-6">
+          <div className="space-y-6 lg:space-y-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+              className="group relative bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 lg:p-8"
             >
-              <h3 className="text-base lg:text-lg font-medium text-white mb-4">System Settings</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium text-sm lg:text-base">Email Notifications</p>
-                    <p className="text-white/60 text-xs lg:text-sm">Receive email alerts for important events</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="relative">
+                <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">System Settings</h3>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div>
+                      <p className="text-white font-semibold text-lg">Email Notifications</p>
+                      <p className="text-white/60 text-sm">Receive email alerts for important events</p>
+                    </div>
+                    <button className="w-14 h-7 bg-green-500 rounded-full relative transition-all">
+                      <div className="w-5 h-5 bg-white rounded-full absolute right-1 top-1 transition-all"></div>
+                    </button>
                   </div>
-                  <button className="w-12 h-6 bg-green-500 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div>
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium text-sm lg:text-base">Auto Backup</p>
-                    <p className="text-white/60 text-xs lg:text-sm">Automatically backup data daily</p>
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div>
+                      <p className="text-white font-semibold text-lg">Auto Backup</p>
+                      <p className="text-white/60 text-sm">Automatically backup data daily</p>
+                    </div>
+                    <button className="w-14 h-7 bg-gray-500 rounded-full relative transition-all">
+                      <div className="w-5 h-5 bg-white rounded-full absolute left-1 top-1 transition-all"></div>
+                    </button>
                   </div>
-                  <button className="w-12 h-6 bg-gray-500 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute left-1 top-1"></div>
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-medium text-sm lg:text-base">Maintenance Mode</p>
-                    <p className="text-white/60 text-xs lg:text-sm">Enable maintenance mode for updates</p>
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div>
+                      <p className="text-white font-semibold text-lg">Maintenance Mode</p>
+                      <p className="text-white/60 text-sm">Enable maintenance mode for updates</p>
+                    </div>
+                    <button className="w-14 h-7 bg-gray-500 rounded-full relative transition-all">
+                      <div className="w-5 h-5 bg-white rounded-full absolute left-1 top-1 transition-all"></div>
+                    </button>
                   </div>
-                  <button className="w-12 h-6 bg-gray-500 rounded-full relative">
-                    <div className="w-4 h-4 bg-white rounded-full absolute left-1 top-1"></div>
-                  </button>
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div>
+                      <p className="text-white font-semibold text-lg">Analytics Tracking</p>
+                      <p className="text-white/60 text-sm">Track user behavior and analytics</p>
+                    </div>
+                    <button className="w-14 h-7 bg-green-500 rounded-full relative transition-all">
+                      <div className="w-5 h-5 bg-white rounded-full absolute right-1 top-1 transition-all"></div>
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
