@@ -122,6 +122,32 @@ const AdminChat: React.FC<AdminChatProps> = () => {
     loadSessions();
   };
 
+  const handleDeleteSession = () => {
+    if (!selectedSession) return;
+    
+    if (window.confirm(`Are you sure you want to delete ticket ${selectedSession.ticketNumber}? This action cannot be undone.`)) {
+      chatSystem.deleteSession(selectedSession.id);
+      setSelectedSession(null);
+      setMessages([]);
+      loadSessions();
+    }
+  };
+
+  const handleDeleteAllSessions = () => {
+    const filteredSessions = getFilteredSessions();
+    if (filteredSessions.length === 0) return;
+    
+    const sessionType = activeTab === 'closed' ? 'closed' : 'resolved';
+    if (window.confirm(`Are you sure you want to delete all ${sessionType} tickets? This action cannot be undone.`)) {
+      filteredSessions.forEach(session => {
+        chatSystem.deleteSession(session.id);
+      });
+      setSelectedSession(null);
+      setMessages([]);
+      loadSessions();
+    }
+  };
+
   const getFilteredSessions = () => {
     switch (activeTab) {
       case 'waiting':
@@ -209,6 +235,16 @@ const AdminChat: React.FC<AdminChatProps> = () => {
           <div className="xl:col-span-1 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
             {/* Tab Navigation */}
             <div className="flex bg-white/5 border-b border-white/20 overflow-x-auto">
+              {/* Delete All Button for Closed/Resolved tabs */}
+              {(activeTab === 'closed' || activeTab === 'resolved') && getFilteredSessions().length > 0 && (
+                <button
+                  onClick={handleDeleteAllSessions}
+                  className="flex-shrink-0 px-3 py-2 text-xs font-medium bg-red-500/20 hover:bg-red-500/30 text-red-400 border-r border-white/20 transition-colors"
+                  title={`Delete all ${activeTab} tickets`}
+                >
+                  Delete All
+                </button>
+              )}
               <button
                 onClick={() => setActiveTab('waiting')}
                 className={`flex-shrink-0 px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap ${
@@ -323,6 +359,15 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                           title="Resolve Ticket"
                         >
                           Resolve
+                        </button>
+                      )}
+                      {(selectedSession.status === 'closed' || selectedSession.status === 'resolved') && (
+                        <button
+                          onClick={handleDeleteSession}
+                          className="bg-red-500 hover:bg-red-600 text-white px-2 lg:px-3 py-1 rounded text-xs font-medium transition-colors"
+                          title="Delete Ticket"
+                        >
+                          Delete
                         </button>
                       )}
                       <button

@@ -128,6 +128,22 @@ class ChatSystem {
     }
   }
 
+  // Delete a chat session and all its messages
+  deleteSession(sessionId: string): void {
+    const sessions = this.getAllSessions();
+    const filteredSessions = sessions.filter(s => s.id !== sessionId);
+    this.saveSessions(filteredSessions);
+    
+    // Also delete all messages for this session
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(`${this.messagesKey}_${sessionId}`);
+      } catch (error) {
+        console.error('Error deleting session messages:', error);
+      }
+    }
+  }
+
   // Send a message
   async sendMessage(sessionId: string, userId: string, userName: string, userEmail: string, message: string, isAdmin: boolean = false): Promise<ChatMessage> {
     const chatMessage: ChatMessage = {
