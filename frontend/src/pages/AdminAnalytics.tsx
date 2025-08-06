@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
+import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, MessageCircle, HardDrive } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 
 interface Analytics {
@@ -17,7 +17,7 @@ interface Analytics {
 
 interface ActivityItem {
   id: string;
-  type: 'registration' | 'calculation' | 'export' | 'chat' | 'backup' | 'login';
+  type: 'registration' | 'chat' | 'backup' | 'login';
   description: string;
   timestamp: number;
   user?: string;
@@ -122,37 +122,7 @@ const AdminAnalytics: React.FC = () => {
 
       activities.push(...recentRegistrations);
 
-      // Get real calculation activity from user data
-      const usersWithCalculations = allUsers.filter(user => user.totalCalculations > 0);
-      usersWithCalculations.forEach(user => {
-        // Simulate recent calculations based on user activity
-        const lastCalculationTime = now - Math.random() * 24 * 60 * 60 * 1000; // Random time in last 24h
-        activities.push({
-          id: `calc-${user.id}`,
-          type: 'calculation' as const,
-          description: `ROI calculation completed by ${user.name}`,
-          timestamp: lastCalculationTime,
-          user: user.name,
-          color: 'bg-blue-400'
-        });
-      });
-
-      // Get real export activity from user data
-      const usersWithExports = allUsers.filter(user => user.totalExports > 0);
-      usersWithExports.forEach(user => {
-        // Simulate recent exports based on user activity
-        const lastExportTime = now - Math.random() * 24 * 60 * 60 * 1000; // Random time in last 24h
-        activities.push({
-          id: `export-${user.id}`,
-          type: 'export' as const,
-          description: `Report exported by ${user.name}`,
-          timestamp: lastExportTime,
-          user: user.name,
-          color: 'bg-purple-400'
-        });
-      });
-
-      // Get real chat activity
+      // Get real chat activity (last 24 hours)
       const storedMessages = localStorage.getItem('adminChatMessages');
       if (storedMessages) {
         const chatMessages = JSON.parse(storedMessages);
@@ -166,12 +136,13 @@ const AdminAnalytics: React.FC = () => {
             user: msg.userName,
             color: 'bg-yellow-400'
           }))
-          .slice(0, 2);
+          .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
+          .slice(0, 3);
 
         activities.push(...recentChats);
       }
 
-      // Get real backup activity
+      // Get real backup activity (last 7 days)
       const storedBackups = localStorage.getItem('databaseBackups');
       if (storedBackups) {
         const backups = JSON.parse(storedBackups);
@@ -184,6 +155,7 @@ const AdminAnalytics: React.FC = () => {
             timestamp: backup.timestamp,
             color: 'bg-orange-400'
           }))
+          .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
           .slice(0, 2);
 
         activities.push(...recentBackups);
@@ -191,7 +163,7 @@ const AdminAnalytics: React.FC = () => {
 
       // Sort by timestamp (most recent first) and take top 8
       const sortedActivities = activities
-        .sort((a, b) => b.timestamp - a.timestamp)
+        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
         .slice(0, 8);
 
       setRecentActivity(sortedActivities);
@@ -217,10 +189,6 @@ const AdminAnalytics: React.FC = () => {
     switch (type) {
       case 'registration':
         return <User size={16} />;
-      case 'calculation':
-        return <Calculator size={16} />;
-      case 'export':
-        return <Download size={16} />;
       case 'chat':
         return <MessageCircle size={16} />;
       case 'backup':
