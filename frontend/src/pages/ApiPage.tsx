@@ -43,7 +43,7 @@ const ApiPage: React.FC = () => {
     {
       icon: Code,
       title: 'Easy Integration',
-      description: 'Simple SDKs for JavaScript and Python - Ready to use'
+      description: 'Simple SDKs for JavaScript and Python'
     }
   ];
 
@@ -123,7 +123,7 @@ function MyComponent() {
               </h1>
             </div>
             <p className="text-xl text-white/70 max-w-3xl mx-auto mb-8">
-              Powerful ROI calculation API for developers. Integrate investment analysis into your apps with just a few lines of code. Ready to use now!
+              Powerful ROI calculation API for developers. Integrate investment analysis into your apps with just a few lines of code. Get your API key and start building today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.button
@@ -386,12 +386,13 @@ function MyComponent() {
         >
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
           <p className="text-white/70 mb-6 max-w-2xl mx-auto">
-            Join thousands of developers who are already using our API to power their investment applications.
+            Start building with our ROI calculator API. Generate your API key and integrate investment analysis into your applications.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.href = '/admin'}
               className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium transition-colors"
             >
               <ExternalLink className="w-5 h-5 mr-2 inline" />
@@ -400,10 +401,11 @@ function MyComponent() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('docs')}
               className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-lg font-medium transition-colors border border-white/20"
             >
               <Users className="w-5 h-5 mr-2 inline" />
-              View Pricing
+              View Documentation
             </motion.button>
           </div>
         </motion.div>
