@@ -110,7 +110,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: 'Do you offer custom business scenarios?',
-      answer: 'Yes! We create custom business scenarios tailored to your specific industry and business model. Our team works with you to understand your unique requirements, market conditions, and investment parameters. We can develop scenarios for any industry including real estate, e-commerce, manufacturing, SaaS, retail, and more. Custom scenarios include industry-specific data, market analysis, and personalized ROI calculations.'
+      answer: 'Yes! We offer 15 comprehensive business scenarios covering E-commerce, SaaS, Freelancer, Agency, Startup, Restaurant, Real Estate, Manufacturing, Consulting, Franchise, Mobile App, Online Course, Dropshipping, Print on Demand, and Subscription Box. Each scenario includes industry-specific parameters, market data, and ROI calculations. We also create custom scenarios for unique business models and are constantly adding new scenarios based on market trends.'
     }
   ];
 
