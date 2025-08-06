@@ -34,6 +34,7 @@ import AdminData from './pages/AdminData';
 import AdminSystem from './pages/AdminSystem';
 import AdminBackups from './pages/AdminBackups';
 import AdminChat from './pages/AdminChat';
+import ApiPage from './pages/ApiPage';
 
 
 // Store
@@ -115,6 +116,7 @@ function App() {
                         <Route path="/admin/system" element={<AdminSystem />} />
                         <Route path="/admin/backups" element={<AdminBackups />} />
                         <Route path="/admin/chat" element={<AdminChat />} />
+                        <Route path="/api" element={<ApiPage />} />
                       </Routes>
                     </main>
                     
