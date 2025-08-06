@@ -16,7 +16,8 @@ import {
   CheckCircle,
   Play,
   User,
-  X
+  X,
+  Receipt
 } from 'lucide-react';
 
 import { api } from '../services/api';
@@ -40,6 +41,7 @@ const CalculatorPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -490,7 +492,7 @@ const CalculatorPage: React.FC = () => {
             </motion.div>
           )}
 
-          {/* ROI Calculator - Only show after scenario is selected */}
+          {/* Country Selection - Only show after scenario is selected */}
           {selectedScenario && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -501,6 +503,75 @@ const CalculatorPage: React.FC = () => {
             >
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">3</div>
+                <Globe className="w-5 h-5 mr-2" />
+                Select Country
+              </h2>
+              
+              <CountrySelector
+                selectedCountry={selectedCountry}
+                onCountrySelect={handleCountrySelect}
+                onDropdownStateChange={setIsDropdownOpen}
+              />
+            </motion.div>
+          )}
+
+          {/* Tax Data - Only show after country is selected */}
+          {selectedCountry && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">4</div>
+                <Receipt className="w-5 h-5 mr-2" />
+                Tax Information
+              </h2>
+              
+              <TaxDataDisplay
+                country={selectedCountry}
+                scenario={selectedScenario}
+                scenariosData={scenariosData}
+              />
+            </motion.div>
+          )}
+
+          {/* Risk Analysis - Only show after tax data is displayed */}
+          {selectedCountry && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">5</div>
+                <Shield className="w-5 h-5 mr-2" />
+                Risk Analysis
+              </h2>
+              
+              <RiskAnalysis
+                scenario={selectedScenario}
+                country={selectedCountry}
+                scenariosData={scenariosData}
+              />
+            </motion.div>
+          )}
+
+          {/* ROI Calculator - Only show after risk analysis */}
+          {selectedCountry && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">6</div>
                 <Calculator className="w-5 h-5 mr-2" />
                 Investment Details
               </h2>
