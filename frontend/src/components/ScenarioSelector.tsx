@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Search, Building2, Target } from 'lucide-react';
+import { categories } from '../data/categories';
 
 interface Scenario {
   id: number;
@@ -35,6 +36,7 @@ interface ScenarioSelectorProps {
   miniScenarios: MiniScenario[];
   selectedScenario: number | null;
   selectedMiniScenario: number | null;
+  selectedCategory: string | null;
   onScenarioSelect: (id: number) => void;
   onMiniScenarioSelect: (id: number) => void;
   onDropdownStateChange?: (isOpen: boolean) => void;
@@ -46,6 +48,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   miniScenarios,
   selectedScenario,
   selectedMiniScenario,
+  selectedCategory,
   onScenarioSelect,
   onMiniScenarioSelect,
   onDropdownStateChange,
@@ -55,7 +58,15 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   const [isScenarioOpen, setIsScenarioOpen] = useState(false);
   const [isMiniScenarioOpen, setIsMiniScenarioOpen] = useState(false);
 
-  const filteredScenarios = scenarios.filter(scenario =>
+  // Filter scenarios by selected category
+  const categoryScenarios = selectedCategory 
+    ? scenarios.filter(scenario => {
+        const category = categories.find(cat => cat.id === selectedCategory);
+        return category?.scenarioIds.includes(scenario.id);
+      })
+    : scenarios;
+
+  const filteredScenarios = categoryScenarios.filter(scenario =>
     scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     scenario.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -98,6 +109,20 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
         <div className="animate-pulse">
           <div className="h-12 bg-white/10 rounded-lg mb-4"></div>
           <div className="h-12 bg-white/10 rounded-lg"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no category is selected
+  if (!selectedCategory) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <Building2 className="w-12 h-12 text-white/40 mx-auto mb-4" />
+          <p className="text-white/60 text-sm">
+            Please select a business category first to view available scenarios
+          </p>
         </div>
       </div>
     );

@@ -21,6 +21,7 @@ import {
 
 import { api } from '../services/api';
 
+import CategorySelector from '../components/CategorySelector';
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
@@ -36,6 +37,7 @@ import UserAuth from '../components/UserAuth';
 const CalculatorPage: React.FC = () => {
   const { addNotification } = useNotifications();
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
@@ -333,6 +335,13 @@ const CalculatorPage: React.FC = () => {
   const scenariosData = scenarios?.data || mockScenarios;
   const miniScenariosData = miniScenarios?.data || [];
 
+  const handleCategorySelect = (categoryId: string) => {
+    console.log('Category selected:', categoryId);
+    setSelectedCategory(categoryId);
+    setSelectedScenario(null);
+    setSelectedMiniScenario(null);
+  };
+
   const handleScenarioSelect = (scenarioId: number) => {
     console.log('Scenario selected:', scenarioId);
     setSelectedScenario(scenarioId);
@@ -429,6 +438,28 @@ const CalculatorPage: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="lg:col-span-2 space-y-6"
         >
+          {/* Category Selection */}
+          <motion.div 
+            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6"
+            animate={{ 
+              zIndex: isDropdownOpen ? 50 : 1,
+              position: isDropdownOpen ? 'relative' : 'static'
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <Target className="w-5 h-5 mr-2" />
+              Select Business Category
+            </h2>
+            
+            <CategorySelector
+              selectedCategory={selectedCategory}
+              onCategorySelect={handleCategorySelect}
+              onDropdownStateChange={setIsDropdownOpen}
+              isLoading={scenariosLoading}
+            />
+          </motion.div>
+
           {/* Scenario Selection */}
           <motion.div 
             className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
@@ -448,6 +479,7 @@ const CalculatorPage: React.FC = () => {
               miniScenarios={miniScenariosData}
               selectedScenario={selectedScenario}
               selectedMiniScenario={selectedMiniScenario}
+              selectedCategory={selectedCategory}
               onScenarioSelect={handleScenarioSelect}
               onMiniScenarioSelect={handleMiniScenarioSelect}
               onDropdownStateChange={setIsDropdownOpen}
