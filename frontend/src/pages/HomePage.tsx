@@ -2,11 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  TrendingUp, Target, Shield, Globe, BarChart3,
-  ArrowRight, Star, Zap, Users
+  TrendingUp, Globe, ArrowRight, Star, Zap, Users
 } from 'lucide-react';
 import Logo from '../components/Logo';
-import { CalculatorIcon } from '../components/icons/CustomIcons';
+import { 
+  CalculatorIcon, 
+  AnalyticsIcon, 
+  TargetIcon, 
+  ShieldIcon 
+} from '../components/icons/CustomIcons';
 
 const HomePage: React.FC = () => {
   const features = [
@@ -17,19 +21,19 @@ const HomePage: React.FC = () => {
       color: 'from-blue-500 to-blue-600'
     },
     {
-      icon: BarChart3,
+      icon: AnalyticsIcon,
       title: 'Market Analysis',
       description: 'Get detailed market insights, competitive analysis, and growth projections for informed decisions.',
       color: 'from-purple-500 to-purple-600'
     },
     {
-      icon: Target,
+      icon: TargetIcon,
       title: 'Professional Reports',
       description: 'Generate comprehensive PDF reports with charts, analysis, and recommendations for stakeholders.',
       color: 'from-green-500 to-green-600'
     },
     {
-      icon: Shield,
+      icon: ShieldIcon,
       title: 'Risk Assessment',
       description: 'Evaluate investment risks with detailed analysis and mitigation strategies for better planning.',
       color: 'from-red-500 to-red-600'
