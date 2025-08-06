@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Users, Mail, Phone, Calendar, Eye, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Database, Users, Mail, Phone, Calendar, Eye, Edit, Trash2, X, Save, Send } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 
 interface User {
@@ -28,6 +28,16 @@ const AdminData: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'contacts'>('users');
+  
+  // Modal states
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', email: '' });
+  const [replyMessage, setReplyMessage] = useState('');
 
   useEffect(() => {
     loadData();
@@ -58,11 +68,135 @@ const AdminData: React.FC = () => {
   };
 
   const handleUserAction = (action: string, userId: string) => {
-    console.log(`${action} user ${userId}`);
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    switch (action) {
+      case 'view':
+        setSelectedUser(user);
+        setIsViewModalOpen(true);
+        break;
+      case 'edit':
+        setSelectedUser(user);
+        setEditForm({ name: user.name, email: user.email });
+        setIsEditModalOpen(true);
+        break;
+      case 'delete':
+        setSelectedUser(user);
+        setIsDeleteModalOpen(true);
+        break;
+    }
   };
 
   const handleContactAction = (action: string, contactId: string) => {
-    console.log(`${action} contact ${contactId}`);
+    const contact = contacts.find(c => c.id === contactId);
+    if (!contact) return;
+
+    switch (action) {
+      case 'view':
+        setSelectedContact(contact);
+        setIsViewModalOpen(true);
+        break;
+      case 'reply':
+        setSelectedContact(contact);
+        setReplyMessage('');
+        setIsReplyModalOpen(true);
+        break;
+      case 'delete':
+        setSelectedContact(contact);
+        setIsDeleteModalOpen(true);
+        break;
+    }
+  };
+
+  const handleEditUser = () => {
+    if (!selectedUser) return;
+
+    // Update user in localStorage
+    const allUsers = userManager.getAllUsers();
+    const userIndex = allUsers.findIndex(u => u.id === selectedUser.id);
+    
+    if (userIndex !== -1) {
+      allUsers[userIndex] = {
+        ...allUsers[userIndex],
+        name: editForm.name,
+        email: editForm.email
+      };
+      
+      localStorage.setItem('registered_users', JSON.stringify(allUsers));
+      
+      // Update local state
+      setUsers(users.map(u => 
+        u.id === selectedUser.id 
+          ? { ...u, name: editForm.name, email: editForm.email }
+          : u
+      ));
+    }
+
+    setIsEditModalOpen(false);
+    setSelectedUser(null);
+    setEditForm({ name: '', email: '' });
+  };
+
+  const handleDeleteUser = () => {
+    if (!selectedUser) return;
+
+    // Remove user from localStorage
+    const allUsers = userManager.getAllUsers();
+    const filteredUsers = allUsers.filter(u => u.id !== selectedUser.id);
+    localStorage.setItem('registered_users', JSON.stringify(filteredUsers));
+    
+    // Update local state
+    setUsers(users.filter(u => u.id !== selectedUser.id));
+
+    setIsDeleteModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleDeleteContact = () => {
+    if (!selectedContact) return;
+
+    // Remove contact from localStorage
+    const filteredContacts = contacts.filter(c => c.id !== selectedContact.id);
+    localStorage.setItem('adminContacts', JSON.stringify(filteredContacts));
+    
+    // Update local state
+    setContacts(filteredContacts);
+
+    setIsDeleteModalOpen(false);
+    setSelectedContact(null);
+  };
+
+  const handleReplyContact = () => {
+    if (!selectedContact || !replyMessage.trim()) return;
+
+    // Update contact status to replied
+    const updatedContacts = contacts.map(c => 
+      c.id === selectedContact.id 
+        ? { ...c, status: 'replied' as const }
+        : c
+    );
+    
+    localStorage.setItem('adminContacts', JSON.stringify(updatedContacts));
+    setContacts(updatedContacts);
+
+    // In a real app, you would send the reply email here
+    console.log(`Reply to ${selectedContact.email}: ${replyMessage}`);
+
+    setIsReplyModalOpen(false);
+    setSelectedContact(null);
+    setReplyMessage('');
+  };
+
+  const closeModals = () => {
+    setIsViewModalOpen(false);
+    setIsEditModalOpen(false);
+    setIsDeleteModalOpen(false);
+    setIsReplyModalOpen(false);
+    setSelectedUser(null);
+    setSelectedContact(null);
+    setEditForm({ name: '', email: '' });
+    setReplyMessage('');
   };
 
   return (
@@ -159,18 +293,21 @@ const AdminData: React.FC = () => {
                           <button
                             onClick={() => handleUserAction('view', user.id)}
                             className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                            title="View Details"
                           >
                             <Eye size={16} />
                           </button>
                           <button
                             onClick={() => handleUserAction('edit', user.id)}
                             className="p-1 text-yellow-400 hover:text-yellow-300 transition-colors"
+                            title="Edit User"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleUserAction('delete', user.id)}
                             className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                            title="Delete User"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -225,18 +362,21 @@ const AdminData: React.FC = () => {
                       <button
                         onClick={() => handleContactAction('view', contact.id)}
                         className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
+                        title="View Details"
                       >
                         <Eye size={16} />
                       </button>
                       <button
                         onClick={() => handleContactAction('reply', contact.id)}
                         className="p-2 text-green-400 hover:text-green-300 transition-colors"
+                        title="Reply"
                       >
                         <Mail size={16} />
                       </button>
                       <button
                         onClick={() => handleContactAction('delete', contact.id)}
                         className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                        title="Delete"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -254,6 +394,244 @@ const AdminData: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* View Modal */}
+      {isViewModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Details</h3>
+              <button
+                onClick={closeModals}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="space-y-4 text-white">
+              {selectedUser && (
+                <>
+                  <div>
+                    <label className="text-white/60 text-sm">Name</label>
+                    <p className="text-white font-medium">{selectedUser.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Email</label>
+                    <p className="text-white font-medium">{selectedUser.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Calculations</label>
+                    <p className="text-white font-medium">{selectedUser.totalCalculations}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Exports</label>
+                    <p className="text-white font-medium">{selectedUser.totalExports}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Last Active</label>
+                    <p className="text-white font-medium">
+                      {new Date(selectedUser.lastActive).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Status</label>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedUser.status === 'active' 
+                        ? 'bg-green-500/20 text-green-400' 
+                        : 'bg-red-500/20 text-red-400'
+                    }`}>
+                      {selectedUser.status}
+                    </span>
+                  </div>
+                </>
+              )}
+              {selectedContact && (
+                <>
+                  <div>
+                    <label className="text-white/60 text-sm">Name</label>
+                    <p className="text-white font-medium">{selectedContact.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Email</label>
+                    <p className="text-white font-medium">{selectedContact.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Phone</label>
+                    <p className="text-white font-medium">{selectedContact.phone}</p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Date</label>
+                    <p className="text-white font-medium">
+                      {new Date(selectedContact.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Status</label>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedContact.status === 'new' 
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : selectedContact.status === 'read'
+                        ? 'bg-yellow-500/20 text-yellow-400'
+                        : 'bg-green-500/20 text-green-400'
+                    }`}>
+                      {selectedContact.status}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="text-white/60 text-sm">Message</label>
+                    <p className="text-white font-medium">{selectedContact.message}</p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {isEditModalOpen && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Edit User</h3>
+              <button
+                onClick={closeModals}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-white/60 text-sm">Name</label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="text-white/60 text-sm">Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={handleEditUser}
+                  className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Save size={16} />
+                  <span>Save</span>
+                </button>
+                <button
+                  onClick={closeModals}
+                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Confirm Delete</h3>
+              <button
+                onClick={closeModals}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="text-white mb-6">
+              <p>Are you sure you want to delete this {selectedUser ? 'user' : 'contact'}?</p>
+              <p className="text-white/60 mt-2">
+                {selectedUser ? `${selectedUser.name} (${selectedUser.email})` : 
+                 selectedContact ? `${selectedContact.name} (${selectedContact.email})` : ''}
+              </p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={selectedUser ? handleDeleteUser : handleDeleteContact}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+              <button
+                onClick={closeModals}
+                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reply Modal */}
+      {isReplyModalOpen && selectedContact && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Reply to Contact</h3>
+              <button
+                onClick={closeModals}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-white/60 text-sm">To</label>
+                <p className="text-white font-medium">{selectedContact.name} ({selectedContact.email})</p>
+              </div>
+              <div>
+                <label className="text-white/60 text-sm">Original Message</label>
+                <p className="text-white/80 text-sm bg-white/5 p-3 rounded-lg">
+                  {selectedContact.message}
+                </p>
+              </div>
+              <div>
+                <label className="text-white/60 text-sm">Your Reply</label>
+                <textarea
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  placeholder="Type your reply message..."
+                  rows={4}
+                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={handleReplyContact}
+                  disabled={!replyMessage.trim()}
+                  className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Send size={16} />
+                  <span>Send Reply</span>
+                </button>
+                <button
+                  onClick={closeModals}
+                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
