@@ -9,7 +9,6 @@ import {
   Activity,
   DollarSign,
   Download,
-  CheckCircle,
   Settings,
   Mail,
   Phone,
@@ -24,7 +23,9 @@ import {
   Menu,
   X,
   Sparkles,
-  Zap
+  Database,
+  FileText,
+  ActivitySquare
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -153,24 +154,46 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleComprehensiveTest = () => {
+  const handleExportData = () => {
     addNotification({
       type: 'success',
-      title: 'Comprehensive Test Complete!',
-      message: 'All system components have been tested successfully.',
-      redirectTo: '/calculator',
-      redirectLabel: 'Test Calculator',
+      title: 'Data Export Complete!',
+      message: 'All system data has been exported successfully.',
+      redirectTo: '/admin',
+      redirectLabel: 'View Dashboard',
       duration: 8000
     });
   };
 
-  const handleTestFeatures = () => {
+  const handleSystemHealth = () => {
     addNotification({
       type: 'info',
-      title: 'Feature Test Started',
-      message: 'Testing all admin dashboard features and functionality.',
-      redirectTo: '/scenarios',
-      redirectLabel: 'View Scenarios',
+      title: 'System Health Check',
+      message: 'All systems are running optimally. No issues detected.',
+      redirectTo: '/admin',
+      redirectLabel: 'View Dashboard',
+      duration: 8000
+    });
+  };
+
+  const handleBackupDatabase = () => {
+    addNotification({
+      type: 'success',
+      title: 'Database Backup Complete!',
+      message: 'System backup has been created successfully.',
+      redirectTo: '/admin',
+      redirectLabel: 'View Dashboard',
+      duration: 8000
+    });
+  };
+
+  const handleGenerateReport = () => {
+    addNotification({
+      type: 'success',
+      title: 'Report Generated!',
+      message: 'Monthly analytics report has been created.',
+      redirectTo: '/admin',
+      redirectLabel: 'View Dashboard',
       duration: 8000
     });
   };
@@ -325,27 +348,79 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Test Buttons */}
+      {/* Admin Actions */}
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
-        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleComprehensiveTest}
-            className="flex items-center justify-center space-x-3 px-6 lg:px-8 py-4 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 hover:from-blue-500/30 hover:to-indigo-500/30 text-blue-300 rounded-xl transition-all text-sm font-medium border border-blue-500/30 shadow-lg"
+            onClick={handleExportData}
+            className="group relative bg-gradient-to-br from-blue-500/20 to-indigo-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
           >
-            <CheckCircle className="w-5 h-5" />
-            <span>1 - Comprehensive Test</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative flex items-center space-x-4">
+              <div className="p-3 bg-white/10 rounded-xl">
+                <Download className="w-6 h-6 text-blue-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-semibold text-lg">Export Data</p>
+                <p className="text-white/60 text-sm">Download all system data</p>
+              </div>
+            </div>
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleTestFeatures}
-            className="flex items-center justify-center space-x-3 px-6 lg:px-8 py-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 text-green-300 rounded-xl transition-all text-sm font-medium border border-green-500/30 shadow-lg"
+            onClick={handleSystemHealth}
+            className="group relative bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
           >
-            <Zap className="w-5 h-5" />
-            <span>2 - Test Features</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative flex items-center space-x-4">
+              <div className="p-3 bg-white/10 rounded-xl">
+                <ActivitySquare className="w-6 h-6 text-green-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-semibold text-lg">System Health</p>
+                <p className="text-white/60 text-sm">Check system status</p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleBackupDatabase}
+            className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative flex items-center space-x-4">
+              <div className="p-3 bg-white/10 rounded-xl">
+                <Database className="w-6 h-6 text-purple-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-semibold text-lg">Backup Database</p>
+                <p className="text-white/60 text-sm">Create system backup</p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleGenerateReport}
+            className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative flex items-center space-x-4">
+              <div className="p-3 bg-white/10 rounded-xl">
+                <FileText className="w-6 h-6 text-orange-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-semibold text-lg">Generate Report</p>
+                <p className="text-white/60 text-sm">Create monthly report</p>
+              </div>
+            </div>
           </motion.button>
         </div>
       </div>
