@@ -93,7 +93,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
   };
 
   return (
-    <div className="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
+    <div className="fixed top-20 right-4 z-[9999] space-y-2 max-w-sm">
       <AnimatePresence>
         {notifications.map((notification) => (
           <motion.div
@@ -105,7 +105,7 @@ const NotificationSystem: React.FC<NotificationSystemProps> = ({
             className={`
               relative p-4 rounded-xl border backdrop-blur-lg
               ${getBackgroundColor(notification.type)}
-              shadow-lg
+              shadow-lg z-[9999]
             `}
           >
             {/* Close button */}

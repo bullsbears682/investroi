@@ -98,13 +98,11 @@ function App() {
                   
                   {/* Live Chat Button */}
                   <ChatButton />
-                  
-                  {/* Notification System */}
-                  <NotificationWrapper />
-                  
-
                 </div>
               </div>
+              
+              {/* Notification System - Outside main container for proper z-index */}
+              <NotificationWrapper />
             </Router>
           </NotificationProvider>
         </CookiesProvider>
