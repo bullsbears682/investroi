@@ -163,17 +163,51 @@ const AdminDashboard: React.FC = () => {
       const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
       const revenue = allUsers.length * 29.99; // Assuming $29.99 per user
 
+      // Calculate real growth rate based on user registration dates
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+      
+      const recentUsers = allUsers.filter(user => new Date(user.registrationDate) > thirtyDaysAgo);
+      const previousPeriodUsers = allUsers.filter(user => {
+        const regDate = new Date(user.registrationDate);
+        return regDate > sixtyDaysAgo && regDate <= thirtyDaysAgo;
+      });
+      
+      const growthRate = previousPeriodUsers.length > 0 
+        ? ((recentUsers.length - previousPeriodUsers.length) / previousPeriodUsers.length) * 100
+        : recentUsers.length > 0 ? 100 : 0;
+      
+      const monthlyGrowth = growthRate; // Same as growth rate for this calculation
+      
+      // Calculate real conversion rate based on active vs total users
+      const conversionRate = allUsers.length > 0 
+        ? (activeUsers.length / allUsers.length) * 100
+        : 0;
+      
+      // Calculate average session time based on user activity
+      const usersWithActivity = allUsers.filter(user => user.totalCalculations > 0 || user.totalExports > 0);
+      const averageSessionTime = usersWithActivity.length > 0 
+        ? Math.round((totalCalculations + totalExports) / usersWithActivity.length * 2.5) // Rough estimate
+        : 0;
+      
+      // Calculate bounce rate (users who registered but never used the app)
+      const inactiveUsers = allUsers.filter(user => user.totalCalculations === 0 && user.totalExports === 0);
+      const bounceRate = allUsers.length > 0 
+        ? (inactiveUsers.length / allUsers.length) * 100
+        : 0;
+
       setAdminStats({
         totalUsers: allUsers.length,
         activeUsers: activeUsers.length,
         totalCalculations,
         totalExports,
         revenue,
-        growthRate: 15.5,
-        monthlyGrowth: 12.3,
-        conversionRate: 8.7,
-        averageSessionTime: 4.2,
-        bounceRate: 23.1
+        growthRate: Math.round(growthRate * 10) / 10, // Round to 1 decimal
+        monthlyGrowth: Math.round(monthlyGrowth * 10) / 10,
+        conversionRate: Math.round(conversionRate * 10) / 10,
+        averageSessionTime: Math.round(averageSessionTime * 10) / 10,
+        bounceRate: Math.round(bounceRate * 10) / 10
       });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
