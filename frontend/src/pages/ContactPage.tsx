@@ -110,7 +110,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: 'Do you offer custom business scenarios?',
-      answer: 'Our ROI calculator is designed for basic investment calculations. We focus on providing a simple, reliable tool for calculating return on investment with essential parameters like initial investment, additional costs, and country-based adjustments. We\'re working on expanding features based on user needs.'
+      answer: 'Yes! We offer 35+ pre-built business scenarios covering industries like real estate, e-commerce, manufacturing, SaaS, retail, and more. Each scenario includes industry-specific parameters and market data. We also create custom scenarios for unique business models and are constantly adding new scenarios based on market trends.'
     }
   ];
 
