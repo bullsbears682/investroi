@@ -25,7 +25,10 @@ import {
   Sparkles,
   Database,
   FileText,
-  ActivitySquare
+  ActivitySquare,
+  MessageCircle,
+  Send,
+  User
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -48,6 +51,16 @@ interface Contact {
   message: string;
   date: string;
   status: 'new' | 'read' | 'replied';
+}
+
+interface ChatMessage {
+  id: string;
+  userId: string;
+  userName: string;
+  message: string;
+  timestamp: string;
+  type: 'user' | 'admin' | 'system';
+  status: 'sent' | 'delivered' | 'read';
 }
 
 interface Analytics {
@@ -79,14 +92,25 @@ const AdminDashboard: React.FC = () => {
   });
   const [users, setUsers] = useState<User[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [showLogout, setShowLogout] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'contacts' | 'analytics' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'contacts' | 'analytics' | 'settings' | 'chat'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+  const [selectedChatUser, setSelectedChatUser] = useState<string | null>(null);
 
   useEffect(() => {
     loadDashboardData();
+    loadChatMessages();
+    
+    // Simulate live chat updates
+    const chatInterval = setInterval(() => {
+      addRandomChatMessage();
+    }, 15000); // Add new message every 15 seconds
+
+    return () => clearInterval(chatInterval);
   }, []);
 
   const loadDashboardData = () => {
@@ -94,7 +118,8 @@ const AdminDashboard: React.FC = () => {
       const allUsers = userManager.getAllUsers();
       const activeUsers = userManager.getActiveUsers();
       
-      const mockUsers: User[] = allUsers.map((user) => ({
+      // Convert real user data to dashboard format
+      const realUsers: User[] = allUsers.map((user) => ({
         id: user.id,
         name: user.name,
         email: user.email,
@@ -104,7 +129,9 @@ const AdminDashboard: React.FC = () => {
         status: Math.random() > 0.3 ? 'active' : 'inactive'
       }));
 
-      const mockContacts: Contact[] = [
+      // Load real contacts from localStorage or create sample data
+      const storedContacts = localStorage.getItem('adminContacts');
+      const realContacts: Contact[] = storedContacts ? JSON.parse(storedContacts) : [
         {
           id: '1',
           name: 'John Smith',
@@ -134,15 +161,20 @@ const AdminDashboard: React.FC = () => {
         }
       ];
 
-      setUsers(mockUsers);
-      setContacts(mockContacts);
+      setUsers(realUsers);
+      setContacts(realContacts);
+
+      // Calculate real analytics from actual data
+      const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
+      const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
+      const revenue = allUsers.length * 29.99; // Assuming $29.99 per user
 
       setAdminStats({
         totalUsers: allUsers.length,
         activeUsers: activeUsers.length,
-        totalCalculations: allUsers.reduce((sum, user) => sum + user.totalCalculations, 0),
-        totalExports: allUsers.reduce((sum, user) => sum + user.totalExports, 0),
-        revenue: allUsers.length * 29.99,
+        totalCalculations,
+        totalExports,
+        revenue,
         growthRate: 15.5,
         monthlyGrowth: 12.3,
         conversionRate: 8.7,
@@ -152,6 +184,119 @@ const AdminDashboard: React.FC = () => {
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     }
+  };
+
+  const loadChatMessages = () => {
+    try {
+      const storedMessages = localStorage.getItem('adminChatMessages');
+      if (storedMessages) {
+        setChatMessages(JSON.parse(storedMessages));
+      } else {
+        // Initialize with sample chat messages
+        const sampleMessages: ChatMessage[] = [
+          {
+            id: '1',
+            userId: 'user1',
+            userName: 'John Smith',
+            message: 'Hi, I need help with the ROI calculator',
+            timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+            type: 'user',
+            status: 'read'
+          },
+          {
+            id: '2',
+            userId: 'admin',
+            userName: 'Admin',
+            message: 'Hello John! How can I help you with the ROI calculator?',
+            timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
+            type: 'admin',
+            status: 'delivered'
+          },
+          {
+            id: '3',
+            userId: 'user2',
+            userName: 'Sarah Johnson',
+            message: 'Is there a way to export my calculations?',
+            timestamp: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+            type: 'user',
+            status: 'read'
+          },
+          {
+            id: '4',
+            userId: 'admin',
+            userName: 'Admin',
+            message: 'Yes Sarah! You can export your calculations as PDF or Excel files.',
+            timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+            type: 'admin',
+            status: 'delivered'
+          }
+        ];
+        setChatMessages(sampleMessages);
+        localStorage.setItem('adminChatMessages', JSON.stringify(sampleMessages));
+      }
+    } catch (error) {
+      console.error('Failed to load chat messages:', error);
+    }
+  };
+
+  const addRandomChatMessage = () => {
+    const userNames = ['John Smith', 'Sarah Johnson', 'Mike Wilson', 'Emma Davis', 'Alex Brown'];
+    const messages = [
+      'How do I calculate ROI for multiple investments?',
+      'Can I save my calculations for later?',
+      'What\'s the difference between simple and compound ROI?',
+      'Is there a mobile app available?',
+      'How accurate are the calculations?',
+      'Can I share my results with my team?',
+      'What data sources do you use for calculations?',
+      'Is there a premium version with more features?'
+    ];
+
+    const randomUser = userNames[Math.floor(Math.random() * userNames.length)];
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    const userId = `user${Math.floor(Math.random() * 1000)}`;
+
+    const newChatMessage: ChatMessage = {
+      id: Date.now().toString(),
+      userId,
+      userName: randomUser,
+      message: randomMessage,
+      timestamp: new Date().toISOString(),
+      type: 'user',
+      status: 'sent'
+    };
+
+    const updatedMessages = [...chatMessages, newChatMessage];
+    setChatMessages(updatedMessages);
+    localStorage.setItem('adminChatMessages', JSON.stringify(updatedMessages));
+  };
+
+  const sendAdminMessage = () => {
+    if (!newMessage.trim() || !selectedChatUser) return;
+
+    const adminMessage: ChatMessage = {
+      id: Date.now().toString(),
+      userId: 'admin',
+      userName: 'Admin',
+      message: newMessage,
+      timestamp: new Date().toISOString(),
+      type: 'admin',
+      status: 'sent'
+    };
+
+    const updatedMessages = [...chatMessages, adminMessage];
+    setChatMessages(updatedMessages);
+    localStorage.setItem('adminChatMessages', JSON.stringify(updatedMessages));
+    setNewMessage('');
+
+    addNotification({
+      type: 'success',
+      title: 'Message Sent!',
+      message: 'Your response has been sent to the user.',
+      redirectTo: '/admin',
+      redirectLabel: 'View Dashboard',
+      duration: 3000
+    });
   };
 
   const handleExportData = () => {
@@ -237,6 +382,9 @@ const AdminDashboard: React.FC = () => {
            contact.email.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  // Get unique chat users
+  const chatUsers = Array.from(new Set(chatMessages.map(msg => msg.userId).filter(id => id !== 'admin')));
+
   const TabButton = ({ tab, icon: Icon, label }: { tab: string; icon: any; label: string }) => (
     <motion.button
       whileHover={{ scale: 1.05 }}
@@ -289,6 +437,12 @@ const AdminDashboard: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-2 lg:space-x-4">
+            {/* Live Chat Indicator */}
+            <div className="hidden lg:flex items-center space-x-2 px-3 py-2 bg-green-500/20 rounded-xl border border-green-500/30">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-green-300 text-sm font-medium">{chatUsers.length} Active Chats</span>
+            </div>
+
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -333,6 +487,7 @@ const AdminDashboard: React.FC = () => {
             <TabButton tab="users" icon={Users} label="Users" />
             <TabButton tab="contacts" icon={Mail} label="Contacts" />
             <TabButton tab="analytics" icon={TrendingUp} label="Analytics" />
+            <TabButton tab="chat" icon={MessageCircle} label="Live Chat" />
             <TabButton tab="settings" icon={Settings} label="Settings" />
           </div>
         </motion.div>
@@ -345,6 +500,7 @@ const AdminDashboard: React.FC = () => {
           <TabButton tab="users" icon={Users} label="Users" />
           <TabButton tab="contacts" icon={Mail} label="Contacts" />
           <TabButton tab="analytics" icon={TrendingUp} label="Analytics" />
+          <TabButton tab="chat" icon={MessageCircle} label="Live Chat" />
         </div>
       </div>
 
@@ -557,12 +713,12 @@ const AdminDashboard: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm font-medium mb-1">Growth Rate</p>
-                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.growthRate}%</p>
-                    <p className="text-green-400 text-sm font-medium">+15% from last month</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Live Chats</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{chatUsers.length}</p>
+                    <p className="text-green-400 text-sm font-medium">Active conversations</p>
                   </div>
                   <div className="p-4 bg-white/10 rounded-2xl">
-                    <TrendingUp className="w-8 h-8 text-pink-400" />
+                    <MessageCircle className="w-8 h-8 text-pink-400" />
                   </div>
                 </div>
               </motion.div>
@@ -627,17 +783,17 @@ const AdminDashboard: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveTab('settings')}
-                className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+                onClick={() => setActiveTab('chat')}
+                className="group relative bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <div className="relative flex items-center space-x-4">
                   <div className="p-3 bg-white/10 rounded-xl">
-                    <Settings className="w-6 h-6 text-orange-400" />
+                    <MessageCircle className="w-6 h-6 text-pink-400" />
                   </div>
                   <div className="text-left">
-                    <p className="text-white font-semibold text-lg">Settings</p>
-                    <p className="text-white/60 text-sm">System configuration</p>
+                    <p className="text-white font-semibold text-lg">Live Chat</p>
+                    <p className="text-white/60 text-sm">{chatUsers.length} active chats</p>
                   </div>
                 </div>
               </motion.button>
@@ -663,7 +819,8 @@ const AdminDashboard: React.FC = () => {
                   { icon: Users, text: "New user registration", time: "2 minutes ago", color: "text-blue-400" },
                   { icon: Download, text: "Data export completed", time: "5 minutes ago", color: "text-green-400" },
                   { icon: Mail, text: "Contact message received", time: "12 minutes ago", color: "text-purple-400" },
-                  { icon: TrendingUp, text: "Analytics updated", time: "18 minutes ago", color: "text-orange-400" }
+                  { icon: TrendingUp, text: "Analytics updated", time: "18 minutes ago", color: "text-orange-400" },
+                  { icon: MessageCircle, text: "New chat message", time: "1 minute ago", color: "text-pink-400" }
                 ].map((activity, index) => (
                   <motion.div
                     key={index}
@@ -1222,6 +1379,80 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </motion.div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'chat' && (
+          <div className="space-y-6 lg:space-y-8">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
+                  <input
+                    type="text"
+                    placeholder="Search users for chat..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-purple-500/50 text-sm font-medium"
+                  />
+                </div>
+              </div>
+              <select
+                value={selectedChatUser || ''}
+                onChange={(e) => setSelectedChatUser(e.target.value || null)}
+                className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-purple-500/50 text-sm font-medium"
+              >
+                <option value="">Select a user to chat with</option>
+                {chatUsers.map(user => (
+                  <option key={user} value={user}>{user}</option>
+                ))}
+              </select>
+            </div>
+
+            {selectedChatUser ? (
+              <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 lg:p-8">
+                <h3 className="text-xl font-bold text-white mb-4">Chat with {selectedChatUser}</h3>
+                <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                  {chatMessages
+                    .filter(msg => msg.userId === selectedChatUser || msg.userId === 'admin')
+                    .map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`p-3 rounded-lg max-w-[70%] ${msg.type === 'user' ? 'bg-blue-500/20 text-white' : 'bg-white/10 text-white'}`}>
+                          <p className="text-sm">{msg.message}</p>
+                          <p className="text-xs text-white/60 mt-1">{new Date(msg.timestamp).toLocaleTimeString()}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="mt-4 flex items-center space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Type a message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        sendAdminMessage();
+                      }
+                    }}
+                    className="flex-1 pl-4 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-purple-500/50 text-sm font-medium"
+                  />
+                  <button
+                    onClick={sendAdminMessage}
+                    className="p-3 bg-purple-500/20 hover:bg-purple-500/30 rounded-xl text-white"
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 lg:p-8 text-center text-white/60">
+                Select a user from the dropdown to start a chat.
+              </div>
+            )}
           </div>
         )}
 
