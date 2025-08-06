@@ -204,14 +204,14 @@ const AdminChat: React.FC<AdminChatProps> = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6 h-[calc(100vh-200px)]">
           {/* Sessions List */}
-          <div className="lg:col-span-1 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
+          <div className="xl:col-span-1 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
             {/* Tab Navigation */}
-            <div className="flex bg-white/5 border-b border-white/20">
+            <div className="flex bg-white/5 border-b border-white/20 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('waiting')}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-shrink-0 px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'waiting'
                     ? 'bg-white/10 text-white border-b-2 border-blue-400'
                     : 'text-white/60 hover:text-white'
@@ -221,7 +221,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
               </button>
               <button
                 onClick={() => setActiveTab('active')}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-shrink-0 px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'active'
                     ? 'bg-white/10 text-white border-b-2 border-green-400'
                     : 'text-white/60 hover:text-white'
@@ -231,7 +231,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
               </button>
               <button
                 onClick={() => setActiveTab('resolved')}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-shrink-0 px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'resolved'
                     ? 'bg-white/10 text-white border-b-2 border-purple-400'
                     : 'text-white/60 hover:text-white'
@@ -241,7 +241,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
               </button>
               <button
                 onClick={() => setActiveTab('closed')}
-                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex-shrink-0 px-3 lg:px-4 py-2 lg:py-3 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === 'closed'
                     ? 'bg-white/10 text-white border-b-2 border-gray-400'
                     : 'text-white/60 hover:text-white'
@@ -264,7 +264,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                     <div
                       key={session.id}
                       onClick={() => handleSelectSession(session)}
-                      className={`p-4 cursor-pointer transition-colors hover:bg-white/5 ${
+                      className={`p-3 lg:p-4 cursor-pointer transition-colors hover:bg-white/5 ${
                         selectedSession?.id === session.id ? 'bg-white/10' : ''
                       }`}
                     >
@@ -297,29 +297,29 @@ const AdminChat: React.FC<AdminChatProps> = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="lg:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col">
+          <div className="xl:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col">
             {selectedSession ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 border-b border-white/20 bg-white/5">
+                <div className="p-3 lg:p-4 border-b border-white/20 bg-white/5">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                        <User className="text-white" size={20} />
+                    <div className="flex items-center space-x-2 lg:space-x-3 min-w-0 flex-1">
+                      <div className="w-8 h-8 lg:w-10 lg:h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <User className="text-white" size={16} />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-white">{selectedSession.ticketNumber} - {selectedSession.userName}</h3>
-                        <p className="text-sm text-white/60">{selectedSession.userEmail}</p>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-white text-sm lg:text-base truncate">{selectedSession.ticketNumber} - {selectedSession.userName}</h3>
+                        <p className="text-xs lg:text-sm text-white/60 truncate">{selectedSession.userEmail}</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 lg:space-x-2 flex-shrink-0">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedSession.status)}`}>
                         {selectedSession.status}
                       </span>
                       {selectedSession.status === 'active' && (
                         <button
                           onClick={handleResolveSession}
-                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                          className="bg-green-500 hover:bg-green-600 text-white px-2 lg:px-3 py-1 rounded text-xs font-medium transition-colors"
                           title="Resolve Ticket"
                         >
                           Resolve
@@ -327,10 +327,10 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                       )}
                       <button
                         onClick={handleCloseSession}
-                        className="p-2 text-white/60 hover:text-white transition-colors"
+                        className="p-1 lg:p-2 text-white/60 hover:text-white transition-colors"
                         title="Close Session"
                       >
-                        <X size={16} />
+                        <X size={14} />
                       </button>
                     </div>
                   </div>
@@ -369,7 +369,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                 </div>
 
                 {/* Message Input - Always visible when session is selected */}
-                <div className="p-4 border-t border-white/20 bg-white/5">
+                <div className="p-3 lg:p-4 border-t border-white/20 bg-white/5">
                   <div className="flex space-x-2">
                     <input
                       type="text"
@@ -378,14 +378,14 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                       onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
                       placeholder="Type your message..."
                       disabled={isLoading}
-                      className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm disabled:opacity-50"
+                      className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-2 lg:px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-xs lg:text-sm disabled:opacity-50"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim() || isLoading}
-                      className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
+                      className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors flex-shrink-0"
                     >
-                      <Send size={16} />
+                      <Send size={14} />
                     </button>
                   </div>
                   {isLoading && (
