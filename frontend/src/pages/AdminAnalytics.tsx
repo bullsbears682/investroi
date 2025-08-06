@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
+import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, DollarSign, PieChart, Target, User, Calculator, Download, MessageCircle, HardDrive } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 
 interface Analytics {
@@ -55,9 +55,8 @@ const AdminAnalytics: React.FC = () => {
       const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
       const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
       
-      // Note: No actual payment system exists - this is a demo application
-      // Revenue calculation removed since there's no real subscription/payment functionality
-      const revenue = 0; // No real revenue since no payment system exists
+      // Revenue is $0 since no payment system exists in this demo application
+      const revenue = 0;
       
       // Calculate real growth rate based on user registration dates
       const now = new Date();
@@ -307,12 +306,11 @@ const AdminAnalytics: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm font-medium">User Engagement</p>
-                <p className="text-3xl font-bold text-white">{analytics.totalCalculations + analytics.totalExports}</p>
-                <p className="text-white/40 text-xs">Total Actions</p>
+                <p className="text-white/60 text-sm font-medium">Revenue</p>
+                <p className="text-3xl font-bold text-white">${analytics.revenue}</p>
               </div>
               <div className="bg-yellow-500/20 p-3 rounded-xl">
-                <Activity className="text-yellow-400" size={24} />
+                <DollarSign className="text-yellow-400" size={24} />
               </div>
             </div>
           </div>
