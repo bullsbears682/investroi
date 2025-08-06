@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Calculator, BarChart3, Target, CheckCircle } from 'lucide-react';
+import { useAppStore } from '../store/appStore';
 import Logo from './Logo';
 
 const LoadingScreen: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
+  const { setLoading } = useAppStore();
 
   const steps = [
     { text: 'Initializing application...', icon: TrendingUp, color: 'text-blue-400' },
@@ -20,6 +22,10 @@ const LoadingScreen: React.FC = () => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
+          // Add a small delay before hiding the loading screen
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
           return 100;
         }
         return prev + 2;
@@ -40,7 +46,7 @@ const LoadingScreen: React.FC = () => {
       clearInterval(interval);
       clearInterval(stepInterval);
     };
-  }, []);
+  }, [setLoading]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
