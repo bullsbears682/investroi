@@ -269,10 +269,179 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleGenerateReport = () => {
+    // Create PDF report content
+    const reportContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .header h1 { color: #333; margin-bottom: 10px; }
+            .header p { color: #666; }
+            .section { margin-bottom: 30px; }
+            .section h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+            .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+            .stat-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #007bff; }
+            .stat-card h3 { margin: 0 0 10px 0; color: #333; }
+            .stat-card .value { font-size: 24px; font-weight: bold; color: #007bff; }
+            .stat-card .label { color: #666; font-size: 14px; }
+            .user-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            .user-table th, .user-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            .user-table th { background: #f8f9fa; font-weight: bold; }
+            .footer { margin-top: 40px; text-align: center; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Admin Dashboard Report</h1>
+            <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+          </div>
+
+          <div class="section">
+            <h2>Executive Summary</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h3>Total Users</h3>
+                <div class="value">${adminStats.totalUsers}</div>
+                <div class="label">Registered users</div>
+              </div>
+              <div class="stat-card">
+                <h3>Active Users</h3>
+                <div class="value">${adminStats.activeUsers}</div>
+                <div class="label">Currently active</div>
+              </div>
+              <div class="stat-card">
+                <h3>Total Calculations</h3>
+                <div class="value">${adminStats.totalCalculations}</div>
+                <div class="label">ROI calculations performed</div>
+              </div>
+              <div class="stat-card">
+                <h3>Total Exports</h3>
+                <div class="value">${adminStats.totalExports}</div>
+                <div class="label">Reports exported</div>
+              </div>
+              <div class="stat-card">
+                <h3>Revenue</h3>
+                <div class="value">$${adminStats.revenue.toFixed(2)}</div>
+                <div class="label">Estimated revenue</div>
+              </div>
+              <div class="stat-card">
+                <h3>Live Chats</h3>
+                <div class="value">${chatUsers.length}</div>
+                <div class="label">Active conversations</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>User Details</h2>
+            ${users.length > 0 ? `
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Calculations</th>
+                    <th>Exports</th>
+                    <th>Status</th>
+                    <th>Last Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${users.map(user => `
+                    <tr>
+                      <td>${user.name}</td>
+                      <td>${user.email}</td>
+                      <td>${user.totalCalculations}</td>
+                      <td>${user.totalExports}</td>
+                      <td>${user.status}</td>
+                      <td>${new Date(user.lastActive).toLocaleDateString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p>No users registered yet.</p>'}
+          </div>
+
+          <div class="section">
+            <h2>Contact Messages</h2>
+            ${contacts.length > 0 ? `
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${contacts.map(contact => `
+                    <tr>
+                      <td>${contact.name}</td>
+                      <td>${contact.email}</td>
+                      <td>${contact.phone}</td>
+                      <td>${contact.message.substring(0, 50)}${contact.message.length > 50 ? '...' : ''}</td>
+                      <td>${contact.status}</td>
+                      <td>${new Date(contact.date).toLocaleDateString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p>No contact messages received yet.</p>'}
+          </div>
+
+          <div class="section">
+            <h2>Recent Chat Activity</h2>
+            ${chatMessages.length > 0 ? `
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Message</th>
+                    <th>Type</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${chatMessages.slice(-10).map(msg => `
+                    <tr>
+                      <td>${msg.userName}</td>
+                      <td>${msg.message.substring(0, 50)}${msg.message.length > 50 ? '...' : ''}</td>
+                      <td>${msg.type}</td>
+                      <td>${new Date(msg.timestamp).toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p>No chat activity yet.</p>'}
+          </div>
+
+          <div class="footer">
+            <p>This report was automatically generated by the Admin Dashboard</p>
+            <p>ROI Calculator Application - Admin Report</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Create blob and download
+    const blob = new Blob([reportContent], { type: 'text/html' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `admin-report-${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
     addNotification({
       type: 'success',
       title: 'Report Generated!',
-      message: 'Monthly analytics report has been created.',
+      message: 'Monthly analytics report has been downloaded as HTML file.',
       redirectTo: '/admin',
       redirectLabel: 'View Dashboard',
       duration: 8000
