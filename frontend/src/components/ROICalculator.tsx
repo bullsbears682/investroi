@@ -31,6 +31,9 @@ interface FormData {
   initial_investment: number;
   additional_costs: number;
   country_code: string;
+  investment_start_date: string;
+  investment_end_date: string;
+  target_date: string;
 }
 
 const ROICalculator: React.FC<ROICalculatorProps> = ({
@@ -52,7 +55,10 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
     defaultValues: {
       initial_investment: 10000,
       additional_costs: 0,
-      country_code: 'US'
+      country_code: 'US',
+      investment_start_date: new Date().toISOString().split('T')[0],
+      investment_end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      target_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     },
     mode: 'onChange'
   });
