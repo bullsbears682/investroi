@@ -525,7 +525,7 @@ const AdminDashboard: React.FC = () => {
           title: 'PDF Data Export Complete!',
           message: 'All system data has been exported as PDF file.',
           redirectTo: '/admin',
-          redirectLabel: 'View Dashboard',
+          redirectLabel: 'View Data',
           duration: 8000
         });
       }).catch(error => {
@@ -613,14 +613,14 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 
-    addNotification({
-      type: 'success',
-      title: 'JSON Data Export Complete!',
-      message: 'All system data has been exported as JSON file (PDF generation failed).',
-      redirectTo: '/admin',
-      redirectLabel: 'View Dashboard',
-      duration: 8000
-    });
+            addNotification({
+          type: 'success',
+          title: 'JSON Data Export Complete!',
+          message: 'All system data has been exported as JSON file (PDF generation failed).',
+          redirectTo: '/admin',
+          redirectLabel: 'View Data',
+          duration: 8000
+        });
   };
 
   const handleSystemHealth = () => {
@@ -893,7 +893,7 @@ const AdminDashboard: React.FC = () => {
           title: 'System Health PDF Generated!',
           message: 'System health report has been downloaded as PDF file.',
           redirectTo: '/admin',
-          redirectLabel: 'View Dashboard',
+          redirectLabel: 'View System',
           duration: 8000
         });
       }).catch(error => {
@@ -998,14 +998,14 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 
-    addNotification({
-      type: 'success',
-      title: 'System Health JSON Generated!',
-      message: 'System health report has been downloaded as JSON file (PDF generation failed).',
-      redirectTo: '/admin',
-      redirectLabel: 'View Dashboard',
-      duration: 8000
-    });
+            addNotification({
+          type: 'success',
+          title: 'System Health JSON Generated!',
+          message: 'System health report has been downloaded as JSON file (PDF generation failed).',
+          redirectTo: '/admin',
+          redirectLabel: 'View System',
+          duration: 8000
+        });
   };
 
   const handleBackupDatabase = () => {
@@ -1393,7 +1393,7 @@ const AdminDashboard: React.FC = () => {
             title: 'Real Database Backup Completed!',
             message: `Backup ${backupData.backupInfo.backupId} created successfully. Data compressed by ${compressionRatio}% and stored securely.`,
             redirectTo: '/admin',
-            redirectLabel: 'View Dashboard',
+            redirectLabel: 'View Backups',
             duration: 8000
           });
         }).catch(error => {
@@ -1413,7 +1413,7 @@ const AdminDashboard: React.FC = () => {
         title: 'Backup Failed',
         message: 'Failed to create database backup. Please try again.',
         redirectTo: '/admin',
-        redirectLabel: 'View Dashboard',
+        redirectLabel: 'View Backups',
         duration: 5000
       });
     }
@@ -1516,7 +1516,7 @@ const AdminDashboard: React.FC = () => {
       title: 'Database Backup JSON Generated!',
       message: 'Database backup report has been downloaded as JSON file (PDF generation failed).',
       redirectTo: '/admin',
-      redirectLabel: 'View Dashboard',
+      redirectLabel: 'View Backups',
       duration: 8000
     });
   };
@@ -1733,7 +1733,7 @@ const AdminDashboard: React.FC = () => {
           title: 'PDF Report Generated!',
           message: 'Monthly analytics report has been downloaded as PDF file.',
           redirectTo: '/admin',
-          redirectLabel: 'View Dashboard',
+          redirectLabel: 'View Analytics',
           duration: 8000
         });
       }).catch(error => {
@@ -1918,14 +1918,14 @@ const AdminDashboard: React.FC = () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 
-    addNotification({
-      type: 'success',
-      title: 'HTML Report Generated!',
-      message: 'Monthly analytics report has been downloaded as HTML file (PDF generation failed).',
-      redirectTo: '/admin',
-      redirectLabel: 'View Dashboard',
-      duration: 8000
-    });
+            addNotification({
+          type: 'success',
+          title: 'HTML Report Generated!',
+          message: 'Monthly analytics report has been downloaded as HTML file (PDF generation failed).',
+          redirectTo: '/admin',
+          redirectLabel: 'View Analytics',
+          duration: 8000
+        });
   };
 
   const handleLogout = () => {
