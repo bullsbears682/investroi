@@ -28,7 +28,7 @@ import TermsPage from './pages/TermsPage';
 import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 import NotificationWrapper from './components/NotificationWrapper';
-import TestNotifications from './components/TestNotifications';
+
 
 // Store
 import { useAppStore } from './store/appStore';
@@ -102,8 +102,7 @@ function App() {
                   {/* Notification System */}
                   <NotificationWrapper />
                   
-                  {/* Test Notifications (Development Only) */}
-                  <TestNotifications />
+
                 </div>
               </div>
             </Router>
