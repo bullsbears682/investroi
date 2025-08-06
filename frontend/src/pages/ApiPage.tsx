@@ -43,7 +43,7 @@ const ApiPage: React.FC = () => {
     {
       icon: Code,
       title: 'Easy Integration',
-      description: 'Simple SDKs for JavaScript and Python'
+      description: 'Simple SDKs for JavaScript and Python - Ready to use'
     }
   ];
 
@@ -123,7 +123,7 @@ function MyComponent() {
               </h1>
             </div>
             <p className="text-xl text-white/70 max-w-3xl mx-auto mb-8">
-              Powerful ROI calculation API for developers. Integrate investment analysis into your apps with just a few lines of code.
+              Powerful ROI calculation API for developers. Integrate investment analysis into your apps with just a few lines of code. Ready to use now!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.button
@@ -275,7 +275,7 @@ function MyComponent() {
                   <div>
                     <h3 className="text-white font-semibold mb-2">Base URL</h3>
                     <code className="bg-white/10 px-3 py-2 rounded text-blue-400">https://api.investwisepro.com/v1</code>
-                    <p className="text-white/60 text-sm mt-1">Currently in development - coming soon!</p>
+                    <p className="text-white/60 text-sm mt-1">Ready to use - Get your API key from the dashboard</p>
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-2">Authentication</h3>
