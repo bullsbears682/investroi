@@ -2235,7 +2235,7 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                    Welcome back, Administrator! 👋
+                    Welcome back! 👋
                   </h2>
                   <p className="text-white/60 text-lg">
                     Here's what's happening with your platform today
