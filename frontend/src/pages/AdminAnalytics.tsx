@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, MessageCircle, HardDrive } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
+import AdminMenu from '../components/AdminMenu';
 
 interface Analytics {
   totalUsers: number;
@@ -38,6 +39,7 @@ const AdminAnalytics: React.FC = () => {
     bounceRate: 0
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     loadAnalyticsData();
@@ -202,8 +204,11 @@ const AdminAnalytics: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Admin Menu */}
+      <AdminMenu isOpen={isMenuOpen} onToggle={() => setIsMenuOpen(!isMenuOpen)} />
+      
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20">
+      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 lg:ml-64">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -226,7 +231,7 @@ const AdminAnalytics: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">

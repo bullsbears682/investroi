@@ -6,6 +6,7 @@ import { userManager } from '../utils/userManagement';
 import { contactStorage } from '../utils/contactStorage';
 import { chatSystem } from '../utils/chatSystem';
 import Logo from '../components/Logo';
+import AdminMenu from '../components/AdminMenu';
 import { 
   ArrowLeftIcon,
   UsersIcon,
@@ -51,6 +52,7 @@ const AdminDashboard: React.FC = () => {
     bounceRate: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { addNotification } = useNotifications();
 
   // Load admin statistics
@@ -399,6 +401,9 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Admin Menu */}
+      <AdminMenu isOpen={isMenuOpen} onToggle={() => setIsMenuOpen(!isMenuOpen)} />
+      
       {/* Animated Background */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
@@ -410,7 +415,7 @@ const AdminDashboard: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-20 bg-white/5 backdrop-blur-xl border-b border-white/10 p-4 lg:p-6 sticky top-0"
+        className="relative z-20 bg-white/5 backdrop-blur-xl border-b border-white/10 p-4 lg:p-6 sticky top-0 lg:ml-64"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 lg:space-x-4">
@@ -439,7 +444,7 @@ const AdminDashboard: React.FC = () => {
       </motion.div>
 
       {/* Main Content */}
-      <div className="relative z-10 p-4 lg:p-6">
+      <div className="relative z-10 p-4 lg:p-6 lg:ml-64">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

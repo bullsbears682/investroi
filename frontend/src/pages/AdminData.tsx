@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Database, Users, Mail, Phone, Calendar, Eye, Trash2, X, Send } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
+import AdminMenu from '../components/AdminMenu';
 
 interface User {
   id: string;
@@ -28,6 +29,7 @@ const AdminData: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'contacts'>('users');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Modal states
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -163,8 +165,11 @@ const AdminData: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Admin Menu */}
+      <AdminMenu isOpen={isMenuOpen} onToggle={() => setIsMenuOpen(!isMenuOpen)} />
+      
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20">
+      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 lg:ml-64">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -187,7 +192,7 @@ const AdminData: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
         {/* Tab Navigation */}
         <div className="flex space-x-1 bg-white/10 backdrop-blur-xl rounded-xl p-1 mb-8">
           <button

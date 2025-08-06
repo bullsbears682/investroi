@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, HardDrive, Download, CheckCircle, Trash2, RefreshCw, X, Eye, AlertCircle } from 'lucide-react';
+import AdminMenu from '../components/AdminMenu';
 
 interface Backup {
   timestamp: number;
@@ -29,6 +30,7 @@ const AdminBackups: React.FC = () => {
   const [backupToDelete, setBackupToDelete] = useState<Backup | null>(null);
   const [backupToRestore, setBackupToRestore] = useState<Backup | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     loadBackups();
@@ -177,8 +179,11 @@ const AdminBackups: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Admin Menu */}
+      <AdminMenu isOpen={isMenuOpen} onToggle={() => setIsMenuOpen(!isMenuOpen)} />
+      
       {/* Header */}
-      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20">
+      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 lg:ml-64">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -203,7 +208,7 @@ const AdminBackups: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:ml-64">
         {/* Backup Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
