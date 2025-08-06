@@ -440,7 +440,7 @@ const CalculatorPage: React.FC = () => {
         >
           {/* Category Selection */}
           <motion.div 
-            className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6"
+            className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30 mb-6"
             animate={{ 
               zIndex: isDropdownOpen ? 50 : 1,
               position: isDropdownOpen ? 'relative' : 'static'
@@ -448,7 +448,8 @@ const CalculatorPage: React.FC = () => {
             transition={{ duration: 0.3 }}
           >
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <Target className="w-5 h-5 mr-2" />
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">1</div>
+              <Target className="w-5 h-5 mr-2 text-blue-400" />
               Select Business Category
             </h2>
             
@@ -470,6 +471,7 @@ const CalculatorPage: React.FC = () => {
             transition={{ duration: 0.3 }}
           >
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">2</div>
               <Target className="w-5 h-5 mr-2" />
               Select Business Scenario
             </h2>
@@ -498,6 +500,7 @@ const CalculatorPage: React.FC = () => {
             transition={{ duration: 0.3 }}
           >
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">3</div>
               <Calculator className="w-5 h-5 mr-2" />
               Investment Details
             </h2>

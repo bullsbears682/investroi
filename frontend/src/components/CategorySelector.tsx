@@ -42,7 +42,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   }
 
   return (
-    <div className="relative">
+    <div className="relative bg-white/5 p-4 rounded-lg border border-white/10">
       <label className="block text-sm font-medium text-white/80 mb-2">
         Business Category
       </label>
