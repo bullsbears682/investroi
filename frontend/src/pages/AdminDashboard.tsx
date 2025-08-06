@@ -129,37 +129,9 @@ const AdminDashboard: React.FC = () => {
         status: Math.random() > 0.3 ? 'active' : 'inactive'
       }));
 
-      // Load real contacts from localStorage or create sample data
+      // Load real contacts from localStorage or create empty array
       const storedContacts = localStorage.getItem('adminContacts');
-      const realContacts: Contact[] = storedContacts ? JSON.parse(storedContacts) : [
-        {
-          id: '1',
-          name: 'John Smith',
-          email: 'john@example.com',
-          phone: '+1-555-0123',
-          message: 'Interested in your ROI calculator for our investment portfolio.',
-          date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          status: 'new'
-        },
-        {
-          id: '2',
-          name: 'Sarah Johnson',
-          email: 'sarah@company.com',
-          phone: '+1-555-0456',
-          message: 'Looking for enterprise pricing and custom features.',
-          date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-          status: 'read'
-        },
-        {
-          id: '3',
-          name: 'Mike Wilson',
-          email: 'mike@startup.io',
-          phone: '+1-555-0789',
-          message: 'Great tool! Would like to discuss integration options.',
-          date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          status: 'replied'
-        }
-      ];
+      const realContacts: Contact[] = storedContacts ? JSON.parse(storedContacts) : [];
 
       setUsers(realUsers);
       setContacts(realContacts);
@@ -192,47 +164,9 @@ const AdminDashboard: React.FC = () => {
       if (storedMessages) {
         setChatMessages(JSON.parse(storedMessages));
       } else {
-        // Initialize with sample chat messages
-        const sampleMessages: ChatMessage[] = [
-          {
-            id: '1',
-            userId: 'user1',
-            userName: 'John Smith',
-            message: 'Hi, I need help with the ROI calculator',
-            timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-            type: 'user',
-            status: 'read'
-          },
-          {
-            id: '2',
-            userId: 'admin',
-            userName: 'Admin',
-            message: 'Hello John! How can I help you with the ROI calculator?',
-            timestamp: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
-            type: 'admin',
-            status: 'delivered'
-          },
-          {
-            id: '3',
-            userId: 'user2',
-            userName: 'Sarah Johnson',
-            message: 'Is there a way to export my calculations?',
-            timestamp: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
-            type: 'user',
-            status: 'read'
-          },
-          {
-            id: '4',
-            userId: 'admin',
-            userName: 'Admin',
-            message: 'Yes Sarah! You can export your calculations as PDF or Excel files.',
-            timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-            type: 'admin',
-            status: 'delivered'
-          }
-        ];
-        setChatMessages(sampleMessages);
-        localStorage.setItem('adminChatMessages', JSON.stringify(sampleMessages));
+        // Initialize with empty chat messages
+        setChatMessages([]);
+        localStorage.setItem('adminChatMessages', JSON.stringify([]));
       }
     } catch (error) {
       console.error('Failed to load chat messages:', error);
@@ -240,7 +174,11 @@ const AdminDashboard: React.FC = () => {
   };
 
   const addRandomChatMessage = () => {
-    const userNames = ['John Smith', 'Sarah Johnson', 'Mike Wilson', 'Emma Davis', 'Alex Brown'];
+    // Only add messages if there are real users
+    const allUsers = userManager.getAllUsers();
+    if (allUsers.length === 0) return;
+
+    const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
     const messages = [
       'How do I calculate ROI for multiple investments?',
       'Can I save my calculations for later?',
@@ -252,14 +190,12 @@ const AdminDashboard: React.FC = () => {
       'Is there a premium version with more features?'
     ];
 
-    const randomUser = userNames[Math.floor(Math.random() * userNames.length)];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-    const userId = `user${Math.floor(Math.random() * 1000)}`;
 
     const newChatMessage: ChatMessage = {
       id: Date.now().toString(),
-      userId,
-      userName: randomUser,
+      userId: randomUser.id,
+      userName: randomUser.name,
       message: randomMessage,
       timestamp: new Date().toISOString(),
       type: 'user',
@@ -815,29 +751,49 @@ const AdminDashboard: React.FC = () => {
               </div>
               
               <div className="space-y-4">
-                {[
-                  { icon: Users, text: "New user registration", time: "2 minutes ago", color: "text-blue-400" },
-                  { icon: Download, text: "Data export completed", time: "5 minutes ago", color: "text-green-400" },
-                  { icon: Mail, text: "Contact message received", time: "12 minutes ago", color: "text-purple-400" },
-                  { icon: TrendingUp, text: "Analytics updated", time: "18 minutes ago", color: "text-orange-400" },
-                  { icon: MessageCircle, text: "New chat message", time: "1 minute ago", color: "text-pink-400" }
-                ].map((activity, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
-                    className="flex items-center space-x-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
-                  >
-                    <div className={`p-2 bg-white/10 rounded-lg`}>
-                      <activity.icon className={`w-5 h-5 ${activity.color}`} />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-white font-medium">{activity.text}</p>
-                      <p className="text-white/60 text-sm">{activity.time}</p>
-                    </div>
-                  </motion.div>
-                ))}
+                {users.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                    <p className="text-white/60">No user activity yet</p>
+                    <p className="text-white/40 text-sm">Users will appear here when they register and use the app</p>
+                  </div>
+                ) : (
+                  <>
+                    {users.slice(0, 3).map((user, index) => (
+                      <motion.div
+                        key={user.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.8 + index * 0.1 }}
+                        className="flex items-center space-x-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
+                      >
+                        <div className="p-2 bg-white/10 rounded-lg">
+                          <Users className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white font-medium">{user.name} - {user.totalCalculations} calculations</p>
+                          <p className="text-white/60 text-sm">Last active: {new Date(user.lastActive).toLocaleDateString()}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                    {chatMessages.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 1.1 }}
+                        className="flex items-center space-x-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
+                      >
+                        <div className="p-2 bg-white/10 rounded-lg">
+                          <MessageCircle className="w-5 h-5 text-pink-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white font-medium">Latest chat message</p>
+                          <p className="text-white/60 text-sm">{chatMessages[chatMessages.length - 1]?.userName}: {chatMessages[chatMessages.length - 1]?.message.substring(0, 50)}...</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </>
+                )}
               </div>
             </motion.div>
           </div>
@@ -1450,7 +1406,15 @@ const AdminDashboard: React.FC = () => {
               </div>
             ) : (
               <div className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 lg:p-8 text-center text-white/60">
-                Select a user from the dropdown to start a chat.
+                {chatUsers.length === 0 ? (
+                  <div>
+                    <MessageCircle className="w-12 h-12 text-white/40 mx-auto mb-4" />
+                    <p className="text-white/60 mb-2">No chat users available</p>
+                    <p className="text-white/40 text-sm">Chat messages will appear when users interact with the app</p>
+                  </div>
+                ) : (
+                  <p>Select a user from the dropdown to start a chat.</p>
+                )}
               </div>
             )}
           </div>
