@@ -4,6 +4,9 @@ import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
 import { CookiesProvider } from 'react-cookie';
 
+// Contexts
+import { NotificationProvider } from './contexts/NotificationContext';
+
 // Components
 import LoadingScreen from './components/LoadingScreen';
 import Header from './components/Header';
@@ -24,6 +27,7 @@ import TermsPage from './pages/TermsPage';
 
 import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
+import NotificationWrapper from './components/NotificationWrapper';
 
 // Store
 import { useAppStore } from './store/appStore';
@@ -55,7 +59,8 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
-          <Router>
+          <NotificationProvider>
+            <Router>
             <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
               <div className="relative">
                 {/* Animated background */}
@@ -93,11 +98,15 @@ function App() {
                 
                 {/* Live Chat Button */}
                 <ChatButton />
+                
+                {/* Notification System */}
+                <NotificationWrapper />
               </div>
             </div>
           </Router>
-        </CookiesProvider>
-      </QueryClientProvider>
+        </NotificationProvider>
+      </CookiesProvider>
+    </QueryClientProvider>
       
       {/* Toast notifications */}
       <Toaster

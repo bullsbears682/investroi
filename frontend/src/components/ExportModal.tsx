@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { generatePDF, PDFExportData } from '../utils/pdfExport';
+import { useNotifications } from '../contexts/NotificationContext';
 
 import { userManager } from '../utils/userManagement';
 
@@ -40,6 +41,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
   scenarioId,
   marketResearchData
 }) => {
+  const { addNotification } = useNotifications();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     template: 'standard',
     includeCharts: true,
@@ -99,7 +101,15 @@ const ExportModal: React.FC<ExportModalProps> = ({
 
       await generatePDF(exportData);
       
-
+      // Add notification with redirect to scenarios
+      addNotification({
+        type: 'success',
+        title: 'PDF Export Complete!',
+        message: 'Your professional report has been generated. Explore more business scenarios.',
+        redirectTo: '/scenarios',
+        redirectLabel: 'View Scenarios',
+        duration: 8000
+      });
       
       // Record export for current user if logged in
       userManager.recordExport(exportOptions.template);

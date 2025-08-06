@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { User as UserIcon, Mail, LogIn, UserPlus, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { userManager, User } from '../utils/userManagement';
+import { useNotifications } from '../contexts/NotificationContext';
 
 interface UserAuthProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface UserAuthProps {
 }
 
 const UserAuth: React.FC<UserAuthProps> = ({ isOpen, onClose, onLogin }) => {
+  const { addNotification } = useNotifications();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -25,6 +27,16 @@ const UserAuth: React.FC<UserAuthProps> = ({ isOpen, onClose, onLogin }) => {
       // Login
       const user = userManager.loginUser(formData.email);
       if (user) {
+        // Add notification with redirect to calculator
+        addNotification({
+          type: 'success',
+          title: `Welcome back, ${user.name}!`,
+          message: 'You\'re all set to start calculating ROI. Click to begin.',
+          redirectTo: '/calculator',
+          redirectLabel: 'Start Calculating',
+          duration: 8000
+        });
+        
         toast.success(`Welcome back, ${user.name}!`);
         onLogin(user);
         onClose();
@@ -36,6 +48,17 @@ const UserAuth: React.FC<UserAuthProps> = ({ isOpen, onClose, onLogin }) => {
       // Register
       try {
         const user = userManager.registerUser(formData.email, formData.name, formData.country);
+        
+        // Add notification with redirect to scenarios
+        addNotification({
+          type: 'success',
+          title: `Welcome, ${user.name}!`,
+          message: 'Your account has been created. Explore business scenarios to get started.',
+          redirectTo: '/scenarios',
+          redirectLabel: 'Explore Scenarios',
+          duration: 8000
+        });
+        
         toast.success(`Welcome, ${user.name}! Your account has been created.`);
         onLogin(user);
         onClose();

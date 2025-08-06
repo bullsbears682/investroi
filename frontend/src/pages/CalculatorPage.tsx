@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+import { useNotifications } from '../contexts/NotificationContext';
 import { 
   Calculator, 
   TrendingUp, 
@@ -33,6 +34,7 @@ import { userManager } from '../utils/userManagement';
 import UserAuth from '../components/UserAuth';
 
 const CalculatorPage: React.FC = () => {
+  const { addNotification } = useNotifications();
 
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
@@ -89,6 +91,17 @@ const CalculatorPage: React.FC = () => {
       console.log('Calculation successful via API');
       const result = data.data || data;
       setCalculationResult({ data: result });
+      
+      // Add notification with redirect to results
+      addNotification({
+        type: 'success',
+        title: 'ROI Calculation Complete!',
+        message: 'Your investment analysis is ready. Click to view detailed results.',
+        redirectTo: '#results',
+        redirectLabel: 'View Results',
+        duration: 8000
+      });
+      
       toast.success('ROI calculation completed!');
     },
             onError: (error: any) => {
@@ -261,6 +274,17 @@ const CalculatorPage: React.FC = () => {
     };
     
     setCalculationResult(result);
+    
+    // Add notification with redirect to results
+    addNotification({
+      type: 'success',
+      title: 'ROI Calculation Complete!',
+      message: 'Your investment analysis is ready. Click to view detailed results.',
+      redirectTo: '#results',
+      redirectLabel: 'View Results',
+      duration: 8000
+    });
+    
     toast.success('ROI calculation completed!');
   };
 
