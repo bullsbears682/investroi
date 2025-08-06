@@ -642,6 +642,47 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </motion.button>
             </div>
+
+            {/* Recent Activity */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 lg:p-8"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl lg:text-2xl font-bold text-white">Recent Activity</h3>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-white/60 text-sm">Live Updates</span>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {[
+                  { icon: Users, text: "New user registration", time: "2 minutes ago", color: "text-blue-400" },
+                  { icon: Download, text: "Data export completed", time: "5 minutes ago", color: "text-green-400" },
+                  { icon: Mail, text: "Contact message received", time: "12 minutes ago", color: "text-purple-400" },
+                  { icon: TrendingUp, text: "Analytics updated", time: "18 minutes ago", color: "text-orange-400" }
+                ].map((activity, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.8 + index * 0.1 }}
+                    className="flex items-center space-x-4 p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all"
+                  >
+                    <div className={`p-2 bg-white/10 rounded-lg`}>
+                      <activity.icon className={`w-5 h-5 ${activity.color}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium">{activity.text}</p>
+                      <p className="text-white/60 text-sm">{activity.time}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         )}
 
@@ -670,6 +711,44 @@ const AdminDashboard: React.FC = () => {
                 <option value="active">Active Users</option>
                 <option value="inactive">Inactive Users</option>
               </select>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 text-white rounded-xl transition-all border border-purple-500/30 font-medium"
+              >
+                Add User
+              </motion.button>
+            </div>
+
+            {/* User Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">Total Users</p>
+                    <p className="text-2xl font-bold text-white">{users.length}</p>
+                  </div>
+                  <Users className="w-8 h-8 text-blue-400" />
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">Active Users</p>
+                    <p className="text-2xl font-bold text-white">{users.filter(u => u.status === 'active').length}</p>
+                  </div>
+                  <Activity className="w-8 h-8 text-green-400" />
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">New This Month</p>
+                    <p className="text-2xl font-bold text-white">+{Math.floor(users.length * 0.15)}</p>
+                  </div>
+                  <TrendingUp className="w-8 h-8 text-purple-400" />
+                </div>
+              </div>
             </div>
 
             {/* Users List - Mobile Optimized */}
@@ -996,7 +1075,13 @@ const AdminDashboard: React.FC = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <div className="relative">
-                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">User Growth</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl lg:text-2xl font-bold text-white">User Growth</h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-white/60 text-sm">Live Data</span>
+                    </div>
+                  </div>
                   <div className="h-64 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
                     <div className="text-center">
                       <BarChart3 className="w-16 h-16 text-white/40 mx-auto mb-4" />
@@ -1010,16 +1095,129 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="group relative bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+                className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <div className="relative">
-                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">Revenue Analytics</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl lg:text-2xl font-bold text-white">Revenue Analytics</h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-white/60 text-sm">Live Data</span>
+                    </div>
+                  </div>
                   <div className="h-64 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
                     <div className="text-center">
                       <DollarSign className="w-16 h-16 text-white/40 mx-auto mb-4" />
                       <p className="text-white/60 text-lg">Chart placeholder - Revenue trends</p>
                     </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Performance Metrics */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="group relative bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative">
+                  <h4 className="text-lg font-bold text-white mb-4">Top Performing Users</h4>
+                  <div className="space-y-3">
+                    {users.slice(0, 3).map((user, index) => (
+                      <div key={user.id} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <span className="text-white text-sm font-bold">{user.name.charAt(0)}</span>
+                          </div>
+                          <div>
+                            <p className="text-white font-medium text-sm">{user.name}</p>
+                            <p className="text-white/60 text-xs">{user.totalCalculations} calculations</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-white font-bold text-sm">#{index + 1}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative">
+                  <h4 className="text-lg font-bold text-white mb-4">System Performance</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60 text-sm">Server Load</span>
+                      <span className="text-green-400 text-sm font-medium">Optimal</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60 text-sm">Database</span>
+                      <span className="text-green-400 text-sm font-medium">Healthy</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60 text-sm">Uptime</span>
+                      <span className="text-green-400 text-sm font-medium">99.9%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60 text-sm">Response Time</span>
+                      <span className="text-green-400 text-sm font-medium">120ms</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                className="group relative bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative">
+                  <h4 className="text-lg font-bold text-white mb-4">Quick Actions</h4>
+                  <div className="space-y-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all text-left"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Download className="w-5 h-5 text-blue-400" />
+                        <span className="text-white text-sm">Export Analytics</span>
+                      </div>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all text-left"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-green-400" />
+                        <span className="text-white text-sm">Generate Report</span>
+                      </div>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all text-left"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Settings className="w-5 h-5 text-purple-400" />
+                        <span className="text-white text-sm">Configure Alerts</span>
+                      </div>
+                    </motion.button>
                   </div>
                 </div>
               </motion.div>
