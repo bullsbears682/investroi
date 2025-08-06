@@ -22,7 +22,10 @@ import {
   Calendar,
   Target,
   Menu,
-  X
+  X,
+  Sparkles,
+  Crown,
+  Zap
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -91,7 +94,6 @@ const AdminDashboard: React.FC = () => {
       const allUsers = userManager.getAllUsers();
       const activeUsers = userManager.getActiveUsers();
       
-      // Mock data for demonstration
       const mockUsers: User[] = allUsers.map((user) => ({
         id: user.id,
         name: user.name,
@@ -221,10 +223,10 @@ const AdminDashboard: React.FC = () => {
         setActiveTab(tab as any);
         setMobileMenuOpen(false);
       }}
-      className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all text-sm ${
+      className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all text-sm font-medium ${
         activeTab === tab
-          ? 'bg-white/20 text-white border border-white/30'
-          : 'bg-white/10 text-white/60 hover:bg-white/15'
+          ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-white border border-purple-500/50 shadow-lg'
+          : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
       }`}
     >
       <Icon className="w-4 h-4" />
@@ -233,20 +235,33 @@ const AdminDashboard: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/50 to-slate-900/50"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(120,119,198,0.2),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,119,198,0.2),transparent_50%)]"></div>
+      </div>
+
       {/* Mobile Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/10 backdrop-blur-lg border-b border-white/20 p-4 lg:p-6"
+        className="relative z-10 bg-white/5 backdrop-blur-xl border-b border-white/10 p-4 lg:p-6 sticky top-0"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3 lg:space-x-4">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <Shield className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+            <div className="relative">
+              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl">
+                <Shield className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
             </div>
             <div>
-              <h1 className="text-lg lg:text-2xl font-bold text-white">Admin Dashboard</h1>
+              <h1 className="text-xl lg:text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                Admin Dashboard
+              </h1>
               <p className="text-white/60 text-xs lg:text-sm">System administration and analytics</p>
             </div>
           </div>
@@ -255,7 +270,7 @@ const AdminDashboard: React.FC = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+              className="lg:hidden p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all border border-white/20"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
             </button>
@@ -265,7 +280,7 @@ const AdminDashboard: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveTab('settings')}
-              className="hidden lg:flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
+              className="hidden lg:flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20"
             >
               <Settings className="w-4 h-4" />
               <span>Settings</span>
@@ -274,7 +289,7 @@ const AdminDashboard: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowLogout(true)}
-              className="flex items-center space-x-2 px-3 lg:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all text-sm"
+              className="flex items-center space-x-2 px-4 lg:px-5 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 text-red-300 rounded-xl transition-all border border-red-500/30 text-sm font-medium"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
@@ -289,7 +304,7 @@ const AdminDashboard: React.FC = () => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="lg:hidden bg-white/10 backdrop-blur-lg border-b border-white/20"
+          className="lg:hidden bg-white/5 backdrop-blur-xl border-b border-white/10"
         >
           <div className="p-4 space-y-2">
             <TabButton tab="overview" icon={BarChart3} label="Overview" />
@@ -302,8 +317,8 @@ const AdminDashboard: React.FC = () => {
       )}
 
       {/* Desktop Navigation Tabs */}
-      <div className="hidden lg:block max-w-7xl mx-auto px-6 py-4">
-        <div className="flex flex-wrap gap-2">
+      <div className="hidden lg:block max-w-7xl mx-auto px-6 py-6">
+        <div className="flex flex-wrap gap-3">
           <TabButton tab="overview" icon={BarChart3} label="Overview" />
           <TabButton tab="users" icon={Users} label="Users" />
           <TabButton tab="contacts" icon={Mail} label="Contacts" />
@@ -312,15 +327,15 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Test Buttons */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
-        <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleComprehensiveTest}
-            className="flex items-center justify-center space-x-2 px-4 lg:px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-all text-sm"
+            className="flex items-center justify-center space-x-3 px-6 lg:px-8 py-4 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 hover:from-blue-500/30 hover:to-indigo-500/30 text-blue-300 rounded-xl transition-all text-sm font-medium border border-blue-500/30 shadow-lg"
           >
-            <CheckCircle className="w-4 h-4" />
+            <CheckCircle className="w-5 h-5" />
             <span>1 - Comprehensive Test</span>
           </motion.button>
           
@@ -328,9 +343,9 @@ const AdminDashboard: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleTestFeatures}
-            className="flex items-center justify-center space-x-2 px-4 lg:px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-all text-sm"
+            className="flex items-center justify-center space-x-3 px-6 lg:px-8 py-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 text-green-300 rounded-xl transition-all text-sm font-medium border border-green-500/30 shadow-lg"
           >
-            <Settings className="w-4 h-4" />
+            <Zap className="w-5 h-5" />
             <span>2 - Test Features</span>
           </motion.button>
         </div>
@@ -339,21 +354,47 @@ const AdminDashboard: React.FC = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
         {activeTab === 'overview' && (
-          <div className="space-y-6 lg:space-y-8">
+          <div className="space-y-8 lg:space-y-10">
+            {/* Welcome Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-orange-500/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 lg:p-8"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+                    Welcome back, Administrator! 👋
+                  </h2>
+                  <p className="text-white/60 text-lg">
+                    Here's what's happening with your platform today
+                  </p>
+                </div>
+                <div className="hidden lg:flex items-center space-x-2">
+                  <Sparkles className="w-6 h-6 text-yellow-400" />
+                  <span className="text-white/80 font-medium">Premium Dashboard</span>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Total Users</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.totalUsers}</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Total Users</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalUsers}</p>
+                    <p className="text-green-400 text-sm font-medium">+12% from last month</p>
                   </div>
-                  <Users className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <Users className="w-8 h-8 text-blue-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -361,14 +402,18 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Active Users</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.activeUsers}</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Active Users</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.activeUsers}</p>
+                    <p className="text-green-400 text-sm font-medium">+8% from last week</p>
                   </div>
-                  <Activity className="w-6 h-6 lg:w-8 lg:h-8 text-green-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <Activity className="w-8 h-8 text-green-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -376,14 +421,18 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Total Calculations</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.totalCalculations}</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Total Calculations</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalCalculations}</p>
+                    <p className="text-green-400 text-sm font-medium">+25% from last month</p>
                   </div>
-                  <BarChart3 className="w-6 h-6 lg:w-8 lg:h-8 text-purple-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <BarChart3 className="w-8 h-8 text-purple-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -391,14 +440,18 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Total Exports</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.totalExports}</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Total Exports</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalExports}</p>
+                    <p className="text-green-400 text-sm font-medium">+18% from last month</p>
                   </div>
-                  <Download className="w-6 h-6 lg:w-8 lg:h-8 text-orange-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <Download className="w-8 h-8 text-orange-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -406,14 +459,18 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Revenue</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">${adminStats.revenue.toFixed(2)}</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Revenue</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">${adminStats.revenue.toFixed(0)}</p>
+                    <p className="text-green-400 text-sm font-medium">+32% from last month</p>
                   </div>
-                  <DollarSign className="w-6 h-6 lg:w-8 lg:h-8 text-green-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <DollarSign className="w-8 h-8 text-emerald-400" />
+                  </div>
                 </div>
               </motion.div>
 
@@ -421,31 +478,38 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
+                className="group relative bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs lg:text-sm">Growth Rate</p>
-                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.growthRate}%</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">Growth Rate</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.growthRate}%</p>
+                    <p className="text-green-400 text-sm font-medium">+15% from last month</p>
                   </div>
-                  <TrendingUp className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
+                  <div className="p-4 bg-white/10 rounded-2xl">
+                    <TrendingUp className="w-8 h-8 text-pink-400" />
+                  </div>
                 </div>
               </motion.div>
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('users')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
+                className="group relative bg-gradient-to-br from-blue-500/20 to-indigo-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
-                <div className="flex items-center space-x-2 lg:space-x-3">
-                  <Users className="w-5 h-5 lg:w-6 lg:h-6 text-blue-400" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center space-x-4">
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <Users className="w-6 h-6 text-blue-400" />
+                  </div>
                   <div className="text-left">
-                    <p className="text-white font-medium text-sm lg:text-base">Manage Users</p>
-                    <p className="text-white/60 text-xs lg:text-sm">{users.length} total users</p>
+                    <p className="text-white font-semibold text-lg">Manage Users</p>
+                    <p className="text-white/60 text-sm">{users.length} total users</p>
                   </div>
                 </div>
               </motion.button>
@@ -454,13 +518,16 @@ const AdminDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('contacts')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
+                className="group relative bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
-                <div className="flex items-center space-x-2 lg:space-x-3">
-                  <Mail className="w-5 h-5 lg:w-6 lg:h-6 text-green-400" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center space-x-4">
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <Mail className="w-6 h-6 text-green-400" />
+                  </div>
                   <div className="text-left">
-                    <p className="text-white font-medium text-sm lg:text-base">Contact Messages</p>
-                    <p className="text-white/60 text-xs lg:text-sm">{contacts.length} messages</p>
+                    <p className="text-white font-semibold text-lg">Contact Messages</p>
+                    <p className="text-white/60 text-sm">{contacts.length} messages</p>
                   </div>
                 </div>
               </motion.button>
@@ -469,13 +536,16 @@ const AdminDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('analytics')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
+                className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
-                <div className="flex items-center space-x-2 lg:space-x-3">
-                  <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center space-x-4">
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <TrendingUp className="w-6 h-6 text-purple-400" />
+                  </div>
                   <div className="text-left">
-                    <p className="text-white font-medium text-sm lg:text-base">Analytics</p>
-                    <p className="text-white/60 text-xs lg:text-sm">Detailed insights</p>
+                    <p className="text-white font-semibold text-lg">Analytics</p>
+                    <p className="text-white/60 text-sm">Detailed insights</p>
                   </div>
                 </div>
               </motion.button>
@@ -484,13 +554,16 @@ const AdminDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('settings')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
+                className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300"
               >
-                <div className="flex items-center space-x-2 lg:space-x-3">
-                  <Settings className="w-5 h-5 lg:w-6 lg:h-6 text-orange-400" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="relative flex items-center space-x-4">
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <Settings className="w-6 h-6 text-orange-400" />
+                  </div>
                   <div className="text-left">
-                    <p className="text-white font-medium text-sm lg:text-base">Settings</p>
-                    <p className="text-white/60 text-xs lg:text-sm">System configuration</p>
+                    <p className="text-white font-semibold text-lg">Settings</p>
+                    <p className="text-white/60 text-sm">System configuration</p>
                   </div>
                 </div>
               </motion.button>
@@ -885,24 +958,26 @@ const AdminDashboard: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 max-w-md w-full"
+            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center">
-              <Shield className="w-12 h-12 text-red-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
-              <p className="text-white/60 mb-6">Are you sure you want to logout from the admin dashboard?</p>
+              <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Confirm Logout</h3>
+              <p className="text-white/60 mb-8">Are you sure you want to logout from the admin dashboard?</p>
               
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <button
                   onClick={() => setShowLogout(false)}
-                  className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
+                  className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex-1 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl transition-all font-medium"
                 >
                   Logout
                 </button>
