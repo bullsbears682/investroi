@@ -83,7 +83,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-50 w-full mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg shadow-xl max-h-80 overflow-hidden"
+              className="absolute z-[9999] w-full mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg shadow-xl max-h-80 overflow-hidden"
             >
               {/* Search Bar */}
               <div className="p-3 border-b border-white/10">
@@ -101,9 +101,6 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 
               {/* Categories List */}
               <div className="max-h-64 overflow-y-auto">
-                <div className="p-2 text-xs text-white/40">
-                  Debug: {filteredCategories.length} categories found
-                </div>
                 {filteredCategories.length === 0 ? (
                   <div className="p-4 text-center text-white/60 text-sm">
                     No categories found
@@ -113,7 +110,6 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                     <motion.button
                       key={category.id}
                       onClick={() => {
-                        console.log('Category selected:', category.id);
                         onCategorySelect(category.id);
                         setIsOpen(false);
                         setSearchTerm('');
@@ -142,7 +138,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
       {/* Click outside to close */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40" 
+          className="fixed inset-0 z-[9998]" 
           onClick={() => setIsOpen(false)}
         />
       )}
