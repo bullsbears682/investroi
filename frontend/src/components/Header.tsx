@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Calculator, Info, Shield, Target, TrendingUp } from 'lucide-react';
-
+import Logo from './Logo';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,11 +31,8 @@ const Header: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             className="flex items-center space-x-2"
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Calculator className="w-5 h-5 text-white" />
-            </div>
-            <Link to="/" className="text-xl font-bold text-white">
-              InvestWise Pro
+            <Link to="/" className="flex items-center space-x-2">
+              <Logo size="md" showText={true} />
             </Link>
           </motion.div>
 

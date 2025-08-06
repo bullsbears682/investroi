@@ -1,37 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Shield, 
-  Users, 
-  TrendingUp, 
-  LogOut,
-  BarChart3,
-  Activity,
-  DollarSign,
-  Download,
-  Settings,
-  Mail,
-  Phone,
-  AlertTriangle,
-  Clock,
-  Eye,
-  Edit,
-  Trash2,
-  Search,
-  Calendar,
-  Target,
-  Menu,
-  X,
-  Sparkles,
-  Database,
-  FileText,
-  ActivitySquare,
-  MessageCircle,
-  Send,
-  User
+  BarChart3, Users, Mail, TrendingUp, MessageCircle, Settings, 
+  LogOut, X, Menu, Download, Activity, Shield, Sparkles, 
+  Search, Eye, Trash2, Send, Clock, Database, Target,
+  DollarSign, FileText, Edit, Phone, Calendar, ActivitySquare,
+  AlertTriangle
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { useNotifications } from '../contexts/NotificationContext';
+import Logo from '../components/Logo';
 
 interface User {
   id: string;
@@ -76,6 +55,7 @@ interface Analytics {
 }
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { addNotification } = useNotifications();
   const [adminStats, setAdminStats] = useState<Analytics>({
     totalUsers: 0,
@@ -2009,7 +1989,7 @@ const AdminDashboard: React.FC = () => {
 
   const handleLogout = () => {
     userManager.logoutUser();
-    window.location.href = '/';
+    navigate('/');
   };
 
   const handleUserAction = (action: string, _userId: string) => {
@@ -2087,8 +2067,8 @@ const AdminDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3 lg:space-x-4">
             <div className="relative">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-2xl">
-                <Shield className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+              <div className="w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center">
+                <Logo size="lg" showText={false} />
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
             </div>
