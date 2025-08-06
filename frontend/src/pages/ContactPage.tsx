@@ -110,7 +110,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: 'Do you offer custom business scenarios?',
-      answer: 'Yes! We offer 15 comprehensive business scenarios covering E-commerce, SaaS, Freelancer, Agency, Startup, Restaurant, Real Estate, Manufacturing, Consulting, Franchise, Mobile App, Online Course, Dropshipping, Print on Demand, and Subscription Box. Each scenario includes industry-specific parameters, market data, and ROI calculations. We also create custom scenarios for unique business models and are constantly adding new scenarios based on market trends.'
+      answer: 'Yes! We offer 35+ comprehensive business scenarios covering diverse industries including E-commerce, SaaS, HealthTech, FinTech, EdTech, GreenTech, Logistics, Cybersecurity, AI/ML Services, Blockchain, IoT Services, Digital Marketing, Content Creation, E-commerce Platform Development, Mobile Game Development, Podcast Production, Virtual Reality, Drone Services, 3D Printing, Renewable Energy, Food Delivery, Pet Services, and more. Each scenario includes industry-specific parameters, market data, and ROI calculations. We also create custom scenarios for unique business models and are constantly adding new scenarios based on market trends.'
     }
   ];
 
