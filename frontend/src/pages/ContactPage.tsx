@@ -110,7 +110,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: 'Do you offer custom business scenarios?',
-      answer: 'Currently, we offer 15 pre-built business scenarios covering various industries. We\'re constantly adding new scenarios based on market trends and user feedback.'
+      answer: 'We currently offer a comprehensive ROI calculator with customizable parameters for different investment types. While we don\'t have pre-built industry scenarios, our tool allows you to input your specific business metrics and get personalized ROI calculations. We\'re always working on new features based on user feedback.'
     }
   ];
 
