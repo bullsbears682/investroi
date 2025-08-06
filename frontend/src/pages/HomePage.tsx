@@ -2,15 +2,16 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Calculator, TrendingUp, Target, Shield, Globe, BarChart3,
+  TrendingUp, Target, Shield, Globe, BarChart3,
   ArrowRight, Star, Zap, Users
 } from 'lucide-react';
 import Logo from '../components/Logo';
+import { CalculatorIcon } from '../components/icons/CustomIcons';
 
 const HomePage: React.FC = () => {
   const features = [
     {
-      icon: Calculator,
+      icon: CalculatorIcon,
       title: 'Advanced ROI Calculator',
       description: 'Calculate returns with real-world business scenarios and comprehensive tax analysis across 25 countries.',
       color: 'from-blue-500 to-blue-600'
@@ -105,7 +106,7 @@ const HomePage: React.FC = () => {
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center space-x-2 shadow-lg hover:shadow-xl transition-all"
                 >
-                  <Calculator className="w-5 h-5" />
+                  <CalculatorIcon className="w-5 h-5" />
                   <span>Start Calculating ROI</span>
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
@@ -257,7 +258,7 @@ const HomePage: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center space-x-2 mx-auto shadow-lg hover:shadow-xl transition-all"
               >
-                <Calculator className="w-5 h-5" />
+                <CalculatorIcon className="w-5 h-5" />
                 <span>Get Started Now</span>
                 <ArrowRight className="w-5 h-5" />
               </motion.button>

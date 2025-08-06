@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Calculator, 
   DollarSign, 
   Target,
   ArrowRight,
@@ -14,6 +13,7 @@ import {
   CheckCircle,
   Lightbulb
 } from 'lucide-react';
+import { CalculatorIcon } from '../components/icons/CustomIcons';
 
 const InvestmentGuidePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('basics');
@@ -605,7 +605,7 @@ const InvestmentGuidePage: React.FC = () => {
               to="/calculator"
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
             >
-              <Calculator className="w-4 h-4" />
+              <CalculatorIcon className="w-4 h-4" />
               <span>Start Calculating ROI</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
