@@ -101,6 +101,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 
               {/* Categories List */}
               <div className="max-h-64 overflow-y-auto">
+                <div className="p-2 text-xs text-white/40">
+                  Debug: {filteredCategories.length} categories found
+                </div>
                 {filteredCategories.length === 0 ? (
                   <div className="p-4 text-center text-white/60 text-sm">
                     No categories found
@@ -110,6 +113,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                     <motion.button
                       key={category.id}
                       onClick={() => {
+                        console.log('Category selected:', category.id);
                         onCategorySelect(category.id);
                         setIsOpen(false);
                         setSearchTerm('');
