@@ -114,19 +114,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
     );
   }
 
-  // Show message if no category is selected
-  if (!selectedCategory) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center py-8">
-          <Building2 className="w-12 h-12 text-white/40 mx-auto mb-4" />
-          <p className="text-white/60 text-sm">
-            Please select a business category first to view available scenarios
-          </p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="space-y-6">
