@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { 
   DollarSign, 
   Globe, 
-  Calculator, 
   AlertCircle,
   Info,
   AlertTriangle,
@@ -12,6 +11,7 @@ import {
   Download,
   Shield
 } from 'lucide-react';
+import { CalculatorIcon } from './icons/CustomIcons';
 
 import ExportModal from './ExportModal';
 import { getResearchBasedMarketData } from '../utils/marketResearchData';
@@ -474,7 +474,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           </>
         ) : (
           <>
-            <Calculator className="w-5 h-5" />
+            <CalculatorIcon className="w-5 h-5" />
             <span>Calculate ROI</span>
           </>
         )}

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Calculator, 
   ArrowRight,
   BarChart3,
   AlertTriangle,
@@ -11,6 +10,7 @@ import {
   Search,
   Globe
 } from 'lucide-react';
+import { CalculatorIcon } from '../components/icons/CustomIcons';
 
 const MarketResearchPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('market-analysis');
@@ -489,7 +489,7 @@ const MarketResearchPage: React.FC = () => {
               to="/calculator"
               className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-xl font-semibold border border-white/20 transition-all duration-300 flex items-center justify-center space-x-2"
             >
-              <Calculator className="w-4 h-4" />
+              <CalculatorIcon className="w-4 h-4" />
               <span>Calculate ROI</span>
             </Link>
           </div>

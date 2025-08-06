@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Calculator, 
   ArrowRight,
   BarChart3,
   Users,
@@ -22,6 +21,7 @@ import {
   Palette,
   Gift
 } from 'lucide-react';
+import { CalculatorIcon } from '../components/icons/CustomIcons';
 
 const ScenariosPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -359,7 +359,7 @@ const ScenariosPage: React.FC = () => {
                 to={`/calculator?scenario=${scenario.id}`}
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
               >
-                <Calculator className="w-4 h-4" />
+                <CalculatorIcon className="w-4 h-4" />
                 <span>Calculate ROI</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -385,7 +385,7 @@ const ScenariosPage: React.FC = () => {
               to="/calculator"
               className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300"
             >
-              <Calculator className="w-4 h-4" />
+              <CalculatorIcon className="w-4 h-4" />
               <span>Start Custom Calculation</span>
               <ArrowRight className="w-4 h-4" />
             </Link>

@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Play, 
-  Calculator, 
   TrendingUp, 
   Globe, 
   BarChart3,
@@ -11,6 +10,7 @@ import {
   Shield,
   Target
 } from 'lucide-react';
+import { CalculatorIcon } from '../components/icons/CustomIcons';
 
 const DemoPage: React.FC = () => {
   const [activeDemo, setActiveDemo] = useState<number | null>(null);
@@ -159,7 +159,7 @@ const DemoPage: React.FC = () => {
                     <span className="text-white font-bold text-lg">{demo.id}</span>
                   </div>
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <Calculator className="w-8 h-8 text-white" />
+                    <CalculatorIcon className="w-8 h-8 text-white" />
                   </div>
                 </div>
                 <div className="flex items-center justify-center mb-2">
@@ -228,7 +228,7 @@ const DemoPage: React.FC = () => {
                   onClick={() => handleTryDemo(demo.id)}
                   className="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl font-semibold border border-white/20 transition-all duration-300 flex items-center justify-center space-x-2"
                 >
-                  <Calculator className="w-4 h-4" />
+                  <CalculatorIcon className="w-4 h-4" />
                   <span>Try This Scenario</span>
                 </button>
               </div>
@@ -339,7 +339,7 @@ const DemoPage: React.FC = () => {
                 to="/calculator"
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2"
               >
-                <Calculator className="w-4 h-4" />
+                <CalculatorIcon className="w-4 h-4" />
                 <span>Start Your Calculation</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
