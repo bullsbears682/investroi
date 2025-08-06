@@ -409,6 +409,27 @@ export const CodeIcon: React.FC<IconProps> = ({ size = 24, className = '', color
   </svg>
 );
 
+export const CopyIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Copy icon with investment theme */}
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke={color} strokeWidth="2"/>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Dollar sign overlay */}
+    <text x="15" y="18" textAnchor="middle" fontSize="3" fill={color} fontWeight="bold">$</text>
+  </svg>
+);
+
+export const AlertCircleIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Alert circle with investment theme */}
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <line x1="12" y1="8" x2="12" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <line x1="12" y1="16" x2="12.01" y2="16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Investment warning indicator */}
+    <path d="M8 8l8 8M16 8l-8 8" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.3"/>
+  </svg>
+);
+
 // Export all icons for easy importing
 export const CustomIcons = {
   Home: HomeIcon,
@@ -444,4 +465,6 @@ export const CustomIcons = {
   Maximize: MaximizeIcon,
   Clock: ClockIcon,
   Code: CodeIcon,
+  Copy: CopyIcon,
+  AlertCircle: AlertCircleIcon,
 };
