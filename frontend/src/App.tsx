@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
@@ -51,6 +51,22 @@ const queryClient = new QueryClient({
   },
 });
 
+// Component to conditionally render Header
+const ConditionalHeader = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+  
+  return !isAdminPage ? <Header /> : null;
+};
+
+// Component to conditionally render Footer
+const ConditionalFooter = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+  
+  return !isAdminPage ? <Footer /> : null;
+};
+
 function App() {
   const { isLoading } = useAppStore();
 
@@ -77,7 +93,7 @@ function App() {
 
                   {/* Main content */}
                   <div className="relative z-10">
-                    <Header />
+                    <ConditionalHeader />
                     
                     <main className="container mx-auto px-4 py-8">
                       <Routes>
@@ -100,7 +116,7 @@ function App() {
                       </Routes>
                     </main>
                     
-                    <Footer />
+                    <ConditionalFooter />
                   </div>
 
                   {/* Cookie consent */}
