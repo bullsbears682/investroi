@@ -13,7 +13,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'waiting' | 'active' | 'closed'>('waiting');
+  const [activeTab, setActiveTab] = useState<'waiting' | 'active' | 'closed' | 'resolved'>('waiting');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -113,6 +113,15 @@ const AdminChat: React.FC<AdminChatProps> = () => {
     loadSessions();
   };
 
+  const handleResolveSession = () => {
+    if (!selectedSession) return;
+    
+    chatSystem.resolveSession(selectedSession.id);
+    setSelectedSession(null);
+    setMessages([]);
+    loadSessions();
+  };
+
   const getFilteredSessions = () => {
     switch (activeTab) {
       case 'waiting':
@@ -121,6 +130,8 @@ const AdminChat: React.FC<AdminChatProps> = () => {
         return sessions.filter(s => s.status === 'active');
       case 'closed':
         return sessions.filter(s => s.status === 'closed');
+      case 'resolved':
+        return sessions.filter(s => s.status === 'resolved');
       default:
         return sessions;
     }
@@ -213,6 +224,16 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                 }`}
               >
                 Active ({sessions.filter(s => s.status === 'active').length})
+              </button>
+              <button
+                onClick={() => setActiveTab('resolved')}
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'resolved'
+                    ? 'bg-white/10 text-white border-b-2 border-purple-400'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Resolved ({sessions.filter(s => s.status === 'resolved').length})
               </button>
               <button
                 onClick={() => setActiveTab('closed')}

@@ -11,10 +11,11 @@ export interface ChatMessage {
 
 export interface ChatSession {
   id: string;
+  ticketNumber: string;
   userId: string;
   userName: string;
   userEmail: string;
-  status: 'active' | 'waiting' | 'closed';
+  status: 'active' | 'waiting' | 'closed' | 'resolved';
   createdAt: string;
   lastMessage: string;
   lastActivity: string;
@@ -36,11 +37,15 @@ class ChatSystem {
   private sessionsKey = 'chat_sessions';
   private messagesKey = 'chat_messages';
   private onlineUsersKey = 'online_users';
+  private ticketCounterKey = 'chat_ticket_counter';
 
   // Create a new chat session
   createSession(userId: string, userName: string, userEmail: string): ChatSession {
+    const ticketNumber = this.generateTicketNumber();
+    
     const session: ChatSession = {
       id: this.generateSessionId(),
+      ticketNumber,
       userId,
       userName,
       userEmail,
@@ -106,6 +111,18 @@ class ChatSystem {
     
     if (session) {
       session.status = 'closed';
+      session.lastActivity = new Date().toISOString();
+      this.saveSessions(sessions);
+    }
+  }
+
+  // Resolve a chat session (mark as resolved)
+  resolveSession(sessionId: string): void {
+    const sessions = this.getAllSessions();
+    const session = sessions.find(s => s.id === sessionId);
+    
+    if (session) {
+      session.status = 'resolved';
       session.lastActivity = new Date().toISOString();
       this.saveSessions(sessions);
     }
@@ -274,6 +291,23 @@ class ChatSystem {
   // Generate message ID
   private generateMessageId(): string {
     return 'msg_' + Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  // Generate ticket number
+  private generateTicketNumber(): string {
+    if (typeof window === 'undefined') return 'TICKET-001';
+    
+    try {
+      const currentCounter = localStorage.getItem(this.ticketCounterKey);
+      const counter = currentCounter ? parseInt(currentCounter) : 0;
+      const newCounter = counter + 1;
+      
+      localStorage.setItem(this.ticketCounterKey, newCounter.toString());
+      return `TICKET-${newCounter.toString().padStart(3, '0')}`;
+    } catch (error) {
+      console.error('Error generating ticket number:', error);
+      return 'TICKET-001';
+    }
   }
 }
 
