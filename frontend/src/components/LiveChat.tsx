@@ -75,12 +75,16 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
     toast.success('Chat session started! An admin will respond soon.');
   };
 
-  const selectQuestion = (question: string) => {
+  const selectQuestion = (question: string, e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     setNewMessage(question);
     setShowQuestions(false);
   };
 
-  const startCustomChat = () => {
+  const startCustomChat = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     setShowQuestions(false);
   };
 
@@ -219,8 +223,9 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
                         {preMadeQuestions.map((question, index) => (
                           <button
                             key={index}
-                            onClick={() => selectQuestion(question)}
+                            onClick={(e) => selectQuestion(question, e)}
                             className="w-full text-left p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors"
+                            type="button"
                           >
                             <p className="text-white text-sm">{question}</p>
                           </button>
@@ -230,8 +235,9 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
                       {/* Custom Message Option */}
                       <div className="pt-2">
                         <button
-                          onClick={startCustomChat}
+                          onClick={(e) => startCustomChat(e)}
                           className="w-full p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors"
+                          type="button"
                         >
                           <p className="text-blue-400 text-sm font-medium">Write my own message</p>
                         </button>
