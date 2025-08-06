@@ -6,9 +6,9 @@ import {
   HomeIcon, 
   CalculatorIcon, 
   AnalyticsIcon, 
-  UsersIcon, 
-  SettingsIcon, 
-  MenuIcon
+  MenuIcon,
+  TargetIcon,
+  ShieldIcon
 } from './icons/CustomIcons';
 
 const Header: React.FC = () => {
@@ -18,9 +18,9 @@ const Header: React.FC = () => {
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },
     { name: 'Calculator', href: '/calculator', icon: CalculatorIcon },
-    { name: 'Analytics', href: '/analytics', icon: AnalyticsIcon },
-    { name: 'Users', href: '/users', icon: UsersIcon },
-    { name: 'Settings', href: '/settings', icon: SettingsIcon },
+    { name: 'Scenarios', href: '/scenarios', icon: AnalyticsIcon },
+    { name: 'Demo', href: '/demo', icon: TargetIcon },
+    { name: 'Guide', href: '/investment-guide', icon: ShieldIcon },
   ];
 
   const isActive = (href: string) => location.pathname === href;

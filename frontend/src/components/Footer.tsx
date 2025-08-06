@@ -10,9 +10,9 @@ const Footer: React.FC = () => {
   const footerLinks = {
     product: [
       { name: 'Calculator', href: '/calculator' },
-      { name: 'Analytics', href: '/analytics' },
       { name: 'Scenarios', href: '/scenarios' },
-      { name: 'Guide', href: '/guide' },
+      { name: 'Demo', href: '/demo' },
+      { name: 'Guide', href: '/investment-guide' },
     ],
     company: [
       { name: 'About', href: '/about' },
@@ -21,10 +21,10 @@ const Footer: React.FC = () => {
       { name: 'Terms', href: '/terms' },
     ],
     support: [
-      { name: 'Help Center', href: '/help' },
-      { name: 'Documentation', href: '/docs' },
-      { name: 'API', href: '/api' },
-      { name: 'Status', href: '/status' },
+      { name: 'Market Research', href: '/market-research' },
+      { name: 'Tax Info', href: '/tax-info' },
+      { name: 'Help Center', href: '/contact' },
+      { name: 'Documentation', href: '/investment-guide' },
     ],
   };
 
