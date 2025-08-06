@@ -328,13 +328,29 @@ export const XIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 
 export const MenuIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     {/* Custom menu with investment theme */}
-    <rect x="2" y="2" width="20" height="20" rx="2" stroke={color} strokeWidth="2" fill="none"/>
-    <line x1="6" y1="6" x2="18" y2="6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="6" y1="12" x2="18" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="6" y1="18" x2="18" y2="18" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    {/* Investment chart inside */}
-    <path d="M8 8h8" stroke={color} strokeWidth="1" strokeLinecap="round"/>
-    <path d="M8 10h2" stroke={color} strokeWidth="1" strokeLinecap="round"/>
+    <line x1="3" y1="6" x2="21" y2="6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="3" y1="12" x2="21" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    <line x1="3" y1="18" x2="21" y2="18" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    {/* Investment dots */}
+    <circle cx="6" cy="6" r="1" fill={color} opacity="0.6"/>
+    <circle cx="6" cy="12" r="1" fill={color} opacity="0.6"/>
+    <circle cx="6" cy="18" r="1" fill={color} opacity="0.6"/>
+  </svg>
+);
+
+export const ActivityIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Custom activity indicator with investment theme */}
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2" fill="none"/>
+    <circle cx="12" cy="12" r="6" stroke={color} strokeWidth="1.5" fill="none" opacity="0.6"/>
+    <circle cx="12" cy="12" r="2" fill={color}/>
+    {/* Activity pulses */}
+    <circle cx="12" cy="12" r="8" stroke={color} strokeWidth="1" fill="none" opacity="0.3">
+      <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    {/* Investment chart lines */}
+    <path d="M6 16l2-2 2 1 2-1 2 2" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none"/>
   </svg>
 );
 
@@ -367,4 +383,5 @@ export const CustomIcons = {
   ArrowRight: ArrowRightIcon,
   X: XIcon,
   Menu: MenuIcon,
+  Activity: ActivityIcon,
 };

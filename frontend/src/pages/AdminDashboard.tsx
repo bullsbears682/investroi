@@ -1,30 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useNotifications } from '../contexts/NotificationContext';
-import { userManager } from '../utils/userManager';
-import { contactManager } from '../utils/contactManager';
-import { chatManager } from '../utils/chatManager';
+import { userManager } from '../utils/userManagement';
+import { contactStorage } from '../utils/contactStorage';
+import { chatSystem } from '../utils/chatSystem';
 import Logo from '../components/Logo';
 import { 
   ArrowLeftIcon,
   UsersIcon,
-  MessageCircleIcon,
   AnalyticsIcon,
-  SettingsIcon,
   DownloadIcon,
   ShieldIcon,
   HardDriveIcon,
-  CheckCircleIcon,
   TrendingUpIcon,
-  EyeIcon,
-  TrashIcon,
-  SendIcon,
-  SearchIcon,
-  AlertTriangleIcon,
-  InfoIcon,
-  DatabaseIcon,
-  ServerIcon,
   ActivityIcon
 } from '../components/icons/CustomIcons';
 
@@ -50,7 +39,6 @@ interface ActivityItem {
 }
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
   const [adminStats, setAdminStats] = useState<Analytics>({
     totalUsers: 0,
     activeUsers: 0,
@@ -64,17 +52,15 @@ const AdminDashboard: React.FC = () => {
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const { addNotification } = useNotifications();
-  const location = useLocation();
 
   // Load admin statistics
   const loadAdminStats = () => {
     try {
       const allUsers = userManager.getAllUsers();
-      const allContacts = contactManager.getAllContacts();
-      const allChats = chatManager.getAllChats();
+      const allContacts = contactStorage.getSubmissions();
 
       const totalUsers = allUsers.length;
-      const activeUsers = allUsers.filter(user => {
+      const activeUsers = allUsers.filter((user: any) => {
         const lastActive = new Date(user.lastActive || user.registrationDate);
         const daysSinceActive = (Date.now() - lastActive.getTime()) / (1000 * 60 * 60 * 24);
         return daysSinceActive <= 30;
@@ -88,10 +74,10 @@ const AdminDashboard: React.FC = () => {
       const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
       const sixtyDaysAgo = now - 60 * 24 * 60 * 60 * 1000;
 
-      const recentUsers = allUsers.filter(user => 
+      const recentUsers = allUsers.filter((user: any) => 
         new Date(user.registrationDate).getTime() > thirtyDaysAgo
       ).length;
-      const previousUsers = allUsers.filter(user => {
+      const previousUsers = allUsers.filter((user: any) => {
         const regDate = new Date(user.registrationDate).getTime();
         return regDate > sixtyDaysAgo && regDate <= thirtyDaysAgo;
       }).length;
@@ -127,8 +113,8 @@ const AdminDashboard: React.FC = () => {
       // Get real user registrations (last 7 days)
       const allUsers = userManager.getAllUsers();
       const recentRegistrations = allUsers
-        .filter(user => new Date(user.registrationDate) > new Date(now - 7 * 24 * 60 * 60 * 1000))
-        .map(user => ({
+        .filter((user: any) => new Date(user.registrationDate) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+        .map((user: any) => ({
           id: `reg-${user.id}`,
           type: 'registration' as const,
           description: `New user registration: ${user.name}`,
@@ -136,7 +122,7 @@ const AdminDashboard: React.FC = () => {
           user: user.name,
           color: 'bg-green-400'
         }))
-        .sort((a, b) => b.timestamp - a.timestamp)
+        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
         .slice(0, 3);
 
       activities.push(...recentRegistrations);
@@ -196,8 +182,8 @@ const AdminDashboard: React.FC = () => {
     try {
       const exportData = {
         users: userManager.getAllUsers(),
-        contacts: contactManager.getAllContacts(),
-        chats: chatManager.getAllChats(),
+        contacts: contactStorage.getSubmissions(),
+        chats: chatSystem.getAllSessions(),
         analytics: adminStats,
         exportDate: new Date().toISOString(),
       };
@@ -214,19 +200,15 @@ const AdminDashboard: React.FC = () => {
       URL.revokeObjectURL(url);
 
       addNotification({
-        id: Date.now().toString(),
         type: 'success',
         title: 'Data Exported Successfully',
         message: 'All data has been exported to JSON file',
-        action: {
-          label: 'View Data',
-          onClick: () => window.open('/admin/data', '_blank')
-        }
+        redirectTo: '/admin/data',
+        redirectLabel: 'View Data'
       });
     } catch (error) {
       console.error('Export failed:', error);
       addNotification({
-        id: Date.now().toString(),
         type: 'error',
         title: 'Export Failed',
         message: 'Failed to export data'
@@ -244,8 +226,8 @@ const AdminDashboard: React.FC = () => {
       const systemHealth = {
         timestamp: new Date().toISOString(),
         performance: {
-          loadTime: performance.getEntriesByType('navigation')[0]?.loadEventEnd || 0,
-          domContentLoaded: performance.getEntriesByType('navigation')[0]?.domContentLoadedEventEnd || 0,
+          loadTime: (performance.getEntriesByType('navigation')[0] as any)?.loadEventEnd || 0,
+          domContentLoaded: (performance.getEntriesByType('navigation')[0] as any)?.domContentLoadedEventEnd || 0,
           firstPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime || 0,
         },
         memory: memory ? {
@@ -276,19 +258,15 @@ const AdminDashboard: React.FC = () => {
       URL.revokeObjectURL(url);
 
       addNotification({
-        id: Date.now().toString(),
         type: 'success',
         title: 'System Health Report Generated',
         message: 'System health data has been exported',
-        action: {
-          label: 'View System',
-          onClick: () => window.open('/admin/system', '_blank')
-        }
+        redirectTo: '/admin/system',
+        redirectLabel: 'View System'
       });
     } catch (error) {
       console.error('System health report failed:', error);
       addNotification({
-        id: Date.now().toString(),
         type: 'error',
         title: 'System Health Report Failed',
         message: 'Failed to generate system health report'
@@ -304,8 +282,8 @@ const AdminDashboard: React.FC = () => {
         timestamp: Date.now(),
         data: {
           users: userManager.getAllUsers(),
-          contacts: contactManager.getAllContacts(),
-          chats: chatManager.getAllChats(),
+          contacts: contactStorage.getSubmissions(),
+          chats: chatSystem.getAllSessions(),
           analytics: adminStats,
         }
       };
@@ -344,19 +322,15 @@ const AdminDashboard: React.FC = () => {
       localStorage.setItem('databaseBackups', JSON.stringify(existingBackups.slice(0, 10))); // Keep last 10
 
       addNotification({
-        id: Date.now().toString(),
         type: 'success',
         title: 'Database Backup Created',
         message: `Backup completed with ${compressionRatio}% compression`,
-        action: {
-          label: 'View Backups',
-          onClick: () => window.open('/admin/backups', '_blank')
-        }
+        redirectTo: '/admin/backups',
+        redirectLabel: 'View Backups'
       });
     } catch (error) {
       console.error('Backup failed:', error);
       addNotification({
-        id: Date.now().toString(),
         type: 'error',
         title: 'Backup Failed',
         message: 'Failed to create database backup'
@@ -402,19 +376,15 @@ const AdminDashboard: React.FC = () => {
       URL.revokeObjectURL(url);
 
       addNotification({
-        id: Date.now().toString(),
         type: 'success',
         title: 'Analytics Report Generated',
         message: 'Comprehensive analytics report has been created',
-        action: {
-          label: 'View Analytics',
-          onClick: () => window.open('/admin/analytics', '_blank')
-        }
+        redirectTo: '/admin/analytics',
+        redirectLabel: 'View Analytics'
       });
     } catch (error) {
       console.error('Report generation failed:', error);
       addNotification({
-        id: Date.now().toString(),
         type: 'error',
         title: 'Report Generation Failed',
         message: 'Failed to generate analytics report'
@@ -426,15 +396,6 @@ const AdminDashboard: React.FC = () => {
     loadAdminStats();
     loadRecentActivity();
   }, []);
-
-  // Handle URL parameters for tab switching
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const tabParam = params.get('tab');
-    if (tabParam && ['overview', 'users', 'contacts', 'analytics', 'settings'].includes(tabParam)) {
-      setActiveTab(tabParam);
-    }
-  }, [location.search]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -630,7 +591,7 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-purple-400 text-sm font-medium">ROI analysis</p>
               </div>
               <div className="p-4 bg-white/10 rounded-2xl">
-                <CalculatorIcon className="w-8 h-8 text-purple-400" />
+                <AnalyticsIcon className="w-8 h-8 text-purple-400" />
               </div>
             </div>
           </motion.div>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { X } from 'lucide-react';
 import Logo from './Logo';
 import { 
   HomeIcon, 
@@ -9,11 +8,7 @@ import {
   AnalyticsIcon, 
   UsersIcon, 
   SettingsIcon, 
-  ShieldIcon, 
-  TargetIcon, 
-  TrendingUpIcon,
-  MenuIcon,
-  XIcon
+  MenuIcon
 } from './icons/CustomIcons';
 
 const Header: React.FC = () => {
