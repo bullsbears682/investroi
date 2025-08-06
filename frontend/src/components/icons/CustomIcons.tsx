@@ -338,6 +338,48 @@ export const MenuIcon: React.FC<IconProps> = ({ size = 24, className = '', color
   </svg>
 );
 
+export const MessageSquareIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Custom message square with investment theme */}
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Investment chart inside message */}
+    <path d="M8 9h8M8 13h4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Dollar sign indicator */}
+    <circle cx="18" cy="7" r="2" fill={color} opacity="0.8"/>
+    <text x="18" y="9" textAnchor="middle" fontSize="3" fill="white" fontWeight="bold">$</text>
+  </svg>
+);
+
+export const MinimizeIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Custom minimize with investment theme */}
+    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Investment arrow */}
+    <path d="M12 8l-4 4 4 4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const MaximizeIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Custom maximize with investment theme */}
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Investment arrow */}
+    <path d="M12 16l4-4-4-4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const ClockIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Custom clock with investment theme */}
+    <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+    <polyline points="12,6 12,12 16,14" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Investment time indicator */}
+    <path d="M12 2v2M12 20v2M20 12h-2M6 12H4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    {/* Dollar sign at center */}
+    <text x="12" y="16" textAnchor="middle" fontSize="3" fill={color} fontWeight="bold">$</text>
+  </svg>
+);
+
 export const ActivityIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     {/* Custom activity indicator with investment theme */}
@@ -384,4 +426,8 @@ export const CustomIcons = {
   X: XIcon,
   Menu: MenuIcon,
   Activity: ActivityIcon,
+  MessageSquare: MessageSquareIcon,
+  Minimize: MinimizeIcon,
+  Maximize: MaximizeIcon,
+  Clock: ClockIcon,
 };

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  MessageSquare, 
-  Send, 
-  X, 
-  Minimize2,
-  Maximize2,
-  Clock
-} from 'lucide-react';
+  MessageSquareIcon, 
+  SendIcon, 
+  XIcon, 
+  MinimizeIcon,
+  MaximizeIcon,
+  ClockIcon
+} from './icons/CustomIcons';
 import { toast } from 'react-hot-toast';
 import { chatSystem, ChatSession, ChatMessage } from '../utils/chatSystem';
 import { userManager } from '../utils/userManagement';
@@ -108,7 +108,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
           onClick={() => setIsMinimized(false)}
           className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg transition-all"
         >
-          <Maximize2 className="w-5 h-5" />
+          <MaximizeIcon className="w-5 h-5" />
         </motion.button>
       ) : (
         <motion.div
@@ -120,7 +120,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
           <div className="flex items-center justify-between p-4 border-b border-white/20">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-white" />
+                <MessageSquareIcon className="w-4 h-4 text-white" />
               </div>
               <div>
                 <h3 className="text-white font-medium">Live Support</h3>
@@ -134,13 +134,13 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
                 onClick={() => setIsMinimized(true)}
                 className="text-white/60 hover:text-white transition-colors p-1"
               >
-                <Minimize2 className="w-4 h-4" />
+                <MinimizeIcon className="w-4 h-4" />
               </button>
               <button
                 onClick={onToggle}
                 className="text-white/60 hover:text-white transition-colors p-1"
               >
-                <X className="w-4 h-4" />
+                <XIcon className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -151,7 +151,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
               // Welcome Screen
               <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
                 <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
-                  <MessageSquare className="w-8 h-8 text-blue-400" />
+                  <MessageSquareIcon className="w-8 h-8 text-blue-400" />
                 </div>
                 <h3 className="text-white font-medium mb-2">Need Help?</h3>
                 <p className="text-white/60 text-sm mb-6">
@@ -188,7 +188,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
                   {messages.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Clock className="w-6 h-6 text-blue-400" />
+                        <ClockIcon className="w-6 h-6 text-blue-400" />
                       </div>
                       <p className="text-white/60 text-sm">Waiting for admin response...</p>
                       <p className="text-white/40 text-xs mt-2">We'll get back to you soon!</p>
@@ -236,7 +236,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
                       disabled={!newMessage.trim()}
                       className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
                     >
-                      <Send className="w-4 h-4" />
+                      <SendIcon className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="flex items-center justify-between mt-2">
