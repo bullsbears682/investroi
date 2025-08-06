@@ -32,7 +32,7 @@ interface Analytics {
 
 interface ActivityItem {
   id: string;
-  type: 'registration' | 'chat' | 'backup';
+  type: 'registration' | 'chat' | 'backup' | 'ticket';
   description: string;
   timestamp: number;
   user?: string;
@@ -129,25 +129,22 @@ const AdminDashboard: React.FC = () => {
 
       activities.push(...recentRegistrations);
 
-      // Get real chat activity (last 24 hours)
-      const storedMessages = localStorage.getItem('adminChatMessages');
-      if (storedMessages) {
-        const chatMessages = JSON.parse(storedMessages);
-        const recentChats = chatMessages
-          .filter((msg: any) => new Date(msg.timestamp) > new Date(now - 24 * 60 * 60 * 1000))
-          .map((msg: any) => ({
-            id: `chat-${msg.id}`,
-            type: 'chat' as const,
-            description: `Chat message from ${msg.userName}`,
-            timestamp: new Date(msg.timestamp).getTime(),
-            user: msg.userName,
-            color: 'bg-yellow-400'
-          }))
-          .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
-          .slice(0, 3);
+      // Get real ticket creation activity (last 7 days)
+      const allSessions = chatSystem.getAllSessions();
+      const recentTickets = allSessions
+        .filter((session: any) => new Date(session.createdAt) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+        .map((session: any) => ({
+          id: `ticket-${session.id}`,
+          type: 'ticket' as const,
+          description: `New ticket created: ${session.ticketNumber}`,
+          timestamp: new Date(session.createdAt).getTime(),
+          user: session.userName,
+          color: 'bg-blue-400'
+        }))
+        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
+        .slice(0, 5);
 
-        activities.push(...recentChats);
-      }
+      activities.push(...recentTickets);
 
       // Get real backup activity (last 7 days)
       const storedBackups = localStorage.getItem('databaseBackups');
