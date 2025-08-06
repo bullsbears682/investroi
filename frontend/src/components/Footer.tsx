@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Calculator, Mail, Twitter, Linkedin, Github } from 'lucide-react';
+import { Mail, Twitter, Linkedin, Github } from 'lucide-react';
 import Logo from './Logo';
 
 const Footer: React.FC = () => {

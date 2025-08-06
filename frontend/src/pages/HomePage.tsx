@@ -2,18 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Calculator, 
-  BarChart3, 
-  FileText, 
-  Shield, 
-  TrendingUp, 
-  Globe, 
-  Users, 
-  Zap,
-  ArrowRight,
-
-  Star
+  Calculator, TrendingUp, Target, Shield, Globe, BarChart3,
+  ArrowRight, Star, Zap, Users
 } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const HomePage: React.FC = () => {
   const features = [
@@ -30,7 +22,7 @@ const HomePage: React.FC = () => {
       color: 'from-purple-500 to-purple-600'
     },
     {
-      icon: FileText,
+      icon: Target,
       title: 'Professional Reports',
       description: 'Generate comprehensive PDF reports with charts, analysis, and recommendations for stakeholders.',
       color: 'from-green-500 to-green-600'
@@ -212,8 +204,9 @@ const HomePage: React.FC = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Trusted by Investment Professionals
             </h2>
-            <p className="text-xl text-white/70">
-              See what our users say about InvestWise Pro
+            <p className="text-xl text-white/70 flex items-center justify-center space-x-2">
+              <span>See what our users say about</span>
+              <Logo size="md" showText={true} />
             </p>
           </motion.div>
           

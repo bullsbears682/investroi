@@ -1,21 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Target, 
-  Heart, 
-  Globe, 
-  Shield, 
-  Calculator,
-  BarChart3,
-  FileText,
-  CheckCircle,
-  Download,
-  Search,
-  Lock,
-  Database,
-  Calendar,
-  TrendingUp
+  CheckCircle, Calculator, Globe, BarChart3, FileText, 
+  Shield, TrendingUp, Target, Heart, Download, Search, Database, Calendar
 } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const AboutPage: React.FC = () => {
   const values = [
@@ -73,7 +62,7 @@ const AboutPage: React.FC = () => {
       highlights: ['25 countries', 'Real-time updates', 'Tax optimization', 'Compliance data']
     },
     {
-      icon: Lock,
+      icon: Shield,
       title: 'Secure & Private',
       description: 'Enterprise-grade security with data encryption, secure transmission, and complete user privacy protection.',
       highlights: ['Data encryption', 'Privacy protection', 'Secure transmission', 'GDPR compliant']
@@ -197,8 +186,9 @@ const AboutPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              About <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">InvestWise Pro</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 flex items-center justify-center space-x-4">
+              <span>About</span>
+              <Logo size="xl" showText={true} />
             </h1>
             <p className="text-xl text-white/80 max-w-3xl mx-auto">
               We're on a mission to democratize professional investment analysis, making sophisticated ROI calculations 
