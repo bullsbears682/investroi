@@ -15,7 +15,8 @@ import {
   ShieldIcon,
   HardDriveIcon,
   TrendingUpIcon,
-  ActivityIcon
+  ActivityIcon,
+  CodeIcon
 } from '../components/icons/CustomIcons';
 
 interface Analytics {
@@ -39,6 +40,16 @@ interface ActivityItem {
   color: string;
 }
 
+interface ApiKey {
+  id: string;
+  key: string;
+  name: string;
+  created: number;
+  lastUsed?: number;
+  isActive: boolean;
+  usageCount: number;
+}
+
 const AdminDashboard: React.FC = () => {
   const [adminStats, setAdminStats] = useState<Analytics>({
     totalUsers: 0,
@@ -52,7 +63,10 @@ const AdminDashboard: React.FC = () => {
     bounceRate: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [newApiKeyName, setNewApiKeyName] = useState('');
   const { addNotification } = useNotifications();
 
   // Load admin statistics
@@ -173,6 +187,79 @@ const AdminDashboard: React.FC = () => {
       setRecentActivity(sortedActivities);
     } catch (error) {
       console.error('Failed to load recent activity:', error);
+    }
+  };
+
+  // Load API keys
+  const loadApiKeys = () => {
+    try {
+      const storedKeys = localStorage.getItem('api_keys');
+      if (storedKeys) {
+        setApiKeys(JSON.parse(storedKeys));
+      }
+    } catch (error) {
+      console.error('Error loading API keys:', error);
+    }
+  };
+
+  // Generate new API key
+  const generateApiKey = () => {
+    if (!newApiKeyName.trim()) {
+      addNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Please enter a name for the API key'
+      });
+      return;
+    }
+
+    const newKey: ApiKey = {
+      id: `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      key: `iw_${Math.random().toString(36).substr(2, 32)}_${Date.now().toString(36)}`,
+      name: newApiKeyName.trim(),
+      created: Date.now(),
+      isActive: true,
+      usageCount: 0
+    };
+
+    const updatedKeys = [...apiKeys, newKey];
+    setApiKeys(updatedKeys);
+    localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
+    
+    setNewApiKeyName('');
+    setShowApiKeyModal(false);
+    addNotification({
+      type: 'success',
+      title: 'Success',
+      message: 'API key generated successfully'
+    });
+  };
+
+  // Toggle API key status
+  const toggleApiKeyStatus = (keyId: string) => {
+    const updatedKeys = apiKeys.map(key => 
+      key.id === keyId ? { ...key, isActive: !key.isActive } : key
+    );
+    setApiKeys(updatedKeys);
+    localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
+    addNotification({
+      type: 'success',
+      title: 'Success',
+      message: 'API key status updated'
+    });
+  };
+
+  // Delete API key
+  const deleteApiKey = (keyId: string) => {
+    if (window.confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+      const updatedKeys = apiKeys.filter(key => key.id !== keyId);
+      setApiKeys(updatedKeys);
+      localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
+      addNotification({
+        type: 'success',
+        title: 'Success',
+        message: 'API key deleted successfully'
+      });
     }
   };
 
@@ -394,6 +481,7 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     loadAdminStats();
     loadRecentActivity();
+    loadApiKeys();
   }, []);
 
   return (
@@ -538,6 +626,25 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowApiKeyModal(true)}
+            className="group relative bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm font-medium mb-1">API Keys</p>
+                <p className="text-3xl lg:text-4xl font-bold text-white">{apiKeys.length}</p>
+                <p className="text-indigo-400 text-sm font-medium">Manage</p>
+              </div>
+              <div className="p-4 bg-white/10 rounded-2xl">
+                <CodeIcon className="w-8 h-8 text-indigo-400" />
+              </div>
+            </div>
+          </motion.button>
         </motion.div>
 
         {/* Overview Stats */}
@@ -647,6 +754,139 @@ const AdminDashboard: React.FC = () => {
             )}
           </div>
         </motion.div>
+
+        {/* API Key Management Modal */}
+        {showApiKeyModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowApiKeyModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white">API Key Management</h3>
+                <button
+                  onClick={() => setShowApiKeyModal(false)}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Generate New API Key */}
+              <div className="mb-6 p-4 bg-white/5 rounded-lg">
+                <h4 className="text-lg font-semibold text-white mb-3">Generate New API Key</h4>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Enter API key name (e.g., 'Production App')"
+                    value={newApiKeyName}
+                    onChange={(e) => setNewApiKeyName(e.target.value)}
+                    className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400"
+                  />
+                  <button
+                    onClick={generateApiKey}
+                    className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                  >
+                    Generate
+                  </button>
+                </div>
+              </div>
+
+              {/* API Keys List */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-white">Your API Keys</h4>
+                {apiKeys.length > 0 ? (
+                  apiKeys.map((apiKey) => (
+                    <motion.div
+                      key={apiKey.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-white/5 rounded-lg border border-white/10"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h5 className="text-white font-semibold">{apiKey.name}</h5>
+                          <p className="text-white/60 text-sm">
+                            Created: {new Date(apiKey.created).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            apiKey.isActive 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-red-500/20 text-red-400'
+                          }`}>
+                            {apiKey.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                          <button
+                            onClick={() => toggleApiKeyStatus(apiKey.id)}
+                            className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-sm transition-colors"
+                          >
+                            {apiKey.isActive ? 'Deactivate' : 'Activate'}
+                          </button>
+                          <button
+                            onClick={() => deleteApiKey(apiKey.id)}
+                            className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded text-sm transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/60 text-sm">API Key:</span>
+                          <code className="flex-1 px-3 py-1 bg-white/10 rounded text-sm text-white font-mono break-all">
+                            {apiKey.key}
+                          </code>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(apiKey.key);
+                              addNotification({
+                                type: 'success',
+                                title: 'Copied!',
+                                message: 'API key copied to clipboard'
+                              });
+                            }}
+                            className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 rounded text-sm transition-colors"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 text-sm text-white/60">
+                          <span>Usage: {apiKey.usageCount} requests</span>
+                          {apiKey.lastUsed && (
+                            <span>Last used: {new Date(apiKey.lastUsed).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="text-white/60 text-center py-8">No API keys generated yet</p>
+                )}
+              </div>
+
+              {/* Usage Instructions */}
+              <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <h4 className="text-lg font-semibold text-blue-400 mb-2">How to Use Your API Keys</h4>
+                <div className="space-y-2 text-sm text-white/80">
+                  <p>• Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded">Authorization: Bearer YOUR_API_KEY</code></p>
+                  <p>• Make requests to: <code className="bg-white/10 px-2 py-1 rounded">https://api.investwisepro.com/v1/calculator/roi</code></p>
+                  <p>• Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded">npm install investwise-calculator-sdk</code></p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
