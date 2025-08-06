@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Users, Mail, Phone, Calendar, Eye, Edit, Trash2, X, Save, Send } from 'lucide-react';
+import { ArrowLeft, Database, Users, Mail, Phone, Calendar, Eye, Trash2, X, Send } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 
 interface User {
@@ -33,10 +33,8 @@ const AdminData: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', email: '' });
   const [replyMessage, setReplyMessage] = useState('');
 
   useEffect(() => {
@@ -76,11 +74,6 @@ const AdminData: React.FC = () => {
         setSelectedUser(user);
         setIsViewModalOpen(true);
         break;
-      case 'edit':
-        setSelectedUser(user);
-        setEditForm({ name: user.name, email: user.email });
-        setIsEditModalOpen(true);
-        break;
       case 'delete':
         setSelectedUser(user);
         setIsDeleteModalOpen(true);
@@ -107,35 +100,6 @@ const AdminData: React.FC = () => {
         setIsDeleteModalOpen(true);
         break;
     }
-  };
-
-  const handleEditUser = () => {
-    if (!selectedUser) return;
-
-    // Update user in localStorage
-    const allUsers = userManager.getAllUsers();
-    const userIndex = allUsers.findIndex(u => u.id === selectedUser.id);
-    
-    if (userIndex !== -1) {
-      allUsers[userIndex] = {
-        ...allUsers[userIndex],
-        name: editForm.name,
-        email: editForm.email
-      };
-      
-      localStorage.setItem('registered_users', JSON.stringify(allUsers));
-      
-      // Update local state
-      setUsers(users.map(u => 
-        u.id === selectedUser.id 
-          ? { ...u, name: editForm.name, email: editForm.email }
-          : u
-      ));
-    }
-
-    setIsEditModalOpen(false);
-    setSelectedUser(null);
-    setEditForm({ name: '', email: '' });
   };
 
   const handleDeleteUser = () => {
@@ -190,12 +154,10 @@ const AdminData: React.FC = () => {
 
   const closeModals = () => {
     setIsViewModalOpen(false);
-    setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setIsReplyModalOpen(false);
     setSelectedUser(null);
     setSelectedContact(null);
-    setEditForm({ name: '', email: '' });
     setReplyMessage('');
   };
 
@@ -296,13 +258,6 @@ const AdminData: React.FC = () => {
                             title="View Details"
                           >
                             <Eye size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleUserAction('edit', user.id)}
-                            className="p-1 text-yellow-400 hover:text-yellow-300 transition-colors"
-                            title="Edit User"
-                          >
-                            <Edit size={16} />
                           </button>
                           <button
                             onClick={() => handleUserAction('delete', user.id)}
@@ -483,58 +438,6 @@ const AdminData: React.FC = () => {
                   </div>
                 </>
               )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {isEditModalOpen && selectedUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Edit User</h3>
-              <button
-                onClick={closeModals}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-white/60 text-sm">Name</label>
-                <input
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="text-white/60 text-sm">Email</label>
-                <input
-                  type="email"
-                  value={editForm.email}
-                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex space-x-3 pt-4">
-                <button
-                  onClick={handleEditUser}
-                  className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  <Save size={16} />
-                  <span>Save</span>
-                </button>
-                <button
-                  onClick={closeModals}
-                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
             </div>
           </div>
         </div>
