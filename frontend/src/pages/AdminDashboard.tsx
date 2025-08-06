@@ -20,7 +20,9 @@ import {
   Trash2,
   Search,
   Calendar,
-  Target
+  Target,
+  Menu,
+  X
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -78,6 +80,7 @@ const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'contacts' | 'analytics' | 'settings'>('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -89,7 +92,7 @@ const AdminDashboard: React.FC = () => {
       const activeUsers = userManager.getActiveUsers();
       
       // Mock data for demonstration
-             const mockUsers: User[] = allUsers.map((user) => ({
+      const mockUsers: User[] = allUsers.map((user) => ({
         id: user.id,
         name: user.name,
         email: user.email,
@@ -214,43 +217,55 @@ const AdminDashboard: React.FC = () => {
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      onClick={() => setActiveTab(tab as any)}
-      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+      onClick={() => {
+        setActiveTab(tab as any);
+        setMobileMenuOpen(false);
+      }}
+      className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all text-sm ${
         activeTab === tab
           ? 'bg-white/20 text-white border border-white/30'
           : 'bg-white/10 text-white/60 hover:bg-white/15'
       }`}
     >
       <Icon className="w-4 h-4" />
-      <span>{label}</span>
+      <span className="hidden sm:inline">{label}</span>
     </motion.button>
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-      {/* Header */}
+      {/* Mobile Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/10 backdrop-blur-lg border-b border-white/20 p-6"
+        className="bg-white/10 backdrop-blur-lg border-b border-white/20 p-4 lg:p-6"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
+          <div className="flex items-center space-x-3 lg:space-x-4">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <Shield className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-              <p className="text-white/60">System administration and analytics</p>
+              <h1 className="text-lg lg:text-2xl font-bold text-white">Admin Dashboard</h1>
+              <p className="text-white/60 text-xs lg:text-sm">System administration and analytics</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 lg:space-x-4">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+            </button>
+
+            {/* Desktop Settings Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveTab('settings')}
-              className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
+              className="hidden lg:flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
             >
               <Settings className="w-4 h-4" />
               <span>Settings</span>
@@ -259,17 +274,35 @@ const AdminDashboard: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowLogout(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all"
+              className="flex items-center space-x-2 px-3 lg:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all text-sm"
             >
               <LogOut className="w-4 h-4" />
-              <span>Logout</span>
+              <span className="hidden sm:inline">Logout</span>
             </motion.button>
           </div>
         </div>
       </motion.div>
 
-      {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="lg:hidden bg-white/10 backdrop-blur-lg border-b border-white/20"
+        >
+          <div className="p-4 space-y-2">
+            <TabButton tab="overview" icon={BarChart3} label="Overview" />
+            <TabButton tab="users" icon={Users} label="Users" />
+            <TabButton tab="contacts" icon={Mail} label="Contacts" />
+            <TabButton tab="analytics" icon={TrendingUp} label="Analytics" />
+            <TabButton tab="settings" icon={Settings} label="Settings" />
+          </div>
+        </motion.div>
+      )}
+
+      {/* Desktop Navigation Tabs */}
+      <div className="hidden lg:block max-w-7xl mx-auto px-6 py-4">
         <div className="flex flex-wrap gap-2">
           <TabButton tab="overview" icon={BarChart3} label="Overview" />
           <TabButton tab="users" icon={Users} label="Users" />
@@ -279,13 +312,13 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Test Buttons */}
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex justify-center space-x-4">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleComprehensiveTest}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-all"
+            className="flex items-center justify-center space-x-2 px-4 lg:px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-all text-sm"
           >
             <CheckCircle className="w-4 h-4" />
             <span>1 - Comprehensive Test</span>
@@ -295,7 +328,7 @@ const AdminDashboard: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleTestFeatures}
-            className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-all"
+            className="flex items-center justify-center space-x-2 px-4 lg:px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-all text-sm"
           >
             <Settings className="w-4 h-4" />
             <span>2 - Test Features</span>
@@ -304,23 +337,23 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8">
         {activeTab === 'overview' && (
-          <div className="space-y-8">
+          <div className="space-y-6 lg:space-y-8">
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Total Users</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.totalUsers}</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Total Users</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.totalUsers}</p>
                   </div>
-                  <Users className="w-8 h-8 text-blue-400" />
+                  <Users className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
                 </div>
               </motion.div>
 
@@ -328,14 +361,14 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Active Users</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.activeUsers}</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Active Users</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.activeUsers}</p>
                   </div>
-                  <Activity className="w-8 h-8 text-green-400" />
+                  <Activity className="w-6 h-6 lg:w-8 lg:h-8 text-green-400" />
                 </div>
               </motion.div>
 
@@ -343,14 +376,14 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Total Calculations</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.totalCalculations}</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Total Calculations</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.totalCalculations}</p>
                   </div>
-                  <BarChart3 className="w-8 h-8 text-purple-400" />
+                  <BarChart3 className="w-6 h-6 lg:w-8 lg:h-8 text-purple-400" />
                 </div>
               </motion.div>
 
@@ -358,14 +391,14 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Total Exports</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.totalExports}</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Total Exports</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.totalExports}</p>
                   </div>
-                  <Download className="w-8 h-8 text-orange-400" />
+                  <Download className="w-6 h-6 lg:w-8 lg:h-8 text-orange-400" />
                 </div>
               </motion.div>
 
@@ -373,14 +406,14 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Revenue</p>
-                    <p className="text-2xl font-bold text-white">${adminStats.revenue.toFixed(2)}</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Revenue</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">${adminStats.revenue.toFixed(2)}</p>
                   </div>
-                  <DollarSign className="w-8 h-8 text-green-400" />
+                  <DollarSign className="w-6 h-6 lg:w-8 lg:h-8 text-green-400" />
                 </div>
               </motion.div>
 
@@ -388,31 +421,31 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Growth Rate</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.growthRate}%</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Growth Rate</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.growthRate}%</p>
                   </div>
-                  <TrendingUp className="w-8 h-8 text-blue-400" />
+                  <TrendingUp className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
                 </div>
               </motion.div>
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('users')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 hover:bg-white/15 transition-all"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
               >
-                <div className="flex items-center space-x-3">
-                  <Users className="w-6 h-6 text-blue-400" />
+                <div className="flex items-center space-x-2 lg:space-x-3">
+                  <Users className="w-5 h-5 lg:w-6 lg:h-6 text-blue-400" />
                   <div className="text-left">
-                    <p className="text-white font-medium">Manage Users</p>
-                    <p className="text-white/60 text-sm">{users.length} total users</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Manage Users</p>
+                    <p className="text-white/60 text-xs lg:text-sm">{users.length} total users</p>
                   </div>
                 </div>
               </motion.button>
@@ -421,13 +454,13 @@ const AdminDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('contacts')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 hover:bg-white/15 transition-all"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
               >
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-6 h-6 text-green-400" />
+                <div className="flex items-center space-x-2 lg:space-x-3">
+                  <Mail className="w-5 h-5 lg:w-6 lg:h-6 text-green-400" />
                   <div className="text-left">
-                    <p className="text-white font-medium">Contact Messages</p>
-                    <p className="text-white/60 text-sm">{contacts.length} messages</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Contact Messages</p>
+                    <p className="text-white/60 text-xs lg:text-sm">{contacts.length} messages</p>
                   </div>
                 </div>
               </motion.button>
@@ -436,13 +469,13 @@ const AdminDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('analytics')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 hover:bg-white/15 transition-all"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
               >
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="w-6 h-6 text-purple-400" />
+                <div className="flex items-center space-x-2 lg:space-x-3">
+                  <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400" />
                   <div className="text-left">
-                    <p className="text-white font-medium">Analytics</p>
-                    <p className="text-white/60 text-sm">Detailed insights</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Analytics</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Detailed insights</p>
                   </div>
                 </div>
               </motion.button>
@@ -451,13 +484,13 @@ const AdminDashboard: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab('settings')}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 hover:bg-white/15 transition-all"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 lg:p-4 hover:bg-white/15 transition-all"
               >
-                <div className="flex items-center space-x-3">
-                  <Settings className="w-6 h-6 text-orange-400" />
+                <div className="flex items-center space-x-2 lg:space-x-3">
+                  <Settings className="w-5 h-5 lg:w-6 lg:h-6 text-orange-400" />
                   <div className="text-left">
-                    <p className="text-white font-medium">Settings</p>
-                    <p className="text-white/60 text-sm">System configuration</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Settings</p>
+                    <p className="text-white/60 text-xs lg:text-sm">System configuration</p>
                   </div>
                 </div>
               </motion.button>
@@ -466,9 +499,9 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'users' && (
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             {/* Search and Filter */}
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/60" />
@@ -477,14 +510,14 @@ const AdminDashboard: React.FC = () => {
                     placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40"
+                    className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 text-sm"
                   />
                 </div>
               </div>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as any)}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40"
+                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 text-sm"
               >
                 <option value="all">All Users</option>
                 <option value="active">Active Users</option>
@@ -492,8 +525,64 @@ const AdminDashboard: React.FC = () => {
               </select>
             </div>
 
-            {/* Users Table */}
-            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
+            {/* Users List - Mobile Optimized */}
+            <div className="space-y-3 lg:hidden">
+              {filteredUsers.map((user) => (
+                <motion.div
+                  key={user.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">{user.name.charAt(0)}</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-white">{user.name}</div>
+                        <div className="text-xs text-white/60">{user.email}</div>
+                      </div>
+                    </div>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      user.status === 'active' 
+                        ? 'bg-green-500/20 text-green-300' 
+                        : 'bg-red-500/20 text-red-300'
+                    }`}>
+                      {user.status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-white/60 mb-3">
+                    <div>Calculations: {user.totalCalculations}</div>
+                    <div>Exports: {user.totalExports}</div>
+                    <div>Last Active: {new Date(user.lastActive).toLocaleDateString()}</div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={() => handleUserAction('viewed', user.id)}
+                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+                    >
+                      <Eye className="w-4 h-4 text-blue-400" />
+                    </button>
+                    <button
+                      onClick={() => handleUserAction('edited', user.id)}
+                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+                    >
+                      <Edit className="w-4 h-4 text-green-400" />
+                    </button>
+                    <button
+                      onClick={() => handleUserAction('deleted', user.id)}
+                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-400" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Users Table - Desktop */}
+            <div className="hidden lg:block bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-white/10">
@@ -566,7 +655,7 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'contacts' && (
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
@@ -576,29 +665,29 @@ const AdminDashboard: React.FC = () => {
                   placeholder="Search contacts..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40"
+                  className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 text-sm"
                 />
               </div>
             </div>
 
             {/* Contacts List */}
-            <div className="space-y-4">
+            <div className="space-y-3 lg:space-y-4">
               {filteredContacts.map((contact) => (
                 <motion.div
                   key={contact.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
+                      <div className="flex items-center space-x-3 mb-2 lg:mb-2">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                           <span className="text-white text-sm font-medium">{contact.name.charAt(0)}</span>
                         </div>
-                        <div>
-                          <h3 className="text-lg font-medium text-white">{contact.name}</h3>
-                          <p className="text-white/60">{contact.email}</p>
+                        <div className="flex-1">
+                          <h3 className="text-base lg:text-lg font-medium text-white">{contact.name}</h3>
+                          <p className="text-white/60 text-sm">{contact.email}</p>
                         </div>
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           contact.status === 'new' 
@@ -610,7 +699,7 @@ const AdminDashboard: React.FC = () => {
                           {contact.status}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-4 mb-3 text-sm text-white/60">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mb-3 text-sm text-white/60">
                         <div className="flex items-center space-x-1">
                           <Phone className="w-4 h-4" />
                           <span>{contact.phone}</span>
@@ -620,9 +709,9 @@ const AdminDashboard: React.FC = () => {
                           <span>{new Date(contact.date).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <p className="text-white/80">{contact.message}</p>
+                      <p className="text-white/80 text-sm lg:text-base">{contact.message}</p>
                     </div>
-                    <div className="flex space-x-2 ml-4">
+                    <div className="flex justify-end space-x-2 mt-3 lg:mt-0 lg:ml-4">
                       <button
                         onClick={() => handleContactAction('viewed', contact.id)}
                         className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all"
@@ -650,21 +739,21 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'analytics' && (
-          <div className="space-y-8">
+          <div className="space-y-6 lg:space-y-8">
             {/* Advanced Analytics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Monthly Growth</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.monthlyGrowth}%</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Monthly Growth</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.monthlyGrowth}%</p>
                   </div>
-                  <TrendingUp className="w-8 h-8 text-green-400" />
+                  <TrendingUp className="w-6 h-6 lg:w-8 lg:h-8 text-green-400" />
                 </div>
               </motion.div>
 
@@ -672,14 +761,14 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Conversion Rate</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.conversionRate}%</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Conversion Rate</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.conversionRate}%</p>
                   </div>
-                  <Target className="w-8 h-8 text-blue-400" />
+                  <Target className="w-6 h-6 lg:w-8 lg:h-8 text-blue-400" />
                 </div>
               </motion.div>
 
@@ -687,14 +776,14 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Avg Session Time</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.averageSessionTime}m</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Avg Session Time</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.averageSessionTime}m</p>
                   </div>
-                  <Clock className="w-8 h-8 text-purple-400" />
+                  <Clock className="w-6 h-6 lg:w-8 lg:h-8 text-purple-400" />
                 </div>
               </motion.div>
 
@@ -702,29 +791,29 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm">Bounce Rate</p>
-                    <p className="text-2xl font-bold text-white">{adminStats.bounceRate}%</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Bounce Rate</p>
+                    <p className="text-xl lg:text-2xl font-bold text-white">{adminStats.bounceRate}%</p>
                   </div>
-                  <AlertTriangle className="w-8 h-8 text-orange-400" />
+                  <AlertTriangle className="w-6 h-6 lg:w-8 lg:h-8 text-orange-400" />
                 </div>
               </motion.div>
             </div>
 
             {/* Analytics Charts Placeholder */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
-                <h3 className="text-lg font-medium text-white mb-4">User Growth</h3>
-                <div className="h-64 bg-white/5 rounded-lg flex items-center justify-center">
-                  <p className="text-white/60">Chart placeholder - User growth over time</p>
+                <h3 className="text-base lg:text-lg font-medium text-white mb-4">User Growth</h3>
+                <div className="h-48 lg:h-64 bg-white/5 rounded-lg flex items-center justify-center">
+                  <p className="text-white/60 text-sm lg:text-base">Chart placeholder - User growth over time</p>
                 </div>
               </motion.div>
 
@@ -732,11 +821,11 @@ const AdminDashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
               >
-                <h3 className="text-lg font-medium text-white mb-4">Revenue Analytics</h3>
-                <div className="h-64 bg-white/5 rounded-lg flex items-center justify-center">
-                  <p className="text-white/60">Chart placeholder - Revenue trends</p>
+                <h3 className="text-base lg:text-lg font-medium text-white mb-4">Revenue Analytics</h3>
+                <div className="h-48 lg:h-64 bg-white/5 rounded-lg flex items-center justify-center">
+                  <p className="text-white/60 text-sm lg:text-base">Chart placeholder - Revenue trends</p>
                 </div>
               </motion.div>
             </div>
@@ -744,18 +833,18 @@ const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'settings' && (
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 lg:p-6"
             >
-              <h3 className="text-lg font-medium text-white mb-4">System Settings</h3>
+              <h3 className="text-base lg:text-lg font-medium text-white mb-4">System Settings</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white font-medium">Email Notifications</p>
-                    <p className="text-white/60 text-sm">Receive email alerts for important events</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Email Notifications</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Receive email alerts for important events</p>
                   </div>
                   <button className="w-12 h-6 bg-green-500 rounded-full relative">
                     <div className="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div>
@@ -763,8 +852,8 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white font-medium">Auto Backup</p>
-                    <p className="text-white/60 text-sm">Automatically backup data daily</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Auto Backup</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Automatically backup data daily</p>
                   </div>
                   <button className="w-12 h-6 bg-gray-500 rounded-full relative">
                     <div className="w-4 h-4 bg-white rounded-full absolute left-1 top-1"></div>
@@ -772,8 +861,8 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white font-medium">Maintenance Mode</p>
-                    <p className="text-white/60 text-sm">Enable maintenance mode for updates</p>
+                    <p className="text-white font-medium text-sm lg:text-base">Maintenance Mode</p>
+                    <p className="text-white/60 text-xs lg:text-sm">Enable maintenance mode for updates</p>
                   </div>
                   <button className="w-12 h-6 bg-gray-500 rounded-full relative">
                     <div className="w-4 h-4 bg-white rounded-full absolute left-1 top-1"></div>
@@ -804,7 +893,7 @@ const AdminDashboard: React.FC = () => {
               <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
               <p className="text-white/60 mb-6">Are you sure you want to logout from the admin dashboard?</p>
               
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <button
                   onClick={() => setShowLogout(false)}
                   className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
