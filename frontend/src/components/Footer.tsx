@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Calculator, Mail, Twitter, Linkedin, Github } from 'lucide-react';
+import Logo from './Logo';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -46,9 +47,7 @@ const Footer: React.FC = () => {
             className="col-span-1 md:col-span-1"
           >
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Calculator className="w-5 h-5 text-white" />
-              </div>
+              <Logo size="md" showText={false} />
               <span className="text-xl font-bold text-white">InvestWise Pro</span>
             </div>
             <p className="text-white/70 text-sm mb-4">
