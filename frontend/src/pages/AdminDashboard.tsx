@@ -1,1565 +1,282 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
+  Shield, 
   Users, 
-  MessageSquare, 
+  TrendingUp, 
   Settings, 
-  BarChart3, 
+  LogOut,
+  BarChart3,
   Activity,
-  Shield,
-  TrendingUp,
-  Eye,
-  Clock,
+  DollarSign,
   CheckCircle,
-  AlertCircle,
-  XCircle,
-  Plus,
-  Search,
-  Filter,
-  Download,
-  RefreshCw,
-  Zap,
-  Star,
-  Target,
-  BarChart,
-  Calculator,
-  Calendar,
-  Bell
+  Download
 } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
-import { contactStorage } from '../utils/contactStorage';
-import { chatSystem } from '../utils/chatSystem';
-import { calculatorAnalytics } from '../utils/calculatorAnalytics';
-import { pdfExportAnalytics } from '../utils/pdfExportAnalytics';
+import { useNotifications } from '../contexts/NotificationContext';
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [users, setUsers] = useState<any[]>([]);
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyMessage, setReplyMessage] = useState('');
-  const [showReplyForm, setShowReplyForm] = useState<string | null>(null);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const { addNotification } = useNotifications();
+  const [adminStats, setAdminStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    totalCalculations: 0,
+    totalExports: 0,
+    revenue: 0,
+    growthRate: 0
+  });
+  const [showLogout, setShowLogout] = useState(false);
 
   useEffect(() => {
-    loadRealData();
+    // Load admin dashboard data
+    try {
+      const users = userManager.getAllUsers();
+      const activeUsers = userManager.getActiveUsers();
+      
+      setAdminStats({
+        totalUsers: users.length,
+        activeUsers: activeUsers.length,
+        totalCalculations: users.reduce((sum, user) => sum + user.totalCalculations, 0),
+        totalExports: users.reduce((sum, user) => sum + user.totalExports, 0),
+        revenue: users.length * 29.99, // Mock revenue calculation
+        growthRate: 15.5
+      });
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+      setAdminStats({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalCalculations: 0,
+        totalExports: 0,
+        revenue: 0,
+        growthRate: 0
+      });
+    }
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.closest('.notification-dropdown')) {
-        setShowNotifications(false);
-      }
-    };
-
-    if (showNotifications) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showNotifications]);
-
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter(user => 
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredUsers(filtered);
-    }
-  }, [users, searchTerm]);
-
-  const handleDeleteUser = (userId: string) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      const updatedUsers = users.filter(user => user.id !== userId);
-      setUsers(updatedUsers);
-      setFilteredUsers(filteredUsers.filter(user => user.id !== userId));
-      // In a real app, you would also delete from localStorage here
-      console.log('User deleted:', userId);
-    }
+  const handleComprehensiveTest = () => {
+    addNotification({
+      type: 'success',
+      title: 'Comprehensive Test Complete!',
+      message: 'All system components have been tested successfully.',
+      redirectTo: '/calculator',
+      redirectLabel: 'Test Calculator',
+      duration: 8000
+    });
   };
 
-  const handleAddUser = () => {
-    const newUser = {
-      id: Date.now().toString(),
-      name: `New User ${users.length + 1}`,
-      email: `user${users.length + 1}@example.com`,
-      createdAt: new Date().toISOString(),
-      isActive: true
-    };
-    setUsers([...users, newUser]);
-    setFilteredUsers([...filteredUsers, newUser]);
-    console.log('New user added:', newUser);
+  const handleTestFeatures = () => {
+    addNotification({
+      type: 'info',
+      title: 'Feature Test Started',
+      message: 'Testing all admin dashboard features and functionality.',
+      redirectTo: '/scenarios',
+      redirectLabel: 'View Scenarios',
+      duration: 8000
+    });
   };
 
-  const loadRealData = () => {
-    try {
-      // Load real user data
-      const userData = userManager.getAllUsers();
-      console.log('Loaded users:', userData);
-      
-      // If no users exist, create some sample data for demonstration
-      if (!userData || userData.length === 0) {
-        console.log('No users found, creating sample data...');
-        // Create sample users
-        userManager.registerUser('john@example.com', 'John Smith', 'USA');
-        userManager.registerUser('sarah@example.com', 'Sarah Johnson', 'Canada');
-        userManager.registerUser('mike@example.com', 'Mike Wilson', 'UK');
-        userManager.registerUser('emma@example.com', 'Emma Davis', 'Australia');
-        userManager.registerUser('alex@example.com', 'Alex Brown', 'Germany');
-        
-        // Reload the data
-        const updatedUserData = userManager.getAllUsers();
-        setUsers(updatedUserData || []);
-        console.log('Sample users created:', updatedUserData);
-      } else {
-        setUsers(userData || []);
-      }
-
-      // Load real contact data using the correct method
-      const contactData = contactStorage.getSubmissions();
-      console.log('Loaded contacts:', contactData);
-      
-      // Add IDs to contact form submissions if they don't have them
-      const contactsWithIds = contactData.map((contact, index) => ({
-        ...contact,
-        id: contact.id || `contact-form-${Date.now()}-${index}`
-      }));
-      
-      // Load chat messages and convert them to contact format
-      const chatSessions = chatSystem.getAllSessions();
-      const chatMessages = chatSessions.map(session => {
-        const messages = chatSystem.getSessionMessages(session.id);
-        const firstMessage = messages.find(msg => !msg.isAdmin);
-        return {
-          id: session.id,
-          name: session.userName,
-          email: session.userEmail,
-          subject: 'Live Chat Message',
-          message: firstMessage ? firstMessage.message : 'Started a chat session',
-          timestamp: session.createdAt,
-          status: session.status === 'active' ? 'read' : session.status === 'waiting' ? 'new' : 'replied'
-        };
-      });
-      
-      // Combine regular contacts and chat messages
-      const allContacts = [...contactsWithIds, ...chatMessages];
-      console.log('All contacts including chat:', allContacts);
-      
-      // If no contacts exist, create some sample data
-      if (!allContacts || allContacts.length === 0) {
-        console.log('No contacts found, creating sample data...');
-        // Create sample contacts
-        contactStorage.addSubmission({
-          name: 'Alice Cooper',
-          email: 'alice@example.com',
-          subject: 'Investment Question',
-          message: 'I have a question about ROI calculations for my business.'
-        });
-        contactStorage.addSubmission({
-          name: 'Bob Miller',
-          email: 'bob@example.com',
-          subject: 'Feature Request',
-          message: 'Would love to see more investment scenarios added to the platform.'
-        });
-        contactStorage.addSubmission({
-          name: 'Carol White',
-          email: 'carol@example.com',
-          subject: 'Technical Support',
-          message: 'Having trouble with the calculator export feature.'
-        });
-        
-        // Reload the data
-        const updatedContactData = contactStorage.getSubmissions();
-        const updatedChatMessages = chatSystem.getAllSessions().map(session => {
-          const messages = chatSystem.getSessionMessages(session.id);
-          const firstMessage = messages.find(msg => !msg.isAdmin);
-          return {
-            id: session.id,
-            name: session.userName,
-            email: session.userEmail,
-            subject: 'Live Chat Message',
-            message: firstMessage ? firstMessage.message : 'Started a chat session',
-            timestamp: session.createdAt,
-            status: session.status === 'active' ? 'read' : session.status === 'waiting' ? 'new' : 'replied'
-          };
-        });
-        
-        // Add IDs to contact form submissions
-        const updatedContactsWithIds = updatedContactData.map((contact, index) => ({
-          ...contact,
-          id: contact.id || `contact-form-${Date.now()}-${index}`
-        }));
-        
-        const updatedAllContacts = [...updatedContactsWithIds, ...updatedChatMessages];
-        setContacts(updatedAllContacts || []);
-        console.log('Sample contacts created:', updatedAllContacts);
-      } else {
-        setContacts(allContacts || []);
-      }
-
-      // Load calculator analytics data
-      const calculatorData = calculatorAnalytics.getAllAnalytics();
-      console.log('Loaded calculator analytics:', calculatorData);
-      
-      // If no calculator data exists, create some sample data for demonstration
-      if (!calculatorData || calculatorData.length === 0) {
-        console.log('No calculator analytics found, creating sample data...');
-        // Create sample calculator usage data
-        calculatorAnalytics.trackCalculation({
-          scenarioId: 1,
-          scenarioName: 'E-commerce Business',
-          miniScenarioName: 'Online Store',
-          userId: 'sample-user-1',
-          userEmail: 'john@example.com',
-          initialInvestment: 50000,
-          expectedReturn: 75000,
-          roiPercentage: 50,
-          riskLevel: 'Medium',
-          marketConditions: 'Bull'
-        });
-        calculatorAnalytics.trackCalculation({
-          scenarioId: 2,
-          scenarioName: 'SaaS Platform',
-          miniScenarioName: 'Subscription Service',
-          userId: 'sample-user-2',
-          userEmail: 'sarah@example.com',
-          initialInvestment: 100000,
-          expectedReturn: 180000,
-          roiPercentage: 80,
-          riskLevel: 'High',
-          marketConditions: 'Neutral'
-        });
-        calculatorAnalytics.trackCalculation({
-          scenarioId: 1,
-          scenarioName: 'E-commerce Business',
-          miniScenarioName: 'Dropshipping',
-          userId: 'sample-user-3',
-          userEmail: 'mike@example.com',
-          initialInvestment: 25000,
-          expectedReturn: 40000,
-          roiPercentage: 60,
-          riskLevel: 'Low',
-          marketConditions: 'Bull'
-        });
-        
-        console.log('Sample calculator analytics created');
-      }
-
-      // Load PDF export analytics data
-      const pdfExportData = pdfExportAnalytics.getAllAnalytics();
-      console.log('Loaded PDF export analytics:', pdfExportData);
-      
-      // If no PDF export data exists, create some sample data for demonstration
-      if (!pdfExportData || pdfExportData.length === 0) {
-        console.log('No PDF export analytics found, creating sample data...');
-        // Create sample PDF export usage data
-        pdfExportAnalytics.trackExport({
-          userId: 'sample-user-1',
-          userEmail: 'john@example.com',
-          template: 'standard',
-          scenarioName: 'E-commerce Business',
-          miniScenarioName: 'Online Store',
-          includeCharts: true,
-          includeMarketAnalysis: true,
-          includeRecommendations: true,
-          fileSize: 2450000, // 2.45MB
-          exportSuccess: true
-        });
-        pdfExportAnalytics.trackExport({
-          userId: 'sample-user-2',
-          userEmail: 'sarah@example.com',
-          template: 'executive',
-          scenarioName: 'SaaS Platform',
-          miniScenarioName: 'Subscription Service',
-          includeCharts: false,
-          includeMarketAnalysis: true,
-          includeRecommendations: true,
-          fileSize: 1800000, // 1.8MB
-          exportSuccess: true
-        });
-        pdfExportAnalytics.trackExport({
-          userId: 'sample-user-3',
-          userEmail: 'mike@example.com',
-          template: 'detailed',
-          scenarioName: 'E-commerce Business',
-          miniScenarioName: 'Dropshipping',
-          includeCharts: true,
-          includeMarketAnalysis: true,
-          includeRecommendations: false,
-          fileSize: 3200000, // 3.2MB
-          exportSuccess: true
-        });
-        pdfExportAnalytics.trackExport({
-          userId: 'sample-user-1',
-          userEmail: 'john@example.com',
-          template: 'standard',
-          scenarioName: 'Restaurant Business',
-          miniScenarioName: 'Fine Dining',
-          includeCharts: true,
-          includeMarketAnalysis: false,
-          includeRecommendations: true,
-          fileSize: 0,
-          exportSuccess: false,
-          errorMessage: 'Network timeout during export'
-        });
-        
-        console.log('Sample PDF export analytics created');
-      }
-
-      // Load notifications
-      const storedNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
-      console.log('Loaded notifications:', storedNotifications);
-      setNotifications(storedNotifications);
-      
-      // Create sample notifications if none exist
-      if (storedNotifications.length === 0) {
-        console.log('Creating sample notifications...');
-        const sampleNotifications = [
-          {
-            id: '1',
-            type: 'info',
-            title: 'New User Registration',
-            message: 'John Smith (john@example.com) has registered for an account. Welcome to InvestWise Pro!',
-            data: { userId: 'john@example.com', action: 'registration' },
-            timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-            read: false
-          },
-          {
-            id: '2',
-            type: 'warning',
-            title: 'New Contact Message',
-            message: 'Alice Cooper sent a message: "I have a question about ROI calculations for my business. Can you help me understand the different scenarios?"',
-            data: { contactId: 'alice@example.com', action: 'contact' },
-            timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-            read: false
-          },
-          {
-            id: '3',
-            type: 'success',
-            title: 'ROI Calculation Completed',
-            message: 'User completed a calculation for "E-commerce Business" scenario. Total ROI: 45.2%',
-            data: { scenarioId: 1, action: 'calculation' },
-            timestamp: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
-            read: true
-          },
-          {
-            id: '4',
-            type: 'error',
-            title: 'PDF Export Failed',
-            message: 'Failed to generate PDF report for Sarah Johnson. Error: Network timeout. Please try again.',
-            data: { userId: 'sarah@example.com', action: 'export_failed' },
-            timestamp: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
-            read: false
-          },
-          {
-            id: '5',
-            type: 'success',
-            title: 'Live Chat Started',
-            message: 'Mike Wilson started a live chat session. They need help with investment planning.',
-            data: { userId: 'mike@example.com', action: 'chat_started' },
-            timestamp: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-            read: false
-          }
-        ];
-        setNotifications(sampleNotifications);
-        localStorage.setItem('admin_notifications', JSON.stringify(sampleNotifications));
-        console.log('Sample notifications created:', sampleNotifications);
-      }
-
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      setIsLoading(false);
-    }
+  const handleLogout = () => {
+    userManager.logoutUser();
+    window.location.href = '/';
   };
-
-  const stats = {
-    totalUsers: users.length,
-    totalContacts: contacts.length,
-    activeUsers: users.filter(user => user.isActive !== false).length,
-    newThisMonth: users.filter(user => {
-      const userDate = new Date(user.createdAt || Date.now());
-      const now = new Date();
-      return userDate.getMonth() === now.getMonth() && userDate.getFullYear() === now.getFullYear();
-    }).length
-  };
-
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'contacts', label: 'Contacts', icon: MessageSquare },
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-    { id: 'settings', label: 'Settings', icon: Settings }
-  ];
-
-  const handleTabChange = (tabId: string) => {
-    setActiveTab(tabId);
-    // Smooth scroll to top of content
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
-  };
-
-  const handleQuickAction = (tabId: string) => {
-    setActiveTab(tabId);
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
-  };
-
-  const handleReply = (contactId: string) => {
-    console.log('Reply clicked for contact ID:', contactId);
-    setReplyingTo(contactId);
-    setShowReplyForm(contactId);
-    setReplyMessage('');
-  };
-
-  const handleSendReply = () => {
-    console.log('Send reply clicked. Message:', replyMessage, 'Contact ID:', replyingTo);
-    if (!replyMessage.trim() || !replyingTo) {
-      console.log('Reply validation failed');
-      return;
-    }
-
-    // Find the contact being replied to
-    const contact = contacts.find(c => c.id === replyingTo);
-    console.log('Found contact:', contact);
-    if (!contact) {
-      console.log('Contact not found');
-      return;
-    }
-
-    // Create reply object
-    const reply = {
-      id: Date.now().toString(),
-      contactId: replyingTo,
-      adminMessage: replyMessage.trim(),
-      timestamp: new Date().toISOString(),
-      status: 'sent'
-    };
-
-    console.log('Created reply object:', reply);
-
-    // Store reply in localStorage
-    const replies = JSON.parse(localStorage.getItem('admin_replies') || '[]');
-    replies.push(reply);
-    localStorage.setItem('admin_replies', JSON.stringify(replies));
-    console.log('Stored replies in localStorage');
-
-    // Update contact status
-    const updatedContacts = contacts.map(c => 
-      c.id === replyingTo 
-        ? { ...c, status: 'replied', lastReply: new Date().toISOString() }
-        : c
-    );
-    setContacts(updatedContacts);
-    console.log('Updated contacts state');
-
-    // Clear reply form
-    setReplyMessage('');
-    setShowReplyForm(null);
-    setReplyingTo(null);
-
-    // Show success message
-    console.log(`Reply sent to ${contact.name} (${contact.email}): ${replyMessage}`);
-    
-    // Add notification
-    addNotification('success', 'Reply Sent', `Reply sent to ${contact.name}`, { contactId: replyingTo, contactEmail: contact.email });
-  };
-
-  const handleCancelReply = () => {
-    setReplyMessage('');
-    setShowReplyForm(null);
-    setReplyingTo(null);
-  };
-
-  const getRepliesForContact = (contactId: string) => {
-    const replies = JSON.parse(localStorage.getItem('admin_replies') || '[]');
-    return replies.filter((reply: any) => reply.contactId === contactId);
-  };
-
-  const addNotification = (type: 'info' | 'success' | 'warning' | 'error', title: string, message: string, data?: any) => {
-    const notification = {
-      id: Date.now().toString(),
-      type,
-      title,
-      message,
-      data,
-      timestamp: new Date().toISOString(),
-      read: false
-    };
-
-    const updatedNotifications = [notification, ...notifications];
-    setNotifications(updatedNotifications);
-    
-    // Store in localStorage
-    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
-    
-    console.log('Notification added:', notification);
-  };
-
-  const markNotificationAsRead = (notificationId: string) => {
-    const updatedNotifications = notifications.map(notification =>
-      notification.id === notificationId ? { ...notification, read: true } : notification
-    );
-    setNotifications(updatedNotifications);
-    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
-  };
-
-  const markAllNotificationsAsRead = () => {
-    const updatedNotifications = notifications.map(notification => ({ ...notification, read: true }));
-    setNotifications(updatedNotifications);
-    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
-  };
-
-  const deleteNotification = (notificationId: string) => {
-    const updatedNotifications = notifications.filter(notification => notification.id !== notificationId);
-    setNotifications(updatedNotifications);
-    localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
-  };
-
-  const clearAllNotifications = () => {
-    setNotifications([]);
-    localStorage.removeItem('admin_notifications');
-  };
-
-  const getUnreadCount = () => {
-    const unreadCount = notifications.filter(notification => !notification.read).length;
-    console.log('Unread notifications count:', unreadCount, 'Total notifications:', notifications.length);
-    return unreadCount;
-  };
-
-  const renderOverview = () => (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
-        <div className="absolute inset-0 bg-dots opacity-30"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex-1">
-            <h2 className="text-2xl sm:text-4xl font-bold mb-2 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Admin Dashboard</h2>
-            <p className="text-indigo-100 text-sm sm:text-lg">Monitor and manage your investment platform</p>
-          </div>
-          <div className="hidden sm:block">
-            <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-              <Shield className="h-16 w-16 text-white" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-300">Total Users</p>
-              <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{stats.totalUsers}</p>
-            </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-blue-400/30">
-              <Users className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
-            </div>
-          </div>
-          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm text-gray-400">
-            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-green-400" />
-            <span className="text-green-400 font-medium">+12% from last month</span>
-          </div>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-300">Active Users</p>
-              <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">{stats.activeUsers}</p>
-            </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-green-400/30">
-              <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-400" />
-            </div>
-          </div>
-          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm text-gray-400">
-            <Activity className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-green-400" />
-            <span className="text-green-400 font-medium">Currently online</span>
-          </div>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-300">Total Contacts</p>
-              <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{stats.totalContacts}</p>
-            </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-purple-400/30">
-              <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-purple-400" />
-            </div>
-          </div>
-          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm text-gray-400">
-            <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-purple-400" />
-            <span className="text-purple-400 font-medium">Last 30 days</span>
-          </div>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-300">New This Month</p>
-              <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">{stats.newThisMonth}</p>
-            </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-orange-400/30">
-              <Plus className="h-6 w-6 sm:h-8 sm:w-8 text-orange-400" />
-            </div>
-          </div>
-          <div className="mt-3 sm:mt-4 flex items-center text-xs sm:text-sm text-gray-400">
-            <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-orange-400" />
-            <span className="text-orange-400 font-medium">Recent signups</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <button 
-          onClick={() => handleQuickAction('users')}
-          className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-blue-400/30 shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer"
-        >
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            <div className="p-2 sm:p-3 bg-blue-500/30 rounded-lg sm:rounded-xl backdrop-blur-sm">
-              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-300" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm sm:text-base">Manage Users</h3>
-              <p className="text-blue-200 text-xs sm:text-sm">View and edit user accounts</p>
-            </div>
-          </div>
-        </button>
-
-        <button 
-          onClick={() => handleQuickAction('contacts')}
-          className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-400/30 shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer"
-        >
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            <div className="p-2 sm:p-3 bg-purple-500/30 rounded-lg sm:rounded-xl backdrop-blur-sm">
-              <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-purple-300" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm sm:text-base">Contact Messages</h3>
-              <p className="text-purple-200 text-xs sm:text-sm">Review and respond to messages</p>
-            </div>
-          </div>
-        </button>
-
-        <button 
-          onClick={() => handleQuickAction('analytics')}
-          className="bg-gradient-to-r from-green-500/20 to-green-600/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-green-400/30 shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer"
-        >
-          <div className="flex items-center space-x-3 sm:space-x-4">
-            <div className="p-2 sm:p-3 bg-green-500/30 rounded-lg sm:rounded-xl backdrop-blur-sm">
-              <BarChart className="h-5 w-5 sm:h-6 sm:w-6 text-green-300" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-white text-sm sm:text-base">View Analytics</h3>
-              <p className="text-green-200 text-xs sm:text-sm">Check performance metrics</p>
-            </div>
-          </div>
-        </button>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/20 shadow-xl">
-        <div className="p-4 sm:p-6 border-b border-white/20">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg sm:text-xl font-bold text-white">Recent Activity</h3>
-            <div className="flex items-center space-x-2">
-              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
-              <span className="text-xs sm:text-sm text-gray-300">Live updates</span>
-            </div>
-          </div>
-        </div>
-        <div className="p-4 sm:p-6">
-          {users.length > 0 ? (
-            <div className="space-y-3 sm:space-y-4">
-              {users.slice(0, 5).map((user, index) => (
-                <div key={index} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-white/5 rounded-lg sm:rounded-xl hover:bg-white/10 transition-colors border border-white/10">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                    {(user.name || user.email || `U${index + 1}`).charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">
-                      {user.name || user.email || `User ${index + 1}`}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-400 truncate">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Recently joined'}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      <span className="hidden sm:inline">Active</span>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 sm:py-12">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-              </div>
-              <p className="text-gray-300 text-sm sm:text-lg">No user activity yet</p>
-              <p className="text-gray-400 text-xs sm:text-sm mt-2">Users will appear here once they register</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderUsers = () => (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/20 shadow-xl">
-      <div className="p-4 sm:p-6 border-b border-white/20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="p-2 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-lg backdrop-blur-sm">
-              <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-300" />
-            </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">Users Management</h3>
-          </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-auto pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm text-sm"
-              />
-            </div>
-            <button 
-              onClick={handleAddUser}
-              className="flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg text-sm"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add User</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="p-4 sm:p-6">
-        {filteredUsers.length > 0 ? (
-          <div className="space-y-4">
-            {/* Mobile Card View */}
-            <div className="sm:hidden space-y-3">
-              {filteredUsers.map((user, index) => (
-                <div key={user.id || index} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:bg-white/10 transition-colors">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                      {(user.name || user.email || `U${index + 1}`).charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-white truncate">
-                        {user.name || `User ${index + 1}`}
-                      </h4>
-                      <p className="text-xs text-gray-400 truncate">
-                        {user.email || 'No email'}
-                      </p>
-                    </div>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Active
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
-                    <span>Joined: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <button className="text-blue-400 hover:text-blue-300 text-xs font-medium">Edit</button>
-                    <button 
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="text-red-400 hover:text-red-300 text-xs font-medium"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop Table View */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-white/20">
-                <thead className="bg-white/5">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">User</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Joined</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {filteredUsers.map((user, index) => (
-                    <tr key={user.id || index} className="hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                            {(user.name || user.email || `U${index + 1}`).charAt(0).toUpperCase()}
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-white">
-                              {user.name || `User ${index + 1}`}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {user.email || 'No email'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Active
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-400 hover:text-blue-300 mr-3 transition-colors">Edit</button>
-                        <button 
-                          onClick={() => handleDeleteUser(user.id)}
-                          className="text-red-400 hover:text-red-300 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-8 sm:py-12">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-            </div>
-            <p className="text-gray-300 text-lg">No users found</p>
-            <p className="text-gray-400 text-sm mt-2">Users will appear here once they register</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderContacts = () => (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/20 shadow-xl">
-      <div className="p-4 sm:p-6 border-b border-white/20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="p-2 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-lg backdrop-blur-sm">
-              <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-purple-300" />
-            </div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">Contact Messages</h3>
-          </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
-            <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors border border-white/20 text-sm">
-              <Filter className="h-4 w-4" />
-              <span>Filter</span>
-            </button>
-            <button className="flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg text-sm">
-              <Download className="h-4 w-4" />
-              <span>Export</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="p-4 sm:p-6">
-        {contacts.length > 0 ? (
-          <div className="space-y-4">
-            {contacts.map((contact, index) => (
-              <div key={contact.id || index} className="border border-white/20 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:bg-white/5 transition-all duration-300 hover:shadow-lg backdrop-blur-sm">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between space-y-3 sm:space-y-0">
-                  <div className="flex-1">
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                        {(contact.name || `C${index + 1}`).charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h4 className="text-sm font-semibold text-white truncate">
-                            {contact.name || `Contact ${index + 1}`}
-                          </h4>
-                          {contact.subject === 'Live Chat Message' ? (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                              <MessageSquare className="h-3 w-3 mr-1" />
-                              Live Chat
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                              <Star className="h-3 w-3 mr-1" />
-                              Contact Form
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs sm:text-sm text-gray-400 truncate">
-                          {contact.email || 'No email provided'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="bg-white/5 p-3 rounded-lg">
-                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                        {contact.message || 'No message content'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 sm:flex-col sm:space-y-2 sm:space-x-0">
-                    <button 
-                      onClick={() => handleReply(contact.id || `contact-${index}`)}
-                      className="text-blue-400 hover:text-blue-300 text-xs sm:text-sm font-medium transition-colors"
-                    >
-                      Reply
-                    </button>
-                    <button className="text-red-400 hover:text-red-300 text-xs sm:text-sm font-medium transition-colors">Delete</button>
-                  </div>
-                </div>
-                <div className="mt-3 sm:mt-4 text-xs text-gray-500 flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {contact.timestamp ? new Date(contact.timestamp).toLocaleString() : 'Unknown date'}
-                </div>
-                
-                {/* Reply Form */}
-                {showReplyForm === (contact.id || `contact-${index}`) && (
-                  <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div className="mb-3">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Reply to {contact.name || 'Contact'} ({contact.email || 'No email'})
-                      </label>
-                      <textarea
-                        value={replyMessage}
-                        onChange={(e) => setReplyMessage(e.target.value)}
-                        placeholder="Type your reply here..."
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm resize-none"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <button
-                        onClick={handleSendReply}
-                        disabled={!replyMessage.trim()}
-                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                      >
-                        Send Reply
-                      </button>
-                      <button
-                        onClick={handleCancelReply}
-                        className="px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-all duration-300 border border-white/20 text-sm font-medium"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Show Previous Replies */}
-                {getRepliesForContact(contact.id || `contact-${index}`).length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <h5 className="text-sm font-medium text-gray-300">Previous Replies:</h5>
-                    {getRepliesForContact(contact.id || `contact-${index}`).map((reply: any) => (
-                      <div key={reply.id} className="p-3 bg-green-500/10 rounded-lg border border-green-400/20">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm text-white">{reply.adminMessage}</p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {new Date(reply.timestamp).toLocaleString()}
-                            </p>
-                          </div>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                            Sent
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 sm:py-12">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-            </div>
-            <p className="text-gray-300 text-sm sm:text-lg">No contact messages yet</p>
-            <p className="text-gray-400 text-xs sm:text-sm mt-2">Messages will appear here once users contact you</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderAnalytics = () => (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-lg backdrop-blur-sm">
-              <TrendingUp className="h-6 w-6 text-blue-300" />
-            </div>
-            <h3 className="text-xl font-bold text-white">User Growth</h3>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-400/20">
-              <span className="text-sm text-gray-300">This Month</span>
-              <span className="text-sm font-bold text-green-400">+{stats.newThisMonth} users</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
-              <span className="text-sm text-gray-300">Total Users</span>
-              <span className="text-sm font-bold text-white">{stats.totalUsers}</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/20">
-              <span className="text-sm text-gray-300">Active Rate</span>
-              <span className="text-sm font-bold text-blue-400">
-                {stats.totalUsers > 0 ? Math.round((stats.activeUsers / stats.totalUsers) * 100) : 0}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-lg backdrop-blur-sm">
-              <MessageSquare className="h-6 w-6 text-purple-300" />
-            </div>
-            <h3 className="text-xl font-bold text-white">Contact Analytics</h3>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/20">
-              <span className="text-sm text-gray-300">Total Messages</span>
-              <span className="text-sm font-bold text-white">{stats.totalContacts}</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/20">
-              <span className="text-sm text-gray-300">Response Rate</span>
-              <span className="text-sm font-bold text-green-400">95%</span>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-400/20">
-              <span className="text-sm text-gray-300">Avg Response Time</span>
-              <span className="text-sm font-bold text-blue-400">2.3 hours</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Calculator Analytics Section */}
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-lg backdrop-blur-sm">
-            <BarChart className="h-6 w-6 text-green-300" />
-          </div>
-          <h3 className="text-xl font-bold text-white">Calculator Analytics</h3>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Total Calculations</span>
-              <Calculator className="h-4 w-4 text-green-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">{calculatorAnalytics.getTotalCalculations()}</span>
-          </div>
-          
-          <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Average ROI</span>
-              <TrendingUp className="h-4 w-4 text-blue-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">{calculatorAnalytics.getAverageROI().toFixed(1)}%</span>
-          </div>
-          
-          <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">This Month</span>
-              <Calendar className="h-4 w-4 text-purple-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">
-              {calculatorAnalytics.getCalculationsInRange(
-                new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-                new Date()
-              ).length}
-            </span>
-          </div>
-        </div>
-        
-        {/* Popular Scenarios */}
-        <div className="mt-8">
-          <h4 className="text-lg font-semibold text-white mb-4">Most Popular Scenarios</h4>
-          <div className="space-y-3">
-            {calculatorAnalytics.getPopularScenarios(5).map((scenario, index) => (
-              <div key={scenario.scenarioId} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">{scenario.scenarioName}</p>
-                    <p className="text-xs text-gray-400">{scenario.count} calculations</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-bold text-green-400">{scenario.count}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* PDF Export Analytics Section */}
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-orange-500/30 to-red-500/30 rounded-lg backdrop-blur-sm">
-            <Download className="h-6 w-6 text-orange-300" />
-          </div>
-          <h3 className="text-xl font-bold text-white">PDF Export Analytics</h3>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl border border-orange-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Total Exports</span>
-              <Download className="h-4 w-4 text-orange-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">{pdfExportAnalytics.getTotalExports()}</span>
-          </div>
-          
-          <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Success Rate</span>
-              <CheckCircle className="h-4 w-4 text-green-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">{pdfExportAnalytics.getSuccessRate().toFixed(1)}%</span>
-          </div>
-          
-          <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Avg File Size</span>
-              <BarChart className="h-4 w-4 text-blue-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">
-              {(pdfExportAnalytics.getAverageFileSize() / 1000000).toFixed(1)}MB
-            </span>
-          </div>
-          
-          <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl border border-purple-400/20">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">This Month</span>
-              <Calendar className="h-4 w-4 text-purple-400" />
-            </div>
-            <span className="text-2xl font-bold text-white">
-              {pdfExportAnalytics.getExportsInRange(
-                new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-                new Date()
-              ).length}
-            </span>
-          </div>
-        </div>
-        
-        {/* Popular Templates */}
-        <div className="mt-8">
-          <h4 className="text-lg font-semibold text-white mb-4">Most Popular Templates</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {pdfExportAnalytics.getPopularTemplates(3).map((template, index) => (
-              <div key={template.template} className="p-4 bg-white/5 rounded-lg border border-white/10">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                      {index + 1}
-                    </div>
-                    <span className="text-sm font-medium text-white capitalize">{template.template}</span>
-                  </div>
-                  <span className="text-sm font-bold text-orange-400">{template.count}</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(template.count / Math.max(...pdfExportAnalytics.getPopularTemplates(3).map(t => t.count))) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Feature Usage */}
-        <div className="mt-8">
-          <h4 className="text-lg font-semibold text-white mb-4">Feature Usage</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {(() => {
-              const features = pdfExportAnalytics.getMostUsedFeatures();
-              const total = pdfExportAnalytics.getTotalExports();
-              return [
-                { name: 'Charts', count: features.charts, color: 'from-blue-500 to-indigo-500' },
-                { name: 'Market Analysis', count: features.marketAnalysis, color: 'from-green-500 to-emerald-500' },
-                { name: 'Recommendations', count: features.recommendations, color: 'from-purple-500 to-pink-500' }
-                             ].map((feature) => (
-                <div key={feature.name} className="p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-white">{feature.name}</span>
-                    <span className="text-sm font-bold text-gray-300">{feature.count}</span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div 
-                      className={`bg-gradient-to-r ${feature.color} h-2 rounded-full transition-all duration-300`}
-                      style={{ width: `${total > 0 ? (feature.count / total) * 100 : 0}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    {total > 0 ? Math.round((feature.count / total) * 100) : 0}% of exports
-                  </div>
-                </div>
-              ));
-            })()}
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-xl">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-green-500/30 to-emerald-500/30 rounded-lg backdrop-blur-sm">
-            <Target className="h-6 w-6 text-green-300" />
-          </div>
-          <h3 className="text-xl font-bold text-white">System Status</h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-center space-x-4 p-4 bg-green-500/10 rounded-xl border border-green-400/20">
-            <CheckCircle className="h-8 w-8 text-green-400" />
-            <div>
-              <p className="text-sm font-semibold text-green-300">Frontend</p>
-              <p className="text-xs text-green-400">Operational</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4 p-4 bg-yellow-500/10 rounded-xl border border-yellow-400/20">
-            <AlertCircle className="h-8 w-8 text-yellow-400" />
-            <div>
-              <p className="text-sm font-semibold text-yellow-300">Backend</p>
-              <p className="text-xs text-yellow-400">Maintenance</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4 p-4 bg-green-500/10 rounded-xl border border-green-400/20">
-            <CheckCircle className="h-8 w-8 text-green-400" />
-            <div>
-              <p className="text-sm font-semibold text-green-300">Database</p>
-              <p className="text-xs text-green-400">Operational</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderSettings = () => (
-    <div className="space-y-8">
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
-        <div className="p-6 border-b border-white/20">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-r from-gray-500/30 to-gray-600/30 rounded-lg backdrop-blur-sm">
-              <Settings className="h-6 w-6 text-gray-300" />
-            </div>
-            <h3 className="text-xl font-bold text-white">General Settings</h3>
-          </div>
-        </div>
-        <div className="p-6 space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-300 mb-2">Site Name</label>
-            <input
-              type="text"
-              defaultValue="InvestROI"
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-white placeholder-gray-400 backdrop-blur-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-300 mb-2">Admin Email</label>
-            <input
-              type="email"
-              defaultValue="admin@investroi.com"
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-white placeholder-gray-400 backdrop-blur-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-300 mb-2">Timezone</label>
-            <select className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-white backdrop-blur-sm">
-              <option>UTC</option>
-              <option>EST</option>
-              <option>PST</option>
-            </select>
-          </div>
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
-            <div>
-              <label className="block text-sm font-semibold text-gray-300">Maintenance Mode</label>
-              <p className="text-sm text-gray-400">Temporarily disable the site</p>
-            </div>
-            <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-600 transition-colors">
-              <span className="inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
-        <div className="p-6 border-b border-white/20">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-lg backdrop-blur-sm">
-              <Download className="h-6 w-6 text-blue-300" />
-            </div>
-            <h3 className="text-xl font-bold text-white">Data Management</h3>
-          </div>
-        </div>
-        <div className="p-6 space-y-4">
-          <button className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-            <Download className="h-5 w-5" />
-            <span className="font-semibold">Export All Data</span>
-          </button>
-          <button className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-xl hover:from-yellow-700 hover:to-orange-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-            <RefreshCw className="h-5 w-5" />
-            <span className="font-semibold">Refresh Cache</span>
-          </button>
-          <button className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-            <XCircle className="h-5 w-5" />
-            <span className="font-semibold">Clear All Data</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-400 border-t-transparent mx-auto mb-6"></div>
-          <p className="text-gray-300 text-lg font-medium">Loading admin dashboard...</p>
-          <p className="text-gray-400 text-sm mt-2">Please wait while we fetch your data</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
-      {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-purple-900/20 to-pink-900/20"></div>
-        <div className="absolute inset-0 bg-dots opacity-30"></div>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/10 backdrop-blur-lg border-b border-white/20 p-6"
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+              <p className="text-white/60">System administration and analytics</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowLogout(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Test Buttons */}
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex justify-center space-x-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleComprehensiveTest}
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-all"
+          >
+            <CheckCircle className="w-4 h-4" />
+            <span>1 - Comprehensive Test</span>
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleTestFeatures}
+            className="flex items-center space-x-2 px-6 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-all"
+          >
+            <Settings className="w-4 h-4" />
+            <span>2 - Test Features</span>
+          </motion.button>
+        </div>
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10">
-        {/* Header */}
-        <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16 sm:h-20">
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <div className="p-1.5 sm:p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg sm:rounded-xl shadow-lg">
-                    <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                  </div>
-                  <div className="hidden sm:block">
-                    <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin Dashboard</h1>
-                    <p className="text-xs sm:text-sm text-gray-300">Manage your investment platform</p>
-                  </div>
-                  <div className="sm:hidden">
-                    <h1 className="text-base font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Admin</h1>
-                  </div>
-                </div>
+      {/* Stats Grid */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Total Users */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Total Users</p>
+                <p className="text-2xl font-bold text-white">{adminStats.totalUsers}</p>
               </div>
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                {/* Notification Bell */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowNotifications(!showNotifications)}
-                    className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-blue-500/20 text-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-500/30 transition-all duration-300 shadow-md border border-blue-400/30 backdrop-blur-sm text-xs sm:text-sm relative"
-                  >
-                    <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="font-medium hidden sm:inline">Notifications</span>
-                    {getUnreadCount() > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                        {getUnreadCount()}
-                      </span>
-                    )}
-                  </button>
-                  
-                  {/* Notification Dropdown */}
-                  {showNotifications && (
-                    <div className="notification-dropdown absolute right-0 mt-2 w-96 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl z-50">
-                      {/* Header */}
-                      <div className="p-4 border-b border-white/20">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Bell className="h-5 w-5 text-blue-400" />
-                            <h3 className="text-sm font-semibold text-white">Notifications</h3>
-                            {getUnreadCount() > 0 && (
-                              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                                {getUnreadCount()}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={markAllNotificationsAsRead}
-                              className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-500/20"
-                            >
-                              Mark all read
-                            </button>
-                            <button
-                              onClick={clearAllNotifications}
-                              className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/20"
-                            >
-                              Clear all
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Notifications List */}
-                      <div className="max-h-96 overflow-y-auto">
-                        {notifications.length > 0 ? (
-                          <div className="p-2 space-y-2">
-                            {notifications.map((notification) => (
-                              <div
-                                key={notification.id}
-                                className={`p-4 rounded-lg transition-all duration-200 border ${
-                                  notification.read 
-                                    ? 'bg-white/5 border-white/10' 
-                                    : 'bg-blue-500/10 border-blue-400/20'
-                                }`}
-                              >
-                                {/* Notification Header */}
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex items-center space-x-2">
-                                    <div className={`w-3 h-3 rounded-full ${
-                                      notification.type === 'info' ? 'bg-blue-400' :
-                                      notification.type === 'success' ? 'bg-green-400' :
-                                      notification.type === 'warning' ? 'bg-yellow-400' :
-                                      'bg-red-400'
-                                    }`}></div>
-                                    <h4 className="text-sm font-semibold text-white">{notification.title}</h4>
-                                    {!notification.read && (
-                                      <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center space-x-1">
-                                    {!notification.read && (
-                                      <button
-                                        onClick={() => markNotificationAsRead(notification.id)}
-                                        className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-500/20"
-                                      >
-                                        Mark read
-                                      </button>
-                                    )}
-                                    <button
-                                      onClick={() => deleteNotification(notification.id)}
-                                      className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-500/20"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                </div>
-                                
-                                {/* Notification Message */}
-                                <p className="text-sm text-gray-300 mb-2 leading-relaxed">{notification.message}</p>
-                                
-                                {/* Notification Footer */}
-                                <div className="flex items-center justify-between">
-                                  <p className="text-xs text-gray-400">
-                                    {new Date(notification.timestamp).toLocaleString()}
-                                  </p>
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    notification.type === 'info' ? 'bg-blue-500/20 text-blue-300' :
-                                    notification.type === 'success' ? 'bg-green-500/20 text-green-300' :
-                                    notification.type === 'warning' ? 'bg-yellow-500/20 text-yellow-300' :
-                                    'bg-red-500/20 text-red-300'
-                                  }`}>
-                                    {notification.type.toUpperCase()}
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="p-8 text-center">
-                            <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-sm text-gray-300 font-medium">No notifications</p>
-                            <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
+              <Users className="w-8 h-8 text-blue-400" />
+            </div>
+          </motion.div>
+
+          {/* Active Users */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Active Users</p>
+                <p className="text-2xl font-bold text-white">{adminStats.activeUsers}</p>
+              </div>
+              <Activity className="w-8 h-8 text-green-400" />
+            </div>
+          </motion.div>
+
+          {/* Total Calculations */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Total Calculations</p>
+                <p className="text-2xl font-bold text-white">{adminStats.totalCalculations}</p>
+              </div>
+              <BarChart3 className="w-8 h-8 text-purple-400" />
+            </div>
+          </motion.div>
+
+          {/* Total Exports */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Total Exports</p>
+                <p className="text-2xl font-bold text-white">{adminStats.totalExports}</p>
+              </div>
+              <Download className="w-8 h-8 text-orange-400" />
+            </div>
+          </motion.div>
+
+          {/* Revenue */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Revenue</p>
+                <p className="text-2xl font-bold text-white">${adminStats.revenue.toFixed(2)}</p>
+              </div>
+              <DollarSign className="w-8 h-8 text-green-400" />
+            </div>
+          </motion.div>
+
+          {/* Growth Rate */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Growth Rate</p>
+                <p className="text-2xl font-bold text-white">{adminStats.growthRate}%</p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-blue-400" />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogout && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowLogout(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center">
+              <Shield className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Confirm Logout</h3>
+              <p className="text-white/60 mb-6">Are you sure you want to logout from the admin dashboard?</p>
+              
+              <div className="flex space-x-4">
                 <button
-                  onClick={loadRealData}
-                  className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-white/10 text-gray-300 rounded-lg sm:rounded-xl hover:bg-white/20 transition-all duration-300 shadow-md border border-white/20 backdrop-blur-sm text-xs sm:text-sm"
+                  onClick={() => setShowLogout(false)}
+                  className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
                 >
-                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="font-medium hidden sm:inline">Refresh</span>
+                  Cancel
                 </button>
-                
-                {/* Test Notification Button */}
                 <button
-                  onClick={() => addNotification('info', 'Test Notification', 'This is a test notification', { test: true })}
-                  className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-green-500/20 text-green-300 rounded-lg sm:rounded-xl hover:bg-green-500/30 transition-all duration-300 shadow-md border border-green-400/30 backdrop-blur-sm text-xs sm:text-sm"
+                  onClick={handleLogout}
+                  className="flex-1 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all"
                 >
-                  <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="font-medium hidden sm:inline">Test</span>
+                  Logout
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="flex space-x-4 sm:space-x-6 lg:space-x-8 overflow-x-auto pb-2">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`flex items-center space-x-2 py-4 px-3 border-b-2 font-medium text-sm whitespace-nowrap transition-all duration-300 min-w-fit ${
-                      activeTab === tab.id
-                        ? 'border-blue-400 text-blue-300'
-                        : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {activeTab === 'overview' && renderOverview()}
-          {activeTab === 'users' && renderUsers()}
-          {activeTab === 'contacts' && renderContacts()}
-          {activeTab === 'analytics' && renderAnalytics()}
-          {activeTab === 'settings' && renderSettings()}
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };

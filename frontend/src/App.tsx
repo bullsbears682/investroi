@@ -28,6 +28,7 @@ import TermsPage from './pages/TermsPage';
 import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 import NotificationWrapper from './components/NotificationWrapper';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 // Store
@@ -87,6 +88,7 @@ function App() {
                         <Route path="/privacy" element={<PrivacyPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/terms" element={<TermsPage />} />
+                        <Route path="/admin" element={<AdminDashboard />} />
                       </Routes>
                     </main>
                     
