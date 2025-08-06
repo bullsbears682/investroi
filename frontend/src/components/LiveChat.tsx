@@ -22,7 +22,18 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
+  const [showQuestions, setShowQuestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Pre-made questions for users
+  const preMadeQuestions = [
+    "I want to make a partnership",
+    "I have a technical question",
+    "I need help with my account",
+    "I want to report a bug",
+    "I have a billing question",
+    "General inquiry"
+  ];
 
   const currentUser = userManager.getCurrentUser();
 
@@ -60,7 +71,17 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
     );
     
     setSession(newSession);
+    setShowQuestions(true);
     toast.success('Chat session started! An admin will respond soon.');
+  };
+
+  const selectQuestion = (question: string) => {
+    setNewMessage(question);
+    setShowQuestions(false);
+  };
+
+  const startCustomChat = () => {
+    setShowQuestions(false);
   };
 
   const sendMessage = () => {
@@ -185,7 +206,38 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
               <>
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {messages.length === 0 ? (
+                  {messages.length === 0 && showQuestions ? (
+                    // Pre-made Questions Screen
+                    <div className="space-y-4">
+                      <div className="text-center mb-4">
+                        <h3 className="text-white font-medium mb-2">How can we help you?</h3>
+                        <p className="text-white/60 text-sm">Choose a question or write your own</p>
+                      </div>
+                      
+                      {/* Pre-made Questions */}
+                      <div className="space-y-2">
+                        {preMadeQuestions.map((question, index) => (
+                          <button
+                            key={index}
+                            onClick={() => selectQuestion(question)}
+                            className="w-full text-left p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors"
+                          >
+                            <p className="text-white text-sm">{question}</p>
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Custom Message Option */}
+                      <div className="pt-2">
+                        <button
+                          onClick={startCustomChat}
+                          className="w-full p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors"
+                        >
+                          <p className="text-blue-400 text-sm font-medium">Write my own message</p>
+                        </button>
+                      </div>
+                    </div>
+                  ) : messages.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                         <ClockIcon className="w-6 h-6 text-blue-400" />
@@ -221,36 +273,38 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-4 border-t border-white/20">
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                      placeholder="Type your message..."
-                      className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
-                    />
-                    <button
-                      onClick={sendMessage}
-                      disabled={!newMessage.trim()}
-                      className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
-                    >
-                      <SendIcon className="w-4 h-4" />
-                    </button>
+                {(!showQuestions || messages.length > 0) && (
+                  <div className="p-4 border-t border-white/20">
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                        placeholder="Type your message..."
+                        className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+                      />
+                      <button
+                        onClick={sendMessage}
+                        disabled={!newMessage.trim()}
+                        className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
+                      >
+                        <SendIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <button
+                        onClick={closeChat}
+                        className="text-white/60 hover:text-white text-xs transition-colors"
+                      >
+                        End Chat
+                      </button>
+                      <span className="text-white/40 text-xs">
+                        {session.status === 'active' ? 'Connected' : 'Waiting for admin'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <button
-                      onClick={closeChat}
-                      className="text-white/60 hover:text-white text-xs transition-colors"
-                    >
-                      End Chat
-                    </button>
-                    <span className="text-white/40 text-xs">
-                      {session.status === 'active' ? 'Connected' : 'Waiting for admin'}
-                    </span>
-                  </div>
-                </div>
+                )}
               </>
             )}
           </div>

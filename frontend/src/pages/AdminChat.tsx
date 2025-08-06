@@ -150,6 +150,8 @@ const AdminChat: React.FC<AdminChatProps> = () => {
         return 'bg-yellow-500/20 text-yellow-400';
       case 'active':
         return 'bg-green-500/20 text-green-400';
+      case 'resolved':
+        return 'bg-purple-500/20 text-purple-400';
       case 'closed':
         return 'bg-gray-500/20 text-gray-400';
       default:
@@ -162,6 +164,8 @@ const AdminChat: React.FC<AdminChatProps> = () => {
       case 'waiting':
         return <Clock size={16} />;
       case 'active':
+        return <CheckCircle size={16} />;
+      case 'resolved':
         return <CheckCircle size={16} />;
       case 'closed':
         return <X size={16} />;
@@ -269,7 +273,10 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                           <div className={`p-1 rounded-full ${getStatusColor(session.status)}`}>
                             {getStatusIcon(session.status)}
                           </div>
-                          <span className="font-medium text-white">{session.userName}</span>
+                          <div>
+                            <span className="font-medium text-white">{session.ticketNumber}</span>
+                            <span className="text-white/60 text-xs ml-2">{session.userName}</span>
+                          </div>
                         </div>
                         <span className="text-xs text-white/60">{formatTime(session.lastActivity)}</span>
                       </div>
@@ -301,7 +308,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                         <User className="text-white" size={20} />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white">{selectedSession.userName}</h3>
+                        <h3 className="font-semibold text-white">{selectedSession.ticketNumber} - {selectedSession.userName}</h3>
                         <p className="text-sm text-white/60">{selectedSession.userEmail}</p>
                       </div>
                     </div>
@@ -309,6 +316,15 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedSession.status)}`}>
                         {selectedSession.status}
                       </span>
+                      {selectedSession.status === 'active' && (
+                        <button
+                          onClick={handleResolveSession}
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                          title="Resolve Ticket"
+                        >
+                          Resolve
+                        </button>
+                      )}
                       <button
                         onClick={handleCloseSession}
                         className="p-2 text-white/60 hover:text-white transition-colors"
