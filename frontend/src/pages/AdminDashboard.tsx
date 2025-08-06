@@ -110,6 +110,28 @@ const AdminDashboard: React.FC = () => {
       addRandomChatMessage();
     }, 15000); // Add new message every 15 seconds
 
+    // Handle URL parameters for tab switching
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      switch (tabParam) {
+        case 'analytics':
+          setActiveTab('analytics');
+          break;
+        case 'users':
+          setActiveTab('users');
+          break;
+        case 'settings':
+          setActiveTab('settings');
+          break;
+        case 'chat':
+          setActiveTab('chat');
+          break;
+        default:
+          setActiveTab('overview');
+      }
+    }
+
     return () => clearInterval(chatInterval);
   }, []);
 
@@ -524,7 +546,7 @@ const AdminDashboard: React.FC = () => {
           type: 'success',
           title: 'PDF Data Export Complete!',
           message: 'All system data has been exported as PDF file.',
-          redirectTo: '/admin',
+          redirectTo: '/admin?tab=users',
           redirectLabel: 'View Data',
           duration: 8000
         });
@@ -617,7 +639,7 @@ const AdminDashboard: React.FC = () => {
           type: 'success',
           title: 'JSON Data Export Complete!',
           message: 'All system data has been exported as JSON file (PDF generation failed).',
-          redirectTo: '/admin',
+          redirectTo: '/admin?tab=users',
           redirectLabel: 'View Data',
           duration: 8000
         });
@@ -892,7 +914,7 @@ const AdminDashboard: React.FC = () => {
           type: 'success',
           title: 'System Health PDF Generated!',
           message: 'System health report has been downloaded as PDF file.',
-          redirectTo: '/admin',
+          redirectTo: '/admin?tab=settings',
           redirectLabel: 'View System',
           duration: 8000
         });
@@ -1002,7 +1024,7 @@ const AdminDashboard: React.FC = () => {
           type: 'success',
           title: 'System Health JSON Generated!',
           message: 'System health report has been downloaded as JSON file (PDF generation failed).',
-          redirectTo: '/admin',
+          redirectTo: '/admin?tab=settings',
           redirectLabel: 'View System',
           duration: 8000
         });
@@ -1392,7 +1414,7 @@ const AdminDashboard: React.FC = () => {
             type: 'success',
             title: 'Real Database Backup Completed!',
             message: `Backup ${backupData.backupInfo.backupId} created successfully. Data compressed by ${compressionRatio}% and stored securely.`,
-            redirectTo: '/admin',
+            redirectTo: '/admin?tab=chat',
             redirectLabel: 'View Backups',
             duration: 8000
           });
@@ -1412,7 +1434,7 @@ const AdminDashboard: React.FC = () => {
         type: 'error',
         title: 'Backup Failed',
         message: 'Failed to create database backup. Please try again.',
-        redirectTo: '/admin',
+        redirectTo: '/admin?tab=chat',
         redirectLabel: 'View Backups',
         duration: 5000
       });
@@ -1515,7 +1537,7 @@ const AdminDashboard: React.FC = () => {
       type: 'success',
       title: 'Database Backup JSON Generated!',
       message: 'Database backup report has been downloaded as JSON file (PDF generation failed).',
-      redirectTo: '/admin',
+      redirectTo: '/admin?tab=chat',
       redirectLabel: 'View Backups',
       duration: 8000
     });
@@ -1732,7 +1754,7 @@ const AdminDashboard: React.FC = () => {
           type: 'success',
           title: 'PDF Report Generated!',
           message: 'Monthly analytics report has been downloaded as PDF file.',
-          redirectTo: '/admin',
+          redirectTo: '/admin?tab=analytics',
           redirectLabel: 'View Analytics',
           duration: 8000
         });
@@ -1922,7 +1944,7 @@ const AdminDashboard: React.FC = () => {
           type: 'success',
           title: 'HTML Report Generated!',
           message: 'Monthly analytics report has been downloaded as HTML file (PDF generation failed).',
-          redirectTo: '/admin',
+          redirectTo: '/admin?tab=analytics',
           redirectLabel: 'View Analytics',
           duration: 8000
         });
