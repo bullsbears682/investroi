@@ -82,7 +82,7 @@ class ChatSystem {
   }
 
   // Assign session to admin
-  assignSessionToAdmin(sessionId: string, adminId: string, adminName: string): void {
+  async assignSessionToAdmin(sessionId: string, adminId: string, adminName: string): Promise<void> {
     const sessions = this.getAllSessions();
     const session = sessions.find(s => s.id === sessionId);
     
@@ -92,7 +92,11 @@ class ChatSystem {
       session.status = 'active';
       session.lastActivity = new Date().toISOString();
       this.saveSessions(sessions);
+      
+      // Return a promise to ensure the operation completes
+      return Promise.resolve();
     }
+    return Promise.reject(new Error('Session not found'));
   }
 
   // Close a chat session
@@ -108,7 +112,7 @@ class ChatSystem {
   }
 
   // Send a message
-  sendMessage(sessionId: string, userId: string, userName: string, userEmail: string, message: string, isAdmin: boolean = false): ChatMessage {
+  async sendMessage(sessionId: string, userId: string, userName: string, userEmail: string, message: string, isAdmin: boolean = false): Promise<ChatMessage> {
     const chatMessage: ChatMessage = {
       id: this.generateMessageId(),
       userId,
@@ -136,7 +140,7 @@ class ChatSystem {
       this.saveSessions(sessions);
     }
 
-    return chatMessage;
+    return Promise.resolve(chatMessage);
   }
 
   // Get messages for a specific session

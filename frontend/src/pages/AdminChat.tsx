@@ -14,6 +14,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [activeTab, setActiveTab] = useState<'waiting' | 'active' | 'closed'>('waiting');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadSessions();
@@ -47,31 +48,60 @@ const AdminChat: React.FC<AdminChatProps> = () => {
     }
   };
 
-  const handleSelectSession = (session: ChatSession) => {
-    setSelectedSession(session);
-    loadMessages(session.id);
-    
-    // Assign session to admin if it's waiting
-    if (session.status === 'waiting') {
-      chatSystem.assignSessionToAdmin(session.id, 'admin-1', 'Admin');
-      loadSessions(); // Refresh sessions
+  const handleSelectSession = async (session: ChatSession) => {
+    setIsLoading(true);
+    try {
+      setSelectedSession(session);
+      loadMessages(session.id);
+      
+      // Assign session to admin if it's waiting
+      if (session.status === 'waiting') {
+        await chatSystem.assignSessionToAdmin(session.id, 'admin-1', 'Admin');
+        // Refresh sessions to update the status
+        setTimeout(() => {
+          loadSessions();
+          // Re-select the updated session
+          const updatedSessions = chatSystem.getAllSessions();
+          const updatedSession = updatedSessions.find(s => s.id === session.id);
+          if (updatedSession) {
+            setSelectedSession(updatedSession);
+          }
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error selecting session:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedSession) return;
 
-    chatSystem.sendMessage(
-      selectedSession.id,
-      'admin-1',
-      'Admin',
-      'admin@investwisepro.com',
-      newMessage.trim(),
-      true // isAdmin = true
-    );
+    setIsLoading(true);
+    try {
+      // Ensure session is assigned to admin if it's waiting
+      if (selectedSession.status === 'waiting') {
+        await chatSystem.assignSessionToAdmin(selectedSession.id, 'admin-1', 'Admin');
+      }
 
-    setNewMessage('');
-    loadMessages(selectedSession.id);
+      await chatSystem.sendMessage(
+        selectedSession.id,
+        'admin-1',
+        'Admin',
+        'admin@investwisepro.com',
+        newMessage.trim(),
+        true // isAdmin = true
+      );
+
+      setNewMessage('');
+      loadMessages(selectedSession.id);
+      loadSessions(); // Refresh sessions to update last message
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCloseSession = () => {
@@ -239,7 +269,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="lg:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
+          <div className="lg:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden flex flex-col">
             {selectedSession ? (
               <>
                 {/* Chat Header */}
@@ -270,7 +300,7 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(100vh-400px)]">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                   {messages.length === 0 ? (
                     <div className="text-center py-8">
                       <MessageCircle className="mx-auto text-white/40 mb-4" size={32} />
@@ -301,25 +331,31 @@ const AdminChat: React.FC<AdminChatProps> = () => {
                   )}
                 </div>
 
-                {/* Message Input */}
-                <div className="p-4 border-t border-white/20">
+                {/* Message Input - Always visible when session is selected */}
+                <div className="p-4 border-t border-white/20 bg-white/5">
                   <div className="flex space-x-2">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
                       placeholder="Type your message..."
-                      className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+                      disabled={isLoading}
+                      className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm disabled:opacity-50"
                     />
                     <button
                       onClick={handleSendMessage}
-                      disabled={!newMessage.trim()}
+                      disabled={!newMessage.trim() || isLoading}
                       className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors"
                     >
                       <Send size={16} />
                     </button>
                   </div>
+                  {isLoading && (
+                    <div className="mt-2 text-xs text-white/60">
+                      Processing...
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
