@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, HardDrive, Download, CheckCircle, Trash2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, HardDrive, Download, CheckCircle, Trash2, RefreshCw, X, Eye } from 'lucide-react';
 
 interface Backup {
   timestamp: number;
@@ -23,6 +23,7 @@ const AdminBackups: React.FC = () => {
   const navigate = useNavigate();
   const [backups, setBackups] = useState<Backup[]>([]);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     loadBackups();
@@ -77,25 +78,37 @@ const AdminBackups: React.FC = () => {
     }
   };
 
+  const handleViewDetails = (backup: Backup) => {
+    setSelectedBackup(backup);
+    setIsDetailsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedBackup(null);
+    setIsDetailsModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-xl border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => navigate('/admin')}
-                className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors"
+                className="flex items-center space-x-1 sm:space-x-2 text-white/80 hover:text-white transition-colors p-2 sm:p-0"
               >
-                <ArrowLeft size={20} />
-                <span>Back to Dashboard</span>
+                <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="sm:hidden">Back</span>
               </button>
             </div>
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-white flex items-center space-x-2">
-                <HardDrive size={28} />
-                <span>Backup Management</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <h1 className="text-lg sm:text-2xl font-bold text-white flex items-center space-x-2">
+                <HardDrive size={24} className="sm:w-7 sm:h-7" />
+                <span className="hidden sm:inline">Backup Management</span>
+                <span className="sm:hidden">Backups</span>
               </h1>
             </div>
           </div>
@@ -103,63 +116,63 @@ const AdminBackups: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Backup Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm font-medium">Total Backups</p>
-                <p className="text-3xl font-bold text-white">{backups.length}</p>
+                <p className="text-white/60 text-xs sm:text-sm font-medium">Total Backups</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{backups.length}</p>
               </div>
-              <div className="bg-blue-500/20 p-3 rounded-xl">
-                <HardDrive className="text-blue-400" size={24} />
+              <div className="bg-blue-500/20 p-2 sm:p-3 rounded-lg sm:rounded-xl">
+                <HardDrive className="text-blue-400 sm:w-6 sm:h-6" size={20} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+          <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm font-medium">Latest Backup</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-white/60 text-xs sm:text-sm font-medium">Latest Backup</p>
+                <p className="text-sm sm:text-lg font-bold text-white">
                   {backups.length > 0 
                     ? new Date(backups[backups.length - 1].timestamp).toLocaleDateString()
                     : 'No backups'
                   }
                 </p>
               </div>
-              <div className="bg-green-500/20 p-3 rounded-xl">
-                <CheckCircle className="text-green-400" size={24} />
+              <div className="bg-green-500/20 p-2 sm:p-3 rounded-lg sm:rounded-xl">
+                <CheckCircle className="text-green-400 sm:w-6 sm:h-6" size={20} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+          <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white/60 text-sm font-medium">Storage Used</p>
-                <p className="text-lg font-bold text-white">
+                <p className="text-white/60 text-xs sm:text-sm font-medium">Storage Used</p>
+                <p className="text-sm sm:text-lg font-bold text-white">
                   {backups.length > 0 
                     ? `${(backups.reduce((sum, backup) => sum + parseFloat(backup.metadata.compressedSize.replace(' KB', '')), 0) / 1024).toFixed(2)} MB`
                     : '0 MB'
                   }
                 </p>
               </div>
-              <div className="bg-purple-500/20 p-3 rounded-xl">
-                <Download className="text-purple-400" size={24} />
+              <div className="bg-purple-500/20 p-2 sm:p-3 rounded-lg sm:rounded-xl">
+                <Download className="text-purple-400 sm:w-6 sm:h-6" size={20} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Backup List */}
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-white">Backup History</h3>
+        <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">Backup History</h3>
             <button
               onClick={loadBackups}
-              className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors w-full sm:w-auto"
             >
               <RefreshCw size={16} />
               <span>Refresh</span>
@@ -167,24 +180,52 @@ const AdminBackups: React.FC = () => {
           </div>
 
           {backups.length === 0 ? (
-            <div className="text-center py-12">
-              <HardDrive className="mx-auto text-white/40" size={48} />
-              <p className="text-white/60 mt-4 text-lg">No backups found</p>
-              <p className="text-white/40 mt-2">Create your first backup from the main dashboard</p>
+            <div className="text-center py-8 sm:py-12">
+              <HardDrive className="mx-auto text-white/40 sm:w-12 sm:h-12" size={40} />
+              <p className="text-white/60 mt-4 text-base sm:text-lg">No backups found</p>
+              <p className="text-white/40 mt-2 text-sm sm:text-base">Create your first backup from the main dashboard</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {backups.map((backup) => (
-                <div key={backup.backupId} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h4 className="text-white font-medium">{backup.backupId}</h4>
-                        <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
+                <div key={backup.backupId} className="bg-white/5 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-white/10">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-3 sm:space-y-0">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mb-2">
+                        <h4 className="text-white font-medium text-sm sm:text-base truncate">{backup.backupId}</h4>
+                        <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium w-fit">
                           Successful
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      
+                      {/* Mobile Layout */}
+                      <div className="sm:hidden space-y-2">
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-white/60">Date:</span>
+                            <p className="text-white">{new Date(backup.timestamp).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-white/60">Time:</span>
+                            <p className="text-white">{new Date(backup.timestamp).toLocaleTimeString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-white/60">Size:</span>
+                            <p className="text-white">{backup.metadata.compressedSize}</p>
+                          </div>
+                          <div>
+                            <span className="text-white/60">Records:</span>
+                            <p className="text-white">{backup.metadata.totalRecords}</p>
+                          </div>
+                        </div>
+                        <div className="text-xs text-white/60">
+                          <span>Compression: {backup.metadata.compressionRatio} | </span>
+                          <span>Encryption: {backup.metadata.encryptionStatus}</span>
+                        </div>
+                      </div>
+
+                      {/* Desktop Layout */}
+                      <div className="hidden sm:grid sm:grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-white/60">Date:</span>
                           <p className="text-white">{new Date(backup.timestamp).toLocaleDateString()}</p>
@@ -202,30 +243,40 @@ const AdminBackups: React.FC = () => {
                           <p className="text-white">{backup.metadata.totalRecords}</p>
                         </div>
                       </div>
-                      <div className="mt-3 text-xs text-white/60">
+                      
+                      <div className="hidden sm:block mt-3 text-xs text-white/60">
                         <span>Compression: {backup.metadata.compressionRatio} | </span>
                         <span>Encryption: {backup.metadata.encryptionStatus} | </span>
                         <span>Checksum: {backup.metadata.integrityChecksum.substring(0, 8)}...</span>
                       </div>
                     </div>
-                    <div className="flex space-x-2 ml-4">
+                    
+                    {/* Action Buttons */}
+                    <div className="flex justify-center sm:justify-end space-x-2 sm:ml-4">
+                      <button
+                        onClick={() => handleViewDetails(backup)}
+                        className="p-2 text-blue-400 hover:text-blue-300 transition-colors rounded-lg hover:bg-white/10"
+                        title="View Details"
+                      >
+                        <Eye size={16} />
+                      </button>
                       <button
                         onClick={() => handleDownloadBackup(backup)}
-                        className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
+                        className="p-2 text-blue-400 hover:text-blue-300 transition-colors rounded-lg hover:bg-white/10"
                         title="Download Backup"
                       >
                         <Download size={16} />
                       </button>
                       <button
                         onClick={() => handleRestoreBackup(backup)}
-                        className="p-2 text-green-400 hover:text-green-300 transition-colors"
+                        className="p-2 text-green-400 hover:text-green-300 transition-colors rounded-lg hover:bg-white/10"
                         title="Restore Backup"
                       >
                         <RefreshCw size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteBackup(backup.backupId)}
-                        className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                        className="p-2 text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-white/10"
                         title="Delete Backup"
                       >
                         <Trash2 size={16} />
@@ -239,48 +290,71 @@ const AdminBackups: React.FC = () => {
         </div>
 
         {/* Backup Details Modal */}
-        {selectedBackup && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-2xl w-full mx-4">
+        {isDetailsModalOpen && selectedBackup && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-white">Backup Details</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white">Backup Details</h3>
                 <button
-                  onClick={() => setSelectedBackup(null)}
-                  className="text-white/60 hover:text-white"
+                  onClick={closeModal}
+                  className="text-white/60 hover:text-white p-1"
                 >
-                  ×
+                  <X size={20} />
                 </button>
               </div>
               <div className="space-y-4 text-white/80">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <span className="text-white/60">Backup ID:</span>
-                    <p className="text-white">{selectedBackup.backupId}</p>
+                    <span className="text-white/60 text-sm">Backup ID:</span>
+                    <p className="text-white text-sm sm:text-base break-all">{selectedBackup.backupId}</p>
                   </div>
                   <div>
-                    <span className="text-white/60">Date:</span>
-                    <p className="text-white">{new Date(selectedBackup.timestamp).toLocaleString()}</p>
+                    <span className="text-white/60 text-sm">Date:</span>
+                    <p className="text-white text-sm sm:text-base">{new Date(selectedBackup.timestamp).toLocaleString()}</p>
                   </div>
                   <div>
-                    <span className="text-white/60">Original Size:</span>
-                    <p className="text-white">{selectedBackup.metadata.originalSize}</p>
+                    <span className="text-white/60 text-sm">Original Size:</span>
+                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.originalSize}</p>
                   </div>
                   <div>
-                    <span className="text-white/60">Compressed Size:</span>
-                    <p className="text-white">{selectedBackup.metadata.compressedSize}</p>
+                    <span className="text-white/60 text-sm">Compressed Size:</span>
+                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.compressedSize}</p>
                   </div>
                   <div>
-                    <span className="text-white/60">Compression Ratio:</span>
-                    <p className="text-white">{selectedBackup.metadata.compressionRatio}</p>
+                    <span className="text-white/60 text-sm">Compression Ratio:</span>
+                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.compressionRatio}</p>
                   </div>
                   <div>
-                    <span className="text-white/60">Total Records:</span>
-                    <p className="text-white">{selectedBackup.metadata.totalRecords}</p>
+                    <span className="text-white/60 text-sm">Total Records:</span>
+                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.totalRecords}</p>
                   </div>
                 </div>
                 <div>
-                  <span className="text-white/60">Integrity Checksum:</span>
-                  <p className="text-white font-mono text-sm">{selectedBackup.metadata.integrityChecksum}</p>
+                  <span className="text-white/60 text-sm">Integrity Checksum:</span>
+                  <p className="text-white font-mono text-xs sm:text-sm break-all">{selectedBackup.metadata.integrityChecksum}</p>
+                </div>
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={() => handleDownloadBackup(selectedBackup)}
+                    className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    <Download size={16} />
+                    <span>Download</span>
+                  </button>
+                  <button
+                    onClick={() => handleRestoreBackup(selectedBackup)}
+                    className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    <RefreshCw size={16} />
+                    <span>Restore</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteBackup(selectedBackup.backupId)}
+                    className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    <Trash2 size={16} />
+                    <span>Delete</span>
+                  </button>
                 </div>
               </div>
             </div>
