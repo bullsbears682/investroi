@@ -139,7 +139,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl w-80 h-96 flex flex-col"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl w-80 h-[420px] flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/20">
@@ -209,37 +209,37 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
               // Chat Interface
               <>
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                <div className="flex-1 overflow-y-auto p-3 space-y-2">
                   {messages.length === 0 && showQuestions ? (
                     // Pre-made Questions Screen
-                    <div className="space-y-4">
-                      <div className="text-center mb-4">
-                        <h3 className="text-white font-medium mb-2">How can we help you?</h3>
-                        <p className="text-white/60 text-sm">Choose a question or write your own</p>
+                    <div className="space-y-3 max-h-full overflow-y-auto">
+                      <div className="text-center mb-3">
+                        <h3 className="text-white font-medium mb-1">How can we help you?</h3>
+                        <p className="text-white/60 text-xs">Choose a question or write your own</p>
                       </div>
                       
                       {/* Pre-made Questions */}
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         {preMadeQuestions.map((question, index) => (
                           <button
                             key={index}
                             onClick={(e) => selectQuestion(question, e)}
-                            className="w-full text-left p-3 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors"
+                            className="w-full text-left p-2 bg-white/10 hover:bg-white/20 rounded-lg border border-white/20 transition-colors"
                             type="button"
                           >
-                            <p className="text-white text-sm">{question}</p>
+                            <p className="text-white text-xs leading-tight">{question}</p>
                           </button>
                         ))}
                       </div>
                       
                       {/* Custom Message Option */}
-                      <div className="pt-2">
+                      <div className="pt-1">
                         <button
                           onClick={(e) => startCustomChat(e)}
-                          className="w-full p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors"
+                          className="w-full p-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg border border-blue-500/30 transition-colors"
                           type="button"
                         >
-                          <p className="text-blue-400 text-sm font-medium">Write my own message</p>
+                          <p className="text-blue-400 text-xs font-medium">Write my own message</p>
                         </button>
                       </div>
                     </div>
@@ -280,7 +280,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
 
                 {/* Message Input */}
                 {(!showQuestions || messages.length > 0) && (
-                  <div className="p-4 border-t border-white/20">
+                  <div className="p-3 border-t border-white/20">
                     <div className="flex space-x-2">
                       <input
                         type="text"
