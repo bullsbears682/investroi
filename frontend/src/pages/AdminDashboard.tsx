@@ -236,10 +236,82 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleExportData = () => {
+    // Create comprehensive data export
+    const exportData = {
+      exportInfo: {
+        timestamp: new Date().toISOString(),
+        generatedBy: 'Admin Dashboard',
+        version: '1.0',
+        dataSource: 'ROI Calculator Application'
+      },
+      statistics: {
+        totalUsers: adminStats.totalUsers,
+        activeUsers: adminStats.activeUsers,
+        totalCalculations: adminStats.totalCalculations,
+        totalExports: adminStats.totalExports,
+        revenue: adminStats.revenue,
+        growthRate: adminStats.growthRate,
+        monthlyGrowth: adminStats.monthlyGrowth,
+        conversionRate: adminStats.conversionRate,
+        averageSessionTime: adminStats.averageSessionTime,
+        bounceRate: adminStats.bounceRate,
+        liveChatUsers: chatUsers.length,
+        totalChatMessages: chatMessages.length,
+        totalContacts: contacts.length
+      },
+      users: users.map(user => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        totalCalculations: user.totalCalculations,
+        totalExports: user.totalExports,
+        lastActive: user.lastActive,
+        status: user.status
+      })),
+      contacts: contacts.map(contact => ({
+        id: contact.id,
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        message: contact.message,
+        date: contact.date,
+        status: contact.status
+      })),
+      chatMessages: chatMessages.map(msg => ({
+        id: msg.id,
+        userId: msg.userId,
+        userName: msg.userName,
+        message: msg.message,
+        timestamp: msg.timestamp,
+        type: msg.type,
+        status: msg.status
+      })),
+      chatUsers: chatUsers,
+      systemInfo: {
+        exportDate: new Date().toLocaleDateString(),
+        exportTime: new Date().toLocaleTimeString(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        userAgent: navigator.userAgent,
+        platform: navigator.platform
+      }
+    };
+
+    // Create and download JSON file
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = window.URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `admin-data-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
     addNotification({
       type: 'success',
       title: 'Data Export Complete!',
-      message: 'All system data has been exported successfully.',
+      message: 'All system data has been exported as JSON file.',
       redirectTo: '/admin',
       redirectLabel: 'View Dashboard',
       duration: 8000
