@@ -29,6 +29,10 @@ import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 import NotificationWrapper from './components/NotificationWrapper';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminAnalytics from './pages/AdminAnalytics';
+import AdminData from './pages/AdminData';
+import AdminSystem from './pages/AdminSystem';
+import AdminBackups from './pages/AdminBackups';
 
 
 // Store
@@ -89,6 +93,10 @@ function App() {
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/terms" element={<TermsPage />} />
                         <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/admin/analytics" element={<AdminAnalytics />} />
+                        <Route path="/admin/data" element={<AdminData />} />
+                        <Route path="/admin/system" element={<AdminSystem />} />
+                        <Route path="/admin/backups" element={<AdminBackups />} />
                       </Routes>
                     </main>
                     

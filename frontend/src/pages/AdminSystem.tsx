@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Shield, Activity, Database, Server, Wifi, HardDrive, Cpu, Memory } from 'lucide-react';
+import { ArrowLeft, Settings, Shield, Activity, Database, Server, Cpu } from 'lucide-react';
 
 const AdminSystem: React.FC = () => {
   const navigate = useNavigate();
-  const [systemHealth, setSystemHealth] = useState({
+  const [systemHealth] = useState({
     status: 'Healthy',
     uptime: '24/7',
     lastMaintenance: new Date().toLocaleDateString(),
@@ -19,7 +19,7 @@ const AdminSystem: React.FC = () => {
     successRate: '99.9%'
   });
 
-  const [securityStatus, setSecurityStatus] = useState({
+  const [securityStatus] = useState({
     sslCertificate: 'Valid',
     firewallStatus: 'Active',
     ddosProtection: 'Enabled',
@@ -30,7 +30,7 @@ const AdminSystem: React.FC = () => {
     sessionTimeout: '30 minutes'
   });
 
-  const [applicationHealth, setApplicationHealth] = useState({
+  const [applicationHealth] = useState({
     frontendStatus: 'Operational',
     backendAPI: 'Healthy',
     database: 'Connected',
@@ -101,7 +101,7 @@ const AdminSystem: React.FC = () => {
                 <p className="text-2xl font-bold text-purple-400">{systemHealth.memoryUsage}</p>
               </div>
               <div className="bg-purple-500/20 p-3 rounded-xl">
-                <Memory className="text-purple-400" size={24} />
+                <Database className="text-purple-400" size={24} />
               </div>
             </div>
           </div>
