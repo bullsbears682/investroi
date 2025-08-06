@@ -341,228 +341,409 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleGenerateReport = () => {
-    // Create PDF content using jsPDF
-    import('jspdf').then(({ jsPDF }) => {
-      const doc = new jsPDF();
-    
-    // Set up PDF styling
-    const pageWidth = doc.internal.pageSize.width;
-    const margin = 20;
-    let yPosition = 20;
-    
-    // Header
-    doc.setFontSize(24);
-    doc.setTextColor(51, 51, 51);
-    doc.text('Admin Dashboard Report', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 15;
-    
-    doc.setFontSize(12);
-    doc.setTextColor(102, 102, 102);
-    doc.text(`Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 25;
-    
-    // Executive Summary
-    doc.setFontSize(18);
-    doc.setTextColor(51, 51, 51);
-    doc.text('Executive Summary', margin, yPosition);
-    yPosition += 15;
-    
-    // Statistics table
-    const stats = [
-      ['Total Users', adminStats.totalUsers.toString()],
-      ['Active Users', adminStats.activeUsers.toString()],
-      ['Total Calculations', adminStats.totalCalculations.toString()],
-      ['Total Exports', adminStats.totalExports.toString()],
-      ['Revenue', `$${adminStats.revenue.toFixed(2)}`],
-      ['Live Chats', chatUsers.length.toString()]
-    ];
-    
-    doc.setFontSize(10);
-    doc.setTextColor(51, 51, 51);
-    
-    stats.forEach(([label, value], index) => {
-      const x1 = margin;
-      const x2 = pageWidth - margin;
-      const rowHeight = 8;
-      
-      // Background for alternating rows
-      if (index % 2 === 0) {
-        doc.setFillColor(248, 249, 250);
-        doc.rect(x1, yPosition - 5, x2 - x1, rowHeight, 'F');
-      }
-      
-      doc.text(label, x1 + 5, yPosition);
-      doc.text(value, x2 - 5, yPosition, { align: 'right' });
-      yPosition += rowHeight;
-    });
-    
-    yPosition += 15;
-    
-    // User Details
-    if (users.length > 0) {
-      doc.setFontSize(16);
-      doc.setTextColor(51, 51, 51);
-      doc.text('User Details', margin, yPosition);
-      yPosition += 15;
-      
-      // Check if we need a new page
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      
-      doc.setFontSize(10);
-      doc.setTextColor(51, 51, 51);
-      
-      // User table headers
-      const headers = ['Name', 'Email', 'Calculations', 'Exports', 'Status'];
-      const colWidths = [40, 50, 25, 20, 25];
-      let xPos = margin;
-      
-      headers.forEach((header, index) => {
-        doc.setFillColor(248, 249, 250);
-        doc.rect(xPos, yPosition - 5, colWidths[index], 8, 'F');
-        doc.text(header, xPos + 2, yPosition);
-        xPos += colWidths[index];
-      });
-      yPosition += 10;
-      
-      // User data
-      users.forEach((user, index) => {
-        // Check if we need a new page
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
+    // Try to generate PDF, fallback to HTML if jsPDF fails
+    try {
+      // Dynamic import of jsPDF
+      import('jspdf').then(({ jsPDF }) => {
+        const doc = new jsPDF();
         
-        xPos = margin;
-        const userData = [
-          user.name.substring(0, 15),
-          user.email.substring(0, 20),
-          user.totalCalculations.toString(),
-          user.totalExports.toString(),
-          user.status
+        // Set up PDF styling
+        const pageWidth = doc.internal.pageSize.width;
+        const margin = 20;
+        let yPosition = 20;
+        
+        // Header
+        doc.setFontSize(24);
+        doc.setTextColor(51, 51, 51);
+        doc.text('Admin Dashboard Report', pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 15;
+        
+        doc.setFontSize(12);
+        doc.setTextColor(102, 102, 102);
+        doc.text(`Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 25;
+        
+        // Executive Summary
+        doc.setFontSize(18);
+        doc.setTextColor(51, 51, 51);
+        doc.text('Executive Summary', margin, yPosition);
+        yPosition += 15;
+        
+        // Statistics table
+        const stats = [
+          ['Total Users', adminStats.totalUsers.toString()],
+          ['Active Users', adminStats.activeUsers.toString()],
+          ['Total Calculations', adminStats.totalCalculations.toString()],
+          ['Total Exports', adminStats.totalExports.toString()],
+          ['Revenue', `$${adminStats.revenue.toFixed(2)}`],
+          ['Live Chats', chatUsers.length.toString()]
         ];
         
-        userData.forEach((data, colIndex) => {
+        doc.setFontSize(10);
+        doc.setTextColor(51, 51, 51);
+        
+        stats.forEach(([label, value], index) => {
+          const x1 = margin;
+          const x2 = pageWidth - margin;
+          const rowHeight = 8;
+          
+          // Background for alternating rows
           if (index % 2 === 0) {
             doc.setFillColor(248, 249, 250);
-            doc.rect(xPos, yPosition - 5, colWidths[colIndex], 8, 'F');
+            doc.rect(x1, yPosition - 5, x2 - x1, rowHeight, 'F');
           }
-          doc.text(data, xPos + 2, yPosition);
-          xPos += colWidths[colIndex];
+          
+          doc.text(label, x1 + 5, yPosition);
+          doc.text(value, x2 - 5, yPosition, { align: 'right' });
+          yPosition += rowHeight;
         });
-        yPosition += 8;
-      });
-      
-      yPosition += 15;
-    }
-    
-    // Contact Messages
-    if (contacts.length > 0) {
-      doc.setFontSize(16);
-      doc.setTextColor(51, 51, 51);
-      doc.text('Contact Messages', margin, yPosition);
-      yPosition += 15;
-      
-      // Check if we need a new page
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      
-      doc.setFontSize(10);
-      doc.setTextColor(51, 51, 51);
-      
-      contacts.forEach((contact) => {
-        // Check if we need a new page
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
+        
+        yPosition += 15;
+        
+        // User Details
+        if (users.length > 0) {
+          doc.setFontSize(16);
+          doc.setTextColor(51, 51, 51);
+          doc.text('User Details', margin, yPosition);
+          yPosition += 15;
+          
+          // Check if we need a new page
+          if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          
+          doc.setFontSize(10);
+          doc.setTextColor(51, 51, 51);
+          
+          // User table headers
+          const headers = ['Name', 'Email', 'Calculations', 'Exports', 'Status'];
+          const colWidths = [40, 50, 25, 20, 25];
+          let xPos = margin;
+          
+          headers.forEach((header, index) => {
+            doc.setFillColor(248, 249, 250);
+            doc.rect(xPos, yPosition - 5, colWidths[index], 8, 'F');
+            doc.text(header, xPos + 2, yPosition);
+            xPos += colWidths[index];
+          });
+          yPosition += 10;
+          
+          // User data
+          users.forEach((user, index) => {
+            // Check if we need a new page
+            if (yPosition > 250) {
+              doc.addPage();
+              yPosition = 20;
+            }
+            
+            xPos = margin;
+            const userData = [
+              user.name.substring(0, 15),
+              user.email.substring(0, 20),
+              user.totalCalculations.toString(),
+              user.totalExports.toString(),
+              user.status
+            ];
+            
+            userData.forEach((data, colIndex) => {
+              if (index % 2 === 0) {
+                doc.setFillColor(248, 249, 250);
+                doc.rect(xPos, yPosition - 5, colWidths[colIndex], 8, 'F');
+              }
+              doc.text(data, xPos + 2, yPosition);
+              xPos += colWidths[colIndex];
+            });
+            yPosition += 8;
+          });
+          
+          yPosition += 15;
         }
         
-        doc.setFillColor(248, 249, 250);
-        doc.rect(margin, yPosition - 5, pageWidth - 2 * margin, 20, 'F');
-        
-        doc.text(`Name: ${contact.name}`, margin + 5, yPosition);
-        doc.text(`Email: ${contact.email}`, margin + 5, yPosition + 5);
-        doc.text(`Phone: ${contact.phone}`, margin + 5, yPosition + 10);
-        doc.text(`Status: ${contact.status}`, margin + 5, yPosition + 15);
-        
-        yPosition += 25;
-      });
-      
-      yPosition += 15;
-    }
-    
-    // Recent Chat Activity
-    if (chatMessages.length > 0) {
-      doc.setFontSize(16);
-      doc.setTextColor(51, 51, 51);
-      doc.text('Recent Chat Activity', margin, yPosition);
-      yPosition += 15;
-      
-      // Check if we need a new page
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      
-      doc.setFontSize(10);
-      doc.setTextColor(51, 51, 51);
-      
-      // Show last 10 chat messages
-      const recentMessages = chatMessages.slice(-10);
-      recentMessages.forEach((msg) => {
-        // Check if we need a new page
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
+        // Contact Messages
+        if (contacts.length > 0) {
+          doc.setFontSize(16);
+          doc.setTextColor(51, 51, 51);
+          doc.text('Contact Messages', margin, yPosition);
+          yPosition += 15;
+          
+          // Check if we need a new page
+          if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          
+          doc.setFontSize(10);
+          doc.setTextColor(51, 51, 51);
+          
+          contacts.forEach((contact) => {
+            // Check if we need a new page
+            if (yPosition > 250) {
+              doc.addPage();
+              yPosition = 20;
+            }
+            
+            doc.setFillColor(248, 249, 250);
+            doc.rect(margin, yPosition - 5, pageWidth - 2 * margin, 20, 'F');
+            
+            doc.text(`Name: ${contact.name}`, margin + 5, yPosition);
+            doc.text(`Email: ${contact.email}`, margin + 5, yPosition + 5);
+            doc.text(`Phone: ${contact.phone}`, margin + 5, yPosition + 10);
+            doc.text(`Status: ${contact.status}`, margin + 5, yPosition + 15);
+            
+            yPosition += 25;
+          });
+          
+          yPosition += 15;
         }
         
-        doc.setFillColor(248, 249, 250);
-        doc.rect(margin, yPosition - 5, pageWidth - 2 * margin, 15, 'F');
+        // Recent Chat Activity
+        if (chatMessages.length > 0) {
+          doc.setFontSize(16);
+          doc.setTextColor(51, 51, 51);
+          doc.text('Recent Chat Activity', margin, yPosition);
+          yPosition += 15;
+          
+          // Check if we need a new page
+          if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          
+          doc.setFontSize(10);
+          doc.setTextColor(51, 51, 51);
+          
+          // Show last 10 chat messages
+          const recentMessages = chatMessages.slice(-10);
+          recentMessages.forEach((msg) => {
+            // Check if we need a new page
+            if (yPosition > 250) {
+              doc.addPage();
+              yPosition = 20;
+            }
+            
+            doc.setFillColor(248, 249, 250);
+            doc.rect(margin, yPosition - 5, pageWidth - 2 * margin, 15, 'F');
+            
+            doc.text(`${msg.userName} (${msg.type}):`, margin + 5, yPosition);
+            doc.text(msg.message.substring(0, 60), margin + 5, yPosition + 5);
+            doc.text(new Date(msg.timestamp).toLocaleString(), margin + 5, yPosition + 10);
+            
+            yPosition += 20;
+          });
+        }
         
-        doc.text(`${msg.userName} (${msg.type}):`, margin + 5, yPosition);
-        doc.text(msg.message.substring(0, 60), margin + 5, yPosition + 5);
-        doc.text(new Date(msg.timestamp).toLocaleString(), margin + 5, yPosition + 10);
+        // Footer
+        const totalPages = doc.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(102, 102, 102);
+          doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, 290, { align: 'center' });
+          doc.text('Generated by Admin Dashboard', margin, 290);
+          doc.text('ROI Calculator Application', pageWidth - margin, 290, { align: 'right' });
+        }
         
-        yPosition += 20;
-      });
-    }
-    
-    // Footer
-    const totalPages = doc.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(102, 102, 102);
-      doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, 290, { align: 'center' });
-      doc.text('Generated by Admin Dashboard', margin, 290);
-      doc.text('ROI Calculator Application', pageWidth - margin, 290, { align: 'right' });
-    }
-    
-      // Save the PDF
-      doc.save(`admin-report-${new Date().toISOString().split('T')[0]}.pdf`);
+        // Save the PDF
+        doc.save(`admin-report-${new Date().toISOString().split('T')[0]}.pdf`);
 
-      addNotification({
-        type: 'success',
-        title: 'Report Generated!',
-        message: 'Monthly analytics report has been downloaded as PDF file.',
-        redirectTo: '/admin',
-        redirectLabel: 'View Dashboard',
-        duration: 8000
+        addNotification({
+          type: 'success',
+          title: 'PDF Report Generated!',
+          message: 'Monthly analytics report has been downloaded as PDF file.',
+          redirectTo: '/admin',
+          redirectLabel: 'View Dashboard',
+          duration: 8000
+        });
+      }).catch(error => {
+        console.error('Error generating PDF:', error);
+        // Fallback to HTML generation
+        generateHTMLReport();
       });
-    }).catch(error => {
-      console.error('Error generating PDF:', error);
-      addNotification({
-        type: 'error',
-        title: 'PDF Generation Failed',
-        message: 'Failed to generate PDF report. Please try again.',
-        redirectTo: '/admin',
-        redirectLabel: 'View Dashboard',
-        duration: 5000
-      });
+    } catch (error) {
+      console.error('Error with PDF generation:', error);
+      // Fallback to HTML generation
+      generateHTMLReport();
+    }
+  };
+
+  const generateHTMLReport = () => {
+    // Create HTML report as fallback
+    const reportContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .header h1 { color: #333; margin-bottom: 10px; }
+            .header p { color: #666; }
+            .section { margin-bottom: 30px; }
+            .section h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+            .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+            .stat-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #007bff; }
+            .stat-card h3 { margin: 0 0 10px 0; color: #333; }
+            .stat-card .value { font-size: 24px; font-weight: bold; color: #007bff; }
+            .stat-card .label { color: #666; font-size: 14px; }
+            .user-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            .user-table th, .user-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            .user-table th { background: #f8f9fa; font-weight: bold; }
+            .footer { margin-top: 40px; text-align: center; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Admin Dashboard Report</h1>
+            <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+          </div>
+
+          <div class="section">
+            <h2>Executive Summary</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h3>Total Users</h3>
+                <div class="value">${adminStats.totalUsers}</div>
+                <div class="label">Registered users</div>
+              </div>
+              <div class="stat-card">
+                <h3>Active Users</h3>
+                <div class="value">${adminStats.activeUsers}</div>
+                <div class="label">Currently active</div>
+              </div>
+              <div class="stat-card">
+                <h3>Total Calculations</h3>
+                <div class="value">${adminStats.totalCalculations}</div>
+                <div class="label">ROI calculations performed</div>
+              </div>
+              <div class="stat-card">
+                <h3>Total Exports</h3>
+                <div class="value">${adminStats.totalExports}</div>
+                <div class="label">Reports exported</div>
+              </div>
+              <div class="stat-card">
+                <h3>Revenue</h3>
+                <div class="value">$${adminStats.revenue.toFixed(2)}</div>
+                <div class="label">Estimated revenue</div>
+              </div>
+              <div class="stat-card">
+                <h3>Live Chats</h3>
+                <div class="value">${chatUsers.length}</div>
+                <div class="label">Active conversations</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>User Details</h2>
+            ${users.length > 0 ? `
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Calculations</th>
+                    <th>Exports</th>
+                    <th>Status</th>
+                    <th>Last Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${users.map(user => `
+                    <tr>
+                      <td>${user.name}</td>
+                      <td>${user.email}</td>
+                      <td>${user.totalCalculations}</td>
+                      <td>${user.totalExports}</td>
+                      <td>${user.status}</td>
+                      <td>${new Date(user.lastActive).toLocaleDateString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p>No users registered yet.</p>'}
+          </div>
+
+          <div class="section">
+            <h2>Contact Messages</h2>
+            ${contacts.length > 0 ? `
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${contacts.map(contact => `
+                    <tr>
+                      <td>${contact.name}</td>
+                      <td>${contact.email}</td>
+                      <td>${contact.phone}</td>
+                      <td>${contact.message.substring(0, 50)}${contact.message.length > 50 ? '...' : ''}</td>
+                      <td>${contact.status}</td>
+                      <td>${new Date(contact.date).toLocaleDateString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p>No contact messages received yet.</p>'}
+          </div>
+
+          <div class="section">
+            <h2>Recent Chat Activity</h2>
+            ${chatMessages.length > 0 ? `
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Message</th>
+                    <th>Type</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${chatMessages.slice(-10).map(msg => `
+                    <tr>
+                      <td>${msg.userName}</td>
+                      <td>${msg.message.substring(0, 50)}${msg.message.length > 50 ? '...' : ''}</td>
+                      <td>${msg.type}</td>
+                      <td>${new Date(msg.timestamp).toLocaleString()}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            ` : '<p>No chat activity yet.</p>'}
+          </div>
+
+          <div class="footer">
+            <p>This report was automatically generated by the Admin Dashboard</p>
+            <p>ROI Calculator Application - Admin Report</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // Create blob and download
+    const blob = new Blob([reportContent], { type: 'text/html' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `admin-report-${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    addNotification({
+      type: 'success',
+      title: 'HTML Report Generated!',
+      message: 'Monthly analytics report has been downloaded as HTML file (PDF generation failed).',
+      redirectTo: '/admin',
+      redirectLabel: 'View Dashboard',
+      duration: 8000
     });
   };
 
