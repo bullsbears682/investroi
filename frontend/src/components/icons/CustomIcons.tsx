@@ -396,6 +396,19 @@ export const ActivityIcon: React.FC<IconProps> = ({ size = 24, className = '', c
   </svg>
 );
 
+export const CodeIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+    {/* Code brackets with investment theme */}
+    <polyline points="16 18 22 12 16 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <polyline points="8 6 2 12 8 18" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Code lines with dollar sign */}
+    <path d="M9 8l2 2-2 2" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M15 8l2 2-2 2" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* Dollar sign in center */}
+    <text x="12" y="14" textAnchor="middle" fontSize="3" fill={color} fontWeight="bold">$</text>
+  </svg>
+);
+
 // Export all icons for easy importing
 export const CustomIcons = {
   Home: HomeIcon,
@@ -430,4 +443,5 @@ export const CustomIcons = {
   Minimize: MinimizeIcon,
   Maximize: MaximizeIcon,
   Clock: ClockIcon,
+  Code: CodeIcon,
 };

@@ -95,7 +95,7 @@ function MyComponent() {
     <div>
       <button onClick={handleCalculate}>Calculate ROI</button>
       {loading && <p>Calculating...</p>}
-      {result && <p>Total Value: ${result.totalValue}</p>}
+      {result && <p>Total Value: \${result.totalValue}</p>}
     </div>
   );
 }`,
