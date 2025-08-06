@@ -161,7 +161,9 @@ const AdminDashboard: React.FC = () => {
       // Calculate real analytics from actual data
       const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
       const totalExports = allUsers.reduce((sum, user) => sum + user.totalExports, 0);
-      const revenue = allUsers.length * 29.99; // Assuming $29.99 per user
+      
+      // Revenue is $0 since no payment system exists in this demo application
+      const revenue = 0;
 
       // Calculate real growth rate based on user registration dates
       const now = new Date();
@@ -360,7 +362,7 @@ const AdminDashboard: React.FC = () => {
           ['Active Users', adminStats.activeUsers.toString()],
           ['Total Calculations', adminStats.totalCalculations.toString()],
           ['Total Exports', adminStats.totalExports.toString()],
-          ['Revenue', `$${adminStats.revenue.toFixed(2)}`],
+          ['User Engagement', (adminStats.totalCalculations + adminStats.totalExports).toString()],
           ['Growth Rate', `${adminStats.growthRate}%`],
           ['Monthly Growth', `${adminStats.monthlyGrowth}%`],
           ['Conversion Rate', `${adminStats.conversionRate}%`],
@@ -610,7 +612,7 @@ const AdminDashboard: React.FC = () => {
         activeUsers: adminStats.activeUsers,
         totalCalculations: adminStats.totalCalculations,
         totalExports: adminStats.totalExports,
-        revenue: adminStats.revenue,
+        userEngagement: adminStats.totalCalculations + adminStats.totalExports,
         growthRate: adminStats.growthRate,
         monthlyGrowth: adminStats.monthlyGrowth,
         conversionRate: adminStats.conversionRate,
@@ -1612,8 +1614,15 @@ const AdminDashboard: React.FC = () => {
           ['Active Users', adminStats.activeUsers.toString()],
           ['Total Calculations', adminStats.totalCalculations.toString()],
           ['Total Exports', adminStats.totalExports.toString()],
-          ['Revenue', `$${adminStats.revenue.toFixed(2)}`],
-          ['Live Chats', chatUsers.length.toString()]
+          ['User Engagement', (adminStats.totalCalculations + adminStats.totalExports).toString()],
+          ['Growth Rate', `${adminStats.growthRate}%`],
+          ['Monthly Growth', `${adminStats.monthlyGrowth}%`],
+          ['Conversion Rate', `${adminStats.conversionRate}%`],
+          ['Average Session Time', `${adminStats.averageSessionTime} min`],
+          ['Bounce Rate', `${adminStats.bounceRate}%`],
+          ['Live Chat Users', chatUsers.length.toString()],
+          ['Total Chat Messages', chatMessages.length.toString()],
+          ['Total Contacts', contacts.length.toString()]
         ];
         
         doc.setFontSize(10);
@@ -2335,12 +2344,12 @@ const AdminDashboard: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm font-medium mb-1">Revenue</p>
-                    <p className="text-3xl lg:text-4xl font-bold text-white">${adminStats.revenue.toFixed(0)}</p>
-                    <p className="text-green-400 text-sm font-medium">+32% from last month</p>
+                    <p className="text-white/60 text-sm font-medium mb-1">User Engagement</p>
+                    <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalCalculations + adminStats.totalExports}</p>
+                    <p className="text-green-400 text-sm font-medium">Total actions</p>
                   </div>
                   <div className="p-4 bg-white/10 rounded-2xl">
-                    <DollarSign className="w-8 h-8 text-emerald-400" />
+                    <Activity className="w-8 h-8 text-emerald-400" />
                   </div>
                 </div>
               </motion.div>
