@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Search, Building2 } from 'lucide-react';
-import { categories, Category } from '../data/categories';
+import { categories } from '../data/categories';
 
 interface CategorySelectorProps {
   selectedCategory: string | null;
