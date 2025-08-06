@@ -27,23 +27,23 @@ const ApiPage: React.FC = () => {
   const features = [
     {
       icon: Zap,
-      title: 'Lightning Fast',
-      description: 'Calculate ROI in milliseconds with our optimized API'
+      title: 'Fast & Reliable',
+      description: 'Quick ROI calculations with reliable service'
     },
     {
       icon: Shield,
-      title: 'Secure & Reliable',
-      description: 'Enterprise-grade security with 99.9% uptime guarantee'
+      title: 'Secure API',
+      description: 'API key authentication with HTTPS encryption'
     },
     {
       icon: Globe,
-      title: 'Global Support',
-      description: 'Support for 25+ countries with accurate tax calculations'
+      title: 'Multi-Country',
+      description: 'Support for major countries with tax calculations'
     },
     {
       icon: Code,
       title: 'Easy Integration',
-      description: 'Simple SDKs for JavaScript, Python, and more'
+      description: 'Simple SDKs for JavaScript and Python'
     }
   ];
 
@@ -55,13 +55,11 @@ const calculator = new InvestWiseCalculator('your-api-key');
 const result = await calculator.calculateROI({
   initialInvestment: 10000,
   additionalCosts: 500,
-  countryCode: 'US',
-  scenarioId: 1,
-  miniScenarioId: 2
+  countryCode: 'US'
 });
 
-console.log(result.totalValue); // $125,000
-console.log(result.totalReturn); // $55,000`,
+console.log(result.data.totalValue); // $12,500
+console.log(result.data.roi); // 25.0`,
 
     python: `from investwise_calculator import InvestWiseCalculator
 
@@ -70,13 +68,11 @@ calculator = InvestWiseCalculator('your-api-key')
 result = calculator.calculate_roi(
     initial_investment=10000,
     additional_costs=500,
-    country_code='US',
-    scenario_id=1,
-    mini_scenario_id=2
+    country_code='US'
 )
 
-print(result.total_value)  # $125,000
-print(result.total_return)  # $55,000`,
+print(result.data.total_value)  # $12,500
+print(result.data.roi)  # 25.0`,
 
     react: `import { useInvestWiseCalculator } from 'investwise-calculator-sdk/react';
 
@@ -106,9 +102,7 @@ function MyComponent() {
   -d '{
     "initialInvestment": 10000,
     "additionalCosts": 500,
-    "countryCode": "US",
-    "scenarioId": 1,
-    "miniScenarioId": 2
+    "countryCode": "US"
   }'`
   };
 
@@ -227,21 +221,21 @@ function MyComponent() {
                       <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
                         <h3 className="text-white font-semibold">Easy Integration</h3>
-                        <p className="text-white/60 text-sm">Get started in minutes with our simple SDKs</p>
+                        <p className="text-white/60 text-sm">Get started quickly with simple SDKs</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h3 className="text-white font-semibold">Global Coverage</h3>
-                        <p className="text-white/60 text-sm">Support for 25+ countries with accurate tax rates</p>
+                        <h3 className="text-white font-semibold">Multi-Country Support</h3>
+                        <p className="text-white/60 text-sm">Support for major countries with tax calculations</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h3 className="text-white font-semibold">Real-time Updates</h3>
-                        <p className="text-white/60 text-sm">Always up-to-date with latest market data</p>
+                        <h3 className="text-white font-semibold">Simple Pricing</h3>
+                        <p className="text-white/60 text-sm">Free tier available with reasonable limits</p>
                       </div>
                     </div>
                   </div>
@@ -249,22 +243,22 @@ function MyComponent() {
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h3 className="text-white font-semibold">High Performance</h3>
-                        <p className="text-white/60 text-sm">99.9% uptime with sub-second response times</p>
+                        <h3 className="text-white font-semibold">Reliable Service</h3>
+                        <p className="text-white/60 text-sm">Stable API with good response times</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h3 className="text-white font-semibold">Comprehensive Analytics</h3>
-                        <p className="text-white/60 text-sm">Detailed breakdowns and projections</p>
+                        <h3 className="text-white font-semibold">Clear Documentation</h3>
+                        <p className="text-white/60 text-sm">Well-documented with code examples</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h3 className="text-white font-semibold">Developer Friendly</h3>
-                        <p className="text-white/60 text-sm">Full documentation and code examples</p>
+                        <h3 className="text-white font-semibold">Developer Support</h3>
+                        <p className="text-white/60 text-sm">Helpful documentation and examples</p>
                       </div>
                     </div>
                   </div>
@@ -281,11 +275,13 @@ function MyComponent() {
                   <div>
                     <h3 className="text-white font-semibold mb-2">Base URL</h3>
                     <code className="bg-white/10 px-3 py-2 rounded text-blue-400">https://api.investwisepro.com/v1</code>
+                    <p className="text-white/60 text-sm mt-1">Currently in development - coming soon!</p>
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-2">Authentication</h3>
-                    <p className="text-white/60 mb-2">All API requests require an API key in the Authorization header:</p>
+                    <p className="text-white/60 mb-2">API key authentication (free tier available):</p>
                     <code className="bg-white/10 px-3 py-2 rounded text-blue-400">Authorization: Bearer your-api-key</code>
+                    <p className="text-white/60 text-sm mt-1">Get your API key from the dashboard</p>
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-2">Calculate ROI</h3>
@@ -296,9 +292,22 @@ function MyComponent() {
 {`{
   "initialInvestment": 10000,
   "additionalCosts": 500,
-  "countryCode": "US",
-  "scenarioId": 1,
-  "miniScenarioId": 2
+  "countryCode": "US"
+}`}
+                      </pre>
+                      <h4 className="text-white font-medium mb-2 mt-4">Response:</h4>
+                      <pre className="text-sm text-white/80 overflow-x-auto">
+{`{
+  "success": true,
+  "data": {
+    "totalValue": 12500,
+    "roi": 25.0,
+    "breakdown": {
+      "initialInvestment": 10000,
+      "additionalCosts": 500,
+      "returns": 2000
+    }
+  }
 }`}
                       </pre>
                     </div>
