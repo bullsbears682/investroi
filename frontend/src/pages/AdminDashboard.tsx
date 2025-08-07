@@ -1044,30 +1044,30 @@ const AdminDashboard: React.FC = () => {
               <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
               
               <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex items-center justify-between mb-8"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <MessageSquare className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                      Contact Submissions
-                    </h3>
-                    <p className="text-white/60 text-sm">View and manage customer messages</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowContactSubmissions(false)}
-                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="flex items-center justify-between mb-8"
                 >
-                  ✕
-                </button>
-              </motion.div>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <MessageSquare className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                        Contact Submissions
+                      </h3>
+                      <p className="text-white/60 text-sm">View and manage customer messages</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowContactSubmissions(false)}
+                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
+                  >
+                    ✕
+                  </button>
+                </motion.div>
 
               {/* Stats */}
               <motion.div
@@ -1200,7 +1200,7 @@ const AdminDashboard: React.FC = () => {
                     <p className="text-white/40 text-sm">Messages sent through the contact form will appear here</p>
                   </motion.div>
                 )}
-              </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
