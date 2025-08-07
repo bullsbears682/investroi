@@ -83,7 +83,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-[9999] w-full mt-2 bg-white/30 backdrop-blur-lg border border-white/40 rounded-lg shadow-xl max-h-48 overflow-hidden"
+              className="absolute z-[9999] w-full mt-2 bg-white/80 backdrop-blur-lg border border-white/60 rounded-lg shadow-xl max-h-48 overflow-hidden"
             >
               {/* Search Bar */}
               <div className="p-3 border-b border-white/10">
