@@ -1,1382 +1,217 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useNotifications } from '../contexts/NotificationContext';
-import { userManager } from '../utils/userManagement';
-import { contactStorage } from '../utils/contactStorage';
-import { chatSystem } from '../utils/chatSystem';
-import Logo from '../components/Logo';
 import AdminMenu from '../components/AdminMenu';
-import { 
-  ArrowLeftIcon,
-  UsersIcon,
+import {
   AnalyticsIcon,
-  DownloadIcon,
+  UsersIcon,
   ShieldIcon,
   HardDriveIcon,
-  TrendingUpIcon,
-  ActivityIcon,
-  CodeIcon
+  MessageSquareIcon,
+  ArrowLeftIcon
 } from '../components/icons/CustomIcons';
-import { MessageSquare } from 'lucide-react';
-import { generateAdminAnalyticsPDF } from '../utils/pdfExport';
+import { userManager } from '../utils/userManagement';
 
-interface Analytics {
+interface Summary {
   totalUsers: number;
   activeUsers: number;
-  totalCalculations: number;
-  totalExports: number;
-  growthRate: number;
-  monthlyGrowth: number;
-  conversionRate: number;
-  averageSessionTime: number;
-  bounceRate: number;
-}
-
-interface ActivityItem {
-  id: string;
-  type: 'registration' | 'chat' | 'backup' | 'ticket';
-  description: string;
-  timestamp: number;
-  user?: string;
-  color: string;
-}
-
-interface ApiKey {
-  id: string;
-  key: string;
-  name: string;
-  created: number;
-  lastUsed?: number;
-  isActive: boolean;
-  usageCount: number;
+  contacts: number;
+  backups: number;
+  chatSessions: number;
 }
 
 const AdminDashboard: React.FC = () => {
-  const [adminStats, setAdminStats] = useState<Analytics>({
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [summary, setSummary] = useState<Summary>({
     totalUsers: 0,
     activeUsers: 0,
-    totalCalculations: 0,
-    totalExports: 0,
-    growthRate: 0,
-    monthlyGrowth: 0,
-    conversionRate: 0,
-    averageSessionTime: 0,
-    bounceRate: 0,
+    contacts: 0,
+    backups: 0,
+    chatSessions: 0,
   });
-  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [newApiKeyName, setNewApiKeyName] = useState('');
-  const [showContactSubmissions, setShowContactSubmissions] = useState(false);
-  const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
-  const { addNotification } = useNotifications();
-  const [analyticsRange] = useState<'7' | '30' | '90'>('30');
-  const [activityQuery, setActivityQuery] = useState('');
-  const [isLoadingStats, setIsLoadingStats] = useState(false);
-  const [isLoadingActivity, setIsLoadingActivity] = useState(false);
-  const [showSystemHealth, setShowSystemHealth] = useState(false);
-  const [systemHealthData, setSystemHealthData] = useState<any | null>(null);
-  const [activityPage, setActivityPage] = useState(1);
-  const activityPageSize = 10;
 
-  // Load admin statistics
-  const loadAdminStats = () => {
+  const loadSummary = () => {
     try {
-      setIsLoadingStats(true);
       const allUsers = userManager.getAllUsers();
-      const allContacts = contactStorage.getSubmissions();
+      const activeUsers = userManager.getActiveUsers();
+      const contacts = JSON.parse(localStorage.getItem('adminContacts') || '[]');
+      const backups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
+      const chatMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
 
-      const totalUsers = allUsers.length;
-      const activeUsers = allUsers.filter((user: any) => {
-        const lastActive = new Date(user.lastActive || user.registrationDate);
-        const daysSinceActive = (Date.now() - lastActive.getTime()) / (1000 * 60 * 60 * 24);
-        return daysSinceActive <= 30;
-      }).length;
-
-      const totalCalculations = parseInt(localStorage.getItem('totalCalculations') || '0');
-      const totalExports = parseInt(localStorage.getItem('totalExports') || '0');
-
-      // Calculate analytics for selected range
-      const now = Date.now();
-      const rangeDays = analyticsRange === '7' ? 7 : analyticsRange === '90' ? 90 : 30;
-      const periodStart = now - rangeDays * 24 * 60 * 60 * 1000;
-      const previousPeriodStart = now - rangeDays * 2 * 24 * 60 * 60 * 1000;
-
-      const recentUsers = allUsers.filter((user: any) => 
-        new Date(user.registrationDate).getTime() > periodStart
-      ).length;
-      const previousUsers = allUsers.filter((user: any) => {
-        const regDate = new Date(user.registrationDate).getTime();
-        return regDate > previousPeriodStart && regDate <= periodStart;
-      }).length;
-
-      const growthRate = previousUsers > 0 ? ((recentUsers - previousUsers) / Math.max(previousUsers, 1)) * 100 : (recentUsers > 0 ? 100 : 0);
-      const monthlyGrowth = growthRate;
-      const conversionRate = totalUsers > 0 ? (allContacts.length / totalUsers) * 100 : 0;
-      const averageSessionTime = totalUsers > 0 ? Math.round((totalCalculations + totalExports) / totalUsers) : 0;
-      const bounceRate = totalUsers > 0 ? Math.round((totalUsers - activeUsers) / totalUsers * 100) : 0;
-
-      setAdminStats({
-        totalUsers,
-        activeUsers,
-        totalCalculations,
-        totalExports,
-        growthRate,
-        monthlyGrowth,
-        conversionRate,
-        averageSessionTime,
-        bounceRate,
+      setSummary({
+        totalUsers: allUsers.length,
+        activeUsers: activeUsers.length,
+        contacts: contacts.length,
+        backups: backups.length,
+        chatSessions: Array.isArray(chatMessages) ? chatMessages.length : 0,
       });
-    } catch (error) {
-      console.error('Failed to load admin stats:', error);
-    } finally {
-      setIsLoadingStats(false);
+    } catch (err) {
+      console.error('Failed to load admin summary:', err);
     }
   };
 
-  // Load recent activity
-  const loadRecentActivity = () => {
-    try {
-      setIsLoadingActivity(true);
-      const activities: ActivityItem[] = [];
-      const now = Date.now();
-      const rangeDays = analyticsRange === '7' ? 7 : analyticsRange === '90' ? 90 : 30;
-      // Get real user registrations (selected range)
-      const allUsers = userManager.getAllUsers();
-      const recentRegistrations = allUsers
-        .filter((user: any) => new Date(user.registrationDate) > new Date(now - rangeDays * 24 * 60 * 60 * 1000))
-        .map((user: any) => ({
-          id: `reg-${user.id}`,
-          type: 'registration' as const,
-          description: `New user registration: ${user.name}`,
-          timestamp: new Date(user.registrationDate).getTime(),
-          user: user.name,
-          color: 'bg-green-400'
-        }))
-        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
-        .slice(0, 3);
-
-      activities.push(...recentRegistrations);
-
-      // Get real ticket creation activity (selected range)
-      const allSessions = chatSystem.getAllSessions();
-      const recentTickets = allSessions
-        .filter((session: any) => new Date(session.createdAt) > new Date(now - rangeDays * 24 * 60 * 60 * 1000))
-        .map((session: any) => ({
-          id: `ticket-${session.id}`,
-          type: 'ticket' as const,
-          description: `New ticket created: ${session.ticketNumber}`,
-          timestamp: new Date(session.createdAt).getTime(),
-          user: session.userName,
-          color: 'bg-blue-400'
-        }))
-        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
-        .slice(0, 5);
-
-      activities.push(...recentTickets);
-
-      // Get real backup activity (selected range)
-      const storedBackups = localStorage.getItem('databaseBackups');
-      if (storedBackups) {
-        const backups = JSON.parse(storedBackups);
-        const recentBackups = backups
-          .filter((backup: any) => backup.timestamp > now - rangeDays * 24 * 60 * 60 * 1000)
-          .map((backup: any) => ({
-            id: `backup-${backup.backupId}`,
-            type: 'backup' as const,
-            description: `System backup completed`,
-            timestamp: backup.timestamp,
-            color: 'bg-orange-400'
-          }))
-          .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
-          .slice(0, 2);
-
-        activities.push(...recentBackups);
-      }
-
-      // Sort by timestamp (most recent first) and take top 8
-      const sortedActivities = activities
-        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
-        .slice(0, 8);
-
-      setRecentActivity(sortedActivities);
-    } catch (error) {
-      console.error('Failed to load recent activity:', error);
-    } finally {
-      setIsLoadingActivity(false);
-    }
-  };
-
-  // Load API keys
-  const loadApiKeys = () => {
-    try {
-      const storedKeys = localStorage.getItem('api_keys');
-      if (storedKeys) {
-        setApiKeys(JSON.parse(storedKeys));
-      }
-    } catch (error) {
-      console.error('Error loading API keys:', error);
-    }
-  };
-
-  // Load contact submissions
-  const loadContactSubmissions = () => {
-    try {
-      const submissions = contactStorage.getSubmissions();
-      setContactSubmissions(submissions);
-    } catch (error) {
-      console.error('Failed to load contact submissions:', error);
-    }
-  };
-
-  // Generate new API key
-  const generateApiKey = () => {
-    if (!newApiKeyName.trim()) {
-      addNotification({
-        type: 'error',
-        title: 'Error',
-        message: 'Please enter a name for the API key'
-      });
-      return;
-    }
-
-    const newKey: ApiKey = {
-      id: `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      key: `iw_${Math.random().toString(36).substr(2, 32)}_${Date.now().toString(36)}`,
-      name: newApiKeyName.trim(),
-      created: Date.now(),
-      isActive: true,
-      usageCount: 0
+  useEffect(() => {
+    loadSummary();
+    const onStorage = () => loadSummary();
+    window.addEventListener('storage', onStorage);
+    const interval = setInterval(loadSummary, 5000);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      clearInterval(interval);
     };
-
-    const updatedKeys = [...apiKeys, newKey];
-    setApiKeys(updatedKeys);
-    localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
-    
-    setNewApiKeyName('');
-    setShowApiKeyModal(false);
-    addNotification({
-      type: 'success',
-      title: 'Success',
-      message: 'API key generated successfully'
-    });
-  };
-
-  // Toggle API key status
-  const toggleApiKeyStatus = (keyId: string) => {
-    const updatedKeys = apiKeys.map(key => 
-      key.id === keyId ? { ...key, isActive: !key.isActive } : key
-    );
-    setApiKeys(updatedKeys);
-    localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
-    addNotification({
-      type: 'success',
-      title: 'Success',
-      message: 'API key status updated'
-    });
-  };
-
-  // Delete API key
-  const deleteApiKey = (keyId: string) => {
-    if (window.confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-      const updatedKeys = apiKeys.filter(key => key.id !== keyId);
-      setApiKeys(updatedKeys);
-      localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
-      addNotification({
-        type: 'success',
-        title: 'Success',
-        message: 'API key deleted successfully'
-      });
-    }
-  };
-
-  // Update contact submission status
-  const updateContactStatus = (id: string, status: 'new' | 'read' | 'replied') => {
-    contactStorage.updateSubmissionStatus(id, status);
-    loadContactSubmissions(); // Reload to reflect changes
-    addNotification({
-      type: 'success',
-      title: 'Status Updated',
-      message: `Contact submission marked as ${status}`
-    });
-  };
-
-  // Delete contact submission
-  const deleteContactSubmission = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this contact submission? This action cannot be undone.')) {
-      contactStorage.deleteSubmission(id);
-      loadContactSubmissions(); // Reload to reflect changes
-      addNotification({
-        type: 'success',
-        title: 'Deleted',
-        message: 'Contact submission deleted successfully'
-      });
-    }
-  };
-
-  // Handle action buttons
-  const handleExportData = () => {
-    try {
-      const exportData = {
-        users: userManager.getAllUsers(),
-        contacts: contactStorage.getSubmissions(),
-        chats: chatSystem.getAllSessions(),
-        analytics: adminStats,
-        exportDate: new Date().toISOString(),
-      };
-
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `investwise-pro-data-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      addNotification({
-        type: 'success',
-        title: 'Data Exported Successfully',
-        message: 'All data has been exported to JSON file',
-        redirectTo: '/admin/data',
-        redirectLabel: 'View Data'
-      });
-    } catch (error) {
-      console.error('Export failed:', error);
-      addNotification({
-        type: 'error',
-        title: 'Export Failed',
-        message: 'Failed to export data'
-      });
-    }
-  };
-
-  const handleSystemHealth = () => {
-    try {
-      // Get real system health data
-      const performance = window.performance;
-      const memory = (performance as any).memory;
-      const connection = (navigator as any).connection;
-      
-      const systemHealth = {
-        timestamp: new Date().toISOString(),
-        performance: {
-          loadTime: (performance.getEntriesByType('navigation')[0] as any)?.loadEventEnd || 0,
-          domContentLoaded: (performance.getEntriesByType('navigation')[0] as any)?.domContentLoadedEventEnd || 0,
-          firstPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime || 0,
-        },
-        memory: memory ? {
-          used: Math.round(memory.usedJSHeapSize / 1024 / 1024),
-          total: Math.round(memory.totalJSHeapSize / 1024 / 1024),
-          limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024),
-        } : null,
-        connection: connection ? {
-          effectiveType: connection.effectiveType,
-          downlink: connection.downlink,
-          rtt: connection.rtt,
-        } : null,
-        localStorage: {
-          used: Math.round(new Blob([JSON.stringify(localStorage)]).size / 1024),
-          items: Object.keys(localStorage).length,
-        }
-      };
-
-      const dataStr = JSON.stringify(systemHealth, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `system-health-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      setSystemHealthData(systemHealth);
-      setShowSystemHealth(true);
-
-      addNotification({
-        type: 'success',
-        title: 'System Health Report Generated',
-        message: 'System health data has been exported',
-        redirectTo: '/admin/system',
-        redirectLabel: 'View System'
-      });
-    } catch (error) {
-      console.error('System health report failed:', error);
-      addNotification({
-        type: 'error',
-        title: 'System Health Report Failed',
-        message: 'Failed to generate system health report'
-      });
-    }
-  };
-
-  const handleBackupDatabase = () => {
-    try {
-      const backupId = `backup-${Date.now()}`;
-      const backupData = {
-        backupId,
-        timestamp: Date.now(),
-        data: {
-          users: userManager.getAllUsers(),
-          contacts: contactStorage.getSubmissions(),
-          chats: chatSystem.getAllSessions(),
-          analytics: adminStats,
-        }
-      };
-
-      // Simulate compression and encryption
-      const jsonString = JSON.stringify(backupData);
-      const compressedSize = jsonString.length;
-      const originalSize = jsonString.length * 1.2; // Simulate compression
-      const compressionRatio = Math.round((1 - compressedSize / originalSize) * 100);
-      
-      // Simulate encryption (base64 encoding)
-      const encrypted = btoa(jsonString);
-      
-      // Generate checksum
-      let checksum = 0;
-      for (let i = 0; i < encrypted.length; i++) {
-        checksum += encrypted.charCodeAt(i);
-      }
-      checksum = checksum % 1000000;
-
-      const backup = {
-        ...backupData,
-        metadata: {
-          size: compressedSize,
-          originalSize: Math.round(originalSize),
-          compressionRatio,
-          encrypted: true,
-          checksum: checksum.toString().padStart(6, '0'),
-          version: '1.0'
-        }
-      };
-
-      // Store backup
-      const existingBackups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
-      existingBackups.unshift(backup);
-      localStorage.setItem('databaseBackups', JSON.stringify(existingBackups.slice(0, 10))); // Keep last 10
-
-      addNotification({
-        type: 'success',
-        title: 'Database Backup Created',
-        message: `Backup completed with ${compressionRatio}% compression`,
-        redirectTo: '/admin/backups',
-        redirectLabel: 'View Backups'
-      });
-    } catch (error) {
-      console.error('Backup failed:', error);
-      addNotification({
-        type: 'error',
-        title: 'Backup Failed',
-        message: 'Failed to create database backup'
-      });
-    }
-  };
-
-  const handleGenerateReport = async () => {
-    try {
-      await generateAdminAnalyticsPDF({
-        title: 'InvestWise Pro Analytics Report',
-        periodLabel: analyticsRange === '7' ? 'Last 7 Days' : analyticsRange === '90' ? 'Last 90 Days' : 'Last 30 Days',
-        stats: {
-          totalUsers: adminStats.totalUsers,
-          activeUsers: adminStats.activeUsers,
-          totalCalculations: adminStats.totalCalculations,
-          totalExports: adminStats.totalExports,
-          growthRate: adminStats.growthRate,
-          monthlyGrowth: adminStats.monthlyGrowth,
-          conversionRate: adminStats.conversionRate,
-          averageSessionTime: adminStats.averageSessionTime,
-          bounceRate: adminStats.bounceRate,
-        },
-        recentActivity: recentActivity.map(a => ({
-          id: a.id,
-          type: a.type,
-          description: a.description,
-          timestamp: a.timestamp,
-        })),
-      });
- 
-      addNotification({
-        type: 'success',
-        title: 'PDF Report Generated',
-        message: 'Admin analytics report has been exported as PDF',
-        redirectTo: '/admin/analytics',
-        redirectLabel: 'View Analytics'
-      });
-    } catch (error) {
-      console.error('Report generation failed:', error);
-      addNotification({
-        type: 'error',
-        title: 'Report Generation Failed',
-        message: 'Failed to generate analytics PDF'
-      });
-    }
-  };
-
-  useEffect(() => {
-    loadAdminStats();
-    loadRecentActivity();
-    loadApiKeys();
-    loadContactSubmissions();
-  }, [analyticsRange]);
-
-  // Derived filtered activity list
-  const filteredRecentActivity = recentActivity.filter((activity) => {
-    if (!activityQuery.trim()) return true;
-    const q = activityQuery.toLowerCase();
-    return (
-      activity.description.toLowerCase().includes(q) ||
-      (activity.user?.toLowerCase().includes(q)) ||
-      activity.type.toLowerCase().includes(q)
-    );
-  });
-  const totalActivityPages = Math.max(1, Math.ceil(filteredRecentActivity.length / activityPageSize));
-  const pagedActivities = filteredRecentActivity.slice((activityPage - 1) * activityPageSize, activityPage * activityPageSize);
-
-  useEffect(() => {
-    setActivityPage(1);
-  }, [activityQuery]);
-
-  // Removed export CSV per request
-
-  // Close modals with Escape key
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (showApiKeyModal) setShowApiKeyModal(false);
-        if (showContactSubmissions) setShowContactSubmissions(false);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [showApiKeyModal, showContactSubmissions]);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Admin Menu */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <AdminMenu isOpen={isMenuOpen} onToggle={() => setIsMenuOpen(!isMenuOpen)} />
-      
-      {/* Animated Background */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
 
-      {/* Mobile Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-20 bg-white/5 backdrop-blur-xl border-b border-white/10 p-4 lg:p-6 sticky top-0 lg:ml-64"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 lg:space-x-4">
-            <div className="relative">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center">
-                <Logo size="lg" showText={false} />
+      {/* Header */}
+      <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 lg:ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-white/80">
+                <ArrowLeftIcon size={18} />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
-            </div>
-            <div>
-              <h1 className="text-xl lg:text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                Admin Dashboard
-              </h1>
-              <p className="text-white/60 text-xs lg:text-sm">System administration and analytics</p>
+              <div>
+                <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
+                <p className="text-white/60 text-sm">System Administration</p>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Total Users</p>
+                <p className="text-3xl font-bold text-white">{summary.totalUsers}</p>
+              </div>
+              <div className="p-3 bg-blue-500/20 rounded-xl">
+                <UsersIcon className="text-blue-400" size={24} />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Active Users</p>
+                <p className="text-3xl font-bold text-white">{summary.activeUsers}</p>
+              </div>
+              <div className="p-3 bg-green-500/20 rounded-xl">
+                <AnalyticsIcon className="text-green-400" size={24} />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Contact Messages</p>
+                <p className="text-3xl font-bold text-white">{summary.contacts}</p>
+              </div>
+              <div className="p-3 bg-yellow-500/20 rounded-xl">
+                <MessageSquareIcon className="text-yellow-400" size={24} />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">Backups</p>
+                <p className="text-3xl font-bold text-white">{summary.backups}</p>
+              </div>
+              <div className="p-3 bg-purple-500/20 rounded-xl">
+                <HardDriveIcon className="text-purple-400" size={24} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link
+            to="/admin/analytics"
+            className="group bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 rounded-2xl p-6 transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-white font-semibold">Analytics</div>
+              <div className="p-2 bg-white/10 rounded-lg">
+                <AnalyticsIcon className="text-white/80" size={18} />
+              </div>
+            </div>
+            <p className="text-white/60 text-sm">Detailed analytics and reports</p>
+          </Link>
 
           <Link
-            to="/"
-            className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-all duration-200"
+            to="/admin/data"
+            className="group bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 rounded-2xl p-6 transition-all"
           >
-            <ArrowLeftIcon size={20} />
-            <span className="hidden sm:inline">Back to App</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-white font-semibold">User Management</div>
+              <div className="p-2 bg-white/10 rounded-lg">
+                <UsersIcon className="text-white/80" size={18} />
+              </div>
+            </div>
+            <p className="text-white/60 text-sm">Manage users and contacts</p>
+          </Link>
+
+          <Link
+            to="/admin/system"
+            className="group bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 rounded-2xl p-6 transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-white font-semibold">System Health</div>
+              <div className="p-2 bg-white/10 rounded-lg">
+                <ShieldIcon className="text-white/80" size={18} />
+              </div>
+            </div>
+            <p className="text-white/60 text-sm">System performance and monitoring</p>
+          </Link>
+
+          <Link
+            to="/admin/backups"
+            className="group bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 rounded-2xl p-6 transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-white font-semibold">Backups</div>
+              <div className="p-2 bg-white/10 rounded-lg">
+                <HardDriveIcon className="text-white/80" size={18} />
+              </div>
+            </div>
+            <p className="text-white/60 text-sm">Database backups and restore</p>
+          </Link>
+
+          <Link
+            to="/admin/chat"
+            className="group bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 rounded-2xl p-6 transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-white font-semibold">Chat</div>
+              <div className="p-2 bg-white/10 rounded-lg">
+                <MessageSquareIcon className="text-white/80" size={18} />
+              </div>
+            </div>
+            <p className="text-white/60 text-sm">Real-time chat</p>
+          </Link>
+
+          <Link
+            to="/api"
+            className="group bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 rounded-2xl p-6 transition-all"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-white font-semibold">API</div>
+              <div className="p-2 bg-white/10 rounded-lg">
+                <AnalyticsIcon className="text-white/80" size={18} />
+              </div>
+            </div>
+            <p className="text-white/60 text-sm">API keys and docs</p>
           </Link>
         </div>
-      </motion.div>
-
-      {/* Main Content */}
-      <div className="relative z-10 p-4 lg:p-6 lg:ml-64">
-        {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-            Welcome back! 👋
-          </h2>
-          <p className="text-white/60 text-lg">
-            Here's what's happening with your platform today
-          </p>
-        </motion.div>
-
-
-        {/* Action Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-        >
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleExportData}
-            className="group relative bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Export Data</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">JSON</p>
-                <p className="text-blue-400 text-sm font-medium">All data</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <DownloadIcon className="w-8 h-8 text-blue-400" />
-              </div>
-            </div>
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleSystemHealth}
-            className="group relative bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">System Health</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">Live</p>
-                <p className="text-green-400 text-sm font-medium">Performance</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <ShieldIcon className="w-8 h-8 text-green-400" />
-              </div>
-            </div>
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleBackupDatabase}
-            className="group relative bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Backup Database</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">Safe</p>
-                <p className="text-orange-400 text-sm font-medium">Encrypted</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <HardDriveIcon className="w-8 h-8 text-orange-400" />
-              </div>
-            </div>
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleGenerateReport}
-            className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Generate Report</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">PDF</p>
-                <p className="text-purple-400 text-sm font-medium">Analytics</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <AnalyticsIcon className="w-8 h-8 text-purple-400" />
-              </div>
-            </div>
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowApiKeyModal(true)}
-            className="group relative bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">API Keys</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{apiKeys.length}</p>
-                <p className="text-purple-400 text-sm font-medium">Manage</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <CodeIcon className="w-8 h-8 text-indigo-400" />
-              </div>
-            </div>
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowContactSubmissions(true)}
-            className="group relative bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Contact Messages</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{contactSubmissions.length}</p>
-                <p className="text-pink-400 text-sm font-medium">View</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <MessageSquare className="w-8 h-8 text-pink-400" />
-              </div>
-            </div>
-          </motion.button>
-        </motion.div>
-
-        {/* Overview Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          {isLoadingStats && (
-            <>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6 animate-pulse">
-                  <div className="h-4 w-24 bg-white/10 rounded mb-3"></div>
-                  <div className="h-8 w-16 bg-white/10 rounded mb-2"></div>
-                  <div className="h-3 w-20 bg-white/10 rounded"></div>
-                </div>
-              ))}
-            </>
-          )}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Total Users</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalUsers}</p>
-                <p className="text-blue-400 text-sm font-medium">+{adminStats.growthRate.toFixed(1)}% growth</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <UsersIcon className="w-8 h-8 text-blue-400" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Active Users</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.activeUsers}</p>
-                <p className="text-green-400 text-sm font-medium">Last 30 days</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <TrendingUpIcon className="w-8 h-8 text-green-400" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Total Calculations</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalCalculations}</p>
-                <p className="text-purple-400 text-sm font-medium">ROI analysis</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <AnalyticsIcon className="w-8 h-8 text-purple-400" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">User Engagement</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalCalculations + adminStats.totalExports}</p>
-                <p className="text-emerald-400 text-sm font-medium">Total actions</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <ActivityIcon className="w-8 h-8 text-emerald-400" />
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h3 className="text-xl font-bold text-white">Recent Activity</h3>
-                         <div className="w-full sm:w-auto">
-               <input
-                 type="text"
-                 value={activityQuery}
-                 onChange={(e) => setActivityQuery(e.target.value)}
-                 placeholder="Search activity..."
-                 className="w-full sm:w-64 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
-               />
-             </div>
-          </div>
-          <div className="space-y-3">
-            {isLoadingActivity && (
-              <>
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg animate-pulse">
-                    <div className="w-3 h-3 rounded-full bg-white/10"></div>
-                    <div className="flex-1">
-                      <div className="h-3 w-2/3 bg-white/10 rounded mb-2"></div>
-                      <div className="h-3 w-1/3 bg-white/10 rounded"></div>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
-            {pagedActivities.length > 0 ? (
-              pagedActivities.map((activity) => (
-                <motion.div
-                  key={activity.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg"
-                >
-                  <div className={`w-3 h-3 rounded-full ${activity.color}`}></div>
-                  <div className="flex-1">
-                    <p className="text-white text-sm">{activity.description}</p>
-                    <p className="text-white/60 text-xs">
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                </motion.div>
-               ))
-            ) : (
-              <p className="text-white/60 text-center py-4">No recent activity</p>
-            )}
-          </div>
-          {totalActivityPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-4">
-              <button
-                onClick={() => setActivityPage(p => Math.max(1, p - 1))}
-                disabled={activityPage === 1}
-                className="px-3 py-1 bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 border border-white/20 rounded text-white text-sm"
-              >
-                Prev
-              </button>
-              <span className="text-white/70 text-sm">Page {activityPage} of {totalActivityPages}</span>
-              <button
-                onClick={() => setActivityPage(p => Math.min(totalActivityPages, p + 1))}
-                disabled={activityPage === totalActivityPages}
-                className="px-3 py-1 bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 border border-white/20 rounded text-white text-sm"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </motion.div>
-
-
-
       </div>
-
-      {/* API Key Management Modal */}
-        {showApiKeyModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-label="API Key Management"
-            onClick={() => setShowApiKeyModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-5xl max-h-[85vh] overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Animated background elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-3xl"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
-              
-              <div className="relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="flex items-center justify-between mb-8"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                      <CodeIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                        API Key Management
-                      </h3>
-                      <p className="text-white/60 text-sm">Generate and manage your API keys</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowApiKeyModal(false)}
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
-                  >
-                    ✕
-                  </button>
-                </motion.div>
-
-                {/* Generate New API Key */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mb-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-white/20"
-                >
-                  <h4 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                    <span>Generate New API Key</span>
-                  </h4>
-                  <div className="flex gap-4">
-                    <input
-                      type="text"
-                      placeholder="Enter API key name (e.g., 'Production App')"
-                      value={newApiKeyName}
-                      onChange={(e) => setNewApiKeyName(e.target.value)}
-                      className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-                    />
-                    <button
-                      onClick={generateApiKey}
-                      className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
-                    >
-                      Generate
-                    </button>
-                  </div>
-                </motion.div>
-
-                {/* API Keys List */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="space-y-4"
-                >
-                  <h4 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                      </svg>
-                    </div>
-                    <span>Your API Keys</span>
-                  </h4>
-                  {apiKeys.length > 0 ? (
-                    apiKeys.map((apiKey) => (
-                      <motion.div
-                        key={apiKey.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <h5 className="text-white font-semibold">{apiKey.name}</h5>
-                            <p className="text-white/60 text-sm">
-                              Created: {new Date(apiKey.created).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded text-xs ${
-                              apiKey.isActive 
-                                ? 'bg-green-500/20 text-green-400' 
-                                : 'bg-red-500/20 text-red-400'
-                            }`}>
-                              {apiKey.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                            <button
-                              onClick={() => toggleApiKeyStatus(apiKey.id)}
-                              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              {apiKey.isActive ? 'Deactivate' : 'Activate'}
-                            </button>
-                            <button
-                              onClick={() => deleteApiKey(apiKey.id)}
-                              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-white/60 text-sm">API Key:</span>
-                            <code className="flex-1 px-3 py-1 bg-white/10 rounded text-sm text-white font-mono break-all">
-                              {apiKey.key}
-                            </code>
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(apiKey.key);
-                                addNotification({
-                                  type: 'success',
-                                  title: 'Copied!',
-                                  message: 'API key copied to clipboard'
-                                });
-                              }}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              Copy
-                            </button>
-                          </div>
-                          
-                          <div className="flex items-center gap-4 text-sm text-white/60">
-                            <span>Usage: {apiKey.usageCount} requests</span>
-                            {apiKey.lastUsed && (
-                              <span>Last used: {new Date(apiKey.lastUsed).toLocaleDateString()}</span>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                      className="text-center py-12"
-                    >
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CodeIcon className="w-8 h-8 text-white/40" />
-                      </div>
-                      <p className="text-white/60 text-lg">No API keys generated yet</p>
-                      <p className="text-white/40 text-sm mt-2">Generate your first API key to get started</p>
-                    </motion.div>
-                  )}
-                </motion.div>
-
-                {/* Usage Instructions */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-2xl border border-blue-500/20"
-                >
-                  <h4 className="text-xl font-semibold text-blue-400 mb-4 flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <span>How to Use Your API Keys</span>
-                  </h4>
-                  <div className="space-y-3 text-sm text-white/80">
-                    <div className="flex items-start space-x-2">
-                      <span className="text-blue-400 font-semibold">•</span>
-                      <p>Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <span className="text-purple-400 font-semibold">•</span>
-                      <p>Make requests to: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">https://api.investwisepro.com/v1/calculator/roi</code></p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <span className="text-indigo-400 font-semibold">•</span>
-                      <p>Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">npm install investwise-calculator-sdk</code></p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* System Health Modal */}
-        {showSystemHealth && systemHealthData && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-label="System Health Details"
-            onClick={() => setShowSystemHealth(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 10 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-white">System Health</h3>
-                <button onClick={() => setShowSystemHealth(false)} className="text-white/60 hover:text-white">✕</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-white/70 mb-2">Performance</p>
-                  <div className="space-y-1 text-white/80">
-                    <div>Load Time: <span className="text-white">{systemHealthData.performance.loadTime} ms</span></div>
-                    <div>DOM Content Loaded: <span className="text-white">{systemHealthData.performance.domContentLoaded} ms</span></div>
-                    <div>First Paint: <span className="text-white">{systemHealthData.performance.firstPaint} ms</span></div>
-                  </div>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-white/70 mb-2">Memory</p>
-                  {systemHealthData.memory ? (
-                    <div className="space-y-1 text-white/80">
-                      <div>Used: <span className="text-white">{systemHealthData.memory.used} MB</span></div>
-                      <div>Total: <span className="text-white">{systemHealthData.memory.total} MB</span></div>
-                      <div>Limit: <span className="text-white">{systemHealthData.memory.limit} MB</span></div>
-                    </div>
-                  ) : (
-                    <p className="text-white/60">Not available</p>
-                  )}
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-white/70 mb-2">Network</p>
-                  {systemHealthData.connection ? (
-                    <div className="space-y-1 text-white/80">
-                      <div>Type: <span className="text-white">{systemHealthData.connection.effectiveType}</span></div>
-                      <div>Downlink: <span className="text-white">{systemHealthData.connection.downlink} Mbps</span></div>
-                      <div>RTT: <span className="text-white">{systemHealthData.connection.rtt} ms</span></div>
-                    </div>
-                  ) : (
-                    <p className="text-white/60">Not available</p>
-                  )}
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="text-white/70 mb-2">Local Storage</p>
-                  <div className="space-y-1 text-white/80">
-                    <div>Size: <span className="text-white">{systemHealthData.localStorage.used} KB</span></div>
-                    <div>Items: <span className="text-white">{systemHealthData.localStorage.items}</span></div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 text-right">
-                <button onClick={() => setShowSystemHealth(false)} className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Close</button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Contact Submissions Modal */}
-        {showContactSubmissions && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Contact Submissions"
-            onClick={() => setShowContactSubmissions(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-6xl max-h-[85vh] overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Animated background elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
-              
-              <div className="relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="flex items-center justify-between mb-8"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                      <MessageSquare className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                        Contact Submissions
-                      </h3>
-                      <p className="text-white/60 text-sm">View and manage customer messages</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowContactSubmissions(false)}
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
-                  >
-                    ✕
-                  </button>
-                </motion.div>
-
-              {/* Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"
-              >
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-gradient-to-br from-white/10 to-white/5 rounded-2xl p-6 text-center border border-white/20"
-                >
-                  <div className="text-3xl font-bold text-white mb-2">{contactSubmissions.length}</div>
-                  <div className="text-white/60 text-sm">Total Messages</div>
-                </motion.div>
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl p-6 text-center border border-blue-500/20"
-                >
-                  <div className="text-3xl font-bold text-blue-400 mb-2">
-                    {contactSubmissions.filter(s => s.status === 'new').length}
-                  </div>
-                  <div className="text-white/60 text-sm">New Messages</div>
-                </motion.div>
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-2xl p-6 text-center border border-yellow-500/20"
-                >
-                  <div className="text-3xl font-bold text-yellow-400 mb-2">
-                    {contactSubmissions.filter(s => s.status === 'read').length}
-                  </div>
-                  <div className="text-white/60 text-sm">Read Messages</div>
-                </motion.div>
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-2xl p-6 text-center border border-green-500/20"
-                >
-                  <div className="text-3xl font-bold text-green-400 mb-2">
-                    {contactSubmissions.filter(s => s.status === 'replied').length}
-                  </div>
-                  <div className="text-white/60 text-sm">Replied Messages</div>
-                </motion.div>
-              </motion.div>
-
-              {/* Contact Submissions List */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="space-y-4"
-              >
-                {contactSubmissions.length > 0 ? (
-                  contactSubmissions.map((submission) => (
-                    <motion.div
-                      key={submission.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h5 className="text-white font-semibold">{submission.name}</h5>
-                            <span className={`px-2 py-1 rounded text-xs ${
-                              submission.status === 'new' 
-                                ? 'bg-blue-500/20 text-blue-400' 
-                                : submission.status === 'read'
-                                ? 'bg-yellow-500/20 text-yellow-400'
-                                : 'bg-green-500/20 text-green-400'
-                            }`}>
-                              {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
-                            </span>
-                          </div>
-                          <p className="text-white/60 text-sm mb-1">{submission.email}</p>
-                          <p className="text-white/80 text-sm font-medium">{submission.subject}</p>
-                          <p className="text-white/60 text-xs">
-                            {new Date(submission.timestamp).toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          {submission.status === 'new' && (
-                            <button
-                              onClick={() => updateContactStatus(submission.id, 'read')}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-blue-600/20 hover:from-blue-500/40 hover:to-blue-600/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              Mark Read
-                            </button>
-                          )}
-                          {submission.status === 'read' && (
-                            <button
-                              onClick={() => updateContactStatus(submission.id, 'replied')}
-                              className="px-4 py-2 bg-gradient-to-r from-green-500/20 to-green-600/20 hover:from-green-500/40 hover:to-green-600/40 text-green-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              Mark Replied
-                            </button>
-                          )}
-                          <button
-                            onClick={() => deleteContactSubmission(submission.id)}
-                            className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/40 hover:to-red-600/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-4 p-4 bg-gradient-to-r from-white/10 to-white/5 rounded-xl border border-white/20">
-                        <p className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">{submission.message}</p>
-                      </div>
-                    </motion.div>
-                  ))
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-center py-16"
-                  >
-                    <div className="w-20 h-20 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <MessageSquare className="w-10 h-10 text-white/40" />
-                    </div>
-                    <p className="text-white/60 text-xl mb-2">No contact submissions yet</p>
-                    <p className="text-white/40 text-sm">Messages sent through the contact form will appear here</p>
-                  </motion.div>
-                )}
-              </motion.div>
-            </div>
-          </motion.div>
-          </motion.div>
-        )}
     </div>
   );
 };
