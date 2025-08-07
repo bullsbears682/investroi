@@ -440,7 +440,7 @@ const CalculatorPage: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="lg:col-span-2 space-y-6 relative z-10"
         >
-          {/* Category Selection */}
+          {/* Business Scenario Selection with Category */}
           <motion.div 
             className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30 mb-6"
             animate={{ 
@@ -452,19 +452,24 @@ const CalculatorPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
               <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">1</div>
               <Target className="w-5 h-5 mr-2 text-blue-400" />
-              Select Business Category
+              Select Business Scenario
             </h2>
             
-            <CategorySelector
-              selectedCategory={selectedCategory}
-              onCategorySelect={handleCategorySelect}
-              onDropdownStateChange={setIsDropdownOpen}
-              isLoading={scenariosLoading}
-            />
-          </motion.div>
-
-          {/* Scenario Selection - Only show after category is selected */}
-          {selectedCategory && (
+            {/* Category Selection within Step 1 */}
+            <div className="mb-6">
+              <label className="block text-white/80 text-sm font-medium mb-2">
+                Business Category
+              </label>
+              <CategorySelector
+                selectedCategory={selectedCategory}
+                onCategorySelect={handleCategorySelect}
+                onDropdownStateChange={setIsDropdownOpen}
+                isLoading={scenariosLoading}
+              />
+            </div>
+            
+            {/* Scenario Selection */}
+            {selectedCategory && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -488,34 +493,12 @@ const CalculatorPage: React.FC = () => {
                 onMiniScenarioSelect={handleMiniScenarioSelect}
                 onDropdownStateChange={setIsDropdownOpen}
                 isLoading={scenariosLoading || miniScenariosLoading}
+                onCalculate={handleCalculate}
+                calculateIsLoading={calculateMutation.isPending}
+                calculationResult={calculationResult?.data || calculationResult}
               />
             </motion.div>
           )}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6"
-            >
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">2</div>
-                <Target className="w-5 h-5 mr-2" />
-                Select Business Scenario
-              </h2>
-              
-              <ScenarioSelector
-                scenarios={scenariosData}
-                miniScenarios={miniScenariosData}
-                selectedScenario={selectedScenario}
-                selectedMiniScenario={selectedMiniScenario}
-                selectedCategory={selectedCategory}
-                onScenarioSelect={handleScenarioSelect}
-                onMiniScenarioSelect={handleMiniScenarioSelect}
-                onDropdownStateChange={setIsDropdownOpen}
-                isLoading={scenariosLoading || miniScenariosLoading}
-              />
-            </motion.div>
 
 
         </motion.div>
