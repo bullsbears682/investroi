@@ -571,13 +571,14 @@ const CalculatorPage: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Quick Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6"
-      >
+      {/* Quick Stats - Only show after calculation */}
+      {calculationResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6"
+        >
         <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 text-center">
           <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
             <CheckCircle className="w-4 h-4 text-green-400" />
@@ -605,7 +606,8 @@ const CalculatorPage: React.FC = () => {
           </div>
           <p className="text-white/70 text-sm">Risk Analysis</p>
         </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* User Authentication Modal */}
       <UserAuth
