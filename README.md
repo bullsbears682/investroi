@@ -6,7 +6,7 @@ A comprehensive ROI calculator with real-world business scenarios, market analys
 
 ### Core Functionality
 - **Advanced ROI Calculator** with real-world business scenarios
-- **35 Business Scenarios** with 7 mini-scenarios each (245 total)
+- **35 Business Scenarios** with 6 mini-scenarios each (210 total)
 - **25 Countries** with real tax data and rates
 - **Market Analysis** with competitive insights
 - **Risk Assessment** with detailed analysis

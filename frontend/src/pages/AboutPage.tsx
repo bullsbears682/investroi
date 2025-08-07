@@ -34,7 +34,7 @@ const AboutPage: React.FC = () => {
     {
       icon: Calculator,
       title: 'Advanced ROI Calculator',
-      description: 'Comprehensive ROI calculations with 35+ business scenarios and 245+ mini-scenarios covering various industries and investment types.',
+      description: 'Comprehensive ROI calculations with 35+ business scenarios and 210+ mini-scenarios covering various industries and investment types.',
       highlights: ['Real-time calculations', 'Multiple investment types', 'Tax considerations', 'Risk assessment']
     },
     {
@@ -77,7 +77,7 @@ const AboutPage: React.FC = () => {
     },
     {
       title: 'Mini Scenarios',
-      count: '245+',
+      count: '210+',
       description: 'Detailed sub-categories for precise investment analysis and planning'
     },
     {
@@ -250,7 +250,7 @@ const AboutPage: React.FC = () => {
               </div>
               <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center">
                 <BarChart3 className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <div className="text-2xl font-bold text-white">245</div>
+                <div className="text-2xl font-bold text-white">210</div>
                 <div className="text-white/70 text-sm">Mini Scenarios</div>
               </div>
               <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center">

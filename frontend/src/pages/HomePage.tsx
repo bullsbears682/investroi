@@ -43,7 +43,7 @@ const HomePage: React.FC = () => {
   const stats = [
     { label: 'Business Scenarios', value: '35+', icon: Globe },
     { label: 'Countries Supported', value: '25', icon: Users },
-    { label: 'Mini Scenarios', value: '245', icon: TrendingUp },
+    { label: 'Mini Scenarios', value: '210', icon: TrendingUp },
     { label: 'Real-time Data', value: '24/7', icon: Zap }
   ];
 
