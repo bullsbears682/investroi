@@ -987,7 +987,7 @@ const AdminDashboard: React.FC = () => {
                     <p className="text-white/40 text-sm mt-2">Generate your first API key to get started</p>
                   </motion.div>
                 )}
-              </div>
+              </motion.div>
 
               {/* Usage Instructions */}
               <motion.div
@@ -1201,7 +1201,7 @@ const AdminDashboard: React.FC = () => {
                   </motion.div>
                 )}
               </motion.div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </div>
