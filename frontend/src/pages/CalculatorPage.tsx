@@ -431,32 +431,32 @@ const CalculatorPage: React.FC = () => {
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-8 relative">
         {/* Left Column - Calculator */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-2 space-y-6 relative z-10"
+          className="xl:col-span-2 space-y-4 lg:space-y-6 relative z-10"
         >
           {/* Business Scenario Selection with Category */}
           <motion.div 
-            className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30 mb-6"
+            className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-blue-500/30 mb-4 lg:mb-6"
             animate={{ 
               zIndex: isDropdownOpen ? 50 : 1,
               position: isDropdownOpen ? 'relative' : 'static'
             }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">1</div>
-              <Target className="w-5 h-5 mr-2 text-blue-400" />
-              Select Business Scenario
+            <h2 className="text-lg lg:text-xl font-semibold text-white mb-3 lg:mb-4 flex items-center">
+              <div className="w-5 h-5 lg:w-6 lg:h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2 lg:mr-3 text-white text-xs lg:text-sm font-bold">1</div>
+              <Target className="w-4 h-4 lg:w-5 lg:h-5 mr-2 text-blue-400" />
+              <span className="text-sm lg:text-base">Select Business Scenario</span>
             </h2>
             
             {/* Category Selection within Step 1 */}
-            <div className="mb-6">
-              <label className="block text-white/80 text-sm font-medium mb-2">
+            <div className="mb-4 lg:mb-6">
+              <label className="block text-white/80 text-xs lg:text-sm font-medium mb-2">
                 Business Category
               </label>
               <CategorySelector
@@ -474,12 +474,12 @@ const CalculatorPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6"
+              className="bg-white/10 backdrop-blur-lg rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-white/20 mb-4 lg:mb-6"
             >
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">2</div>
-                <Target className="w-5 h-5 mr-2" />
-                Select Business Scenario
+              <h2 className="text-lg lg:text-xl font-semibold text-white mb-3 lg:mb-4 flex items-center">
+                <div className="w-5 h-5 lg:w-6 lg:h-6 bg-purple-500 rounded-full flex items-center justify-center mr-2 lg:mr-3 text-white text-xs lg:text-sm font-bold">2</div>
+                <Target className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                <span className="text-sm lg:text-base">Select Business Scenario</span>
               </h2>
               
               <ScenarioSelector
@@ -507,14 +507,14 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
-          className="space-y-6 relative z-30"
+          className="space-y-4 lg:space-y-6 relative z-30"
         >
           {/* Results Display */}
           {calculationResult && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20 mb-6">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2" />
-                Results
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-white/20 relative z-20 mb-4 lg:mb-6">
+              <h2 className="text-lg lg:text-xl font-semibold text-white mb-3 lg:mb-4 flex items-center">
+                <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                <span className="text-sm lg:text-base">Results</span>
               </h2>
               
               <ResultsDisplay result={calculationResult?.data || calculationResult} />
@@ -523,10 +523,10 @@ const CalculatorPage: React.FC = () => {
 
           {/* Risk Assessment */}
           {selectedScenario && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20 mb-6">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <Shield className="w-5 h-5 mr-2" />
-                Risk Assessment
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-white/20 relative z-20 mb-4 lg:mb-6">
+              <h2 className="text-lg lg:text-xl font-semibold text-white mb-3 lg:mb-4 flex items-center">
+                <Shield className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                <span className="text-sm lg:text-base">Risk Assessment</span>
               </h2>
               
               <RiskAssessment
@@ -539,10 +539,10 @@ const CalculatorPage: React.FC = () => {
 
           {/* Market Analysis */}
           {selectedScenario && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20 mb-6">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <BarChart3 className="w-5 h-5 mr-2" />
-                Market Analysis
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-white/20 relative z-20 mb-4 lg:mb-6">
+              <h2 className="text-lg lg:text-xl font-semibold text-white mb-3 lg:mb-4 flex items-center">
+                <BarChart3 className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                <span className="text-sm lg:text-base">Market Analysis</span>
               </h2>
               
               <MarketAnalysis 
@@ -561,35 +561,35 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-20 pb-8"
+          className="mt-8 lg:mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 relative z-20 pb-6 lg:pb-8"
         >
-                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 sm:p-4 border border-white/20 text-center">
-            <div className="w-10 h-10 sm:w-8 sm:h-8 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <CheckCircle className="w-5 h-5 sm:w-4 sm:h-4 text-green-400" />
+                  <div className="bg-white/10 backdrop-blur-lg rounded-lg lg:rounded-xl p-3 lg:p-4 border border-white/20 text-center">
+            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <CheckCircle className="w-4 h-4 lg:w-5 lg:h-5 text-green-400" />
             </div>
-            <p className="text-white/70 text-base sm:text-sm">35 Business Scenarios</p>
+            <p className="text-white/70 text-xs lg:text-sm">35 Business Scenarios</p>
           </div>
         
-                  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 sm:p-4 border border-white/20 text-center">
-            <div className="w-10 h-10 sm:w-8 sm:h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <Globe className="w-5 h-5 sm:w-4 sm:h-4 text-blue-400" />
+                  <div className="bg-white/10 backdrop-blur-lg rounded-lg lg:rounded-xl p-3 lg:p-4 border border-white/20 text-center">
+            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <Globe className="w-4 h-4 lg:w-5 lg:h-5 text-blue-400" />
             </div>
-            <p className="text-white/70 text-base sm:text-sm">25 Countries</p>
+            <p className="text-white/70 text-xs lg:text-sm">25 Countries</p>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 sm:p-4 border border-white/20 text-center">
-            <div className="w-10 h-10 sm:w-8 sm:h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <DollarSign className="w-5 h-5 sm:w-4 sm:h-4 text-purple-400" />
+          <div className="bg-white/10 backdrop-blur-lg rounded-lg lg:rounded-xl p-3 lg:p-4 border border-white/20 text-center">
+            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <DollarSign className="w-4 h-4 lg:w-5 lg:h-5 text-purple-400" />
             </div>
-            <p className="text-white/70 text-base sm:text-sm">Real Tax Data</p>
+            <p className="text-white/70 text-xs lg:text-sm">Real Tax Data</p>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 sm:p-4 border border-white/20 text-center">
-            <div className="w-10 h-10 sm:w-8 sm:h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <AlertTriangle className="w-5 h-5 sm:w-4 sm:h-4 text-yellow-400" />
+                      <div className="bg-white/10 backdrop-blur-lg rounded-lg lg:rounded-xl p-3 lg:p-4 border border-white/20 text-center">
+              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <AlertTriangle className="w-4 h-4 lg:w-5 lg:h-5 text-yellow-400" />
+              </div>
+              <p className="text-white/70 text-xs lg:text-sm">Risk Analysis</p>
             </div>
-            <p className="text-white/70 text-base sm:text-sm">Risk Analysis</p>
-          </div>
         </motion.div>
       )}
 
