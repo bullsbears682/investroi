@@ -626,23 +626,6 @@ const AdminDashboard: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Controls & Action Buttons */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
-          <div className="inline-flex bg-white/10 border border-white/20 rounded-xl overflow-hidden">
-            {(['7','30','90'] as const).map((d) => (
-              <button
-                key={d}
-                onClick={() => setAnalyticsRange(d)}
-                className={`px-3 py-2 text-sm font-medium transition-colors ${analyticsRange === d ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white'}`}
-                aria-pressed={analyticsRange === d}
-                aria-label={`Show last ${d} days`}
-              >
-                {d}d
-              </button>
-            ))}
-          </div>
-          {/* Keep action buttons below */}
-        </div>
 
         {/* Action Buttons */}
         <motion.div
@@ -862,22 +845,15 @@ const AdminDashboard: React.FC = () => {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h3 className="text-xl font-bold text-white">Recent Activity</h3>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <input
-                type="text"
-                value={activityQuery}
-                onChange={(e) => setActivityQuery(e.target.value)}
-                placeholder="Search activity..."
-                className="w-full sm:w-64 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
-              />
-              <button
-                onClick={exportRecentActivityCSV}
-                className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm"
-                title="Export current list to CSV"
-              >
-                Export
-              </button>
-            </div>
+                         <div className="w-full sm:w-auto">
+               <input
+                 type="text"
+                 value={activityQuery}
+                 onChange={(e) => setActivityQuery(e.target.value)}
+                 placeholder="Search activity..."
+                 className="w-full sm:w-64 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+               />
+             </div>
           </div>
           <div className="space-y-3">
             {isLoadingActivity && (
