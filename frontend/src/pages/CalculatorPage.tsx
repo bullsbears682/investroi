@@ -500,7 +500,7 @@ const CalculatorPage: React.FC = () => {
             </motion.div>
           )}
 
-
+          </motion.div>
         </motion.div>
 
         {/* Right Column - Results & Analysis */}
