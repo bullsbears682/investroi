@@ -51,9 +51,9 @@ const Footer: React.FC = () => {
           >
             <div className="flex items-center space-x-2 mb-4">
               <Logo size="md" showText={false} />
-              <span className="text-xl font-bold text-white">InvestWise Pro</span>
+              <span className="text-lg font-bold text-white">InvestWise Pro</span>
             </div>
-            <p className="text-white/60 text-sm leading-relaxed">
+            <p className="text-white/60 text-xs leading-relaxed">
               Advanced investment analysis and ROI calculations for professionals and individuals.
               Make informed decisions with our comprehensive financial tools.
             </p>
@@ -66,13 +66,13 @@ const Footer: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="col-span-1"
           >
-            <h3 className="text-white font-semibold mb-4">Product</h3>
+            <h3 className="text-white font-semibold mb-3 text-sm">Product</h3>
             <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
+                    className="text-white/60 hover:text-white transition-colors duration-200 text-xs"
                   >
                     {link.name}
                   </Link>
@@ -88,13 +88,13 @@ const Footer: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="col-span-1"
           >
-            <h3 className="text-white font-semibold mb-4">Company</h3>
+            <h3 className="text-white font-semibold mb-3 text-sm">Company</h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
+                    className="text-white/60 hover:text-white transition-colors duration-200 text-xs"
                   >
                     {link.name}
                   </Link>
@@ -110,13 +110,13 @@ const Footer: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="col-span-1"
           >
-            <h3 className="text-white font-semibold mb-4">Support</h3>
+            <h3 className="text-white font-semibold mb-3 text-sm">Support</h3>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-white/60 hover:text-white transition-colors duration-200 text-sm"
+                    className="text-white/60 hover:text-white transition-colors duration-200 text-xs"
                   >
                     {link.name}
                   </Link>
@@ -134,7 +134,7 @@ const Footer: React.FC = () => {
           className="border-t border-white/10 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center"
         >
           {/* Copyright */}
-          <div className="text-white/60 text-sm mb-4 md:mb-0">
+          <div className="text-white/60 text-xs mb-4 md:mb-0">
             © {currentYear} InvestWise Pro. All rights reserved.
           </div>
 
