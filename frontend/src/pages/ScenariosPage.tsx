@@ -10,29 +10,17 @@ import {
   ShoppingCart,
   Code,
   Factory,
-  Zap,
   Utensils,
   Home,
-  Briefcase,
   Store,
   Smartphone,
   BookOpen,
-  Package,
-  Palette,
-  Gift,
   Heart,
   Shield,
   Target,
-  TrendingUp,
-  Database,
-  Server,
-  Cpu,
-  Wifi,
-  Camera,
-  Printer,
-  Sun,
   Truck,
-  PawPrint
+  Printer,
+  Sun
 } from 'lucide-react';
 import { CalculatorIcon } from '../components/icons/CustomIcons';
 import { allScenarios } from '../data/allScenarios';
