@@ -67,8 +67,8 @@ const ScenariosPage: React.FC = () => {
       >
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
-              <ChartIcon size={24} color="#ffffff" />
+            <div className="w-16 h-16 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
+              <ChartIcon size={32} color="#ffffff" />
             </div>
             <h1 className="text-3xl font-bold text-white">Business Scenarios</h1>
           </div>
