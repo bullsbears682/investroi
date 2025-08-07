@@ -497,7 +497,7 @@ const CalculatorPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-10 mb-6"
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-5 mb-6"
             >
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">3</div>
@@ -527,7 +527,7 @@ const CalculatorPage: React.FC = () => {
         >
           {/* Results Display */}
           {calculationResult && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2" />
                 Results
@@ -539,7 +539,7 @@ const CalculatorPage: React.FC = () => {
 
           {/* Risk Assessment */}
           {selectedScenario && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2" />
                 Risk Assessment
@@ -555,7 +555,7 @@ const CalculatorPage: React.FC = () => {
 
           {/* Market Analysis */}
           {selectedScenario && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <BarChart3 className="w-5 h-5 mr-2" />
                 Market Analysis
@@ -577,7 +577,7 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6"
+          className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-20"
         >
                   <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 sm:p-4 border border-white/20 text-center">
             <div className="w-10 h-10 sm:w-8 sm:h-8 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">

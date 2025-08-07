@@ -82,7 +82,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ result }) => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative z-10">
       {/* Main ROI Results */}
       <div className="grid grid-cols-2 gap-4">
         <motion.div
