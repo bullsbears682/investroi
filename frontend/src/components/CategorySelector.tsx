@@ -83,7 +83,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-[9999] w-full mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg shadow-xl max-h-80 overflow-hidden"
+              className="absolute z-[9999] w-full mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg shadow-xl max-h-60 overflow-hidden"
             >
               {/* Search Bar */}
               <div className="p-3 border-b border-white/10">
@@ -100,7 +100,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               </div>
 
               {/* Categories List */}
-              <div className="max-h-64 overflow-y-auto">
+              <div className="max-h-40 overflow-y-auto">
                 {filteredCategories.length === 0 ? (
                   <div className="p-4 text-center text-white/60 text-sm">
                     No categories found
