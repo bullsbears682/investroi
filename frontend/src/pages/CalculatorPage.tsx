@@ -362,12 +362,12 @@ const CalculatorPage: React.FC = () => {
         className="text-center mb-8 pt-20"
       >
         <div className="inline-flex items-center space-x-3 mb-4">
-          <div className="w-16 h-16 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
-            <Calculator className="w-8 h-8 sm:w-6 sm:h-6 text-white" />
+          <div className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
+            <Calculator className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-4xl sm:text-3xl font-bold text-white">ROI Calculator</h1>
+          <h1 className="text-3xl font-bold text-white">ROI Calculator</h1>
         </div>
-        <p className="text-white/70 text-xl sm:text-lg max-w-2xl mx-auto mb-6 px-4">
+        <p className="text-white/70 text-lg max-w-2xl mx-auto mb-6">
           Analyze your business investment with our comprehensive ROI calculator featuring 
           35 business scenarios and real-world market data.
         </p>
@@ -376,13 +376,13 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 px-4"
+          className="flex justify-center space-x-4"
         >
           <Link to="/demo">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 sm:px-6 sm:py-3 rounded-xl font-semibold border border-white/20 transition-all flex items-center space-x-2 text-lg sm:text-base"
+              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold border border-white/20 transition-all flex items-center space-x-2"
             >
               <Play className="w-4 h-4" />
               <span>Watch Demo</span>
@@ -421,7 +421,7 @@ const CalculatorPage: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowAuth(true)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 sm:px-6 sm:py-3 rounded-xl font-semibold transition-all flex items-center space-x-2 text-lg sm:text-base"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center space-x-2"
             >
               <User className="w-4 h-4" />
               <span>Login</span>
@@ -430,7 +430,7 @@ const CalculatorPage: React.FC = () => {
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 px-4 sm:px-0">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Calculator */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -440,16 +440,16 @@ const CalculatorPage: React.FC = () => {
         >
           {/* Category Selection */}
           <motion.div 
-            className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-8 sm:p-6 border border-blue-500/30 mb-6"
+            className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30 mb-6"
             animate={{ 
               zIndex: isDropdownOpen ? 50 : 1,
               position: isDropdownOpen ? 'relative' : 'static'
             }}
             transition={{ duration: 0.3 }}
           >
-            <h2 className="text-2xl sm:text-xl font-semibold text-white mb-4 flex items-center">
-              <div className="w-8 h-8 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-base sm:text-sm font-bold">1</div>
-              <Target className="w-6 h-6 sm:w-5 sm:h-5 mr-2 text-blue-400" />
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">1</div>
+              <Target className="w-5 h-5 mr-2 text-blue-400" />
               Select Business Category
             </h2>
             
@@ -468,7 +468,7 @@ const CalculatorPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 sm:p-6 border border-white/20 mb-8 sm:mb-6"
+              className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-8 sm:mb-6"
             >
               <h2 className="text-2xl sm:text-xl font-semibold text-white mb-4 flex items-center">
                 <div className="w-8 h-8 sm:w-6 sm:h-6 bg-purple-500 rounded-full flex items-center justify-center mr-3 text-white text-base sm:text-sm font-bold">2</div>
