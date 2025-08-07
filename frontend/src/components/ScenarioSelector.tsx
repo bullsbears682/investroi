@@ -187,18 +187,18 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden z-[9999] max-h-[500px] overflow-y-auto"
+                className="absolute top-full left-0 right-0 mt-2 bg-transparent backdrop-blur-none border-0 rounded-xl overflow-hidden z-[9999] max-h-[500px] overflow-y-auto"
               >
                 {/* Search */}
-                <div className="p-3 border-b border-white/10">
+                <div className="p-3 border-b border-white/20">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white" />
                     <input
                       type="text"
                       placeholder="Search scenarios..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full bg-white/10 border border-white/20 rounded-lg px-10 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      className="w-full bg-transparent border border-white/30 rounded-lg px-10 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     />
                   </div>
                 </div>
@@ -222,8 +222,8 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                           }}
                           className={`w-full text-left p-3 rounded-xl transition-all duration-300 group border-2 ${
                             isSelected 
-                              ? 'bg-gradient-to-r from-blue-500/30 to-purple-500/30 border-blue-400 shadow-xl shadow-blue-500/30' 
-                              : 'hover:bg-white/15 border-transparent hover:border-white/20'
+                              ? 'bg-transparent border-blue-400 shadow-xl shadow-blue-500/30' 
+                              : 'hover:bg-transparent border-transparent hover:border-white/20'
                           }`}
                         >
                           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
@@ -231,8 +231,8 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                               <div className="flex items-start space-x-3">
                                 <div className={`p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${
                                   isSelected 
-                                    ? 'bg-blue-500/20' 
-                                    : 'bg-white/10'
+                                    ? 'bg-transparent' 
+                                    : 'bg-transparent'
                                 }`}>
                                   <Building2 className={`w-4 h-4 transition-colors ${
                                     isSelected ? 'text-blue-300' : 'text-white/70'
