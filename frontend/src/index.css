@@ -242,6 +242,12 @@
     to { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
   }
   
+  /* Ticker animation for dropdowns */
+  @keyframes ticker {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
   /* Responsive text */
   .text-responsive {
     @apply text-sm sm:text-base lg:text-lg;

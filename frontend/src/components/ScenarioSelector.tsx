@@ -192,7 +192,12 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                                  className="absolute top-full left-0 right-0 mt-2 bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl rounded-xl overflow-hidden z-[99999999] max-h-[200px] overflow-y-auto"
+                                  className="absolute top-full left-0 right-0 mt-2 bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl rounded-xl overflow-hidden z-[99999999] max-h-[200px] overflow-y-auto relative"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'ticker 3s ease-in-out infinite'
+                }}
               >
                 {/* Search */}
                 <div className="p-2 lg:p-3 border-b border-white/20">
@@ -337,7 +342,12 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="fixed top-2 left-4 right-4 bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl rounded-xl overflow-hidden z-[99999999] max-h-[350px] sm:max-h-[250px] overflow-y-auto sm:absolute sm:top-full sm:left-0 sm:right-0 sm:mt-2"
+                  className="fixed top-2 left-4 right-4 bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl rounded-xl overflow-hidden z-[99999999] max-h-[350px] sm:max-h-[250px] overflow-y-auto sm:absolute sm:top-full sm:left-0 sm:right-0 sm:mt-2 relative"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%)',
+                    backgroundSize: '200% 100%',
+                    animation: 'ticker 3s ease-in-out infinite'
+                  }}
                 >
                   <div className="p-1 lg:p-2">
                     {miniScenarios.map((miniScenario) => (
