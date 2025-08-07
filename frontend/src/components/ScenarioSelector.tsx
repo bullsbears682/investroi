@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Search, Building2, Target } from 'lucide-react';
+import { ChevronDown, Search, Building2, Target, Calculator } from 'lucide-react';
+import ROICalculator from './ROICalculator';
 
 
 interface Scenario {
@@ -41,6 +42,9 @@ interface ScenarioSelectorProps {
   onMiniScenarioSelect: (id: number) => void;
   onDropdownStateChange?: (isOpen: boolean) => void;
   isLoading: boolean;
+  onCalculate?: (formData: any) => void;
+  calculateIsLoading?: boolean;
+  calculationResult?: any;
 }
 
 const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
@@ -52,7 +56,10 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   onScenarioSelect,
   onMiniScenarioSelect,
   onDropdownStateChange,
-  isLoading
+  isLoading,
+  onCalculate,
+  calculateIsLoading,
+  calculationResult
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isScenarioOpen, setIsScenarioOpen] = useState(false);
@@ -378,7 +385,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4 mb-6"
         >
           <h3 className="text-white font-semibold mb-2">Selected Investment</h3>
           <div className="space-y-2 text-sm">
@@ -401,6 +408,32 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
               </span>
             </div>
           </div>
+        </motion.div>
+      )}
+
+      {/* ROI Calculator - Integrated into Step 1 */}
+      {selectedScenario && selectedMiniScenario && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20"
+        >
+          <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">3</div>
+            <Calculator className="w-5 h-5 mr-2" />
+            Investment Details
+          </h2>
+          
+          <ROICalculator
+            onCalculate={onCalculate}
+            isLoading={calculateIsLoading}
+            selectedScenario={selectedScenario}
+            selectedMiniScenario={selectedMiniScenario}
+            scenariosData={scenarios}
+            miniScenariosData={miniScenarios}
+            calculationResult={calculationResult}
+          />
         </motion.div>
       )}
     </div>
