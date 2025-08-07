@@ -354,7 +354,7 @@ const CalculatorPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 px-4 sm:px-0">
       {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -430,13 +430,13 @@ const CalculatorPage: React.FC = () => {
         </motion.div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
         {/* Left Column - Calculator */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-2 space-y-6"
+          className="lg:col-span-2 space-y-6 relative z-10"
         >
           {/* Category Selection */}
           <motion.div 
@@ -523,11 +523,11 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
-          className="space-y-6"
+          className="space-y-6 relative z-30"
         >
           {/* Results Display */}
           {calculationResult && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20 mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2" />
                 Results
@@ -539,7 +539,7 @@ const CalculatorPage: React.FC = () => {
 
           {/* Risk Assessment */}
           {selectedScenario && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20 mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <Shield className="w-5 h-5 mr-2" />
                 Risk Assessment
@@ -555,7 +555,7 @@ const CalculatorPage: React.FC = () => {
 
           {/* Market Analysis */}
           {selectedScenario && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-20 mb-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
                 <BarChart3 className="w-5 h-5 mr-2" />
                 Market Analysis
@@ -577,7 +577,7 @@ const CalculatorPage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-20"
+          className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-20 pb-8"
         >
                   <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 sm:p-4 border border-white/20 text-center">
             <div className="w-10 h-10 sm:w-8 sm:h-8 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
