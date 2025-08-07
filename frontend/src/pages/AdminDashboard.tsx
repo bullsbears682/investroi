@@ -812,7 +812,11 @@ const AdminDashboard: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* API Key Management Modal */}
+
+
+      </div>
+
+      {/* API Key Management Modal */}
         {showApiKeyModal && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -833,192 +837,193 @@ const AdminDashboard: React.FC = () => {
               <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
               
               <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex items-center justify-between mb-8"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <CodeIcon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                      API Key Management
-                    </h3>
-                    <p className="text-white/60 text-sm">Generate and manage your API keys</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowApiKeyModal(false)}
-                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="flex items-center justify-between mb-8"
                 >
-                  ✕
-                </button>
-              </motion.div>
-
-              {/* Generate New API Key */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mb-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-white/20"
-              >
-                <h4 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <CodeIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                        API Key Management
+                      </h3>
+                      <p className="text-white/60 text-sm">Generate and manage your API keys</p>
+                    </div>
                   </div>
-                  <span>Generate New API Key</span>
-                </h4>
-                <div className="flex gap-4">
-                  <input
-                    type="text"
-                    placeholder="Enter API key name (e.g., 'Production App')"
-                    value={newApiKeyName}
-                    onChange={(e) => setNewApiKeyName(e.target.value)}
-                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-                  />
                   <button
-                    onClick={generateApiKey}
-                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    onClick={() => setShowApiKeyModal(false)}
+                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
                   >
-                    Generate
+                    ✕
                   </button>
-                </div>
-              </motion.div>
+                </motion.div>
 
-              {/* API Keys List */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="space-y-4"
-              >
-                <h4 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                  </div>
-                  <span>Your API Keys</span>
-                </h4>
-                {apiKeys.length > 0 ? (
-                  apiKeys.map((apiKey) => (
-                    <motion.div
-                      key={apiKey.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
+                {/* Generate New API Key */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-white/20"
+                >
+                  <h4 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <span>Generate New API Key</span>
+                  </h4>
+                  <div className="flex gap-4">
+                    <input
+                      type="text"
+                      placeholder="Enter API key name (e.g., 'Production App')"
+                      value={newApiKeyName}
+                      onChange={(e) => setNewApiKeyName(e.target.value)}
+                      className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
+                    />
+                    <button
+                      onClick={generateApiKey}
+                      className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <h5 className="text-white font-semibold">{apiKey.name}</h5>
-                          <p className="text-white/60 text-sm">
-                            Created: {new Date(apiKey.created).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            apiKey.isActive 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-red-500/20 text-red-400'
-                          }`}>
-                            {apiKey.isActive ? 'Active' : 'Inactive'}
-                          </span>
-                          <button
-                            onClick={() => toggleApiKeyStatus(apiKey.id)}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                          >
-                            {apiKey.isActive ? 'Deactivate' : 'Activate'}
-                          </button>
-                          <button
-                            onClick={() => deleteApiKey(apiKey.id)}
-                            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white/60 text-sm">API Key:</span>
-                          <code className="flex-1 px-3 py-1 bg-white/10 rounded text-sm text-white font-mono break-all">
-                            {apiKey.key}
-                          </code>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(apiKey.key);
-                              addNotification({
-                                type: 'success',
-                                title: 'Copied!',
-                                message: 'API key copied to clipboard'
-                              });
-                            }}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                          >
-                            Copy
-                          </button>
+                      Generate
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* API Keys List */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="space-y-4"
+                >
+                  <h4 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                      </svg>
+                    </div>
+                    <span>Your API Keys</span>
+                  </h4>
+                  {apiKeys.length > 0 ? (
+                    apiKeys.map((apiKey) => (
+                      <motion.div
+                        key={apiKey.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <h5 className="text-white font-semibold">{apiKey.name}</h5>
+                            <p className="text-white/60 text-sm">
+                              Created: {new Date(apiKey.created).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              apiKey.isActive 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {apiKey.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                            <button
+                              onClick={() => toggleApiKeyStatus(apiKey.id)}
+                              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
+                            >
+                              {apiKey.isActive ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button
+                              onClick={() => deleteApiKey(apiKey.id)}
+                              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-sm text-white/60">
-                          <span>Usage: {apiKey.usageCount} requests</span>
-                          {apiKey.lastUsed && (
-                            <span>Last used: {new Date(apiKey.lastUsed).toLocaleDateString()}</span>
-                          )}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white/60 text-sm">API Key:</span>
+                            <code className="flex-1 px-3 py-1 bg-white/10 rounded text-sm text-white font-mono break-all">
+                              {apiKey.key}
+                            </code>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(apiKey.key);
+                                addNotification({
+                                  type: 'success',
+                                  title: 'Copied!',
+                                  message: 'API key copied to clipboard'
+                                });
+                              }}
+                              className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 text-sm text-white/60">
+                            <span>Usage: {apiKey.usageCount} requests</span>
+                            {apiKey.lastUsed && (
+                              <span>Last used: {new Date(apiKey.lastUsed).toLocaleDateString()}</span>
+                            )}
+                          </div>
                         </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-center py-12"
+                    >
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CodeIcon className="w-8 h-8 text-white/40" />
                       </div>
+                      <p className="text-white/60 text-lg">No API keys generated yet</p>
+                      <p className="text-white/40 text-sm mt-2">Generate your first API key to get started</p>
                     </motion.div>
-                  ))
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-center py-12"
-                  >
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CodeIcon className="w-8 h-8 text-white/40" />
-                    </div>
-                    <p className="text-white/60 text-lg">No API keys generated yet</p>
-                    <p className="text-white/40 text-sm mt-2">Generate your first API key to get started</p>
-                  </motion.div>
-                )}
-              </motion.div>
+                  )}
+                </motion.div>
 
-              {/* Usage Instructions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-2xl border border-blue-500/20"
-              >
-                <h4 className="text-xl font-semibold text-blue-400 mb-4 flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                {/* Usage Instructions */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-2xl border border-blue-500/20"
+                >
+                  <h4 className="text-xl font-semibold text-blue-400 mb-4 flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <span>How to Use Your API Keys</span>
+                  </h4>
+                  <div className="space-y-3 text-sm text-white/80">
+                    <div className="flex items-start space-x-2">
+                      <span className="text-blue-400 font-semibold">•</span>
+                      <p>Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <span className="text-purple-400 font-semibold">•</span>
+                      <p>Make requests to: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">https://api.investwisepro.com/v1/calculator/roi</code></p>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <span className="text-indigo-400 font-semibold">•</span>
+                      <p>Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">npm install investwise-calculator-sdk</code></p>
+                    </div>
                   </div>
-                  <span>How to Use Your API Keys</span>
-                </h4>
-                <div className="space-y-3 text-sm text-white/80">
-                  <div className="flex items-start space-x-2">
-                    <span className="text-blue-400 font-semibold">•</span>
-                    <p>Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <span className="text-purple-400 font-semibold">•</span>
-                    <p>Make requests to: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">https://api.investwisepro.com/v1/calculator/roi</code></p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <span className="text-indigo-400 font-semibold">•</span>
-                    <p>Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">npm install investwise-calculator-sdk</code></p>
-                  </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         )}
