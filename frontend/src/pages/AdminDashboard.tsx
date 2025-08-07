@@ -18,6 +18,7 @@ import {
   ActivityIcon,
   CodeIcon
 } from '../components/icons/CustomIcons';
+import { MessageSquare } from 'lucide-react';
 
 interface Analytics {
   totalUsers: number;
@@ -67,6 +68,8 @@ const AdminDashboard: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [newApiKeyName, setNewApiKeyName] = useState('');
+  const [showContactSubmissions, setShowContactSubmissions] = useState(false);
+  const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
   const { addNotification } = useNotifications();
 
   // Load admin statistics
@@ -202,6 +205,16 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Load contact submissions
+  const loadContactSubmissions = () => {
+    try {
+      const submissions = contactStorage.getSubmissions();
+      setContactSubmissions(submissions);
+    } catch (error) {
+      console.error('Failed to load contact submissions:', error);
+    }
+  };
+
   // Generate new API key
   const generateApiKey = () => {
     if (!newApiKeyName.trim()) {
@@ -259,6 +272,30 @@ const AdminDashboard: React.FC = () => {
         type: 'success',
         title: 'Success',
         message: 'API key deleted successfully'
+      });
+    }
+  };
+
+  // Update contact submission status
+  const updateContactStatus = (id: string, status: 'new' | 'read' | 'replied') => {
+    contactStorage.updateSubmissionStatus(id, status);
+    loadContactSubmissions(); // Reload to reflect changes
+    addNotification({
+      type: 'success',
+      title: 'Status Updated',
+      message: `Contact submission marked as ${status}`
+    });
+  };
+
+  // Delete contact submission
+  const deleteContactSubmission = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this contact submission? This action cannot be undone.')) {
+      contactStorage.deleteSubmission(id);
+      loadContactSubmissions(); // Reload to reflect changes
+      addNotification({
+        type: 'success',
+        title: 'Deleted',
+        message: 'Contact submission deleted successfully'
       });
     }
   };
@@ -482,6 +519,7 @@ const AdminDashboard: React.FC = () => {
     loadAdminStats();
     loadRecentActivity();
     loadApiKeys();
+    loadContactSubmissions();
   }, []);
 
   return (
@@ -638,10 +676,29 @@ const AdminDashboard: React.FC = () => {
               <div>
                 <p className="text-white/60 text-sm font-medium mb-1">API Keys</p>
                 <p className="text-3xl lg:text-4xl font-bold text-white">{apiKeys.length}</p>
-                <p className="text-indigo-400 text-sm font-medium">Manage</p>
+                <p className="text-purple-400 text-sm font-medium">Manage</p>
               </div>
               <div className="p-4 bg-white/10 rounded-2xl">
                 <CodeIcon className="w-8 h-8 text-indigo-400" />
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowContactSubmissions(true)}
+            className="group relative bg-gradient-to-br from-pink-500/20 to-pink-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm font-medium mb-1">Contact Messages</p>
+                <p className="text-3xl lg:text-4xl font-bold text-white">{contactSubmissions.length}</p>
+                <p className="text-pink-400 text-sm font-medium">View</p>
+              </div>
+              <div className="p-4 bg-white/10 rounded-2xl">
+                <MessageSquare className="w-8 h-8 text-pink-400" />
               </div>
             </div>
           </motion.button>
@@ -883,6 +940,129 @@ const AdminDashboard: React.FC = () => {
                   <p>• Make requests to: <code className="bg-white/10 px-2 py-1 rounded">https://api.investwisepro.com/v1/calculator/roi</code></p>
                   <p>• Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded">npm install investwise-calculator-sdk</code></p>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Contact Submissions Modal */}
+        {showContactSubmissions && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowContactSubmissions(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-6xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white">Contact Submissions</h3>
+                <button
+                  onClick={() => setShowContactSubmissions(false)}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white/5 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-white">{contactSubmissions.length}</div>
+                  <div className="text-white/60 text-sm">Total Messages</div>
+                </div>
+                <div className="bg-white/5 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-400">
+                    {contactSubmissions.filter(s => s.status === 'new').length}
+                  </div>
+                  <div className="text-white/60 text-sm">New Messages</div>
+                </div>
+                <div className="bg-white/5 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-yellow-400">
+                    {contactSubmissions.filter(s => s.status === 'read').length}
+                  </div>
+                  <div className="text-white/60 text-sm">Read Messages</div>
+                </div>
+                <div className="bg-white/5 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-green-400">
+                    {contactSubmissions.filter(s => s.status === 'replied').length}
+                  </div>
+                  <div className="text-white/60 text-sm">Replied Messages</div>
+                </div>
+              </div>
+
+              {/* Contact Submissions List */}
+              <div className="space-y-4">
+                {contactSubmissions.length > 0 ? (
+                  contactSubmissions.map((submission) => (
+                    <motion.div
+                      key={submission.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-white/5 rounded-lg border border-white/10"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h5 className="text-white font-semibold">{submission.name}</h5>
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              submission.status === 'new' 
+                                ? 'bg-blue-500/20 text-blue-400' 
+                                : submission.status === 'read'
+                                ? 'bg-yellow-500/20 text-yellow-400'
+                                : 'bg-green-500/20 text-green-400'
+                            }`}>
+                              {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
+                            </span>
+                          </div>
+                          <p className="text-white/60 text-sm mb-1">{submission.email}</p>
+                          <p className="text-white/80 text-sm font-medium">{submission.subject}</p>
+                          <p className="text-white/60 text-xs">
+                            {new Date(submission.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 ml-4">
+                          {submission.status === 'new' && (
+                            <button
+                              onClick={() => updateContactStatus(submission.id, 'read')}
+                              className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 rounded text-sm transition-colors"
+                            >
+                              Mark Read
+                            </button>
+                          )}
+                          {submission.status === 'read' && (
+                            <button
+                              onClick={() => updateContactStatus(submission.id, 'replied')}
+                              className="px-3 py-1 bg-green-500/20 hover:bg-green-500/40 text-green-400 rounded text-sm transition-colors"
+                            >
+                              Mark Replied
+                            </button>
+                          )}
+                          <button
+                            onClick={() => deleteContactSubmission(submission.id)}
+                            className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded text-sm transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 p-3 bg-white/5 rounded border border-white/10">
+                        <p className="text-white/80 text-sm whitespace-pre-wrap">{submission.message}</p>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <MessageSquare className="w-16 h-16 text-white/20 mx-auto mb-4" />
+                    <p className="text-white/60 text-lg">No contact submissions yet</p>
+                    <p className="text-white/40 text-sm">Messages sent through the contact form will appear here</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
