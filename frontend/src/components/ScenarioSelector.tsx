@@ -239,7 +239,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                   }`} />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center space-x-2 mb-1">
+                                  <div className="flex flex-col space-y-1 mb-1">
                                     <h3 className={`text-lg font-semibold transition-colors ${
                                       isSelected 
                                         ? 'text-blue-200' 
@@ -248,7 +248,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                       {scenario.name}
                                     </h3>
 
-                                    <span className={`text-sm font-medium transition-colors flex-shrink-0 ${
+                                    <span className={`text-sm font-medium transition-colors ${
                                       isSelected ? 'text-blue-200/80' : 'text-white/60'
                                     }`}>
                                       {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
