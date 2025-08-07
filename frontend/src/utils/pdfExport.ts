@@ -201,17 +201,17 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
           </h2>
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
             <div style="text-align: center; flex: 1;">
-              <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#3B82F6 0deg ${(resultData.initial_investment || 0) / totalInvestment * 360}deg, rgba(59, 130, 246, 0.2) ${(resultData.initial_investment || 0) / totalInvestment * 360}deg 360deg); margin: 0 auto 10px;"></div>
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#3B82F6 0deg ${totalInvestment > 0 ? ((resultData.initial_investment || 0) / totalInvestment * 360).toFixed(2) : 0}deg, rgba(59, 130, 246, 0.2) ${totalInvestment > 0 ? ((resultData.initial_investment || 0) / totalInvestment * 360).toFixed(2) : 0}deg 360deg); margin: 0 auto 10px;"></div>
               <p style="color: #3b82f6; font-size: 14px; font-weight: bold; margin: 0;">Initial Investment</p>
               <p style="color: #ffffff; font-size: 12px; margin: 4px 0 0 0;">${formatCurrency(resultData.initial_investment || 0)}</p>
             </div>
             <div style="text-align: center; flex: 1;">
-              <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#8B5CF6 0deg ${(resultData.additional_costs || 0) / totalInvestment * 360}deg, rgba(139, 92, 246, 0.2) ${(resultData.additional_costs || 0) / totalInvestment * 360}deg 360deg); margin: 0 auto 10px;"></div>
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#8B5CF6 0deg ${totalInvestment > 0 ? ((resultData.additional_costs || 0) / totalInvestment * 360).toFixed(2) : 0}deg, rgba(139, 92, 246, 0.2) ${totalInvestment > 0 ? ((resultData.additional_costs || 0) / totalInvestment * 360).toFixed(2) : 0}deg 360deg); margin: 0 auto 10px;"></div>
               <p style="color: #8b5cf6; font-size: 14px; font-weight: bold; margin: 0;">Additional Costs</p>
               <p style="color: #ffffff; font-size: 12px; margin: 4px 0 0 0;">${formatCurrency(resultData.additional_costs || 0)}</p>
             </div>
             <div style="text-align: center; flex: 1;">
-              <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(${netProfit >= 0 ? '#10B981' : '#EF4444'} 0deg ${Math.abs(netProfit) / totalInvestment * 360}deg, rgba(16, 185, 129, 0.2) ${Math.abs(netProfit) / totalInvestment * 360}deg 360deg); margin: 0 auto 10px;"></div>
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(${netProfit >= 0 ? '#10B981' : '#EF4444'} 0deg ${totalInvestment > 0 ? (Math.abs(netProfit) / totalInvestment * 360).toFixed(2) : 0}deg, rgba(16, 185, 129, 0.2) ${totalInvestment > 0 ? (Math.abs(netProfit) / totalInvestment * 360).toFixed(2) : 0}deg 360deg); margin: 0 auto 10px;"></div>
               <p style="color: ${netProfit >= 0 ? '#10b981' : '#ef4444'}; font-size: 14px; font-weight: bold; margin: 0;">Net Profit</p>
               <p style="color: #ffffff; font-size: 12px; margin: 4px 0 0 0;">${formatCurrency(netProfit)}</p>
             </div>
@@ -455,7 +455,7 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
     // Convert to canvas
     const canvas = await html2canvas(container, {
       backgroundColor: '#1e1b4b',
-      scale: 2,
+      scale: Math.min(3, (window.devicePixelRatio || 2)),
       useCORS: true,
       allowTaint: true,
       width: 800,
@@ -470,7 +470,7 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
     const pdf = new jsPDF('p', 'mm', 'a4');
     
     const imgWidth = 210; // A4 width in mm
-    const pageHeight = 295; // A4 height in mm
+    const pageHeight = 297; // A4 height in mm
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
 
@@ -481,7 +481,7 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
     heightLeft -= pageHeight;
 
     // Add additional pages if needed
-    while (heightLeft >= 0) {
+    while (heightLeft > 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
