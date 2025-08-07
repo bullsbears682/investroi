@@ -332,7 +332,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute bottom-full left-0 right-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl overflow-hidden z-[99999999] max-h-[400px] sm:max-h-[300px] overflow-y-auto sm:top-full sm:bottom-auto sm:mt-2 sm:mb-0"
+                  className="fixed top-1/2 left-4 right-4 transform -translate-y-1/2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl overflow-hidden z-[99999999] max-h-[400px] sm:max-h-[300px] overflow-y-auto sm:absolute sm:top-full sm:left-0 sm:right-0 sm:transform-none sm:mt-2"
                 >
                   <div className="p-2">
                     {miniScenarios.map((miniScenario) => (
