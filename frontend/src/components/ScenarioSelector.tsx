@@ -187,7 +187,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                                  className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl overflow-hidden z-[99999999] max-h-[200px] overflow-y-auto"
+                                  className="absolute top-full left-0 right-0 mt-2 bg-transparent backdrop-blur-none border-0 rounded-xl overflow-hidden z-[99999999] max-h-[200px] overflow-y-auto"
               >
                 {/* Search */}
                 <div className="p-3 border-b border-white/20">
@@ -198,7 +198,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                       placeholder="Search scenarios..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full bg-white/10 border border-white/30 rounded-lg px-10 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      className="w-full bg-transparent border border-white/30 rounded-lg px-10 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     />
                   </div>
                 </div>
@@ -332,7 +332,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden z-[99999999] max-h-[180px] overflow-y-auto"
+                  className="absolute top-full left-0 right-0 mt-2 bg-transparent backdrop-blur-none border-0 rounded-xl overflow-hidden z-[99999999] max-h-[180px] overflow-y-auto"
                 >
                   <div className="p-2">
                     {miniScenarios.map((miniScenario) => (
