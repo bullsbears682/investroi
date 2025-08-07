@@ -3,13 +3,11 @@ import React from 'react';
 interface BusinessScenariosIconProps {
   size?: number;
   className?: string;
-  color?: string;
 }
 
 const BusinessScenariosIcon: React.FC<BusinessScenariosIconProps> = ({ 
   size = 24, 
-  className = '', 
-  color = 'currentColor' 
+  className = '' 
 }) => {
   return (
     <svg 
