@@ -354,7 +354,7 @@ const CalculatorPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20">
       {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
