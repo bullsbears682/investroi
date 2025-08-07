@@ -12,6 +12,7 @@ const ContactPage: React.FC = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +34,13 @@ const ContactPage: React.FC = () => {
       setFormData({ name: '', email: '', subject: '', message: '' });
       setIsSubmitting(false);
       
-      // Show success message
-      alert('Thank you for your message! We\'ll get back to you soon.');
+      // Show success popup
+      setShowSuccessPopup(true);
+      
+      // Auto-hide popup after 5 seconds
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 5000);
       
       console.log('Contact submission stored:', submission);
     } catch (error) {
@@ -328,6 +334,54 @@ const ContactPage: React.FC = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowSuccessPopup(false)}
+        >
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 max-w-md w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
+            <p className="text-white/80 mb-6">
+              Thank you for your message! We've received your inquiry and will get back to you within 24 hours.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowSuccessPopup(false)}
+                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+              >
+                Continue Browsing
+              </button>
+              <button
+                onClick={() => {
+                  setShowSuccessPopup(false);
+                  // Scroll to top of page
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+              >
+                Send Another
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };
