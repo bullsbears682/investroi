@@ -21,6 +21,7 @@ import {
 
 import { api } from '../services/api';
 
+import CategorySelector from '../components/CategorySelector';
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
@@ -36,6 +37,7 @@ import UserAuth from '../components/UserAuth';
 const CalculatorPage: React.FC = () => {
   const { addNotification } = useNotifications();
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
@@ -334,6 +336,13 @@ const CalculatorPage: React.FC = () => {
   const miniScenariosData = miniScenarios?.data || [];
 
 
+
+  const handleCategorySelect = (categoryId: string) => {
+    console.log('Category selected:', categoryId);
+    setSelectedCategory(categoryId);
+    setSelectedScenario(null);
+    setSelectedMiniScenario(null);
+  };
 
   const handleScenarioSelect = (scenarioId: number) => {
     console.log('Scenario selected:', scenarioId);
