@@ -17,11 +17,66 @@ import {
 import { toast } from 'react-hot-toast';
 
 const ApiPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'docs' | 'sdk' | 'examples'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'docs' | 'sdk' | 'examples' | 'demo'>('overview');
+  const [form, setForm] = useState({ initialInvestment: '10000', additionalCosts: '500', countryCode: 'US', apiKey: '' });
+  const [loading, setLoading] = useState(false);
+  const [responseJson, setResponseJson] = useState<any>(null);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Code copied to clipboard!');
+  };
+
+  const callApiOrMock = async () => {
+    setLoading(true);
+    setResponseJson(null);
+    try {
+      const baseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string | undefined) || undefined;
+      const payload = {
+        initialInvestment: Number(form.initialInvestment) || 0,
+        additionalCosts: Number(form.additionalCosts) || 0,
+        countryCode: form.countryCode || 'US',
+      };
+
+      if (baseUrl) {
+        const res = await fetch(`${baseUrl.replace(/\/$/, '')}/v1/calculator/roi`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(form.apiKey ? { Authorization: `Bearer ${form.apiKey}` } : {}),
+          },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        setResponseJson({ status: res.status, ok: res.ok, body: json });
+      } else {
+        // Mocked fallback for demo
+        const totalValue = payload.initialInvestment + payload.additionalCosts + (payload.initialInvestment * 0.25);
+        const roi = 25.0;
+        await new Promise(r => setTimeout(r, 600));
+        setResponseJson({
+          status: 200,
+          ok: true,
+          body: {
+            success: true,
+            data: {
+              totalValue: Math.round(totalValue),
+              roi,
+              breakdown: {
+                initialInvestment: payload.initialInvestment,
+                additionalCosts: payload.additionalCosts,
+                returns: Math.round(payload.initialInvestment * 0.25)
+              }
+            },
+            mocked: true
+          }
+        });
+      }
+    } catch (err: any) {
+      setResponseJson({ status: 0, ok: false, error: err?.message || String(err) });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const features = [
@@ -184,7 +239,8 @@ function MyComponent() {
             { id: 'overview', label: 'Overview', icon: Globe },
             { id: 'docs', label: 'Documentation', icon: BookOpen },
             { id: 'sdk', label: 'SDK', icon: Package },
-            { id: 'examples', label: 'Examples', icon: Code }
+            { id: 'examples', label: 'Examples', icon: Code },
+            { id: 'demo', label: 'Demo', icon: Terminal }
           ].map((tab) => {
             const IconComponent = tab.icon;
             return (
@@ -370,6 +426,83 @@ function MyComponent() {
                       </pre>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'demo' && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-4">Try the ROI API</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white/10 rounded-lg p-6 border border-white/20">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-white/80 text-sm mb-1">Initial Investment</label>
+                        <input
+                          value={form.initialInvestment}
+                          onChange={(e) => setForm({ ...form, initialInvestment: e.target.value })}
+                          type="number"
+                          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                          placeholder="10000"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/80 text-sm mb-1">Additional Costs</label>
+                        <input
+                          value={form.additionalCosts}
+                          onChange={(e) => setForm({ ...form, additionalCosts: e.target.value })}
+                          type="number"
+                          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                          placeholder="500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/80 text-sm mb-1">Country Code</label>
+                        <input
+                          value={form.countryCode}
+                          onChange={(e) => setForm({ ...form, countryCode: e.target.value.toUpperCase() })}
+                          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                          placeholder="US"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/80 text-sm mb-1">API Key (optional for demo)</label>
+                        <input
+                          value={form.apiKey}
+                          onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
+                          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                          placeholder="iw_..."
+                        />
+                      </div>
+                      <button
+                        onClick={callApiOrMock}
+                        disabled={loading}
+                        className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                      >
+                        {loading ? 'Calling API...' : 'Calculate ROI'}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-6 border border-white/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-white font-semibold">Response</h3>
+                      <button
+                        onClick={() => responseJson && copyToClipboard(JSON.stringify(responseJson, null, 2))}
+                        className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors"
+                      >
+                        <Copy size={16} />
+                        <span className="text-sm">Copy</span>
+                      </button>
+                    </div>
+                    <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4 min-h-[200px]">
+{responseJson ? JSON.stringify(responseJson, null, 2) : '// Fill the form and click Calculate ROI'}
+                    </pre>
+                    {!((import.meta as any)?.env?.VITE_API_BASE_URL) && (
+                      <p className="text-white/50 text-xs mt-2">Note: Using mocked response. Set VITE_API_BASE_URL to call your live API.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

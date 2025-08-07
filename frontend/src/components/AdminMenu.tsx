@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  HomeIcon,
   AnalyticsIcon,
   UsersIcon,
   ShieldIcon,
@@ -19,12 +18,6 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onToggle }) => {
   const location = useLocation();
   
   const adminNavItems = [
-    {
-      name: 'Overview',
-      href: '/admin',
-      icon: HomeIcon,
-      description: 'Dashboard overview and quick actions'
-    },
     {
       name: 'Analytics',
       href: '/admin/analytics',
