@@ -817,55 +817,101 @@ const AdminDashboard: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => setShowApiKeyModal(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-5xl max-h-[85vh] overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">API Key Management</h3>
+              {/* Animated background elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-3xl"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+              
+              <div className="relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="flex items-center justify-between mb-8"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <CodeIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                      API Key Management
+                    </h3>
+                    <p className="text-white/60 text-sm">Generate and manage your API keys</p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowApiKeyModal(false)}
-                  className="text-white/60 hover:text-white transition-colors"
+                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
                 >
                   ✕
                 </button>
-              </div>
+              </motion.div>
 
               {/* Generate New API Key */}
-              <div className="mb-6 p-4 bg-white/5 rounded-lg">
-                <h4 className="text-lg font-semibold text-white mb-3">Generate New API Key</h4>
-                <div className="flex gap-3">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mb-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-white/20"
+              >
+                <h4 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <span>Generate New API Key</span>
+                </h4>
+                <div className="flex gap-4">
                   <input
                     type="text"
                     placeholder="Enter API key name (e.g., 'Production App')"
                     value={newApiKeyName}
                     onChange={(e) => setNewApiKeyName(e.target.value)}
-                    className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400"
+                    className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
                   />
                   <button
                     onClick={generateApiKey}
-                    className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                   >
                     Generate
                   </button>
                 </div>
-              </div>
+              </motion.div>
 
               {/* API Keys List */}
-              <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-white">Your API Keys</h4>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-4"
+              >
+                <h4 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </div>
+                  <span>Your API Keys</span>
+                </h4>
                 {apiKeys.length > 0 ? (
                   apiKeys.map((apiKey) => (
                     <motion.div
                       key={apiKey.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-4 bg-white/5 rounded-lg border border-white/10"
+                      className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div>
@@ -884,13 +930,13 @@ const AdminDashboard: React.FC = () => {
                           </span>
                           <button
                             onClick={() => toggleApiKeyStatus(apiKey.id)}
-                            className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-sm transition-colors"
+                            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
                           >
                             {apiKey.isActive ? 'Deactivate' : 'Activate'}
                           </button>
                           <button
                             onClick={() => deleteApiKey(apiKey.id)}
-                            className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded text-sm transition-colors"
+                            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
                           >
                             Delete
                           </button>
@@ -912,7 +958,7 @@ const AdminDashboard: React.FC = () => {
                                 message: 'API key copied to clipboard'
                               });
                             }}
-                            className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 rounded text-sm transition-colors"
+                            className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
                           >
                             Copy
                           </button>
@@ -928,19 +974,51 @@ const AdminDashboard: React.FC = () => {
                     </motion.div>
                   ))
                 ) : (
-                  <p className="text-white/60 text-center py-8">No API keys generated yet</p>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-center py-12"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CodeIcon className="w-8 h-8 text-white/40" />
+                    </div>
+                    <p className="text-white/60 text-lg">No API keys generated yet</p>
+                    <p className="text-white/40 text-sm mt-2">Generate your first API key to get started</p>
+                  </motion.div>
                 )}
               </div>
 
               {/* Usage Instructions */}
-              <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                <h4 className="text-lg font-semibold text-blue-400 mb-2">How to Use Your API Keys</h4>
-                <div className="space-y-2 text-sm text-white/80">
-                  <p>• Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded">Authorization: Bearer YOUR_API_KEY</code></p>
-                  <p>• Make requests to: <code className="bg-white/10 px-2 py-1 rounded">https://api.investwisepro.com/v1/calculator/roi</code></p>
-                  <p>• Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded">npm install investwise-calculator-sdk</code></p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-2xl border border-blue-500/20"
+              >
+                <h4 className="text-xl font-semibold text-blue-400 mb-4 flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span>How to Use Your API Keys</span>
+                </h4>
+                <div className="space-y-3 text-sm text-white/80">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-blue-400 font-semibold">•</span>
+                    <p>Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-purple-400 font-semibold">•</span>
+                    <p>Make requests to: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">https://api.investwisepro.com/v1/calculator/roi</code></p>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-indigo-400 font-semibold">•</span>
+                    <p>Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">npm install investwise-calculator-sdk</code></p>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
@@ -950,60 +1028,112 @@ const AdminDashboard: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={() => setShowContactSubmissions(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-6xl max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-6xl max-h-[85vh] overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">Contact Submissions</h3>
+              {/* Animated background elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+              
+              <div className="relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="flex items-center justify-between mb-8"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <MessageSquare className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                      Contact Submissions
+                    </h3>
+                    <p className="text-white/60 text-sm">View and manage customer messages</p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowContactSubmissions(false)}
-                  className="text-white/60 hover:text-white transition-colors"
+                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
                 >
                   ✕
                 </button>
-              </div>
+              </motion.div>
 
               {/* Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-white">{contactSubmissions.length}</div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8"
+              >
+                <motion.div
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-br from-white/10 to-white/5 rounded-2xl p-6 text-center border border-white/20"
+                >
+                  <div className="text-3xl font-bold text-white mb-2">{contactSubmissions.length}</div>
                   <div className="text-white/60 text-sm">Total Messages</div>
-                </div>
-                <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-400">
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl p-6 text-center border border-blue-500/20"
+                >
+                  <div className="text-3xl font-bold text-blue-400 mb-2">
                     {contactSubmissions.filter(s => s.status === 'new').length}
                   </div>
                   <div className="text-white/60 text-sm">New Messages</div>
-                </div>
-                <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-400">
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-2xl p-6 text-center border border-yellow-500/20"
+                >
+                  <div className="text-3xl font-bold text-yellow-400 mb-2">
                     {contactSubmissions.filter(s => s.status === 'read').length}
                   </div>
                   <div className="text-white/60 text-sm">Read Messages</div>
-                </div>
-                <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-green-400">
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-2xl p-6 text-center border border-green-500/20"
+                >
+                  <div className="text-3xl font-bold text-green-400 mb-2">
                     {contactSubmissions.filter(s => s.status === 'replied').length}
                   </div>
                   <div className="text-white/60 text-sm">Replied Messages</div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
               {/* Contact Submissions List */}
-              <div className="space-y-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-4"
+              >
                 {contactSubmissions.length > 0 ? (
                   contactSubmissions.map((submission) => (
                     <motion.div
                       key={submission.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-4 bg-white/5 rounded-lg border border-white/10"
+                      className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
@@ -1029,7 +1159,7 @@ const AdminDashboard: React.FC = () => {
                           {submission.status === 'new' && (
                             <button
                               onClick={() => updateContactStatus(submission.id, 'read')}
-                              className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 rounded text-sm transition-colors"
+                              className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-blue-600/20 hover:from-blue-500/40 hover:to-blue-600/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
                             >
                               Mark Read
                             </button>
@@ -1037,31 +1167,38 @@ const AdminDashboard: React.FC = () => {
                           {submission.status === 'read' && (
                             <button
                               onClick={() => updateContactStatus(submission.id, 'replied')}
-                              className="px-3 py-1 bg-green-500/20 hover:bg-green-500/40 text-green-400 rounded text-sm transition-colors"
+                              className="px-4 py-2 bg-gradient-to-r from-green-500/20 to-green-600/20 hover:from-green-500/40 hover:to-green-600/40 text-green-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
                             >
                               Mark Replied
                             </button>
                           )}
                           <button
                             onClick={() => deleteContactSubmission(submission.id)}
-                            className="px-3 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded text-sm transition-colors"
+                            className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/40 hover:to-red-600/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
                           >
                             Delete
                           </button>
                         </div>
                       </div>
                       
-                      <div className="mt-3 p-3 bg-white/5 rounded border border-white/10">
-                        <p className="text-white/80 text-sm whitespace-pre-wrap">{submission.message}</p>
+                      <div className="mt-4 p-4 bg-gradient-to-r from-white/10 to-white/5 rounded-xl border border-white/20">
+                        <p className="text-white/80 text-sm whitespace-pre-wrap leading-relaxed">{submission.message}</p>
                       </div>
                     </motion.div>
                   ))
                 ) : (
-                  <div className="text-center py-12">
-                    <MessageSquare className="w-16 h-16 text-white/20 mx-auto mb-4" />
-                    <p className="text-white/60 text-lg">No contact submissions yet</p>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-center py-16"
+                  >
+                    <div className="w-20 h-20 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <MessageSquare className="w-10 h-10 text-white/40" />
+                    </div>
+                    <p className="text-white/60 text-xl mb-2">No contact submissions yet</p>
                     <p className="text-white/40 text-sm">Messages sent through the contact form will appear here</p>
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
