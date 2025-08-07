@@ -497,3 +497,137 @@ export const generatePDF = async (data: PDFExportData): Promise<void> => {
     throw new Error('Failed to generate PDF');
   }
 };
+
+export interface AdminAnalyticsPDFData {
+  title?: string;
+  periodLabel: string;
+  stats: {
+    totalUsers: number;
+    activeUsers: number;
+    totalCalculations: number;
+    totalExports: number;
+    growthRate: number;
+    monthlyGrowth: number;
+    conversionRate: number;
+    averageSessionTime: number;
+    bounceRate: number;
+  };
+  recentActivity: Array<{
+    id: string;
+    type: string;
+    description: string;
+    timestamp: number;
+  }>;
+}
+
+export const generateAdminAnalyticsPDF = async (data: AdminAnalyticsPDFData): Promise<void> => {
+  try {
+    // Create a temporary container for the PDF content
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '800px';
+    container.style.backgroundColor = '#0f172a';
+    container.style.color = 'white';
+    container.style.fontFamily = 'Arial, sans-serif';
+    container.style.padding = '40px';
+    container.style.borderRadius = '16px';
+
+    const header = `
+      <div style="text-align: center; margin-bottom: 28px; border-bottom: 2px solid #6366f1; padding-bottom: 18px;">
+        <h1 style="color: #ffffff; font-size: 30px; margin: 0 0 8px 0; font-weight: bold;">
+          ${data.title || 'Admin Analytics Report'}
+        </h1>
+        <p style="color: #a5b4fc; font-size: 14px; margin: 0;">
+          ${data.periodLabel} • Generated on ${new Date().toLocaleString()}
+        </p>
+      </div>
+    `;
+
+    const s = data.stats;
+    const kpiGrid = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+        ${[
+          { label: 'Total Users', value: s.totalUsers, color: '#60a5fa' },
+          { label: 'Active Users', value: s.activeUsers, color: '#34d399' },
+          { label: 'Total Calculations', value: s.totalCalculations, color: '#a78bfa' },
+          { label: 'Total Exports', value: s.totalExports, color: '#fbbf24' },
+          { label: 'Growth Rate', value: `${s.growthRate.toFixed(1)}%`, color: '#10b981' },
+          { label: 'Conversion Rate', value: `${s.conversionRate.toFixed(1)}%`, color: '#38bdf8' },
+          { label: 'Avg. Actions/User', value: s.averageSessionTime, color: '#f472b6' },
+          { label: 'Bounce Rate', value: `${s.bounceRate.toFixed(1)}%`, color: '#f97316' },
+        ].map(k => `
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 16px;">
+            <p style="color: #a5b4fc; font-size: 12px; margin: 0 0 6px 0;">${k.label}</p>
+            <p style="color: ${k.color}; font-size: 24px; font-weight: bold; margin: 0;">${k.value}</p>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    const activitySection = `
+      <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 18px;">
+        <h2 style="color: #ffffff; font-size: 18px; margin: 0 0 12px 0; font-weight: bold;">Recent Activity</h2>
+        ${data.recentActivity.length === 0
+          ? '<p style="color:#94a3b8; font-size: 13px; margin:0;">No activity recorded in this period.</p>'
+          : data.recentActivity.map(a => `
+            <div style="display:flex; align-items:flex-start; gap:10px; padding:10px; border-radius:8px; background: rgba(255,255,255,0.04); margin-bottom:8px;">
+              <div style="width:8px; height:8px; border-radius:50%; background:#6366f1; margin-top:6px;"></div>
+              <div style="flex:1;">
+                <p style="color:#e2e8f0; font-size: 13px; margin:0; font-weight: 600;">${a.description}</p>
+                <p style="color:#94a3b8; font-size: 11px; margin:4px 0 0 0;">${new Date(a.timestamp).toLocaleString()}</p>
+              </div>
+            </div>
+          `).join('')}
+      </div>
+    `;
+
+    container.innerHTML = `
+      <div style="max-width:800px; margin: 0 auto;">
+        ${header}
+        ${kpiGrid}
+        ${activitySection}
+      </div>
+    `;
+
+    document.body.appendChild(container);
+
+    const canvas = await html2canvas(container, {
+      backgroundColor: '#0f172a',
+      scale: Math.min(3, (window.devicePixelRatio || 2)),
+      useCORS: true,
+      allowTaint: true,
+      width: 800,
+      height: container.scrollHeight,
+    });
+
+    document.body.removeChild(container);
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const imgWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    const fileName = `Admin_Analytics_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
+  } catch (err) {
+    console.error('Error generating Admin Analytics PDF:', err);
+    throw new Error('Failed to generate Admin Analytics PDF');
+  }
+};

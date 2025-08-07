@@ -19,6 +19,7 @@ import {
   CodeIcon
 } from '../components/icons/CustomIcons';
 import { MessageSquare } from 'lucide-react';
+import { generateAdminAnalyticsPDF } from '../utils/pdfExport';
 
 interface Analytics {
   totalUsers: number;
@@ -472,47 +473,34 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
     try {
-      const reportData = {
+      await generateAdminAnalyticsPDF({
         title: 'InvestWise Pro Analytics Report',
-        generatedAt: new Date().toISOString(),
-        period: 'Last 30 Days',
-        summary: {
+        periodLabel: analyticsRange === '7' ? 'Last 7 Days' : analyticsRange === '90' ? 'Last 90 Days' : 'Last 30 Days',
+        stats: {
           totalUsers: adminStats.totalUsers,
           activeUsers: adminStats.activeUsers,
           totalCalculations: adminStats.totalCalculations,
           totalExports: adminStats.totalExports,
-          userEngagement: adminStats.totalCalculations + adminStats.totalExports,
           growthRate: adminStats.growthRate,
           monthlyGrowth: adminStats.monthlyGrowth,
           conversionRate: adminStats.conversionRate,
           averageSessionTime: adminStats.averageSessionTime,
           bounceRate: adminStats.bounceRate,
         },
-        analytics: {
-          userGrowth: `${adminStats.growthRate.toFixed(1)}%`,
-          engagement: `${adminStats.averageSessionTime} actions per user`,
-          retention: `${(100 - adminStats.bounceRate).toFixed(1)}%`,
-          conversion: `${adminStats.conversionRate.toFixed(1)}%`,
-        }
-      };
-
-      const dataStr = JSON.stringify(reportData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
+        recentActivity: recentActivity.map(a => ({
+          id: a.id,
+          type: a.type,
+          description: a.description,
+          timestamp: a.timestamp,
+        })),
+      });
+ 
       addNotification({
         type: 'success',
-        title: 'Analytics Report Generated',
-        message: 'Comprehensive analytics report has been created',
+        title: 'PDF Report Generated',
+        message: 'Admin analytics report has been exported as PDF',
         redirectTo: '/admin/analytics',
         redirectLabel: 'View Analytics'
       });
@@ -521,7 +509,7 @@ const AdminDashboard: React.FC = () => {
       addNotification({
         type: 'error',
         title: 'Report Generation Failed',
-        message: 'Failed to generate analytics report'
+        message: 'Failed to generate analytics PDF'
       });
     }
   };
