@@ -490,8 +490,8 @@ const CalculatorPage: React.FC = () => {
             </motion.div>
           )}
 
-          {/* ROI Calculator - Only show after scenario is selected */}
-          {selectedScenario && (
+          {/* ROI Calculator - Only show after mini scenario is selected */}
+          {selectedScenario && selectedMiniScenario && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
