@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Search, Building2, Target, Calculator } from 'lucide-react';
+import { ChevronDown, Search, Building2, Target } from 'lucide-react';
+import { CalculatorIcon } from './icons/CustomIcons';
 import ROICalculator from './ROICalculator';
 import { getScenariosByCategory } from '../data/categories';
 
@@ -436,7 +437,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
         >
           <h2 className="text-lg lg:text-xl font-semibold text-white mb-3 lg:mb-4 flex items-center">
             <div className="w-5 h-5 lg:w-6 lg:h-6 bg-green-500 rounded-full flex items-center justify-center mr-2 lg:mr-3 text-white text-xs lg:text-sm font-bold">3</div>
-            <Calculator className="w-4 h-4 lg:w-5 lg:h-5 mr-2" />
+                                    <CalculatorIcon size={20} className="mr-2" />
             <span className="text-sm lg:text-base">Investment Details</span>
           </h2>
           
