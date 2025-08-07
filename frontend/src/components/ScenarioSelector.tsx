@@ -240,7 +240,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center space-x-2 mb-1">
-                                    <h3 className={`text-base font-semibold transition-colors truncate ${
+                                    <h3 className={`text-lg font-semibold transition-colors ${
                                       isSelected 
                                         ? 'text-blue-200' 
                                         : 'text-white group-hover:text-blue-300'
@@ -248,25 +248,25 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                       {scenario.name}
                                     </h3>
 
-                                    <span className={`text-xs font-medium transition-colors flex-shrink-0 ${
+                                    <span className={`text-sm font-medium transition-colors flex-shrink-0 ${
                                       isSelected ? 'text-blue-200/80' : 'text-white/60'
                                     }`}>
                                       {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
                                     </span>
 
                                   </div>
-                                  <p className={`text-xs leading-relaxed transition-colors mb-2 text-white/70 ${
+                                  <p className={`text-sm leading-relaxed transition-colors mb-2 text-white/70 ${
                                     isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
                                   }`}>
                                     {scenario.description}
                                   </p>
                                   <div className="flex items-center space-x-2">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${getRiskColor(scenario.risk_level)} ${
+                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${getRiskColor(scenario.risk_level)} ${
                                       isSelected ? 'shadow-lg' : ''
                                     }`}>
                                       {scenario.risk_level} Risk
                                     </span>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${getMarketSizeColor(scenario.market_size)} ${
+                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${getMarketSizeColor(scenario.market_size)} ${
                                       isSelected ? 'shadow-lg' : ''
                                     }`}>
                                       {scenario.market_size} Market
@@ -276,7 +276,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className={`text-base font-bold transition-colors ${
+                              <div className={`text-lg font-bold transition-colors ${
                                 isSelected ? 'text-green-300' : 'text-green-400'
                               }`}>
                                 {scenario.typical_roi_min}% - {scenario.typical_roi_max}% ROI
@@ -346,26 +346,26 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="text-white font-medium group-hover:text-blue-300 transition-colors">
+                            <h3 className="text-lg text-white font-medium group-hover:text-blue-300 transition-colors">
                               {miniScenario.name}
                             </h3>
-                            <p className="text-white/60 text-sm mt-1">
+                            <p className="text-white/60 text-base mt-1">
                               {miniScenario.description}
                             </p>
                             <div className="flex items-center space-x-2 mt-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(miniScenario.risk_level)}`}>
+                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(miniScenario.risk_level)}`}>
                                 {miniScenario.risk_level} Risk
                               </span>
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-400/10 text-purple-400">
+                              <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-400/10 text-purple-400">
                                 {miniScenario.revenue_model}
                               </span>
                             </div>
                           </div>
                           <div className="text-right ml-4">
-                            <div className="text-white/70 text-sm">
+                            <div className="text-white/70 text-base">
                               {formatCurrency(miniScenario.recommended_investment_min)} - {formatCurrency(miniScenario.recommended_investment_max)}
                             </div>
-                            <div className="text-green-400 text-sm font-medium">
+                            <div className="text-green-400 text-base font-medium">
                               {miniScenario.typical_roi_min}% - {miniScenario.typical_roi_max}% ROI
                             </div>
                           </div>
