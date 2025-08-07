@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '../store/appStore';
 import Logo from './Logo';
+import AnimatedGraph from './AnimatedGraph';
 import { 
   TrendingUpIcon, 
   CalculatorIcon, 
@@ -69,13 +70,19 @@ const LoadingScreen: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Logo animation */}
+          {/* Animated Graph */}
           <div className="flex justify-center mb-6">
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <Logo size="xl" showText={false} />
+              <AnimatedGraph 
+                width={300} 
+                height={150} 
+                color="#3B82F6" 
+                speed={1.5} 
+              />
             </motion.div>
           </div>
           
