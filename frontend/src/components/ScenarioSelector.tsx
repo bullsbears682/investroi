@@ -198,7 +198,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                       placeholder="Search scenarios..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full bg-transparent border border-white/30 rounded-lg px-10 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      className="w-full bg-white/10 border border-white/30 rounded-lg px-10 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     />
                   </div>
                 </div>
