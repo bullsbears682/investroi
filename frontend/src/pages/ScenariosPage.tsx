@@ -22,7 +22,7 @@ import {
   Sun
 } from 'lucide-react';
 import { CalculatorIcon } from '../components/icons/CustomIcons';
-import BusinessScenariosIcon from '../components/icons/BusinessScenariosIcon';
+import { BarChart3 } from 'lucide-react';
 import { allScenarios } from '../data/allScenarios';
 
 const ScenariosPage: React.FC = () => {
@@ -68,7 +68,7 @@ const ScenariosPage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center space-x-3 mb-4">
             <div className="w-16 h-16 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
-              <BusinessScenariosIcon size={32} />
+              <BarChart3 className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-white">Business Scenarios</h1>
           </div>
