@@ -20,17 +20,41 @@ export const HomeIcon: React.FC<IconProps> = ({ size = 24, className = '', color
 
 export const CalculatorIcon: React.FC<IconProps> = ({ size = 24, className = '', color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-    {/* Calculator with financial symbols */}
-    <rect x="4" y="3" width="16" height="18" rx="2" stroke={color} strokeWidth="2"/>
-    <rect x="6" y="6" width="12" height="4" rx="1" fill={color} opacity="0.2"/>
-    <circle cx="8" cy="12" r="1" fill={color}/>
-    <circle cx="12" cy="12" r="1" fill={color}/>
-    <circle cx="16" cy="12" r="1" fill={color}/>
-    <circle cx="8" cy="16" r="1" fill={color}/>
-    <circle cx="12" cy="16" r="1" fill={color}/>
-    <circle cx="16" cy="16" r="1" fill={color}/>
-    {/* Dollar sign in display */}
-    <text x="12" y="8" textAnchor="middle" fontSize="3" fill={color} fontWeight="bold">$</text>
+    {/* Modern calculator with gradient effect */}
+    <rect x="3" y="2" width="18" height="20" rx="3" stroke={color} strokeWidth="2" fill="none"/>
+    
+    {/* Display screen with gradient */}
+    <rect x="4" y="3" width="16" height="6" rx="2" fill={color} opacity="0.1"/>
+    <rect x="5" y="4" width="14" height="4" rx="1" fill={color} opacity="0.2"/>
+    
+    {/* Modern button grid */}
+    <rect x="5" y="11" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    <rect x="9" y="11" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    <rect x="13" y="11" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    <rect x="17" y="11" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    
+    <rect x="5" y="15" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    <rect x="9" y="15" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    <rect x="13" y="15" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    <rect x="17" y="15" width="3" height="3" rx="1" fill={color} opacity="0.8"/>
+    
+    {/* ROI indicator on display */}
+    <text x="12" y="7" textAnchor="middle" fontSize="2.5" fill={color} fontWeight="bold">ROI</text>
+    
+    {/* Plus and minus symbols on buttons */}
+    <text x="6.5" y="12.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">+</text>
+    <text x="10.5" y="12.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">-</text>
+    <text x="14.5" y="12.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">×</text>
+    <text x="18.5" y="12.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">÷</text>
+    
+    {/* Percentage and equals on bottom row */}
+    <text x="6.5" y="16.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">%</text>
+    <text x="10.5" y="16.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">=</text>
+    <text x="14.5" y="16.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">$</text>
+    <text x="18.5" y="16.5" textAnchor="middle" fontSize="1.5" fill={color} fontWeight="bold">✓</text>
+    
+    {/* Glow effect */}
+    <rect x="3" y="2" width="18" height="20" rx="3" stroke={color} strokeWidth="1" fill="none" opacity="0.3"/>
   </svg>
 );
 
