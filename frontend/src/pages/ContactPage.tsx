@@ -338,46 +338,98 @@ const ContactPage: React.FC = () => {
       {/* Success Popup */}
       {showSuccessPopup && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={() => setShowSuccessPopup(false)}
         >
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 max-w-md w-full text-center"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 max-w-md w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-blue-500/5 to-purple-500/10 rounded-3xl"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-green-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
             
-            <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-            <p className="text-white/80 mb-6">
-              Thank you for your message! We've received your inquiry and will get back to you within 24 hours.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setShowSuccessPopup(false)}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+            <div className="relative z-10">
+              {/* Success Icon with Animation */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: "spring", damping: 15 }}
+                className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
               >
-                Continue Browsing
-              </button>
-              <button
-                onClick={() => {
-                  setShowSuccessPopup(false);
-                  // Scroll to top of page
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+                <motion.svg 
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                  className="w-10 h-10 text-white" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </motion.svg>
+              </motion.div>
+              
+              {/* Success Message */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-center mb-8"
               >
-                Send Another
-              </button>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent mb-3">
+                  Message Sent!
+                </h3>
+                <div className="w-16 h-0.5 bg-gradient-to-r from-green-400 to-blue-400 mx-auto mb-4"></div>
+                <p className="text-white/90 text-lg leading-relaxed">
+                  Thank you for reaching out! We've received your message and will respond within 
+                  <span className="font-semibold text-green-400"> 24 hours</span>.
+                </p>
+              </motion.div>
+              
+              {/* Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <button
+                  onClick={() => setShowSuccessPopup(false)}
+                  className="flex-1 group relative bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  <span className="relative z-10">Continue Browsing</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSuccessPopup(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="flex-1 group relative bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 border border-white/20 hover:border-white/40"
+                >
+                  <span className="relative z-10">Send Another</span>
+                </button>
+              </motion.div>
+              
+              {/* Additional Info */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="mt-6 text-center"
+              >
+                <p className="text-white/50 text-sm">
+                  Your message has been saved and will appear in our admin dashboard.
+                </p>
+              </motion.div>
             </div>
           </motion.div>
         </motion.div>
