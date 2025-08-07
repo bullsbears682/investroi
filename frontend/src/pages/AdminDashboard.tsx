@@ -7,7 +7,8 @@ import {
   ShieldIcon,
   HardDriveIcon,
   MessageSquareIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  CodeIcon
 } from '../components/icons/CustomIcons';
 import { userManager } from '../utils/userManagement';
 
@@ -17,6 +18,7 @@ interface Summary {
   contacts: number;
   backups: number;
   chatSessions: number;
+  apiKeys: number;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -27,6 +29,7 @@ const AdminDashboard: React.FC = () => {
     contacts: 0,
     backups: 0,
     chatSessions: 0,
+    apiKeys: 0,
   });
 
   const loadSummary = () => {
@@ -36,6 +39,7 @@ const AdminDashboard: React.FC = () => {
       const contacts = JSON.parse(localStorage.getItem('adminContacts') || '[]');
       const backups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
       const chatMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      const apiKeys = JSON.parse(localStorage.getItem('api_keys') || '[]');
 
       setSummary({
         totalUsers: allUsers.length,
@@ -43,6 +47,7 @@ const AdminDashboard: React.FC = () => {
         contacts: contacts.length,
         backups: backups.length,
         chatSessions: Array.isArray(chatMessages) ? chatMessages.length : 0,
+        apiKeys: Array.isArray(apiKeys) ? apiKeys.length : 0,
       });
     } catch (err) {
       console.error('Failed to load admin summary:', err);
@@ -84,7 +89,7 @@ const AdminDashboard: React.FC = () => {
       {/* Main */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
         {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
@@ -127,6 +132,20 @@ const AdminDashboard: React.FC = () => {
               <div className="p-3 bg-purple-500/20 rounded-xl">
                 <HardDriveIcon className="text-purple-400" size={24} />
               </div>
+            </div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/60 text-sm">API Keys</p>
+                <p className="text-3xl font-bold text-white">{summary.apiKeys}</p>
+              </div>
+              <div className="p-3 bg-indigo-500/20 rounded-xl">
+                <CodeIcon className="text-indigo-400" size={24} />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Link to="/api-key" className="text-indigo-300 hover:text-indigo-200 text-sm underline">Manage keys</Link>
             </div>
           </div>
         </div>
