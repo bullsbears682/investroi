@@ -31,7 +31,7 @@ const ApiPage: React.FC = () => {
     setLoading(true);
     setResponseJson(null);
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+      const baseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string | undefined) || undefined;
       const payload = {
         initialInvestment: Number(form.initialInvestment) || 0,
         additionalCosts: Number(form.additionalCosts) || 0,
@@ -499,7 +499,7 @@ function MyComponent() {
                     <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4 min-h-[200px]">
 {responseJson ? JSON.stringify(responseJson, null, 2) : '// Fill the form and click Calculate ROI'}
                     </pre>
-                    {!import.meta.env.VITE_API_BASE_URL && (
+                    {!((import.meta as any)?.env?.VITE_API_BASE_URL) && (
                       <p className="text-white/50 text-xs mt-2">Note: Using mocked response. Set VITE_API_BASE_URL to call your live API.</p>
                     )}
                   </div>
