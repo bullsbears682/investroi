@@ -383,70 +383,73 @@ const AdminBackups: React.FC = () => {
 
         {/* Backup Details Modal */}
         {isDetailsModalOpen && selectedBackup && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg sm:text-xl font-semibold text-white">Backup Details</h3>
-                <button
-                  onClick={closeModal}
-                  className="text-white/60 hover:text-white p-1"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="space-y-4 text-white/80">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <span className="text-white/60 text-sm">Backup ID:</span>
-                    <p className="text-white text-sm sm:text-base break-all">{selectedBackup.backupId}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/60 text-sm">Date:</span>
-                    <p className="text-white text-sm sm:text-base">{new Date(selectedBackup.timestamp).toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/60 text-sm">Original Size:</span>
-                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.originalSize}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/60 text-sm">Compressed Size:</span>
-                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.compressedSize}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/60 text-sm">Compression Ratio:</span>
-                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.compressionRatio}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/60 text-sm">Total Records:</span>
-                    <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.totalRecords}</p>
-                  </div>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={closeModal}>
+            <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              {/* Animated background elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-3xl"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg sm:text-xl font-semibold text-white">Backup Details</h3>
+                  <button onClick={closeModal} className="text-white/60 hover:text-white p-1">
+                    <X size={20} />
+                  </button>
                 </div>
-                <div>
-                  <span className="text-white/60 text-sm">Integrity Checksum:</span>
-                  <p className="text-white font-mono text-xs sm:text-sm break-all">{selectedBackup.metadata.integrityChecksum}</p>
-                </div>
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
-                  <button
-                    onClick={() => handleDownloadBackup(selectedBackup)}
-                    className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                  >
-                    <Download size={16} />
-                    <span>Download</span>
-                  </button>
-                  <button
-                    onClick={() => handleRestoreBackup(selectedBackup)}
-                    className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                  >
-                    <RefreshCw size={16} />
-                    <span>Restore</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteBackup(selectedBackup)}
-                    className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                  >
-                    <Trash2 size={16} />
-                    <span>Delete</span>
-                  </button>
+                <div className="space-y-4 text-white/80">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <span className="text-white/60 text-sm">Backup ID:</span>
+                      <p className="text-white text-sm sm:text-base break-all">{selectedBackup.backupId}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60 text-sm">Date:</span>
+                      <p className="text-white text-sm sm:text-base">{new Date(selectedBackup.timestamp).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60 text-sm">Original Size:</span>
+                      <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.originalSize}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60 text-sm">Compressed Size:</span>
+                      <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.compressedSize}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60 text-sm">Compression Ratio:</span>
+                      <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.compressionRatio}</p>
+                    </div>
+                    <div>
+                      <span className="text-white/60 text-sm">Total Records:</span>
+                      <p className="text-white text-sm sm:text-base">{selectedBackup.metadata.totalRecords}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-white/60 text-sm">Integrity Checksum:</span>
+                    <p className="text-white font-mono text-xs sm:text-sm break-all">{selectedBackup.metadata.integrityChecksum}</p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                    <button
+                      onClick={() => handleDownloadBackup(selectedBackup)}
+                      className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    >
+                      <Download size={16} />
+                      <span>Download</span>
+                    </button>
+                    <button
+                      onClick={() => handleRestoreBackup(selectedBackup)}
+                      className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    >
+                      <RefreshCw size={16} />
+                      <span>Restore</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBackup(selectedBackup)}
+                      className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    >
+                      <Trash2 size={16} />
+                      <span>Delete</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -455,39 +458,45 @@ const AdminBackups: React.FC = () => {
 
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && backupToDelete && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 w-full max-w-md">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-red-500/20 p-2 rounded-lg">
-                  <AlertCircle className="text-red-400" size={24} />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={closeModal}>
+            <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/30 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              {/* Animated background elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-red-500/20 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-red-500/20 p-2 rounded-lg">
+                    <AlertCircle className="text-red-400" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-semibold text-white">Delete Backup</h3>
+                    <p className="text-white/60 text-sm">This action cannot be undone.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-white">Delete Backup</h3>
-                  <p className="text-white/60 text-sm">This action cannot be undone.</p>
+                <div className="text-white mb-6">
+                  <p>Are you sure you want to delete this backup?</p>
+                  <p className="text-white/60 mt-2">
+                    <strong>Backup ID:</strong> {backupToDelete.backupId}<br />
+                    <strong>Date:</strong> {new Date(backupToDelete.timestamp).toLocaleString()}<br />
+                    <strong>Size:</strong> {backupToDelete.metadata.compressedSize}
+                  </p>
                 </div>
-              </div>
-              <div className="text-white mb-6">
-                <p>Are you sure you want to delete this backup?</p>
-                <p className="text-white/60 mt-2">
-                  <strong>Backup ID:</strong> {backupToDelete.backupId}<br />
-                  <strong>Date:</strong> {new Date(backupToDelete.timestamp).toLocaleString()}<br />
-                  <strong>Size:</strong> {backupToDelete.metadata.compressedSize}
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                <button
-                  onClick={confirmDeleteBackup}
-                  className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                >
-                  <Trash2 size={16} />
-                  <span>Delete Backup</span>
-                </button>
-                <button
-                  onClick={closeModal}
-                  className="flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                >
-                  <span>Cancel</span>
-                </button>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                  <button
+                    onClick={confirmDeleteBackup}
+                    className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    <Trash2 size={16} />
+                    <span>Delete Backup</span>
+                  </button>
+                  <button
+                    onClick={closeModal}
+                    className="flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    <span>Cancel</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -495,55 +504,61 @@ const AdminBackups: React.FC = () => {
 
         {/* Restore Confirmation Modal */}
         {isRestoreModalOpen && backupToRestore && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 w-full max-w-md">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-green-500/20 p-2 rounded-lg">
-                  <RefreshCw className="text-green-400" size={24} />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={closeModal}>
+            <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/30 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              {/* Animated background elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-green-500/20 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="bg-green-500/20 p-2 rounded-lg">
+                    <RefreshCw className="text-green-400" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-semibold text-white">Restore Backup</h3>
+                    <p className="text-white/60 text-sm">This will overwrite current data.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-white">Restore Backup</h3>
-                  <p className="text-white/60 text-sm">This will overwrite current data.</p>
-                </div>
-              </div>
-              <div className="text-white mb-6">
-                <p>Are you sure you want to restore this backup?</p>
-                <p className="text-white/60 mt-2">
-                  <strong>Backup ID:</strong> {backupToRestore.backupId}<br />
-                  <strong>Date:</strong> {new Date(backupToRestore.timestamp).toLocaleString()}<br />
-                  <strong>Records:</strong> {backupToRestore.metadata.totalRecords}
-                </p>
-                <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                  <p className="text-yellow-400 text-sm">
-                    <strong>Warning:</strong> This will replace all current application data with the backup data.
+                <div className="text-white mb-6">
+                  <p>Are you sure you want to restore this backup?</p>
+                  <p className="text-white/60 mt-2">
+                    <strong>Backup ID:</strong> {backupToRestore.backupId}<br />
+                    <strong>Date:</strong> {new Date(backupToRestore.timestamp).toLocaleString()}<br />
+                    <strong>Records:</strong> {backupToRestore.metadata.totalRecords}
                   </p>
+                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                    <p className="text-yellow-400 text-sm">
+                      <strong>Warning:</strong> This will replace all current application data with the backup data.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                <button
-                  onClick={confirmRestoreBackup}
-                  disabled={isLoading}
-                  className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                >
-                  {isLoading ? (
-                    <>
-                      <RefreshCw size={16} className="animate-spin" />
-                      <span>Restoring...</span>
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw size={16} />
-                      <span>Restore Backup</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={closeModal}
-                  disabled={isLoading}
-                  className="flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                >
-                  <span>Cancel</span>
-                </button>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                  <button
+                    onClick={confirmRestoreBackup}
+                    disabled={isLoading}
+                    className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    {isLoading ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin" />
+                        <span>Restoring...</span>
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw size={16} />
+                        <span>Restore Backup</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={closeModal}
+                    disabled={isLoading}
+                    className="flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    <span>Cancel</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

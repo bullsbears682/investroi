@@ -357,92 +357,98 @@ const AdminData: React.FC = () => {
 
       {/* View Modal */}
       {isViewModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Details</h3>
-              <button
-                onClick={closeModals}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="space-y-4 text-white">
-              {selectedUser && (
-                <>
-                  <div>
-                    <label className="text-white/60 text-sm">Name</label>
-                    <p className="text-white font-medium">{selectedUser.name}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Email</label>
-                    <p className="text-white font-medium">{selectedUser.email}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Calculations</label>
-                    <p className="text-white font-medium">{selectedUser.totalCalculations}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Exports</label>
-                    <p className="text-white font-medium">{selectedUser.totalExports}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Last Active</label>
-                    <p className="text-white font-medium">
-                      {new Date(selectedUser.lastActive).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Status</label>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      selectedUser.status === 'active' 
-                        ? 'bg-green-500/20 text-green-400' 
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {selectedUser.status}
-                    </span>
-                  </div>
-                </>
-              )}
-              {selectedContact && (
-                <>
-                  <div>
-                    <label className="text-white/60 text-sm">Name</label>
-                    <p className="text-white font-medium">{selectedContact.name}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Email</label>
-                    <p className="text-white font-medium">{selectedContact.email}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Phone</label>
-                    <p className="text-white font-medium">{selectedContact.phone}</p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Date</label>
-                    <p className="text-white font-medium">
-                      {new Date(selectedContact.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Status</label>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      selectedContact.status === 'new' 
-                        ? 'bg-blue-500/20 text-blue-400'
-                        : selectedContact.status === 'read'
-                        ? 'bg-yellow-500/20 text-yellow-400'
-                        : 'bg-green-500/20 text-green-400'
-                    }`}>
-                      {selectedContact.status}
-                    </span>
-                  </div>
-                  <div>
-                    <label className="text-white/60 text-sm">Message</label>
-                    <p className="text-white font-medium">{selectedContact.message}</p>
-                  </div>
-                </>
-              )}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={closeModals}>
+          <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/30 max-w-md w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-3xl"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-white">Details</h3>
+                <button
+                  onClick={closeModals}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-4 text-white">
+                {selectedUser && (
+                  <>
+                    <div>
+                      <label className="text-white/60 text-sm">Name</label>
+                      <p className="text-white font-medium">{selectedUser.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Email</label>
+                      <p className="text-white font-medium">{selectedUser.email}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Calculations</label>
+                      <p className="text-white font-medium">{selectedUser.totalCalculations}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Exports</label>
+                      <p className="text-white font-medium">{selectedUser.totalExports}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Last Active</label>
+                      <p className="text-white font-medium">
+                        {new Date(selectedUser.lastActive).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Status</label>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedUser.status === 'active' 
+                          ? 'bg-green-500/20 text-green-400' 
+                          : 'bg-red-500/20 text-red-400'
+                      }`}>
+                        {selectedUser.status}
+                      </span>
+                    </div>
+                  </>
+                )}
+                {selectedContact && (
+                  <>
+                    <div>
+                      <label className="text-white/60 text-sm">Name</label>
+                      <p className="text-white font-medium">{selectedContact.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Email</label>
+                      <p className="text-white font-medium">{selectedContact.email}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Phone</label>
+                      <p className="text-white font-medium">{selectedContact.phone}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Date</label>
+                      <p className="text-white font-medium">
+                        {new Date(selectedContact.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Status</label>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedContact.status === 'new' 
+                          ? 'bg-blue-500/20 text-blue-400'
+                          : selectedContact.status === 'read'
+                          ? 'bg-yellow-500/20 text-yellow-400'
+                          : 'bg-green-500/20 text-green-400'
+                      }`}>
+                        {selectedContact.status}
+                      </span>
+                    </div>
+                    <div>
+                      <label className="text-white/60 text-sm">Message</label>
+                      <p className="text-white font-medium">{selectedContact.message}</p>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -450,84 +456,35 @@ const AdminData: React.FC = () => {
 
       {/* Delete Modal */}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Confirm Delete</h3>
-              <button
-                onClick={closeModals}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="text-white mb-6">
-              <p>Are you sure you want to delete this {selectedUser ? 'user' : 'contact'}?</p>
-              <p className="text-white/60 mt-2">
-                {selectedUser ? `${selectedUser.name} (${selectedUser.email})` : 
-                 selectedContact ? `${selectedContact.name} (${selectedContact.email})` : ''}
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={selectedUser ? handleDeleteUser : handleDeleteContact}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-              <button
-                onClick={closeModals}
-                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Reply Modal */}
-      {isReplyModalOpen && selectedContact && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Reply to Contact</h3>
-              <button
-                onClick={closeModals}
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-white/60 text-sm">To</label>
-                <p className="text-white font-medium">{selectedContact.name} ({selectedContact.email})</p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={closeModals}>
+          <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/30 max-w-md w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-red-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-white">Confirm Delete</h3>
+                <button
+                  onClick={closeModals}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
               </div>
-              <div>
-                <label className="text-white/60 text-sm">Original Message</label>
-                <p className="text-white/80 text-sm bg-white/5 p-3 rounded-lg">
-                  {selectedContact.message}
+              <div className="text-white mb-6">
+                <p>Are you sure you want to delete this {selectedUser ? 'user' : 'contact'}?</p>
+                <p className="text-white/60 mt-2">
+                  {selectedUser ? `${selectedUser.name} (${selectedUser.email})` : 
+                   selectedContact ? `${selectedContact.name} (${selectedContact.email})` : ''}
                 </p>
               </div>
-              <div>
-                <label className="text-white/60 text-sm">Your Reply</label>
-                <textarea
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  placeholder="Type your reply message..."
-                  rows={4}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex space-x-3 pt-4">
+              <div className="flex space-x-3">
                 <button
-                  onClick={handleReplyContact}
-                  disabled={!replyMessage.trim()}
-                  className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors"
+                  onClick={selectedUser ? handleDeleteUser : handleDeleteContact}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
                 >
-                  <Send size={16} />
-                  <span>Send Reply</span>
+                  Delete
                 </button>
                 <button
                   onClick={closeModals}
@@ -535,6 +492,67 @@ const AdminData: React.FC = () => {
                 >
                   Cancel
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reply Modal */}
+      {isReplyModalOpen && selectedContact && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" onClick={closeModals}>
+          <div className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/30 max-w-md w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-green-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-white">Reply to Contact</h3>
+                <button
+                  onClick={closeModals}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-white/60 text-sm">To</label>
+                  <p className="text-white font-medium">{selectedContact.name} ({selectedContact.email})</p>
+                </div>
+                <div>
+                  <label className="text-white/60 text-sm">Original Message</label>
+                  <p className="text-white/80 text-sm bg-white/5 p-3 rounded-lg">
+                    {selectedContact.message}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-white/60 text-sm">Your Reply</label>
+                  <textarea
+                    value={replyMessage}
+                    onChange={(e) => setReplyMessage(e.target.value)}
+                    placeholder="Type your reply message..."
+                    rows={4}
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={handleReplyContact}
+                    disabled={!replyMessage.trim()}
+                    className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    <Send size={16} />
+                    <span>Send Reply</span>
+                  </button>
+                  <button
+                    onClick={closeModals}
+                    className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
