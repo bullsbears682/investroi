@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Search, Building2, Target, Calculator } from 'lucide-react';
 import ROICalculator from './ROICalculator';
+import { getScenariosByCategory } from '../data/categories';
 
 
 interface Scenario {
@@ -67,7 +68,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
 
   // Filter scenarios by selected category and search term
   const categoryScenarios = selectedCategory 
-    ? scenarios.filter(scenario => scenario.category === selectedCategory)
+    ? getScenariosByCategory(selectedCategory, scenarios)
     : scenarios;
 
   const filteredScenarios = categoryScenarios.filter(scenario =>
