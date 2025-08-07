@@ -72,10 +72,14 @@ const AdminDashboard: React.FC = () => {
   const [showContactSubmissions, setShowContactSubmissions] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
   const { addNotification } = useNotifications();
-  const [analyticsRange, setAnalyticsRange] = useState<'7' | '30' | '90'>('30');
+  const [analyticsRange] = useState<'7' | '30' | '90'>('30');
   const [activityQuery, setActivityQuery] = useState('');
   const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [isLoadingActivity, setIsLoadingActivity] = useState(false);
+  const [showSystemHealth, setShowSystemHealth] = useState(false);
+  const [systemHealthData, setSystemHealthData] = useState<any | null>(null);
+  const [activityPage, setActivityPage] = useState(1);
+  const activityPageSize = 10;
 
   // Load admin statistics
   const loadAdminStats = () => {
@@ -392,6 +396,9 @@ const AdminDashboard: React.FC = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
+      setSystemHealthData(systemHealth);
+      setShowSystemHealth(true);
+
       addNotification({
         type: 'success',
         title: 'System Health Report Generated',
@@ -531,28 +538,14 @@ const AdminDashboard: React.FC = () => {
       activity.type.toLowerCase().includes(q)
     );
   });
+  const totalActivityPages = Math.max(1, Math.ceil(filteredRecentActivity.length / activityPageSize));
+  const pagedActivities = filteredRecentActivity.slice((activityPage - 1) * activityPageSize, activityPage * activityPageSize);
 
-  // Export filtered recent activity as CSV
-  const exportRecentActivityCSV = () => {
-    const headers = ['id', 'type', 'description', 'user', 'timestamp'];
-    const rows = filteredRecentActivity.map(a => [
-      a.id,
-      a.type,
-      a.description.replace(/\n/g, ' '),
-      a.user || '',
-      new Date(a.timestamp).toISOString()
-    ]);
-    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `recent-activity-${analyticsRange}d.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  useEffect(() => {
+    setActivityPage(1);
+  }, [activityQuery]);
+
+  // Removed export CSV per request
 
   // Close modals with Escape key
   useEffect(() => {
@@ -869,8 +862,8 @@ const AdminDashboard: React.FC = () => {
                 ))}
               </>
             )}
-            {filteredRecentActivity.length > 0 ? (
-              filteredRecentActivity.map((activity) => (
+            {pagedActivities.length > 0 ? (
+              pagedActivities.map((activity) => (
                 <motion.div
                   key={activity.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -890,6 +883,25 @@ const AdminDashboard: React.FC = () => {
               <p className="text-white/60 text-center py-4">No recent activity</p>
             )}
           </div>
+          {totalActivityPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <button
+                onClick={() => setActivityPage(p => Math.max(1, p - 1))}
+                disabled={activityPage === 1}
+                className="px-3 py-1 bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 border border-white/20 rounded text-white text-sm"
+              >
+                Prev
+              </button>
+              <span className="text-white/70 text-sm">Page {activityPage} of {totalActivityPages}</span>
+              <button
+                onClick={() => setActivityPage(p => Math.min(totalActivityPages, p + 1))}
+                disabled={activityPage === totalActivityPages}
+                className="px-3 py-1 bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 border border-white/20 rounded text-white text-sm"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </motion.div>
 
 
@@ -1106,6 +1118,75 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                 </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* System Health Modal */}
+        {showSystemHealth && systemHealthData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="System Health Details"
+            onClick={() => setShowSystemHealth(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-white">System Health</h3>
+                <button onClick={() => setShowSystemHealth(false)} className="text-white/60 hover:text-white">✕</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p className="text-white/70 mb-2">Performance</p>
+                  <div className="space-y-1 text-white/80">
+                    <div>Load Time: <span className="text-white">{systemHealthData.performance.loadTime} ms</span></div>
+                    <div>DOM Content Loaded: <span className="text-white">{systemHealthData.performance.domContentLoaded} ms</span></div>
+                    <div>First Paint: <span className="text-white">{systemHealthData.performance.firstPaint} ms</span></div>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p className="text-white/70 mb-2">Memory</p>
+                  {systemHealthData.memory ? (
+                    <div className="space-y-1 text-white/80">
+                      <div>Used: <span className="text-white">{systemHealthData.memory.used} MB</span></div>
+                      <div>Total: <span className="text-white">{systemHealthData.memory.total} MB</span></div>
+                      <div>Limit: <span className="text-white">{systemHealthData.memory.limit} MB</span></div>
+                    </div>
+                  ) : (
+                    <p className="text-white/60">Not available</p>
+                  )}
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p className="text-white/70 mb-2">Network</p>
+                  {systemHealthData.connection ? (
+                    <div className="space-y-1 text-white/80">
+                      <div>Type: <span className="text-white">{systemHealthData.connection.effectiveType}</span></div>
+                      <div>Downlink: <span className="text-white">{systemHealthData.connection.downlink} Mbps</span></div>
+                      <div>RTT: <span className="text-white">{systemHealthData.connection.rtt} ms</span></div>
+                    </div>
+                  ) : (
+                    <p className="text-white/60">Not available</p>
+                  )}
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p className="text-white/70 mb-2">Local Storage</p>
+                  <div className="space-y-1 text-white/80">
+                    <div>Size: <span className="text-white">{systemHealthData.localStorage.used} KB</span></div>
+                    <div>Items: <span className="text-white">{systemHealthData.localStorage.items}</span></div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 text-right">
+                <button onClick={() => setShowSystemHealth(false)} className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Close</button>
               </div>
             </motion.div>
           </motion.div>
