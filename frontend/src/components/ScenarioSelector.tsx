@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Search, Building2, Target } from 'lucide-react';
-import { categories } from '../data/categories';
+
 
 interface Scenario {
   id: number;
@@ -58,15 +58,8 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   const [isScenarioOpen, setIsScenarioOpen] = useState(false);
   const [isMiniScenarioOpen, setIsMiniScenarioOpen] = useState(false);
 
-  // Filter scenarios by selected category
-  const categoryScenarios = selectedCategory 
-    ? scenarios.filter(scenario => {
-        const category = categories.find(cat => cat.id === selectedCategory);
-        return category?.scenarioIds.includes(scenario.id);
-      })
-    : scenarios;
-
-  const filteredScenarios = categoryScenarios.filter(scenario =>
+  // Filter scenarios by search term
+  const filteredScenarios = scenarios.filter(scenario =>
     scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     scenario.category.toLowerCase().includes(searchTerm.toLowerCase())
   );

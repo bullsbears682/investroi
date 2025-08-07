@@ -21,7 +21,6 @@ import {
 
 import { api } from '../services/api';
 
-import CategorySelector from '../components/CategorySelector';
 import ScenarioSelector from '../components/ScenarioSelector';
 import ROICalculator from '../components/ROICalculator';
 import ResultsDisplay from '../components/ResultsDisplay';
@@ -37,7 +36,6 @@ import UserAuth from '../components/UserAuth';
 const CalculatorPage: React.FC = () => {
   const { addNotification } = useNotifications();
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
@@ -335,12 +333,7 @@ const CalculatorPage: React.FC = () => {
   const scenariosData = scenarios?.data || mockScenarios;
   const miniScenariosData = miniScenarios?.data || [];
 
-  const handleCategorySelect = (categoryId: string) => {
-    console.log('Category selected:', categoryId);
-    setSelectedCategory(categoryId);
-    setSelectedScenario(null);
-    setSelectedMiniScenario(null);
-  };
+
 
   const handleScenarioSelect = (scenarioId: number) => {
     console.log('Scenario selected:', scenarioId);
@@ -438,7 +431,7 @@ const CalculatorPage: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="lg:col-span-2 space-y-6 relative z-10"
         >
-          {/* Category Selection */}
+          {/* Business Scenario Selection */}
           <motion.div 
             className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30 mb-6"
             animate={{ 
@@ -450,19 +443,21 @@ const CalculatorPage: React.FC = () => {
             <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
               <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">1</div>
               <Target className="w-5 h-5 mr-2 text-blue-400" />
-              Select Business Category
+              Select Business Scenario
             </h2>
             
-            <CategorySelector
-              selectedCategory={selectedCategory}
-              onCategorySelect={handleCategorySelect}
+            <ScenarioSelector
+              scenarios={scenariosData}
+              miniScenarios={miniScenariosData}
+              selectedScenario={selectedScenario}
+              selectedMiniScenario={selectedMiniScenario}
+              selectedCategory={null}
+              onScenarioSelect={handleScenarioSelect}
+              onMiniScenarioSelect={handleMiniScenarioSelect}
               onDropdownStateChange={setIsDropdownOpen}
-              isLoading={scenariosLoading}
+              isLoading={scenariosLoading || miniScenariosLoading}
             />
           </motion.div>
-
-          {/* Scenario Selection - Only show after category is selected */}
-          {selectedCategory && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -488,7 +483,6 @@ const CalculatorPage: React.FC = () => {
                 isLoading={scenariosLoading || miniScenariosLoading}
               />
             </motion.div>
-          )}
 
           {/* ROI Calculator - Only show after mini scenario is selected */}
           {selectedScenario && selectedMiniScenario && (
@@ -500,7 +494,7 @@ const CalculatorPage: React.FC = () => {
               className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 relative z-5 mb-6 mt-16 sm:mt-0"
             >
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">3</div>
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold">2</div>
                 <Calculator className="w-5 h-5 mr-2" />
                 Investment Details
               </h2>
