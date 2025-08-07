@@ -73,10 +73,13 @@ const AdminDashboard: React.FC = () => {
   const { addNotification } = useNotifications();
   const [analyticsRange, setAnalyticsRange] = useState<'7' | '30' | '90'>('30');
   const [activityQuery, setActivityQuery] = useState('');
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const [isLoadingActivity, setIsLoadingActivity] = useState(false);
 
   // Load admin statistics
   const loadAdminStats = () => {
     try {
+      setIsLoadingStats(true);
       const allUsers = userManager.getAllUsers();
       const allContacts = contactStorage.getSubmissions();
 
@@ -123,12 +126,15 @@ const AdminDashboard: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to load admin stats:', error);
+    } finally {
+      setIsLoadingStats(false);
     }
   };
 
   // Load recent activity
   const loadRecentActivity = () => {
     try {
+      setIsLoadingActivity(true);
       const activities: ActivityItem[] = [];
       const now = Date.now();
       const rangeDays = analyticsRange === '7' ? 7 : analyticsRange === '90' ? 90 : 30;
@@ -193,6 +199,8 @@ const AdminDashboard: React.FC = () => {
       setRecentActivity(sortedActivities);
     } catch (error) {
       console.error('Failed to load recent activity:', error);
+    } finally {
+      setIsLoadingActivity(false);
     }
   };
 
@@ -536,6 +544,40 @@ const AdminDashboard: React.FC = () => {
     );
   });
 
+  // Export filtered recent activity as CSV
+  const exportRecentActivityCSV = () => {
+    const headers = ['id', 'type', 'description', 'user', 'timestamp'];
+    const rows = filteredRecentActivity.map(a => [
+      a.id,
+      a.type,
+      a.description.replace(/\n/g, ' '),
+      a.user || '',
+      new Date(a.timestamp).toISOString()
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `recent-activity-${analyticsRange}d.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Close modals with Escape key
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showApiKeyModal) setShowApiKeyModal(false);
+        if (showContactSubmissions) setShowContactSubmissions(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showApiKeyModal, showContactSubmissions]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       {/* Admin Menu */}
@@ -743,6 +785,17 @@ const AdminDashboard: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
+          {isLoadingStats && (
+            <>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6 animate-pulse">
+                  <div className="h-4 w-24 bg-white/10 rounded mb-3"></div>
+                  <div className="h-8 w-16 bg-white/10 rounded mb-2"></div>
+                  <div className="h-3 w-20 bg-white/10 rounded"></div>
+                </div>
+              ))}
+            </>
+          )}
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="group relative bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
@@ -821,15 +874,37 @@ const AdminDashboard: React.FC = () => {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h3 className="text-xl font-bold text-white">Recent Activity</h3>
-            <input
-              type="text"
-              value={activityQuery}
-              onChange={(e) => setActivityQuery(e.target.value)}
-              placeholder="Search activity..."
-              className="w-full sm:w-64 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
-            />
+            <div className="flex gap-2 w-full sm:w-auto">
+              <input
+                type="text"
+                value={activityQuery}
+                onChange={(e) => setActivityQuery(e.target.value)}
+                placeholder="Search activity..."
+                className="w-full sm:w-64 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+              />
+              <button
+                onClick={exportRecentActivityCSV}
+                className="px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm"
+                title="Export current list to CSV"
+              >
+                Export
+              </button>
+            </div>
           </div>
           <div className="space-y-3">
+            {isLoadingActivity && (
+              <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg animate-pulse">
+                    <div className="w-3 h-3 rounded-full bg-white/10"></div>
+                    <div className="flex-1">
+                      <div className="h-3 w-2/3 bg-white/10 rounded mb-2"></div>
+                      <div className="h-3 w-1/3 bg-white/10 rounded"></div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
             {filteredRecentActivity.length > 0 ? (
               filteredRecentActivity.map((activity) => (
                 <motion.div
@@ -845,7 +920,7 @@ const AdminDashboard: React.FC = () => {
                       {new Date(activity.timestamp).toLocaleString()}
                     </p>
                   </div>
-                                </motion.div>
+                </motion.div>
                ))
             ) : (
               <p className="text-white/60 text-center py-4">No recent activity</p>
@@ -863,6 +938,9 @@ const AdminDashboard: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="API Key Management"
             onClick={() => setShowApiKeyModal(false)}
           >
             <motion.div
@@ -1075,6 +1153,9 @@ const AdminDashboard: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Contact Submissions"
             onClick={() => setShowContactSubmissions(false)}
           >
             <motion.div
