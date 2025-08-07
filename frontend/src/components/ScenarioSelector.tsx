@@ -42,8 +42,8 @@ interface ScenarioSelectorProps {
   onMiniScenarioSelect: (id: number) => void;
   onDropdownStateChange?: (isOpen: boolean) => void;
   isLoading: boolean;
-  onCalculate?: (formData: any) => void;
-  calculateIsLoading?: boolean;
+  onCalculate: (formData: any) => void;
+  calculateIsLoading: boolean;
   calculationResult?: any;
 }
 
@@ -65,8 +65,12 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   const [isScenarioOpen, setIsScenarioOpen] = useState(false);
   const [isMiniScenarioOpen, setIsMiniScenarioOpen] = useState(false);
 
-  // Filter scenarios by search term
-  const filteredScenarios = scenarios.filter(scenario =>
+  // Filter scenarios by selected category and search term
+  const categoryScenarios = selectedCategory 
+    ? scenarios.filter(scenario => scenario.category === selectedCategory)
+    : scenarios;
+
+  const filteredScenarios = categoryScenarios.filter(scenario =>
     scenario.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     scenario.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
