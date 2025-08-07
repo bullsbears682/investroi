@@ -19,6 +19,12 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onToggle }) => {
   
   const adminNavItems = [
     {
+      name: 'Overview',
+      href: '/admin',
+      icon: AnalyticsIcon,
+      description: 'Dashboard overview and quick actions'
+    },
+    {
       name: 'Analytics',
       href: '/admin/analytics',
       icon: AnalyticsIcon,
