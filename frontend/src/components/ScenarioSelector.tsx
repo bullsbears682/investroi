@@ -332,7 +332,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="fixed top-16 left-4 right-4 bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl overflow-hidden z-[99999999] max-h-[400px] sm:max-h-[300px] overflow-y-auto sm:absolute sm:top-full sm:left-0 sm:right-0 sm:mt-2"
+                  className="fixed top-12 left-4 right-4 bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl overflow-hidden z-[99999999] max-h-[400px] sm:max-h-[300px] overflow-y-auto sm:absolute sm:top-full sm:left-0 sm:right-0 sm:mt-2"
                 >
                   <div className="p-2">
                     {miniScenarios.map((miniScenario) => (
@@ -346,26 +346,26 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="text-lg text-white font-medium group-hover:text-blue-300 transition-colors">
+                            <h3 className="text-sm text-white font-medium group-hover:text-blue-300 transition-colors">
                               {miniScenario.name}
                             </h3>
-                            <p className="text-white/60 text-base mt-1">
+                                                          <p className="text-white/60 text-xs mt-1">
                               {miniScenario.description}
                             </p>
                             <div className="flex items-center space-x-2 mt-2">
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(miniScenario.risk_level)}`}>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getRiskColor(miniScenario.risk_level)}`}>
                                 {miniScenario.risk_level} Risk
                               </span>
-                              <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-400/10 text-purple-400">
+                                                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-400/10 text-purple-400">
                                 {miniScenario.revenue_model}
                               </span>
                             </div>
                           </div>
                           <div className="text-right ml-4">
-                            <div className="text-white/70 text-base">
+                            <div className="text-white/70 text-xs">
                               {formatCurrency(miniScenario.recommended_investment_min)} - {formatCurrency(miniScenario.recommended_investment_max)}
                             </div>
-                            <div className="text-green-400 text-base font-medium">
+                                                          <div className="text-green-400 text-xs font-medium">
                               {miniScenario.typical_roi_min}% - {miniScenario.typical_roi_max}% ROI
                             </div>
                           </div>
