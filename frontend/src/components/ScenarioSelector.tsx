@@ -187,7 +187,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                                  className="absolute top-full left-0 right-0 mt-2 bg-transparent backdrop-blur-none border-0 rounded-xl overflow-hidden z-[99999999] max-h-[200px] overflow-y-auto"
+                                  className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-lg border border-white/30 rounded-xl overflow-hidden z-[99999999] max-h-[200px] overflow-y-auto"
               >
                 {/* Search */}
                 <div className="p-3 border-b border-white/20">
@@ -198,7 +198,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                       placeholder="Search scenarios..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full bg-white/10 border border-white/30 rounded-lg px-10 py-2 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      className="w-full bg-white/20 border border-gray-300 rounded-lg px-10 py-2 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     />
                   </div>
                 </div>
@@ -242,21 +242,21 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                                   <div className="flex flex-col space-y-1 mb-1">
                                     <h3 className={`text-lg font-semibold transition-colors ${
                                       isSelected 
-                                        ? 'text-blue-200' 
-                                        : 'text-white group-hover:text-blue-300'
+                                        ? 'text-blue-600' 
+                                        : 'text-gray-800 group-hover:text-blue-600'
                                     }`}>
                                       {scenario.name}
                                     </h3>
 
                                     <span className={`text-sm font-medium transition-colors ${
-                                      isSelected ? 'text-blue-200/80' : 'text-white/60'
+                                      isSelected ? 'text-blue-600/80' : 'text-gray-600'
                                     }`}>
                                       {formatCurrency(scenario.recommended_investment_min)} - {formatCurrency(scenario.recommended_investment_max)}
                                     </span>
 
                                   </div>
-                                  <p className={`text-sm leading-relaxed transition-colors mb-2 text-white/70 ${
-                                    isSelected ? 'text-blue-200/90 font-medium' : 'text-white/60'
+                                  <p className={`text-sm leading-relaxed transition-colors mb-2 text-gray-600 ${
+                                    isSelected ? 'text-blue-600/90 font-medium' : 'text-gray-500'
                                   }`}>
                                     {scenario.description}
                                   </p>
@@ -277,7 +277,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                             </div>
                             <div className="text-right">
                               <div className={`text-lg font-bold transition-colors ${
-                                isSelected ? 'text-green-300' : 'text-green-400'
+                                isSelected ? 'text-green-600' : 'text-green-700'
                               }`}>
                                 {scenario.typical_roi_min}% - {scenario.typical_roi_max}% ROI
                               </div>
@@ -332,7 +332,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full left-0 right-0 mt-2 bg-transparent backdrop-blur-none border-0 rounded-xl overflow-hidden z-[99999999] max-h-[180px] overflow-y-auto"
+                  className="absolute top-full left-0 right-0 mt-2 bg-white/90 backdrop-blur-lg border border-white/30 rounded-xl overflow-hidden z-[99999999] max-h-[180px] overflow-y-auto"
                 >
                   <div className="p-2">
                     {miniScenarios.map((miniScenario) => (

@@ -83,7 +83,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-[9999] w-full mt-2 bg-transparent backdrop-blur-none border-0 rounded-lg shadow-none max-h-48 overflow-hidden"
+              className="absolute z-[9999] w-full mt-2 bg-white/90 backdrop-blur-lg border border-white/30 rounded-lg shadow-xl max-h-48 overflow-hidden"
             >
               {/* Search Bar */}
               <div className="p-3 border-b border-white/10">
@@ -94,7 +94,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                     placeholder="Search categories..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full pl-10 pr-4 py-2 bg-white/20 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </div>
               </div>
