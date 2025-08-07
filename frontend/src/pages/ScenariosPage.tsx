@@ -19,7 +19,20 @@ import {
   BookOpen,
   Package,
   Palette,
-  Gift
+  Gift,
+  Heart,
+  Shield,
+  Target,
+  TrendingUp,
+  Database,
+  Server,
+  Cpu,
+  Wifi,
+  Camera,
+  Printer,
+  Sun,
+  Truck,
+  PawPrint
 } from 'lucide-react';
 import { CalculatorIcon } from '../components/icons/CustomIcons';
 
