@@ -71,6 +71,8 @@ const AdminDashboard: React.FC = () => {
   const [showContactSubmissions, setShowContactSubmissions] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
   const { addNotification } = useNotifications();
+  const [analyticsRange, setAnalyticsRange] = useState<'7' | '30' | '90'>('30');
+  const [activityQuery, setActivityQuery] = useState('');
 
   // Load admin statistics
   const loadAdminStats = () => {
@@ -88,20 +90,21 @@ const AdminDashboard: React.FC = () => {
       const totalCalculations = parseInt(localStorage.getItem('totalCalculations') || '0');
       const totalExports = parseInt(localStorage.getItem('totalExports') || '0');
 
-      // Calculate real analytics
+      // Calculate analytics for selected range
       const now = Date.now();
-      const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
-      const sixtyDaysAgo = now - 60 * 24 * 60 * 60 * 1000;
+      const rangeDays = analyticsRange === '7' ? 7 : analyticsRange === '90' ? 90 : 30;
+      const periodStart = now - rangeDays * 24 * 60 * 60 * 1000;
+      const previousPeriodStart = now - rangeDays * 2 * 24 * 60 * 60 * 1000;
 
       const recentUsers = allUsers.filter((user: any) => 
-        new Date(user.registrationDate).getTime() > thirtyDaysAgo
+        new Date(user.registrationDate).getTime() > periodStart
       ).length;
       const previousUsers = allUsers.filter((user: any) => {
         const regDate = new Date(user.registrationDate).getTime();
-        return regDate > sixtyDaysAgo && regDate <= thirtyDaysAgo;
+        return regDate > previousPeriodStart && regDate <= periodStart;
       }).length;
 
-      const growthRate = previousUsers > 0 ? ((recentUsers - previousUsers) / previousUsers) * 100 : 0;
+      const growthRate = previousUsers > 0 ? ((recentUsers - previousUsers) / Math.max(previousUsers, 1)) * 100 : (recentUsers > 0 ? 100 : 0);
       const monthlyGrowth = growthRate;
       const conversionRate = totalUsers > 0 ? (allContacts.length / totalUsers) * 100 : 0;
       const averageSessionTime = totalUsers > 0 ? Math.round((totalCalculations + totalExports) / totalUsers) : 0;
@@ -128,11 +131,11 @@ const AdminDashboard: React.FC = () => {
     try {
       const activities: ActivityItem[] = [];
       const now = Date.now();
-      
-      // Get real user registrations (last 7 days)
+      const rangeDays = analyticsRange === '7' ? 7 : analyticsRange === '90' ? 90 : 30;
+      // Get real user registrations (selected range)
       const allUsers = userManager.getAllUsers();
       const recentRegistrations = allUsers
-        .filter((user: any) => new Date(user.registrationDate) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+        .filter((user: any) => new Date(user.registrationDate) > new Date(now - rangeDays * 24 * 60 * 60 * 1000))
         .map((user: any) => ({
           id: `reg-${user.id}`,
           type: 'registration' as const,
@@ -146,10 +149,10 @@ const AdminDashboard: React.FC = () => {
 
       activities.push(...recentRegistrations);
 
-      // Get real ticket creation activity (last 7 days)
+      // Get real ticket creation activity (selected range)
       const allSessions = chatSystem.getAllSessions();
       const recentTickets = allSessions
-        .filter((session: any) => new Date(session.createdAt) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+        .filter((session: any) => new Date(session.createdAt) > new Date(now - rangeDays * 24 * 60 * 60 * 1000))
         .map((session: any) => ({
           id: `ticket-${session.id}`,
           type: 'ticket' as const,
@@ -163,12 +166,12 @@ const AdminDashboard: React.FC = () => {
 
       activities.push(...recentTickets);
 
-      // Get real backup activity (last 7 days)
+      // Get real backup activity (selected range)
       const storedBackups = localStorage.getItem('databaseBackups');
       if (storedBackups) {
         const backups = JSON.parse(storedBackups);
         const recentBackups = backups
-          .filter((backup: any) => backup.timestamp > now - 7 * 24 * 60 * 60 * 1000)
+          .filter((backup: any) => backup.timestamp > now - rangeDays * 24 * 60 * 60 * 1000)
           .map((backup: any) => ({
             id: `backup-${backup.backupId}`,
             type: 'backup' as const,
@@ -520,7 +523,18 @@ const AdminDashboard: React.FC = () => {
     loadRecentActivity();
     loadApiKeys();
     loadContactSubmissions();
-  }, []);
+  }, [analyticsRange]);
+
+  // Derived filtered activity list
+  const filteredRecentActivity = recentActivity.filter((activity) => {
+    if (!activityQuery.trim()) return true;
+    const q = activityQuery.toLowerCase();
+    return (
+      activity.description.toLowerCase().includes(q) ||
+      (activity.user?.toLowerCase().includes(q)) ||
+      activity.type.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -581,6 +595,24 @@ const AdminDashboard: React.FC = () => {
             Here's what's happening with your platform today
           </p>
         </motion.div>
+
+        {/* Controls & Action Buttons */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+          <div className="inline-flex bg-white/10 border border-white/20 rounded-xl overflow-hidden">
+            {(['7','30','90'] as const).map((d) => (
+              <button
+                key={d}
+                onClick={() => setAnalyticsRange(d)}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${analyticsRange === d ? 'bg-white/20 text-white' : 'text-white/70 hover:text-white'}`}
+                aria-pressed={analyticsRange === d}
+                aria-label={`Show last ${d} days`}
+              >
+                {d}d
+              </button>
+            ))}
+          </div>
+          {/* Keep action buttons below */}
+        </div>
 
         {/* Action Buttons */}
         <motion.div
@@ -787,10 +819,19 @@ const AdminDashboard: React.FC = () => {
           transition={{ delay: 0.3 }}
           className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
         >
-          <h3 className="text-xl font-bold text-white mb-4">Recent Activity</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h3 className="text-xl font-bold text-white">Recent Activity</h3>
+            <input
+              type="text"
+              value={activityQuery}
+              onChange={(e) => setActivityQuery(e.target.value)}
+              placeholder="Search activity..."
+              className="w-full sm:w-64 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+            />
+          </div>
           <div className="space-y-3">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity) => (
+            {filteredRecentActivity.length > 0 ? (
+              filteredRecentActivity.map((activity) => (
                 <motion.div
                   key={activity.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -804,8 +845,8 @@ const AdminDashboard: React.FC = () => {
                       {new Date(activity.timestamp).toLocaleString()}
                     </p>
                   </div>
-                </motion.div>
-              ))
+                                </motion.div>
+               ))
             ) : (
               <p className="text-white/60 text-center py-4">No recent activity</p>
             )}
