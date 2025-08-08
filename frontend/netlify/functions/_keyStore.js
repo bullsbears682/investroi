@@ -1,3 +1,4 @@
+const { getRedis } = require('./_redisClient.js');
 const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 
 const MEM = {
@@ -27,6 +28,11 @@ async function upstashFetch(path, method = 'GET', body) {
 }
 
 async function getKeyRecord(apiKey) {
+  const redis = await getRedis();
+  if (redis) {
+    const raw = await redis.get(`api:keys:${apiKey}`);
+    return raw ? JSON.parse(raw) : null;
+  }
   if (hasUpstash) {
     const key = `api:keys:${apiKey}`;
     const r = await upstashFetch(`/get/${encodeURIComponent(key)}`);
@@ -41,6 +47,12 @@ async function getKeyRecord(apiKey) {
 }
 
 async function putKeyRecord(apiKey, record) {
+  const redis = await getRedis();
+  if (redis) {
+    await redis.set(`api:keys:${apiKey}`, JSON.stringify(record));
+    await redis.sAdd(KEY_INDEX, apiKey);
+    return true;
+  }
   if (hasUpstash) {
     const key = `api:keys:${apiKey}`;
     await upstashFetch('/set', 'POST', { key, value: JSON.stringify(record) });
@@ -53,6 +65,12 @@ async function putKeyRecord(apiKey, record) {
 }
 
 async function deleteKeyRecord(apiKey) {
+  const redis = await getRedis();
+  if (redis) {
+    await redis.del(`api:keys:${apiKey}`);
+    await redis.sRem(KEY_INDEX, apiKey);
+    return true;
+  }
   if (hasUpstash) {
     const key = `api:keys:${apiKey}`;
     await upstashFetch(`/del/${encodeURIComponent(key)}`);
@@ -65,6 +83,16 @@ async function deleteKeyRecord(apiKey) {
 }
 
 async function listKeys() {
+  const redis = await getRedis();
+  if (redis) {
+    const keys = await redis.sMembers(KEY_INDEX);
+    const out = [];
+    for (const apiKey of keys) {
+      const rec = await getKeyRecord(apiKey);
+      if (rec) out.push({ apiKey, ...rec });
+    }
+    return out;
+  }
   if (hasUpstash) {
     const r = await upstashFetch(`/smembers/${encodeURIComponent(KEY_INDEX)}`);
     const keys = Array.isArray(r.result) ? r.result : [];
@@ -79,6 +107,11 @@ async function listKeys() {
 }
 
 async function incrementUsage(apiKey) {
+  const redis = await getRedis();
+  if (redis) {
+    await redis.incr(`api:usage_total:${apiKey}`);
+    return true;
+  }
   if (hasUpstash) {
     const key = `api:usage_total:${apiKey}`;
     await upstashFetch(`/incr/${encodeURIComponent(key)}`);
@@ -91,6 +124,13 @@ async function incrementUsage(apiKey) {
 async function rateLimitCheckAndIncr(apiKey, limitPerMinute) {
   const now = Date.now();
   const windowId = Math.floor(now / 60000); // minute window
+  const redis = await getRedis();
+  if (redis) {
+    const key = `api:rate:${apiKey}:${windowId}`;
+    const count = await redis.incr(key);
+    if (Number(count) === 1) await redis.expire(key, 60);
+    return { allowed: Number(count) <= limitPerMinute, remaining: Math.max(0, limitPerMinute - Number(count)) };
+  }
   if (hasUpstash) {
     const key = `api:rate:${apiKey}:${windowId}`;
     const r = await upstashFetch(`/incr/${encodeURIComponent(key)}`);
