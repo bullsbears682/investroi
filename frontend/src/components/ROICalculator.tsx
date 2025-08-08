@@ -269,7 +269,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
         animate={{ opacity: 1, y: 0 }}
         className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
       >
-        <h3 className="text-white font-semibold mb-3 flex items-center">
+        <h3 className="text-white font-semibold mb-3 flex items-center text-sm">
           <Info className="w-4 h-4 mr-2" />
           Investment Summary
         </h3>
@@ -396,7 +396,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
             transition={{ delay: 0.1 }}
             className="mt-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
           >
-            <h3 className="text-white font-semibold mb-4 flex items-center">
+            <h3 className="text-white font-semibold mb-3 flex items-center text-sm">
               <Shield className="w-4 h-4 mr-2" />
               Investment Recommendations
             </h3>
