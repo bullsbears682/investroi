@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useNotifications } from '../contexts/NotificationContext';
 import { 
@@ -19,7 +19,7 @@ import {
   X
 } from 'lucide-react';
 
-import { api } from '../services/api';
+// API service removed; using local/mock logic only
 
 import CategorySelector from '../components/CategorySelector';
 import ScenarioSelector from '../components/ScenarioSelector';
@@ -48,13 +48,7 @@ const CalculatorPage: React.FC = () => {
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
     queryKey: ['scenarios'],
     queryFn: async () => {
-      try {
-        const response = await api.get('/api/roi/scenarios');
-        return response;
-      } catch (error) {
-        console.log('Using mock scenarios due to API error');
-        return { data: mockScenarios };
-      }
+      return { data: mockScenarios };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -63,67 +57,15 @@ const CalculatorPage: React.FC = () => {
   const { data: miniScenarios, isLoading: miniScenariosLoading } = useQuery({
     queryKey: ['mini-scenarios', selectedScenario],
     queryFn: async () => {
-      try {
-        const response = await api.get(`/api/roi/scenarios/${selectedScenario}/mini-scenarios`);
-        return response;
-      } catch (error) {
-        console.log('Using mock mini scenarios due to API error');
-        return { data: mockMiniScenarios[selectedScenario!] || [] };
-      }
+      return { data: mockMiniScenarios[selectedScenario!] || [] };
     },
     enabled: !!selectedScenario,
     staleTime: 5 * 60 * 1000,
   });
 
-    // Calculate ROI mutation with fallback
-  const calculateMutation = useMutation({
-    mutationFn: async (data: any) => {
-      console.log('Attempting API calculation...');
-      try {
-        const response = await api.post('/api/roi/calculate', data);
-        console.log('API calculation successful:', response.data);
-        return response;
-      } catch (error: any) {
-        console.error('API calculation failed:', error);
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      console.log('Calculation successful via API');
-      const result = data.data || data;
-      setCalculationResult({ data: result });
-      
-      // Add notification with redirect to results
-      addNotification({
-        type: 'success',
-        title: 'ROI Calculation Complete!',
-        message: 'Your investment analysis is ready. Click to view detailed results.',
-        redirectTo: '#results',
-        redirectLabel: 'View Results',
-        duration: 8000
-      });
-      
-      toast.success('ROI calculation completed!');
-    },
-            onError: (error: any) => {
-          console.error('API calculation failed:', error);
-          
-          // Log specific error details
-          if (error.response) {
-            console.error('Response status:', error.response.status);
-            console.error('Response data:', error.response.data);
-          } else if (error.request) {
-            console.error('No response received - network issue');
-          } else {
-            console.error('Request setup error:', error.message);
-          }
-          
-          // Fallback to local calculation
-          performLocalCalculation();
-        },
-  });
+  // Local calculation only; track calculating state for UI
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  // Local calculation fallback
   const performLocalCalculation = (formDataOverride?: any) => {
     console.log('Using local calculation fallback...');
     
@@ -289,46 +231,21 @@ const CalculatorPage: React.FC = () => {
     toast.success('ROI calculation completed!');
   };
 
-        const handleCalculate = (formData: any) => {
-        if (!selectedScenario || !selectedMiniScenario) {
-          toast.error('Please select a business scenario and mini scenario');
-          return;
-        }
-
-        // Store form data for fallback
-        (window as any).formData = formData;
-
-        // Prepare data for API call
-        const calculationData = {
-          initial_investment: Number(formData.initial_investment) || 0,
-          additional_costs: Number(formData.additional_costs) || 0,
-          business_scenario_id: selectedScenario,
-          mini_scenario_id: selectedMiniScenario,
-          country_code: formData.country_code || 'US'
-        };
-
-        // Record the calculation for current user if logged in
-        const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
-        
-        // Record calculation for current user if logged in
-        if (currentUser) {
-          userManager.recordCalculation(scenarioName);
-        }
-
-        console.log('Sending calculation request to API...');
-        
-        // First try a simple health check
-        api.get('/api/roi/calculate')
-          .then(() => {
-            console.log('API is reachable, proceeding with calculation...');
-            calculateMutation.mutate(calculationData);
-          })
-          .catch((error) => {
-            console.error('API health check failed:', error);
-            console.log('Using local fallback immediately...');
-            performLocalCalculation(formData);
-          });
-      };
+  const handleCalculate = (formData: any) => {
+    if (!selectedScenario || !selectedMiniScenario) {
+      toast.error('Please select a business scenario and mini scenario');
+      return;
+    }
+    (window as any).formData = formData;
+    const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
+    if (currentUser) {
+      userManager.recordCalculation(scenarioName);
+    }
+    setIsCalculating(true);
+    // Perform local calculation synchronously
+    performLocalCalculation(formData);
+    setIsCalculating(false);
+  };
 
   // Use scenarios data with fallback
   const scenariosData = scenarios?.data || mockScenarios;
@@ -493,7 +410,7 @@ const CalculatorPage: React.FC = () => {
                 onDropdownStateChange={setIsDropdownOpen}
                 isLoading={scenariosLoading || miniScenariosLoading}
                 onCalculate={handleCalculate}
-                calculateIsLoading={calculateMutation.isPending}
+                calculateIsLoading={isCalculating}
                 calculationResult={calculationResult?.data || calculationResult}
               />
             </motion.div>

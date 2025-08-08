@@ -22,7 +22,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '', showText = tru
   };
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div className={`flex items-center space-x-2 ${className}`} aria-label="InvestWise Pro">
       {/* Logo Icon */}
       <div className={`${sizeClasses[size]} relative`}>
         <svg
@@ -30,94 +30,88 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', className = '', showText = tru
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="w-full h-full"
+          role="img"
+          aria-labelledby="investwise-logo-title"
         >
-          {/* Background Circle */}
-          <circle
-            cx="32"
-            cy="32"
-            r="30"
-            fill="url(#gradient1)"
-            stroke="url(#gradient2)"
-            strokeWidth="2"
-          />
-          
-          {/* Chart Bars */}
-          <rect x="16" y="40" width="4" height="12" fill="url(#gradient3)" rx="1" />
-          <rect x="22" y="36" width="4" height="16" fill="url(#gradient3)" rx="1" />
-          <rect x="28" y="32" width="4" height="20" fill="url(#gradient3)" rx="1" />
-          <rect x="34" y="28" width="4" height="24" fill="url(#gradient3)" rx="1" />
-          <rect x="40" y="24" width="4" height="28" fill="url(#gradient3)" rx="1" />
-          <rect x="46" y="20" width="4" height="32" fill="url(#gradient3)" rx="1" />
-          
-          {/* Trend Line */}
+          <title id="investwise-logo-title">InvestWise Pro Logo</title>
+          {/* Outer ring */}
+          <circle cx="32" cy="32" r="30" fill="url(#iw-bg)" />
+          <circle cx="32" cy="32" r="29" stroke="url(#iw-ring)" strokeWidth="2" />
+
+          {/* Subtle inner glow */}
+          <circle cx="32" cy="32" r="22" fill="url(#iw-glow)" opacity="0.25" />
+
+          {/* Grid accent */}
+          <g opacity="0.08">
+            <path d="M16 24 H48" stroke="white" strokeWidth="1" />
+            <path d="M16 40 H48" stroke="white" strokeWidth="1" />
+            <path d="M24 16 V48" stroke="white" strokeWidth="1" />
+            <path d="M40 16 V48" stroke="white" strokeWidth="1" />
+          </g>
+
+          {/* Upward growth arrow */}
           <path
-            d="M 16 44 L 22 40 L 28 36 L 34 32 L 40 28 L 46 24"
-            stroke="url(#gradient4)"
-            strokeWidth="2.5"
+            d="M18 42 L28 34 L35 37 L46 24"
+            fill="none"
+            stroke="url(#iw-arrow)"
+            strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            fill="none"
           />
-          
-          {/* Data Points */}
-          <circle cx="16" cy="44" r="2" fill="url(#gradient5)" />
-          <circle cx="22" cy="40" r="2" fill="url(#gradient5)" />
-          <circle cx="28" cy="36" r="2" fill="url(#gradient5)" />
-          <circle cx="34" cy="32" r="2" fill="url(#gradient5)" />
-          <circle cx="40" cy="28" r="2" fill="url(#gradient5)" />
-          <circle cx="46" cy="24" r="2" fill="url(#gradient5)" />
-          
-          {/* Center Diamond */}
+          {/* Arrow head */}
           <path
-            d="M 32 20 L 36 24 L 32 28 L 28 24 Z"
-            fill="url(#gradient6)"
-            stroke="url(#gradient7)"
-            strokeWidth="1"
+            d="M41 24 L46 24 L46 29"
+            fill="none"
+            stroke="url(#iw-arrow)"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
-          
-          {/* Gradients */}
+
+          {/* Data spark at the tip */}
+          <circle cx="46" cy="24" r="2.6" fill="url(#iw-spark)" />
+
+          {/* Center badge (subtle) */}
+          <path d="M32 20 L36 24 L32 28 L28 24 Z" fill="url(#iw-badge)" opacity="0.7" />
+
+          {/* Definitions */}
           <defs>
-            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#667eea" />
-              <stop offset="100%" stopColor="#764ba2" />
+            <linearGradient id="iw-bg" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#0f172a" />
+              <stop offset="100%" stopColor="#1f1340" />
             </linearGradient>
-            
-            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#f093fb" />
-              <stop offset="100%" stopColor="#f5576c" />
+
+            <linearGradient id="iw-ring" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="100%" stopColor="#3b82f6" />
             </linearGradient>
-            
-            <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#4facfe" />
-              <stop offset="100%" stopColor="#00f2fe" />
+
+            <radialGradient id="iw-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(32 32) rotate(90) scale(24)">
+              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
+            </radialGradient>
+
+            <linearGradient id="iw-arrow" x1="18" y1="42" x2="46" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#22d3ee" />
+              <stop offset="100%" stopColor="#34d399" />
             </linearGradient>
-            
-            <linearGradient id="gradient4" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#43e97b" />
-              <stop offset="100%" stopColor="#38f9d7" />
+
+            <linearGradient id="iw-spark" x1="44" y1="22" x2="48" y2="26" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#f0abfc" />
+              <stop offset="100%" stopColor="#93c5fd" />
             </linearGradient>
-            
-            <linearGradient id="gradient5" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#fa709a" />
-              <stop offset="100%" stopColor="#fee140" />
-            </linearGradient>
-            
-            <linearGradient id="gradient6" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#a8edea" />
-              <stop offset="100%" stopColor="#fed6e3" />
-            </linearGradient>
-            
-            <linearGradient id="gradient7" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ffecd2" />
-              <stop offset="100%" stopColor="#fcb69f" />
+
+            <linearGradient id="iw-badge" x1="28" y1="20" x2="36" y2="28" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#a78bfa" />
+              <stop offset="100%" stopColor="#60a5fa" />
             </linearGradient>
           </defs>
         </svg>
       </div>
-      
+
       {/* Logo Text */}
       {showText && (
-        <div className={`font-bold ${textSizes[size]} bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent`}>
+        <div className={`font-bold ${textSizes[size]} bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent tracking-wide`}>
           InvestWise Pro
         </div>
       )}

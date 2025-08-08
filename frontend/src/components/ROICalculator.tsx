@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { 
   DollarSign, 
@@ -15,6 +15,7 @@ import { CalculatorIcon } from './icons/CustomIcons';
 
 import ExportModal from './ExportModal';
 import { getResearchBasedMarketData } from '../utils/marketResearchData';
+// no demo gating
 
 
 interface ROICalculatorProps {
@@ -64,7 +65,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
   });
 
   const watchedValues = watch();
-
+  
   const countries = [
     { code: 'US', name: 'United States', flag: '🇺🇸' },
     { code: 'UK', name: 'United Kingdom', flag: '🇬🇧' },
@@ -102,10 +103,10 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
     }).format(amount);
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit: SubmitHandler<FormData> = (data) => {
     onCalculate(data);
   };
-
+  
   const totalInvestment = (Number(watchedValues.initial_investment) || 0) + (Number(watchedValues.additional_costs) || 0);
   
   // Investment validation logic

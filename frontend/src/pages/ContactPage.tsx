@@ -91,13 +91,13 @@ const ContactPage: React.FC = () => {
   const officeInfo = [
     {
       icon: MapPin,
-      title: 'Headquarters',
-      description: '123 Innovation Drive, Tech Valley, CA 94000'
+      title: 'Remote-first',
+      description: 'We operate globally with no physical office'
     },
     {
       icon: Clock,
-      title: 'Business Hours',
-      description: 'Monday - Friday: 9:00 AM - 6:00 PM PST'
+      title: 'Support Availability',
+      description: '24/7 email support; live chat Mon–Fri 9:00–18:00 UTC'
     }
   ];
 
@@ -384,14 +384,9 @@ const ContactPage: React.FC = () => {
                 transition={{ delay: 0.3 }}
                 className="text-center mb-8"
               >
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent mb-3">
-                  Message Sent!
-                </h3>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent mb-3">Message sent</h3>
                 <div className="w-16 h-0.5 bg-gradient-to-r from-green-400 to-blue-400 mx-auto mb-4"></div>
-                <p className="text-white/90 text-lg leading-relaxed">
-                  Thank you for reaching out! We've received your message and will respond within 
-                  <span className="font-semibold text-green-400"> 24 hours</span>.
-                </p>
+                <p className="text-white/90 text-lg leading-relaxed">Thanks for reaching out. We'll reply by email within 24 hours.</p>
               </motion.div>
               
               {/* Action Buttons */}
@@ -419,17 +414,6 @@ const ContactPage: React.FC = () => {
                 </button>
               </motion.div>
               
-              {/* Additional Info */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="mt-6 text-center"
-              >
-                <p className="text-white/50 text-sm">
-                  Your message has been saved and will appear in our admin dashboard.
-                </p>
-              </motion.div>
             </div>
           </motion.div>
         </motion.div>

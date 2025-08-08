@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  TrendingUp, Globe, ArrowRight, Star, Zap, Users
+  TrendingUp, Globe, ArrowRight, Zap, Users
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import { 
@@ -47,27 +47,21 @@ const HomePage: React.FC = () => {
     { label: 'Real-time Data', value: '24/7', icon: Zap }
   ];
 
-  const testimonials = [
+  const trustItems = [
     {
-      name: 'Alex Thompson',
-      role: 'Investment Manager',
-      company: 'Capital Growth Partners',
-      content: 'InvestWise Pro has revolutionized our investment analysis process. The real-world scenarios and comprehensive reports are invaluable.',
-      rating: 5
+      icon: Zap,
+      title: 'Fast & Accurate',
+      description: 'Get decision‑ready outputs in seconds with realistic scenarios and clean reports.'
     },
     {
-      name: 'Jordan Lee',
-      role: 'Startup Founder',
-      company: 'NextGen Solutions',
-      content: 'The market analysis and risk assessment features helped us make informed decisions about our expansion strategy.',
-      rating: 5
+      icon: TrendingUp,
+      title: 'Actionable Analytics',
+      description: 'From ROI to market outlook, see signals that translate into concrete actions.'
     },
     {
-      name: 'Casey Williams',
-      role: 'Financial Advisor',
-      company: 'Strategic Wealth Group',
-      content: 'Professional PDF reports with detailed analysis have significantly improved our client presentations and decision-making.',
-      rating: 5
+      icon: Users,
+      title: 'Team‑Ready',
+      description: 'Simple to share, present, and iterate with stakeholders and clients.'
     }
   ];
 
@@ -125,6 +119,8 @@ const HomePage: React.FC = () => {
                   Watch Demo
                 </motion.button>
               </Link>
+
+              
             </motion.div>
           </div>
         </div>
@@ -207,34 +203,29 @@ const HomePage: React.FC = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Trusted by Investment Professionals
+              Why Teams Choose <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">InvestWise Pro</span>
             </h2>
-            <p className="text-xl text-white/70 flex items-center justify-center space-x-2">
-              <span>See what our users say about</span>
-              <Logo size="md" showText={true} />
+            <p className="text-xl text-white/70 flex items-center justify-center gap-2">
+              <span>Built for speed, clarity, and results</span>
+              <Logo size="md" showText={false} />
             </p>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
+            {trustItems.map((item, index) => (
               <motion.div
-                key={testimonial.name}
+                key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6"
+                className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 text-center"
               >
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                  ))}
+                <div className="w-12 h-12 mx-auto mb-4 bg-white/10 rounded-lg flex items-center justify-center">
+                  <item.icon className="w-6 h-6 text-blue-300" />
                 </div>
-                <p className="text-white/80 mb-4 italic">"{testimonial.content}"</p>
-                <div>
-                  <div className="font-semibold text-white">{testimonial.name}</div>
-                  <div className="text-white/60 text-sm">{testimonial.role} at {testimonial.company}</div>
-                </div>
+                <div className="text-white font-semibold mb-2">{item.title}</div>
+                <div className="text-white/70 text-sm">{item.description}</div>
               </motion.div>
             ))}
           </div>

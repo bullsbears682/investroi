@@ -114,254 +114,258 @@ const AdminChat: React.FC<AdminChatProps> = ({ isOpen, onClose }) => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl w-full max-w-5xl h-[70vh] flex flex-col"
+        className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl w-full max-w-5xl h-[70vh] flex flex-col shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/20">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Customer Support</h2>
-              <div className="flex items-center space-x-2 text-xs">
-                <span className="text-green-400">● {sessions.filter(s => s.status === 'active').length} active</span>
-                <span className="text-yellow-400">● {sessions.filter(s => s.status === 'waiting').length} waiting</span>
-                <span className="text-gray-400">● {sessions.filter(s => s.status === 'closed').length} closed</span>
+        {/* Animated background elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-3xl"></div>
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+        <div className="relative z-10">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-white/20">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Customer Support</h2>
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-green-400">● {sessions.filter(s => s.status === 'active').length} active</span>
+                  <span className="text-yellow-400">● {sessions.filter(s => s.status === 'waiting').length} waiting</span>
+                  <span className="text-gray-400">● {sessions.filter(s => s.status === 'closed').length} closed</span>
+                </div>
               </div>
             </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors p-1"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar - Sessions */}
-          <div className="w-1/3 border-r border-white/20 flex flex-col">
-                         {/* Tabs */}
-             <div className="flex border-b border-white/20">
-               <button
-                 onClick={() => setActiveTab('sessions')}
-                 className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-                   activeTab === 'sessions' 
-                     ? 'text-blue-400 border-b-2 border-blue-400' 
-                     : 'text-white/60 hover:text-white'
-                 }`}
-               >
-                 Conversations
-               </button>
-               <button
-                 onClick={() => setActiveTab('recent')}
-                 className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-                   activeTab === 'recent' 
-                     ? 'text-blue-400 border-b-2 border-blue-400' 
-                     : 'text-white/60 hover:text-white'
-                 }`}
-               >
-                 Recent Messages
-               </button>
-             </div>
-
-            {/* Sessions List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                           {activeTab === 'sessions' ? (
-               sessions.length === 0 ? (
-                 <div className="text-center py-6">
-                   <MessageSquare className="w-10 h-10 text-white/40 mx-auto mb-3" />
-                   <p className="text-white/60 text-sm">No conversations yet</p>
-                 </div>
-                                ) : (
-                   sessions.map((session) => (
-                     <div
-                       key={session.id}
-                       className={`p-3 rounded-lg cursor-pointer transition-all hover:bg-white/10 ${
-                         selectedSession?.id === session.id ? 'bg-blue-500/20 border border-blue-500/30' : 'bg-white/5'
-                       }`}
-                       onClick={() => setSelectedSession(session)}
-                     >
-                       <div className="flex items-center justify-between mb-2">
-                         <div className="flex items-center space-x-2">
-                           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                             <span className="text-white text-sm font-medium">
-                               {session.userName.charAt(0).toUpperCase()}
-                             </span>
-                           </div>
-                           <div className="flex-1 min-w-0">
-                             <p className="text-white font-medium text-sm truncate">{session.userName}</p>
-                             <p className="text-white/60 text-xs truncate">{session.userEmail}</p>
-                           </div>
-                         </div>
-                         <div className="flex flex-col items-end space-y-1">
-                           <span className={`text-xs px-2 py-1 rounded-full ${getSessionStatusColor(session.status)}`}>
-                             {session.status}
-                           </span>
-                           <span className="text-white/40 text-xs">{formatTime(session.lastActivity)}</span>
-                         </div>
-                       </div>
-                       
-                       <div className="flex items-center justify-between text-xs text-white/60">
-                         <span className="truncate flex-1 mr-2">
-                           {session.lastMessage || 'No messages yet'}
-                         </span>
-                         {session.unreadCount > 0 && (
-                           <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full min-w-0">
-                             {session.unreadCount}
-                           </span>
-                         )}
-                       </div>
-
-                       <div className="mt-2 flex items-center justify-between">
-                         <div className="flex space-x-1">
-                           {!session.adminId && (
-                             <button
-                               onClick={(e) => {
-                                 e.stopPropagation();
-                                 handleAssignSession(session);
-                               }}
-                               className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
-                             >
-                               Take
-                             </button>
-                           )}
-                           <button
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               handleCloseSession(session);
-                             }}
-                             className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
-                           >
-                             Close
-                           </button>
-                         </div>
-                         {session.adminId && (
-                           <span className="text-white/40 text-xs">Assigned</span>
-                         )}
-                       </div>
-                     </div>
-                   ))
-                 )
-                           ) : (
-               <div className="space-y-2">
-                 {chatSystem.getRecentMessages(8).map((message) => (
-                   <div key={message.id} className="p-2 bg-white/5 rounded-lg">
-                     <div className="flex items-center justify-between mb-1">
-                       <span className="text-white font-medium text-xs">
-                         {message.isAdmin ? 'Admin' : message.userName}
-                       </span>
-                       <span className="text-white/60 text-xs">{formatTime(message.timestamp)}</span>
-                     </div>
-                     <p className="text-white/80 text-xs">{message.message}</p>
-                   </div>
-                 ))}
-               </div>
-             )}
-            </div>
+            <button
+              onClick={onClose}
+              className="text-white/60 hover:text-white transition-colors p-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col">
-            {selectedSession ? (
-              <>
-                                 {/* Chat Header */}
-                 <div className="p-3 border-b border-white/20">
-                   <div className="flex items-center justify-between">
-                     <div className="flex items-center space-x-2">
-                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                         <span className="text-white font-medium text-sm">
-                           {selectedSession.userName.charAt(0).toUpperCase()}
-                         </span>
-                       </div>
-                       <div>
-                         <h3 className="text-white font-medium text-sm">{selectedSession.userName}</h3>
-                         <p className="text-white/60 text-xs">{selectedSession.userEmail}</p>
-                       </div>
-                     </div>
-                     <div className="flex items-center space-x-2">
-                       <span className={`text-xs px-2 py-1 rounded-full ${getSessionStatusColor(selectedSession.status)}`}>
-                         {selectedSession.status}
-                       </span>
-                       <button
-                         onClick={() => {
-                           navigator.clipboard.writeText(selectedSession.userEmail);
-                           toast.success('Email copied!');
-                         }}
-                         className="text-white/60 hover:text-white transition-colors p-1"
-                         title="Copy email"
-                       >
-                         <Mail className="w-3 h-3" />
-                       </button>
-                     </div>
-                   </div>
-                 </div>
+          <div className="flex flex-1 overflow-hidden">
+            {/* Sidebar - Sessions */}
+            <div className="w-1/3 border-r border-white/20 flex flex-col">
+              {/* Tabs */}
+              <div className="flex border-b border-white/20">
+                <button
+                  onClick={() => setActiveTab('sessions')}
+                  className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+                    activeTab === 'sessions' 
+                      ? 'text-blue-400 border-b-2 border-blue-400' 
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  Conversations
+                </button>
+                <button
+                  onClick={() => setActiveTab('recent')}
+                  className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+                    activeTab === 'recent' 
+                      ? 'text-blue-400 border-b-2 border-blue-400' 
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  Recent Messages
+                </button>
+              </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.isAdmin ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${
-                        message.isAdmin 
-                          ? 'bg-blue-500/20 text-white' 
-                          : 'bg-white/10 text-white'
-                      }`}>
+              {/* Sessions List */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {activeTab === 'sessions' ? (
+                  sessions.length === 0 ? (
+                    <div className="text-center py-6">
+                      <MessageSquare className="w-10 h-10 text-white/40 mx-auto mb-3" />
+                      <p className="text-white/60 text-sm">No conversations yet</p>
+                    </div>
+                  ) : (
+                    sessions.map((session) => (
+                      <div
+                        key={session.id}
+                        className={`p-3 rounded-lg cursor-pointer transition-all hover:bg-white/10 ${
+                          selectedSession?.id === session.id ? 'bg-blue-500/20 border border-blue-500/30' : 'bg-white/5'
+                        }`}
+                        onClick={() => setSelectedSession(session)}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-sm font-medium">
+                                {session.userName.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-medium text-sm truncate">{session.userName}</p>
+                              <p className="text-white/60 text-xs truncate">{session.userEmail}</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end space-y-1">
+                            <span className={`text-xs px-2 py-1 rounded-full ${getSessionStatusColor(session.status)}`}>
+                              {session.status}
+                            </span>
+                            <span className="text-white/40 text-xs">{formatTime(session.lastActivity)}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-white/60">
+                          <span className="truncate flex-1 mr-2">
+                            {session.lastMessage || 'No messages yet'}
+                          </span>
+                          {session.unreadCount > 0 && (
+                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full min-w-0">
+                              {session.unreadCount}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex space-x-1">
+                            {!session.adminId && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAssignSession(session);
+                                }}
+                                className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+                              >
+                                Take
+                              </button>
+                            )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCloseSession(session);
+                              }}
+                              className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors"
+                            >
+                              Close
+                            </button>
+                          </div>
+                          {session.adminId && (
+                            <span className="text-white/40 text-xs">Assigned</span>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )
+                ) : (
+                  <div className="space-y-2">
+                    {chatSystem.getRecentMessages(8).map((message) => (
+                      <div key={message.id} className="p-2 bg-white/5 rounded-lg">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium opacity-70">
+                          <span className="text-white font-medium text-xs">
                             {message.isAdmin ? 'Admin' : message.userName}
                           </span>
-                          <span className="text-xs opacity-60">{formatTime(message.timestamp)}</span>
+                          <span className="text-white/60 text-xs">{formatTime(message.timestamp)}</span>
                         </div>
-                        <p className="text-sm">{message.message}</p>
+                        <p className="text-white/80 text-xs">{message.message}</p>
                       </div>
-                    </motion.div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
-                                 {/* Message Input */}
-                 <div className="p-3 border-t border-white/20">
-                   <div className="flex space-x-2">
-                     <input
-                       type="text"
-                       value={newMessage}
-                       onChange={(e) => setNewMessage(e.target.value)}
-                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                       placeholder="Type your response..."
-                       className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
-                     />
-                     <button
-                       onClick={handleSendMessage}
-                       disabled={!newMessage.trim()}
-                       className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg transition-colors"
-                     >
-                       <Send className="w-3 h-3" />
-                     </button>
-                   </div>
-                 </div>
-              </>
-                         ) : (
-               <div className="flex-1 flex items-center justify-center">
-                 <div className="text-center">
-                   <MessageSquare className="w-12 h-12 text-white/40 mx-auto mb-3" />
-                   <p className="text-white/60 text-sm">Select a conversation to respond</p>
-                   <p className="text-white/40 text-xs mt-1">Click on any conversation from the list</p>
-                 </div>
-               </div>
-             )}
+            {/* Chat Area */}
+            <div className="flex-1 flex flex-col">
+              {selectedSession ? (
+                <>
+                  {/* Chat Header */}
+                  <div className="p-3 border-b border-white/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-medium text-sm">
+                            {selectedSession.userName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="text-white font-medium text-sm">{selectedSession.userName}</h3>
+                          <p className="text-white/60 text-xs">{selectedSession.userEmail}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${getSessionStatusColor(selectedSession.status)}`}>
+                          {selectedSession.status}
+                        </span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedSession.userEmail);
+                            toast.success('Email copied!');
+                          }}
+                          className="text-white/60 hover:text-white transition-colors p-1"
+                          title="Copy email"
+                        >
+                          <Mail className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Messages */}
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {messages.map((message) => (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${message.isAdmin ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`max-w-xs lg|max-w-md p-3 rounded-lg ${
+                          message.isAdmin 
+                            ? 'bg-blue-500/20 text-white' 
+                            : 'bg-white/10 text-white'
+                        }`}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium opacity-70">
+                              {message.isAdmin ? 'Admin' : message.userName}
+                            </span>
+                            <span className="text-xs opacity-60">{formatTime(message.timestamp)}</span>
+                          </div>
+                          <p className="text-sm">{message.message}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
+
+                  {/* Message Input */}
+                  <div className="p-3 border-t border-white/20">
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                        placeholder="Type your response..."
+                        className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-sm"
+                      />
+                      <button
+                        onClick={handleSendMessage}
+                        disabled={!newMessage.trim()}
+                        className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg transition-colors"
+                      >
+                        <Send className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <MessageSquare className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                    <p className="text-white/60 text-sm">Select a conversation to respond</p>
+                    <p className="text-white/40 text-xs mt-1">Click on any conversation from the list</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </motion.div>

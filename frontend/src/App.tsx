@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
 import { CookiesProvider } from 'react-cookie';
+import { Suspense, lazy } from 'react';
 
 // Contexts
 import { NotificationProvider } from './contexts/NotificationContext';
@@ -12,29 +13,27 @@ import LoadingScreen from './components/LoadingScreen';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
-// Pages
-import HomePage from './pages/HomePage';
-import CalculatorPage from './pages/CalculatorPage';
-import AboutPage from './pages/AboutPage';
-import PrivacyPage from './pages/PrivacyPage';
-import DemoPage from './pages/DemoPage';
-import ScenariosPage from './pages/ScenariosPage';
-import InvestmentGuidePage from './pages/InvestmentGuidePage';
-import TaxInfoPage from './pages/TaxInfoPage';
-import MarketResearchPage from './pages/MarketResearchPage';
-import ContactPage from './pages/ContactPage';
-import TermsPage from './pages/TermsPage';
+// Pages (lazy)
+const HomePage = lazy(() => import('./pages/HomePage'));
+const CalculatorPage = lazy(() => import('./pages/CalculatorPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const DemoPage = lazy(() => import('./pages/DemoPage'));
+const ScenariosPage = lazy(() => import('./pages/ScenariosPage'));
+const InvestmentGuidePage = lazy(() => import('./pages/InvestmentGuidePage'));
+const TaxInfoPage = lazy(() => import('./pages/TaxInfoPage'));
+const MarketResearchPage = lazy(() => import('./pages/MarketResearchPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
 
 import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 import NotificationWrapper from './components/NotificationWrapper';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminAnalytics from './pages/AdminAnalytics';
-import AdminData from './pages/AdminData';
-import AdminSystem from './pages/AdminSystem';
-import AdminBackups from './pages/AdminBackups';
-import AdminChat from './pages/AdminChat';
-
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
+const AdminData = lazy(() => import('./pages/AdminData'));
+const AdminSystem = lazy(() => import('./pages/AdminSystem'));
+const AdminChat = lazy(() => import('./pages/AdminChat'));
 
 
 // Store
@@ -98,6 +97,7 @@ function App() {
                     <ConditionalHeader />
                     
                     <main className="container mx-auto px-4 py-8">
+                      <Suspense fallback={<LoadingScreen />}>
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/scenarios" element={<ScenariosPage />} />
@@ -114,10 +114,15 @@ function App() {
                         <Route path="/admin/analytics" element={<AdminAnalytics />} />
                         <Route path="/admin/data" element={<AdminData />} />
                         <Route path="/admin/system" element={<AdminSystem />} />
-                        <Route path="/admin/backups" element={<AdminBackups />} />
+                        {/* Backups route removed */}
                         <Route path="/admin/chat" element={<AdminChat />} />
+<<<<<<< HEAD
 
+=======
+                        {/* API routes removed */}
+>>>>>>> 1dccbd7d5ec218828c789a6cf5f15cd3c497fce6
                       </Routes>
+                      </Suspense>
                     </main>
                     
                     <ConditionalFooter />

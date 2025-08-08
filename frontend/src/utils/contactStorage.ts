@@ -38,6 +38,9 @@ class ContactStorage {
     
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('contact_submissions_updated'));
+      }
     } catch (error) {
       console.error('Error saving contact submission:', error);
     }
@@ -54,6 +57,9 @@ class ContactStorage {
       submission.status = status;
       try {
         localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('contact_submissions_updated'));
+        }
       } catch (error) {
         console.error('Error updating submission status:', error);
       }
@@ -67,6 +73,9 @@ class ContactStorage {
     
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(filtered));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('contact_submissions_updated'));
+      }
     } catch (error) {
       console.error('Error deleting submission:', error);
     }
