@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Users, Mail, Calendar, Eye, Trash2, X, Send } from 'lucide-react';
+import { ArrowLeft, Database, Users, Mail, Calendar, Eye, Trash2, X, Send, MoreVertical } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import AdminMenu from '../components/AdminMenu';
 import { contactStorage, type ContactSubmission } from '../utils/contactStorage';
@@ -31,6 +31,7 @@ const AdminData: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [replyMessage, setReplyMessage] = useState('');
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -302,7 +303,8 @@ const AdminData: React.FC = () => {
                       </div>
                       <p className="text-white/80 text-sm break-words whitespace-pre-wrap">{contact.message}</p>
                     </div>
-                    <div className="absolute right-3 top-3 sm:static sm:ml-4 flex gap-2">
+                    {/* Desktop actions */}
+                    <div className="hidden sm:flex sm:ml-4 gap-2">
                       <button
                         onClick={() => handleContactAction('view', contact.id)}
                         className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
@@ -324,6 +326,33 @@ const AdminData: React.FC = () => {
                       >
                         <Trash2 size={16} />
                       </button>
+                    </div>
+
+                    {/* Mobile kebab actions */}
+                    <div className="absolute right-2 top-2 sm:hidden">
+                      <button
+                        onClick={() => setOpenMenuId((prev) => (prev === contact.id ? null : contact.id))}
+                        className="p-2 rounded-md bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                        aria-label="More actions"
+                      >
+                        <MoreVertical size={16} />
+                      </button>
+                      {openMenuId === contact.id && (
+                        <div className="absolute right-0 mt-2 w-36 bg-white/10 border border-white/20 rounded-lg backdrop-blur-xl shadow-xl z-10">
+                          <button
+                            onClick={() => { setOpenMenuId(null); handleContactAction('view', contact.id); }}
+                            className="w-full text-left px-3 py-2 text-white/90 hover:bg-white/15 rounded-t-lg"
+                          >View</button>
+                          <button
+                            onClick={() => { setOpenMenuId(null); handleContactAction('reply', contact.id); }}
+                            className="w-full text-left px-3 py-2 text-white/90 hover:bg-white/15"
+                          >Reply</button>
+                          <button
+                            onClick={() => { setOpenMenuId(null); handleContactAction('delete', contact.id); }}
+                            className="w-full text-left px-3 py-2 text-red-300 hover:bg-white/15 rounded-b-lg"
+                          >Delete</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
