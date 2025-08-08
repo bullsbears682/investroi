@@ -716,20 +716,20 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
     ) + list([
       'Lead gen: public calculator + in-browser contact capture.',
       'Discovery: quantify value with guided inputs and presets; save/share snapshots.',
-      'Deal workflow: push ROI summary + PDF to Deals/Companies (via HubSpot integration).',
+      'Deal workflow: push ROI summary + PDF to Deals/Companies (via HubSpot app connection).',
       'Reporting: generate executive-ready PDFs for stakeholders in one click.',
       'Team usage: shared scenario templates and a small snapshot library (add minimal backend).',
       'Branding: quickly re-skin/white-label (Tailwind + componentized UI).',
-      'Marketplace: package as a HubSpot app for sales assist (OAuth + minimal APIs).',
+      'Marketplace: package as a HubSpot app for sales assist (app connection + lightweight storage).',
       'Analytics: basic usage metrics and error logs to improve conversion.',
       'Extensibility: multi-currency, localization, benchmark presets, A/B scenario compare.',
     ]);
 
     const hubspot = section(
       'What HubSpot could do with it (quick wins)',
-      'Small integration layer unlocks CRM value and a Marketplace path.'
+      'A small connection layer unlocks CRM value and a Marketplace path.'
     ) + list([
-      'OAuth + “Export to Deal”: push ROI summary and attach PDF to Deals/Companies.',
+      '“Export to Deal”: push ROI summary and attach PDF to Deals/Companies.',
       'Shareable ROI snapshots (minimal backend + auth).',
       'Workflow triggers (e.g., “ROI generated” → follow-up tasks).',
       'Marketplace-ready add-on for sales assist after basic packaging.',
@@ -751,9 +751,9 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'What it needs to succeed',
       'Light additions to turn the current front‑end into a reliable, monetizable app.'
     ) + list([
-      'Backend & database: minimal API (snapshots/share links), persistence (Redis/Supabase/Postgres).',
-      'Auth & org model: users, teams, roles; session security.',
-      'HubSpot OAuth: scopes, embedded app surface, rate limits.',
+      'Persistence: storage for snapshots/share links (Redis/Supabase/Postgres).',
+      'Users/teams: basic org model and session handling.',
+      'HubSpot app connection: scopes, embedded app surface, rate limits.',
       'Logging & metrics: error tracking and usage analytics (Sentry, Logtail, OpenTelemetry).',
       'Security & compliance: PII consent, privacy policy, data retention, cookie banner, basic DPA.',
       'Testing & CI/CD: smoke tests, e2e for core flows, automated deploys.',
@@ -766,7 +766,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Minimal implementation plan (2–3 weeks)',
       'Deliver a pilot suitable for internal use and Marketplace submission.'
     ) + list([
-      'Week 1: OAuth, Deal/Company linking, Export-to-Deal stub, snapshot schema.',
+      'Week 1: Deal/Company linking, Export-to-Deal stub, snapshot schema.',
       'Week 2: Snapshot share links, logs/metrics, error handling, basic tests.',
       'Week 3 (buffer): UI polish, packaging, Marketplace checklist.'
     ]);
@@ -777,7 +777,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
     ) + list([
       'Live demo: https://bespoke-gumdrop-1b7fc6.netlify.app/',
       'Repo: transfer on acceptance (MIT, clean of secrets, with release tag).',
-      'Status: API removed (front‑end only). Admin panel present. MIT license added.'
+      'Status: front‑end only. Admin panel present. MIT license added.'
     ]);
 
     const footer = `
