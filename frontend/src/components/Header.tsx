@@ -16,31 +16,15 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [maintenance, setMaintenance] = useState(false);
   const location = useLocation();
-  const { demoActive, demoExpiresAt, activateDemo, refreshDemoFromStorage } = useAppStore();
+  const {} = useAppStore();
 
   useEffect(() => {
     const read = () => setMaintenance(localStorage.getItem('maintenance_mode') === 'true');
     read();
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'maintenance_mode') read();
-    };
-    window.addEventListener('storage', onStorage);
     const onCustom = () => read();
     window.addEventListener('maintenanceChanged' as any, onCustom as any);
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener('maintenanceChanged' as any, onCustom as any);
-    };
+    return () => window.removeEventListener('maintenanceChanged' as any, onCustom as any);
   }, []);
-
-  useEffect(() => {
-    refreshDemoFromStorage();
-    const onDemo = () => refreshDemoFromStorage();
-    window.addEventListener('demoChanged', onDemo);
-    return () => window.removeEventListener('demoChanged', onDemo);
-  }, [refreshDemoFromStorage]);
-  const remaining = demoExpiresAt ? Math.max(0, demoExpiresAt - Date.now()) : 0;
-  const remainingHrs = Math.ceil(remaining / (60 * 60 * 1000));
 
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },
@@ -58,16 +42,6 @@ const Header: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50"
     >
-      {!demoActive && (
-        <div className="bg-indigo-900/60 backdrop-blur text-white text-xs sm:text-sm text-center py-2 border-b border-white/10">
-          <button onClick={() => activateDemo(7)} className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/20">Enable Demo (7 days)</button>
-        </div>
-      )}
-      {demoActive && (
-        <div className="bg-emerald-900/60 backdrop-blur text-white text-xs sm:text-sm text-center py-2 border-b border-white/10">
-          Demo mode active • Expires in ~{remainingHrs}h
-        </div>
-      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {maintenance && (
           <div className="text-center text-yellow-200 bg-yellow-500/10 border border-yellow-400/30 rounded-lg px-3 py-2 my-2 text-sm">

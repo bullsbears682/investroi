@@ -15,7 +15,7 @@ import { CalculatorIcon } from './icons/CustomIcons';
 
 import ExportModal from './ExportModal';
 import { getResearchBasedMarketData } from '../utils/marketResearchData';
-import { useAppStore } from '../store/appStore';
+// no demo gating
 
 
 interface ROICalculatorProps {
@@ -65,8 +65,7 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
   });
 
   const watchedValues = watch();
-  const { demoActive, activateDemo } = useAppStore();
-
+  
   const countries = [
     { code: 'US', name: 'United States', flag: '🇺🇸' },
     { code: 'UK', name: 'United Kingdom', flag: '🇬🇧' },
@@ -433,8 +432,8 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
           </motion.div>
         )}
         
-        {/* Export Report Button (Demo-gated) */}
-        {calculationResult && demoActive && (
+        {/* Export Report Button */}
+        {calculationResult && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -447,21 +446,6 @@ const ROICalculator: React.FC<ROICalculatorProps> = ({
             >
               <Download className="w-4 h-4" />
               <span>Export Report</span>
-            </button>
-          </motion.div>
-        )}
-        {calculationResult && !demoActive && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-4 flex justify-center"
-          >
-            <button
-              onClick={() => activateDemo(7)}
-              className="flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium border border-white/20 transition-all duration-200"
-            >
-              <span>Enable Demo to Export</span>
             </button>
           </motion.div>
         )}
