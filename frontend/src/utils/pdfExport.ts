@@ -747,6 +747,21 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Cross‑sell workflows: trigger sequences/tasks from “ROI generated” events to increase tool adoption.'
     ]);
 
+    const needsToSucceed = section(
+      'What it needs to succeed',
+      'Light additions to turn the current front‑end into a reliable, monetizable app.'
+    ) + list([
+      'Backend & database: minimal API (snapshots/share links), persistence (Redis/Supabase/Postgres).',
+      'Auth & org model: users, teams, roles; session security.',
+      'HubSpot OAuth: scopes, embedded app surface, rate limits.',
+      'Logging & metrics: error tracking and usage analytics (Sentry, Logtail, OpenTelemetry).',
+      'Security & compliance: PII consent, privacy policy, data retention, cookie banner, basic DPA.',
+      'Testing & CI/CD: smoke tests, e2e for core flows, automated deploys.',
+      'Packaging: HubSpot Marketplace checklist, app listing, screenshots, docs.',
+      'Performance & UX: code‑split bundles, accessibility (WCAG), mobile polish.',
+      'Optional billing: Stripe for subscriptions/credits if sold standalone.'
+    ]);
+
     const plan = section(
       'Minimal implementation plan (2–3 weeks)',
       'Deliver a pilot suitable for internal use and Marketplace submission.'
@@ -781,6 +796,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
         ${appCouldDo}
         ${hubspot}
         ${monetization}
+        ${needsToSucceed}
         ${plan}
         ${links}
         ${footer}
