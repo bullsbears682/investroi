@@ -711,6 +711,21 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Extend with templates per ICP (SaaS, services, e‑comm).',
     ]);
 
+    const appCouldDo = section(
+      'What the app could do (end‑to‑end)',
+      'Combining current capabilities with light additions enables a full sales-assist flow from lead to closed-won.'
+    ) + list([
+      'Lead gen: public calculator + in-browser contact capture (no backend needed to demo).',
+      'Discovery: quantify value with guided inputs and presets; save/share snapshots.',
+      'Deal workflow: push ROI summary + PDF to Deals/Companies (HubSpot integration).',
+      'Reporting: generate executive-ready PDFs for stakeholders in one click.',
+      'Team usage: shared scenario templates and a small snapshot library (minimal backend).',
+      'Branding: quickly re-skin/white-label (Tailwind + componentized UI).',
+      'Marketplace: package as a HubSpot app for sales assist (OAuth + minimal APIs).',
+      'Analytics: basic usage metrics and error logs to improve conversion.',
+      'Extensibility: multi-currency, localization, benchmark presets, A/B scenario compare.',
+    ]);
+
     const hubspot = section(
       'What HubSpot could do with it (quick wins)',
       'Small integration layer unlocks CRM value and a Marketplace path.'
@@ -751,6 +766,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
         ${repoDoes}
         ${demoAndDeploy}
         ${potential}
+        ${appCouldDo}
         ${hubspot}
         ${plan}
         ${links}
