@@ -4,7 +4,8 @@ exports.handler = async function (event) {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: utils.corsHeaders() };
   }
-  if (event.httpMethod !== 'POST') return utils.methodNotAllowed();
+  if (event.httpMethod !== 'POST' && event.httpMethod !== 'GET') return utils.methodNotAllowed();
+
   const auth = await utils.validateAndRateLimit(event);
   if (!auth.ok) {
     if (auth.status === 401) return utils.unauthorized('Invalid API key');
@@ -12,8 +13,21 @@ exports.handler = async function (event) {
     return utils.unauthorized('Unauthorized');
   }
 
-  const body = utils.parseBody(event);
-  if (!body) return utils.badRequest('Invalid JSON');
+  let body = null;
+  if (event.httpMethod === 'POST') {
+    body = utils.parseBody(event);
+    if (!body) return utils.badRequest('Invalid JSON');
+  } else {
+    // GET: parse from query string
+    const params = new URLSearchParams(event.rawQuery || event.queryStringParameters ? '' : '');
+    // Fallback to event.queryStringParameters
+    const q = event.queryStringParameters || {};
+    body = {
+      initialInvestment: Number(q.initialInvestment || 0),
+      additionalCosts: Number(q.additionalCosts || 0),
+      countryCode: q.countryCode || 'US',
+    };
+  }
 
   const initialInvestment = Number(body.initialInvestment || 0);
   const additionalCosts = Number(body.additionalCosts || 0);
@@ -23,7 +37,6 @@ exports.handler = async function (event) {
     return utils.badRequest('Values must be non-negative');
   }
 
-  // Simple ROI demo: assume 25% return on initial investment
   const returns = Math.round(initialInvestment * 0.25);
   const totalValue = Math.round(initialInvestment + additionalCosts + returns);
   const roi = 25.0;
