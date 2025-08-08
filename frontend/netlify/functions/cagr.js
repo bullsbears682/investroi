@@ -5,11 +5,12 @@ exports.handler = async function (event) {
     return { statusCode: 204, headers: utils.corsHeaders() };
   }
   if (event.httpMethod !== 'POST') return utils.methodNotAllowed();
-  if (!utils.allowRate(event)) return utils.tooMany();
-
-  const key = utils.extractApiKey(event);
-  const auth = utils.validateApiKeyOrAllowDemo(key);
-  if (!auth.ok) return utils.unauthorized('Invalid API key');
+  const auth = await utils.validateAndRateLimit(event);
+  if (!auth.ok) {
+    if (auth.status === 401) return utils.unauthorized('Invalid API key');
+    if (auth.status === 429) return utils.tooMany(auth.remaining);
+    return utils.unauthorized('Unauthorized');
+  }
 
   const body = utils.parseBody(event);
   if (!body) return utils.badRequest('Invalid JSON');
@@ -28,5 +29,5 @@ exports.handler = async function (event) {
     cagr: Math.round(cagr * 10000) / 10000,
     inputs: { beginningValue, endingValue, years },
     meta: { authMode: auth.mode, function: 'cagr', servedBy: 'netlify' },
-  });
+  }, auth.remaining);
 };
