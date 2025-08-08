@@ -91,13 +91,13 @@ const ContactPage: React.FC = () => {
   const officeInfo = [
     {
       icon: MapPin,
-      title: 'Global HQ',
-      description: '350 Mission St, San Francisco, CA 94105'
+      title: 'Remote-first',
+      description: 'We operate globally with no physical office'
     },
     {
       icon: Clock,
-      title: 'Support Hours',
-      description: 'Monday - Sunday: 8:00 AM - 8:00 PM (local time)'
+      title: 'Support Availability',
+      description: '24/7 email support; live chat Mon–Fri 9:00–18:00 UTC'
     }
   ];
 
