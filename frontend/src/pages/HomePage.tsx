@@ -11,7 +11,6 @@ import {
   TargetIcon, 
   ShieldIcon 
 } from '../components/icons/CustomIcons';
-import { generateHubspotPitchPDF } from '../utils/pdfExport';
 
 const HomePage: React.FC = () => {
   const features = [
@@ -121,14 +120,7 @@ const HomePage: React.FC = () => {
                 </motion.button>
               </Link>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => generateHubspotPitchPDF()}
-                className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-semibold text-lg border border-white/20 transition-all"
-              >
-                Download HubSpot Pitch (PDF)
-              </motion.button>
+              
             </motion.div>
           </div>
         </div>
