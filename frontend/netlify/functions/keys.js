@@ -17,15 +17,8 @@ exports.handler = async function (event) {
   const last = segments[segments.length - 1];
 
   if (event.httpMethod === 'GET') {
-    // For Upstash: list is not straightforward; require client to know keys
-    // For demo, return memory keys only
-    if (store.hasUpstash) {
-      return utils.ok({ note: 'Listing keys requires separate key index; not implemented for Upstash. Use create/delete by known key.' }, auth.remaining);
-    }
-    const data = [];
-    for (const [apiKey, rec] of store.__proto__ && store.__proto__.constructor.name ? [] : []) {}
-    // Memory fallback: not directly accessible; we cannot reliably list without exposing internals
-    return utils.ok([], auth.remaining);
+    const list = await store.listKeys();
+    return utils.ok(list, auth.remaining);
   }
 
   if (event.httpMethod === 'POST') {
@@ -46,19 +39,7 @@ exports.handler = async function (event) {
     // DELETE /.netlify/functions/keys/:apiKey
     const apiKey = segments[segments.length - 1] !== 'keys' ? decodeURIComponent(last) : null;
     if (!apiKey) return utils.badRequest('Missing apiKey');
-    if (store.hasUpstash) {
-      // Delete record
-      try {
-        const key = `api:keys:${apiKey}`;
-        const url = `${process.env.UPSTASH_REDIS_REST_URL}/del/${encodeURIComponent(key)}`;
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}` } });
-        if (!res.ok) throw new Error('Failed');
-      } catch (e) {
-        return utils.badRequest('Delete failed');
-      }
-      return utils.ok({ deleted: true, apiKey }, auth.remaining);
-    }
-    // Memory: not maintained - nothing to do
+    await store.deleteKeyRecord(apiKey);
     return utils.ok({ deleted: true, apiKey }, auth.remaining);
   }
 

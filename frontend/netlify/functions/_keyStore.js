@@ -1,10 +1,13 @@
 const hasUpstash = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 
 const MEM = {
-  keys: new Map(), // apiKey -> { active, name, created }
+  keys: new Map(), // apiKey -> { active, name, created, limitPerMinute }
+  keyIndex: new Set(),
   usageTotal: new Map(), // apiKey -> number
   rateBuckets: new Map(), // apiKey+window -> count
 };
+
+const KEY_INDEX = 'api:keys:index';
 
 async function upstashFetch(path, method = 'GET', body) {
   const url = `${process.env.UPSTASH_REDIS_REST_URL}${path}`;
@@ -41,10 +44,38 @@ async function putKeyRecord(apiKey, record) {
   if (hasUpstash) {
     const key = `api:keys:${apiKey}`;
     await upstashFetch('/set', 'POST', { key, value: JSON.stringify(record) });
+    await upstashFetch(`/sadd/${encodeURIComponent(KEY_INDEX)}/${encodeURIComponent(apiKey)}`);
     return true;
   }
   MEM.keys.set(apiKey, record);
+  MEM.keyIndex.add(apiKey);
   return true;
+}
+
+async function deleteKeyRecord(apiKey) {
+  if (hasUpstash) {
+    const key = `api:keys:${apiKey}`;
+    await upstashFetch(`/del/${encodeURIComponent(key)}`);
+    await upstashFetch('/srem', 'POST', { key: KEY_INDEX, member: apiKey });
+    return true;
+  }
+  MEM.keys.delete(apiKey);
+  MEM.keyIndex.delete(apiKey);
+  return true;
+}
+
+async function listKeys() {
+  if (hasUpstash) {
+    const r = await upstashFetch(`/smembers/${encodeURIComponent(KEY_INDEX)}`);
+    const keys = Array.isArray(r.result) ? r.result : [];
+    const out = [];
+    for (const apiKey of keys) {
+      const rec = await getKeyRecord(apiKey);
+      if (rec) out.push({ apiKey, ...rec });
+    }
+    return out;
+  }
+  return Array.from(MEM.keyIndex).map((apiKey) => ({ apiKey, ...(MEM.keys.get(apiKey) || {}) }));
 }
 
 async function incrementUsage(apiKey) {
@@ -79,6 +110,8 @@ async function rateLimitCheckAndIncr(apiKey, limitPerMinute) {
 module.exports = {
   getKeyRecord,
   putKeyRecord,
+  deleteKeyRecord,
+  listKeys,
   incrementUsage,
   rateLimitCheckAndIncr,
   hasUpstash,
