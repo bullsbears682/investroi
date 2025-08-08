@@ -29,13 +29,6 @@ const TermsPage = lazy(() => import('./pages/TermsPage'));
 import ChatButton from './components/ChatButton';
 import CookieConsent from './components/CookieConsent';
 import NotificationWrapper from './components/NotificationWrapper';
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
-const AdminData = lazy(() => import('./pages/AdminData'));
-const AdminSystem = lazy(() => import('./pages/AdminSystem'));
-const AdminChat = lazy(() => import('./pages/AdminChat'));
-// API pages removed
-
 
 // Store
 import { useAppStore } from './store/appStore';
@@ -111,13 +104,7 @@ function App() {
                         <Route path="/privacy" element={<PrivacyPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/terms" element={<TermsPage />} />
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                        <Route path="/admin/data" element={<AdminData />} />
-                        <Route path="/admin/system" element={<AdminSystem />} />
-                        {/* Backups route removed */}
-                        <Route path="/admin/chat" element={<AdminChat />} />
-                        {/* API routes removed */}
+                        {/* Admin routes removed */}
                       </Routes>
                       </Suspense>
                     </main>
