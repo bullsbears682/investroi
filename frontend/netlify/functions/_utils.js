@@ -69,7 +69,16 @@ function extractApiKey(event) {
 }
 
 async function validateAndRateLimit(event, defaultLimit = LIMIT_PER_WINDOW) {
-  const key = extractApiKey(event);
+  let key = extractApiKey(event);
+  // If no Authorization header, allow ?apiKey=... in query or apiKey in POST body for convenience (mobile/testing)
+  if (!key) {
+    const q = event.queryStringParameters || {};
+    if (q.apiKey) key = q.apiKey;
+    if (!key && event.httpMethod === 'POST') {
+      const b = parseBody(event);
+      if (b && typeof b.apiKey === 'string') key = b.apiKey;
+    }
+  }
 
   // Demo mode: no key provided, allow but apply IP-based limit
   if (!key) {
