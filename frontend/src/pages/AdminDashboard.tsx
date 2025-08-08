@@ -401,9 +401,9 @@ const AdminDashboard: React.FC = () => {
               <h3 className="text-white font-semibold mb-3">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-3">
                 <Link to="/admin/data" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Manage Users</Link>
-                <Link to="/admin/backups" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Create Backup</Link>
                 <Link to="/admin/chat" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Open Chat</Link>
                 <Link to="/api-key" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">API Keys</Link>
+                <Link to="/admin/backups" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Backups</Link>
               </div>
             </div>
           </div>
