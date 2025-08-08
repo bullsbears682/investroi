@@ -50,27 +50,41 @@ const ApiPage: React.FC = () => {
         const json = await res.json();
         setResponseJson({ status: res.status, ok: res.ok, body: json });
       } else {
-        // Mocked fallback for demo
-        const totalValue = payload.initialInvestment + payload.additionalCosts + (payload.initialInvestment * 0.25);
-        const roi = 25.0;
-        await new Promise(r => setTimeout(r, 600));
-        setResponseJson({
-          status: 200,
-          ok: true,
-          body: {
-            success: true,
-            data: {
-              totalValue: Math.round(totalValue),
-              roi,
-              breakdown: {
-                initialInvestment: payload.initialInvestment,
-                additionalCosts: payload.additionalCosts,
-                returns: Math.round(payload.initialInvestment * 0.25)
-              }
+        // Try Netlify Function first
+        try {
+          const res = await fetch('/.netlify/functions/roi', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(form.apiKey ? { Authorization: `Bearer ${form.apiKey}` } : {}),
             },
-            mocked: true
-          }
-        });
+            body: JSON.stringify(payload),
+          });
+          const json = await res.json();
+          setResponseJson({ status: res.status, ok: res.ok, body: json, via: 'netlify-functions' });
+        } catch (fnErr) {
+          // Fallback mocked response
+          const totalValue = payload.initialInvestment + payload.additionalCosts + (payload.initialInvestment * 0.25);
+          const roi = 25.0;
+          await new Promise(r => setTimeout(r, 600));
+          setResponseJson({
+            status: 200,
+            ok: true,
+            body: {
+              success: true,
+              data: {
+                totalValue: Math.round(totalValue),
+                roi,
+                breakdown: {
+                  initialInvestment: payload.initialInvestment,
+                  additionalCosts: payload.additionalCosts,
+                  returns: Math.round(payload.initialInvestment * 0.25)
+                }
+              },
+              mocked: true
+            }
+          });
+        }
       }
     } catch (err: any) {
       setResponseJson({ status: 0, ok: false, error: err?.message || String(err) });
@@ -329,43 +343,32 @@ function MyComponent() {
                 <h2 className="text-2xl font-bold text-white mb-4">API Documentation</h2>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-white font-semibold mb-2">Base URL</h3>
-                    <code className="bg-white/10 px-3 py-2 rounded text-blue-400">https://api.investwisepro.com/v1</code>
-                    <p className="text-white/60 text-sm mt-1">Ready to use - Get your API key from the dashboard</p>
+                    <h3 className="text-white font-semibold mb-2">Base URLs</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-white/60 text-sm mb-1">External API (production)</p>
+                        <code className="bg-white/10 px-3 py-2 rounded text-blue-400">https://api.investwisepro.com/v1</code>
+                      </div>
+                      <div>
+                        <p className="text-white/60 text-sm mb-1">On this site (Netlify Functions)</p>
+                        <code className="bg-white/10 px-3 py-2 rounded text-blue-400">/.netlify/functions</code>
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <h3 className="text-white font-semibold mb-2">Authentication</h3>
-                    <p className="text-white/60 mb-2">API key authentication (free tier available):</p>
-                    <code className="bg-white/10 px-3 py-2 rounded text-blue-400">Authorization: Bearer your-api-key</code>
-                    <p className="text-white/60 text-sm mt-1">Request your API key via live chat or contact form</p>
+                    <p className="text-white/60 mb-2">API key via Bearer token:</p>
+                    <code className="bg-white/10 px-3 py-2 rounded text-blue-400">Authorization: Bearer iw_...</code>
+                    <p className="text-white/60 text-sm mt-1">Demo accepts no key or any key prefixed with <code className="bg-white/10 px-1 rounded">iw_</code>.</p>
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold mb-2">Calculate ROI</h3>
-                    <p className="text-white/60 mb-2">POST /calculator/roi</p>
-                    <div className="bg-white/10 rounded-lg p-4">
-                      <h4 className="text-white font-medium mb-2">Request Body:</h4>
-                      <pre className="text-sm text-white/80 overflow-x-auto">
-{`{
-  "initialInvestment": 10000,
-  "additionalCosts": 500,
-  "countryCode": "US"
-}`}
-                      </pre>
-                      <h4 className="text-white font-medium mb-2 mt-4">Response:</h4>
-                      <pre className="text-sm text-white/80 overflow-x-auto">
-{`{
-  "success": true,
-  "data": {
-    "totalValue": 12500,
-    "roi": 25.0,
-    "breakdown": {
-      "initialInvestment": 10000,
-      "additionalCosts": 500,
-      "returns": 2000
-    }
-  }
-}`}
-                      </pre>
+                    <h3 className="text-white font-semibold mb-2">Interactive Docs</h3>
+                    <div className="rounded-lg overflow-hidden border border-white/10">
+                      <iframe
+                        title="OpenAPI Docs"
+                        src={`https://redocly.github.io/redoc/?url=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin + '/openapi.json') : ''}`}
+                        className="w-full h-[600px] bg-white"
+                      />
                     </div>
                   </div>
                 </div>
@@ -500,7 +503,7 @@ function MyComponent() {
 {responseJson ? JSON.stringify(responseJson, null, 2) : '// Fill the form and click Calculate ROI'}
                     </pre>
                     {!((import.meta as any)?.env?.VITE_API_BASE_URL) && (
-                      <p className="text-white/50 text-xs mt-2">Note: Using mocked response. Set VITE_API_BASE_URL to call your live API.</p>
+                      <p className="text-white/50 text-xs mt-2">Note: Using Netlify Function if available, otherwise a mocked response.</p>
                     )}
                   </div>
                 </div>
