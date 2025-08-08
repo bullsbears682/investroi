@@ -156,11 +156,20 @@ const AdminDashboard: React.FC = () => {
         setLastUpdatedAt(Date.now());
       }
     };
+
+    const onContactsUpdated = () => {
+      loadSummary();
+      loadRecentMessages();
+      setLastUpdatedAt(Date.now());
+    };
+
     window.addEventListener('storage', onStorage);
+    window.addEventListener('contact_submissions_updated', onContactsUpdated as EventListener);
     const onCustom = () => setIsMaintenance(localStorage.getItem('maintenance_mode') === 'true');
     window.addEventListener('maintenanceChanged' as any, onCustom as any);
     return () => {
       window.removeEventListener('storage', onStorage);
+      window.removeEventListener('contact_submissions_updated', onContactsUpdated as EventListener);
       window.removeEventListener('maintenanceChanged' as any, onCustom as any);
     };
   }, []);
