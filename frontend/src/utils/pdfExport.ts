@@ -631,3 +631,129 @@ export const generateAdminAnalyticsPDF = async (data: AdminAnalyticsPDFData): Pr
     throw new Error('Failed to generate Admin Analytics PDF');
   }
 };
+
+export const generateHubspotPitchPDF = async (): Promise<void> => {
+  try {
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '800px';
+    container.style.background = '#0b1020';
+    container.style.color = '#fff';
+    container.style.fontFamily = 'Arial, sans-serif';
+    container.style.padding = '40px';
+    container.style.borderRadius = '16px';
+
+    const section = (title: string, body: string) => `
+      <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+        <h2 style="margin:0 0 10px 0; font-size:18px; color:#e5e7eb;">${title}</h2>
+        <p style="margin:0; font-size:13px; color:#cbd5e1; line-height:1.6;">${body}</p>
+      </div>
+    `;
+
+    const list = (items: string[]) => `
+      <ul style="margin: 8px 0 0 18px; padding:0; color:#cbd5e1; font-size:13px;">
+        ${items.map(i => `<li style="margin:6px 0;">${i}</li>`).join('')}
+      </ul>
+    `;
+
+    const header = `
+      <div style="text-align:center; margin-bottom:24px; border-bottom:2px solid #6366f1; padding-bottom:16px;">
+        <h1 style="margin:0; font-size:28px; color:#fff;">InvestWise Pro — ROI Calculator</h1>
+        <p style="margin:6px 0 0 0; color:#a5b4fc; font-size:14px;">HubSpot Pitch — Generated ${new Date().toLocaleString()}</p>
+      </div>
+    `;
+
+    const capabilities = section(
+      'What it does today',
+      [
+        'Fast ROI calculator with guided inputs and scenario presets.',
+        'Polished PDF export (enable Demo in-app to try export).',
+        'Modern, responsive UI with smooth interactions.',
+        'Front-end only: data stored locally (no backend).',
+        'Tech: React + Vite + TypeScript + Tailwind (Netlify-ready, MIT-licensed).'
+      ].join(' ')
+    ) + list([
+      'ROI %, Net profit, after-tax figures, investment breakdown',
+      'Contact capture and activity (localStorage)',
+      'Demo mode toggle (7 days) for gated features like PDF export',
+    ]);
+
+    const potential = section(
+      'Product potential',
+      'A lightweight, embeddable ROI module for sales teams to quantify value quickly, share clean summaries, and keep momentum during discovery.'
+    ) + list([
+      'Use as a standalone lead-gen tool (public calculator).',
+      'Embed in sales workflows to standardize discovery quantification.',
+      'Extend with templates per ICP (SaaS, services, e‑comm).',
+    ]);
+
+    const hubspot = section(
+      'What HubSpot could do with it (quick wins)',
+      'Small integration layer unlocks CRM value and a Marketplace path.'
+    ) + list([
+      'OAuth + “Export to Deal”: push ROI summary and attach PDF to Deals/Companies.',
+      'Shareable ROI snapshots (minimal backend + auth).',
+      'Workflow triggers (e.g., “ROI generated” → follow-up tasks).',
+      'Marketplace-ready add-on for sales assist after basic packaging.',
+    ]);
+
+    const plan = section(
+      'Minimal implementation plan (2–3 weeks)',
+      'Deliver a pilot suitable for internal use and Marketplace submission.'
+    ) + list([
+      'Week 1: OAuth, Deal/Company linking, Export-to-Deal stub, snapshot schema.',
+      'Week 2: Snapshot share links, logs/metrics, error handling, basic tests.',
+      'Week 3 (buffer): UI polish, packaging, Marketplace checklist.'
+    ]);
+
+    const footer = `
+      <div style="text-align:center; margin-top:20px; padding-top:12px; border-top:2px solid #6366f1;">
+        <p style="margin:0; color:#94a3b8; font-size:12px;">Codebase is MIT-licensed with third‑party notices. Front-end only; easy to integrate.</p>
+      </div>
+    `;
+
+    container.innerHTML = `
+      <div style="max-width:800px; margin:0 auto;">
+        ${header}
+        ${capabilities}
+        ${potential}
+        ${hubspot}
+        ${plan}
+        ${footer}
+      </div>
+    `;
+
+    document.body.appendChild(container);
+    const canvas = await html2canvas(container, {
+      backgroundColor: '#0b1020',
+      scale: Math.min(3, (window.devicePixelRatio || 2)),
+      useCORS: true,
+      allowTaint: true,
+      width: 800,
+      height: container.scrollHeight,
+    });
+    document.body.removeChild(container);
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+    pdf.save(`InvestWisePro_HubSpot_Pitch_${new Date().toISOString().split('T')[0]}.pdf`);
+  } catch (e) {
+    console.error('Error generating HubSpot pitch PDF', e);
+    throw e;
+  }
+};
