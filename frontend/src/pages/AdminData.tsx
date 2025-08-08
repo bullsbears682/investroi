@@ -181,7 +181,7 @@ const AdminData: React.FC = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
         {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-white/10 backdrop-blur-xl rounded-xl p-1 mb-8">
+        <div className="flex space-x-1 bg-white/10 backdrop-blur-xl rounded-xl p-1 mb-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab('users')}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
@@ -275,8 +275,8 @@ const AdminData: React.FC = () => {
             <div className="space-y-4">
               {contacts.map((contact) => (
                 <div key={contact.id} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-3 mb-2">
                         <h4 className="text-white font-medium">{contact.name}</h4>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -289,10 +289,10 @@ const AdminData: React.FC = () => {
                           {contact.status}
                         </span>
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-white/60 mb-2">
-                        <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-4 text-sm text-white/60 mb-2 min-w-0">
+                        <div className="flex items-center space-x-1 min-w-0">
                           <Mail size={14} />
-                          <span>{contact.email}</span>
+                          <span className="truncate max-w-[55vw] sm:max-w-none">{contact.email}</span>
                         </div>
                         {/* phone not captured in form; omitted intentionally */}
                         <div className="flex items-center space-x-1">
@@ -300,7 +300,7 @@ const AdminData: React.FC = () => {
                           <span>{new Date(contact.date || contact.timestamp).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <p className="text-white/80 text-sm">{contact.message}</p>
+                      <p className="text-white/80 text-sm break-words whitespace-pre-wrap">{contact.message}</p>
                     </div>
                     <div className="flex space-x-2 ml-4">
                       <button
