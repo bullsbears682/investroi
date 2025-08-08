@@ -9,7 +9,6 @@ import Logo from '../components/Logo';
 import AdminMenu from '../components/AdminMenu';
 import { 
   ArrowLeftIcon,
-  UsersIcon,
   AnalyticsIcon,
   DownloadIcon,
   ShieldIcon,
@@ -40,8 +39,6 @@ interface ActivityItem {
   color: string;
 }
 
-
-
 const AdminDashboard: React.FC = () => {
   const [adminStats, setAdminStats] = useState<Analytics>({
     totalUsers: 0,
@@ -55,9 +52,7 @@ const AdminDashboard: React.FC = () => {
     bounceRate: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [showContactSubmissions, setShowContactSubmissions] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
   const { addNotification } = useNotifications();
@@ -158,12 +153,13 @@ const AdminDashboard: React.FC = () => {
       if (storedBackups) {
         const backups = JSON.parse(storedBackups);
         const recentBackups = backups
-          .filter((backup: any) => backup.timestamp > now - 7 * 24 * 60 * 60 * 1000)
+          .filter((backup: any) => new Date(backup.createdAt) > new Date(now - 7 * 24 * 60 * 60 * 1000))
           .map((backup: any) => ({
-            id: `backup-${backup.backupId}`,
+            id: `backup-${backup.id}`,
             type: 'backup' as const,
-            description: `System backup completed`,
-            timestamp: backup.timestamp,
+            description: `Database backup created: ${backup.name}`,
+            timestamp: new Date(backup.createdAt).getTime(),
+            user: 'System',
             color: 'bg-orange-400'
           }))
           .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
@@ -172,18 +168,13 @@ const AdminDashboard: React.FC = () => {
         activities.push(...recentBackups);
       }
 
-      // Sort by timestamp (most recent first) and take top 8
-      const sortedActivities = activities
-        .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
-        .slice(0, 8);
-
-      setRecentActivity(sortedActivities);
+      // Sort all activities by timestamp
+      activities.sort((a, b) => b.timestamp - a.timestamp);
+      setRecentActivity(activities.slice(0, 10));
     } catch (error) {
       console.error('Failed to load recent activity:', error);
     }
   };
-
-
 
   // Load contact submissions
   const loadContactSubmissions = () => {
@@ -194,10 +185,6 @@ const AdminDashboard: React.FC = () => {
       console.error('Failed to load contact submissions:', error);
     }
   };
-
-
-
-
 
   // Update contact submission status
   const updateContactStatus = (id: string, status: 'new' | 'read' | 'replied') => {
@@ -223,15 +210,19 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Handle action buttons
+  // Export data function
   const handleExportData = () => {
     try {
+      const allUsers = userManager.getAllUsers();
+      const allContacts = contactStorage.getSubmissions();
+      const allSessions = chatSystem.getAllSessions();
+      
       const exportData = {
-        users: userManager.getAllUsers(),
-        contacts: contactStorage.getSubmissions(),
-        chats: chatSystem.getAllSessions(),
-        analytics: adminStats,
-        exportDate: new Date().toISOString(),
+        users: allUsers,
+        contacts: allContacts,
+        sessions: allSessions,
+        stats: adminStats,
+        exportDate: new Date().toISOString()
       };
 
       const dataStr = JSON.stringify(exportData, null, 2);
@@ -239,7 +230,7 @@ const AdminDashboard: React.FC = () => {
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `investwise-pro-data-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `admin-export-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -247,52 +238,38 @@ const AdminDashboard: React.FC = () => {
 
       addNotification({
         type: 'success',
-        title: 'Data Exported Successfully',
-        message: 'All data has been exported to JSON file',
-        redirectTo: '/admin/data',
-        redirectLabel: 'View Data'
+        title: 'Export Complete',
+        message: 'All data has been exported successfully'
       });
     } catch (error) {
       console.error('Export failed:', error);
       addNotification({
         type: 'error',
         title: 'Export Failed',
-        message: 'Failed to export data'
+        message: 'Failed to export data. Please try again.'
       });
     }
   };
 
+  // System health function
   const handleSystemHealth = () => {
     try {
-      // Get real system health data
-      const performance = window.performance;
-      const memory = (performance as any).memory;
-      const connection = (navigator as any).connection;
-      
-      const systemHealth = {
+      const healthData = {
         timestamp: new Date().toISOString(),
+        systemStatus: 'healthy',
         performance: {
-          loadTime: (performance.getEntriesByType('navigation')[0] as any)?.loadEventEnd || 0,
-          domContentLoaded: (performance.getEntriesByType('navigation')[0] as any)?.domContentLoadedEventEnd || 0,
-          firstPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime || 0,
+          memoryUsage: (performance as any).memory ? Math.round((performance as any).memory.usedJSHeapSize / 1024 / 1024) : 'N/A',
+          loadTime: Math.round(performance.timing.loadEventEnd - performance.timing.navigationStart),
+          userAgent: navigator.userAgent
         },
-        memory: memory ? {
-          used: Math.round(memory.usedJSHeapSize / 1024 / 1024),
-          total: Math.round(memory.totalJSHeapSize / 1024 / 1024),
-          limit: Math.round(memory.jsHeapSizeLimit / 1024 / 1024),
-        } : null,
-        connection: connection ? {
-          effectiveType: connection.effectiveType,
-          downlink: connection.downlink,
-          rtt: connection.rtt,
-        } : null,
-        localStorage: {
-          used: Math.round(new Blob([JSON.stringify(localStorage)]).size / 1024),
-          items: Object.keys(localStorage).length,
-        }
+        storage: {
+          localStorage: localStorage.length,
+          sessionStorage: sessionStorage.length
+        },
+        stats: adminStats
       };
 
-      const dataStr = JSON.stringify(systemHealth, null, 2);
+      const dataStr = JSON.stringify(healthData, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
@@ -305,117 +282,60 @@ const AdminDashboard: React.FC = () => {
 
       addNotification({
         type: 'success',
-        title: 'System Health Report Generated',
-        message: 'System health data has been exported',
-        redirectTo: '/admin/system',
-        redirectLabel: 'View System'
+        title: 'Health Report Generated',
+        message: 'System health report has been downloaded'
       });
     } catch (error) {
-      console.error('System health report failed:', error);
+      console.error('Health check failed:', error);
       addNotification({
         type: 'error',
-        title: 'System Health Report Failed',
-        message: 'Failed to generate system health report'
+        title: 'Health Check Failed',
+        message: 'Failed to generate health report'
       });
     }
   };
 
+  // Backup database function
   const handleBackupDatabase = () => {
     try {
-      const backupId = `backup-${Date.now()}`;
+      const allUsers = userManager.getAllUsers();
+      const allContacts = contactStorage.getSubmissions();
+      const allSessions = chatSystem.getAllSessions();
+      
       const backupData = {
-        backupId,
-        timestamp: Date.now(),
-        data: {
-          users: userManager.getAllUsers(),
-          contacts: contactStorage.getSubmissions(),
-          chats: chatSystem.getAllSessions(),
-          analytics: adminStats,
-        }
+        users: allUsers,
+        contacts: allContacts,
+        sessions: allSessions,
+        stats: adminStats,
+        backupDate: new Date().toISOString(),
+        version: '1.0.0'
       };
 
-      // Simulate compression and encryption
-      const jsonString = JSON.stringify(backupData);
-      const compressedSize = jsonString.length;
-      const originalSize = jsonString.length * 1.2; // Simulate compression
-      const compressionRatio = Math.round((1 - compressedSize / originalSize) * 100);
+      // Store backup in localStorage
+      const backups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
+      const newBackup = {
+        id: `backup_${Date.now()}`,
+        name: `Backup_${new Date().toISOString().split('T')[0]}_${new Date().toISOString().split('T')[1].split('.')[0]}`,
+        data: backupData,
+        createdAt: new Date().toISOString(),
+        size: JSON.stringify(backupData).length
+      };
       
-      // Simulate encryption (base64 encoding)
-      const encrypted = btoa(jsonString);
-      
-      // Generate checksum
-      let checksum = 0;
-      for (let i = 0; i < encrypted.length; i++) {
-        checksum += encrypted.charCodeAt(i);
+      backups.unshift(newBackup);
+      // Keep only last 10 backups
+      if (backups.length > 10) {
+        backups.splice(10);
       }
-      checksum = checksum % 1000000;
+      
+      localStorage.setItem('databaseBackups', JSON.stringify(backups));
 
-      const backup = {
-        ...backupData,
-        metadata: {
-          size: compressedSize,
-          originalSize: Math.round(originalSize),
-          compressionRatio,
-          encrypted: true,
-          checksum: checksum.toString().padStart(6, '0'),
-          version: '1.0'
-        }
-      };
-
-      // Store backup
-      const existingBackups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
-      existingBackups.unshift(backup);
-      localStorage.setItem('databaseBackups', JSON.stringify(existingBackups.slice(0, 10))); // Keep last 10
-
-      addNotification({
-        type: 'success',
-        title: 'Database Backup Created',
-        message: `Backup completed with ${compressionRatio}% compression`,
-        redirectTo: '/admin/backups',
-        redirectLabel: 'View Backups'
-      });
-    } catch (error) {
-      console.error('Backup failed:', error);
-      addNotification({
-        type: 'error',
-        title: 'Backup Failed',
-        message: 'Failed to create database backup'
-      });
-    }
-  };
-
-  const handleGenerateReport = () => {
-    try {
-      const reportData = {
-        title: 'InvestWise Pro Analytics Report',
-        generatedAt: new Date().toISOString(),
-        period: 'Last 30 Days',
-        summary: {
-          totalUsers: adminStats.totalUsers,
-          activeUsers: adminStats.activeUsers,
-          totalCalculations: adminStats.totalCalculations,
-          totalExports: adminStats.totalExports,
-          userEngagement: adminStats.totalCalculations + adminStats.totalExports,
-          growthRate: adminStats.growthRate,
-          monthlyGrowth: adminStats.monthlyGrowth,
-          conversionRate: adminStats.conversionRate,
-          averageSessionTime: adminStats.averageSessionTime,
-          bounceRate: adminStats.bounceRate,
-        },
-        analytics: {
-          userGrowth: `${adminStats.growthRate.toFixed(1)}%`,
-          engagement: `${adminStats.averageSessionTime} actions per user`,
-          retention: `${(100 - adminStats.bounceRate).toFixed(1)}%`,
-          conversion: `${adminStats.conversionRate.toFixed(1)}%`,
-        }
-      };
-
-      const dataStr = JSON.stringify(reportData, null, 2);
+      // Download backup file
+      const dataStr = JSON.stringify(backupData, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `${newBackup.name}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -423,17 +343,70 @@ const AdminDashboard: React.FC = () => {
 
       addNotification({
         type: 'success',
-        title: 'Analytics Report Generated',
-        message: 'Comprehensive analytics report has been created',
-        redirectTo: '/admin/analytics',
-        redirectLabel: 'View Analytics'
+        title: 'Backup Complete',
+        message: 'Database has been backed up successfully'
+      });
+    } catch (error) {
+      console.error('Backup failed:', error);
+      addNotification({
+        type: 'error',
+        title: 'Backup Failed',
+        message: 'Failed to create backup. Please try again.'
+      });
+    }
+  };
+
+  // Generate report function
+  const handleGenerateReport = () => {
+    try {
+      const reportData = {
+        title: 'Admin Dashboard Report',
+        generatedAt: new Date().toISOString(),
+        period: 'Last 30 days',
+        summary: {
+          totalUsers: adminStats.totalUsers,
+          activeUsers: adminStats.activeUsers,
+          growthRate: `${adminStats.growthRate.toFixed(1)}%`,
+          totalCalculations: adminStats.totalCalculations,
+          totalExports: adminStats.totalExports
+        },
+        details: {
+          userGrowth: adminStats.monthlyGrowth,
+          conversionRate: `${adminStats.conversionRate.toFixed(1)}%`,
+          averageSessionTime: `${adminStats.averageSessionTime} minutes`,
+          bounceRate: `${adminStats.bounceRate}%`
+        },
+        recentActivity: recentActivity.slice(0, 5),
+        recommendations: [
+          'Consider implementing user onboarding improvements',
+          'Monitor conversion rate trends',
+          'Optimize for mobile users',
+          'Review user engagement metrics'
+        ]
+      };
+
+      const dataStr = JSON.stringify(reportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `admin-report-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      addNotification({
+        type: 'success',
+        title: 'Report Generated',
+        message: 'Admin report has been downloaded'
       });
     } catch (error) {
       console.error('Report generation failed:', error);
       addNotification({
         type: 'error',
-        title: 'Report Generation Failed',
-        message: 'Failed to generate analytics report'
+        title: 'Report Failed',
+        message: 'Failed to generate report'
       });
     }
   };
@@ -587,8 +560,6 @@ const AdminDashboard: React.FC = () => {
             </div>
           </motion.button>
 
-
-
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -600,7 +571,7 @@ const AdminDashboard: React.FC = () => {
               <div>
                 <p className="text-white/60 text-sm font-medium mb-1">Contact Messages</p>
                 <p className="text-3xl lg:text-4xl font-bold text-white">{contactSubmissions.length}</p>
-                <p className="text-pink-400 text-sm font-medium">View</p>
+                <p className="text-pink-400 text-sm font-medium">View All</p>
               </div>
               <div className="p-4 bg-white/10 rounded-2xl">
                 <MessageSquare className="w-8 h-8 text-pink-400" />
@@ -609,77 +580,75 @@ const AdminDashboard: React.FC = () => {
           </motion.button>
         </motion.div>
 
-        {/* Overview Stats */}
+        {/* Analytics Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
         >
+          {/* Analytics Overview */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Total Users</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalUsers}</p>
-                <p className="text-blue-400 text-sm font-medium">+{adminStats.growthRate.toFixed(1)}% growth</p>
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                <AnalyticsIcon className="w-4 h-4 text-white" />
               </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <UsersIcon className="w-8 h-8 text-blue-400" />
+              <span>Analytics Overview</span>
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{adminStats.totalUsers}</div>
+                <div className="text-white/60 text-sm">Total Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{adminStats.activeUsers}</div>
+                <div className="text-white/60 text-sm">Active Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{adminStats.totalCalculations}</div>
+                <div className="text-white/60 text-sm">Calculations</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-white">{adminStats.totalExports}</div>
+                <div className="text-white/60 text-sm">Exports</div>
               </div>
             </div>
           </motion.div>
 
+          {/* Growth Metrics */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Active Users</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.activeUsers}</p>
-                <p className="text-green-400 text-sm font-medium">Last 30 days</p>
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
+                <TrendingUpIcon className="w-4 h-4 text-white" />
               </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <TrendingUpIcon className="w-8 h-8 text-green-400" />
+              <span>Growth Metrics</span>
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Growth Rate</span>
+                <span className="text-white font-semibold">{adminStats.growthRate.toFixed(1)}%</span>
               </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">Total Calculations</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalCalculations}</p>
-                <p className="text-purple-400 text-sm font-medium">ROI analysis</p>
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Conversion Rate</span>
+                <span className="text-white font-semibold">{adminStats.conversionRate.toFixed(1)}%</span>
               </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <AnalyticsIcon className="w-8 h-8 text-purple-400" />
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Bounce Rate</span>
+                <span className="text-white font-semibold">{adminStats.bounceRate}%</span>
               </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="group relative bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">User Engagement</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{adminStats.totalCalculations + adminStats.totalExports}</p>
-                <p className="text-emerald-400 text-sm font-medium">Total actions</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <ActivityIcon className="w-8 h-8 text-emerald-400" />
+              <div className="flex justify-between items-center">
+                <span className="text-white/60">Avg Session</span>
+                <span className="text-white font-semibold">{adminStats.averageSessionTime} min</span>
               </div>
             </div>
           </motion.div>
@@ -689,10 +658,15 @@ const AdminDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6"
+          transition={{ delay: 0.5 }}
+          className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6"
         >
-          <h3 className="text-xl font-bold text-white mb-4">Recent Activity</h3>
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center">
+              <ActivityIcon className="w-4 h-4 text-white" />
+            </div>
+            <span>Recent Activity</span>
+          </h3>
           <div className="space-y-3">
             {recentActivity.length > 0 ? (
               recentActivity.map((activity) => (
@@ -700,7 +674,7 @@ const AdminDashboard: React.FC = () => {
                   key={activity.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg"
+                  className="flex items-center space-x-3 p-3 bg-white/5 rounded-xl"
                 >
                   <div className={`w-3 h-3 rounded-full ${activity.color}`}></div>
                   <div className="flex-1">
@@ -712,240 +686,63 @@ const AdminDashboard: React.FC = () => {
                 </motion.div>
               ))
             ) : (
-              <p className="text-white/60 text-center py-4">No recent activity</p>
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ActivityIcon className="w-8 h-8 text-white/40" />
+                </div>
+                <p className="text-white/60 text-lg">No recent activity</p>
+                <p className="text-white/40 text-sm">Activity will appear here as users interact with the platform</p>
+              </div>
             )}
           </div>
         </motion.div>
-
-
-
       </div>
 
-
-
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-5xl max-h-[85vh] overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Animated background elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-3xl"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
-              
-              <div className="relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="flex items-center justify-between mb-8"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                      <CodeIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                        API Key Management
-                      </h3>
-                      <p className="text-white/60 text-sm">Generate and manage your API keys</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowApiKeyModal(false)}
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
-                  >
-                    ✕
-                  </button>
-                </motion.div>
-
-                {/* Generate New API Key */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mb-8 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl border border-white/20"
-                >
-                  <h4 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                    <span>Generate New API Key</span>
-                  </h4>
-                  <div className="flex gap-4">
-                    <input
-                      type="text"
-                      placeholder="Enter API key name (e.g., 'Production App')"
-                      value={newApiKeyName}
-                      onChange={(e) => setNewApiKeyName(e.target.value)}
-                      className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-                    />
-                    <button
-                      onClick={generateApiKey}
-                      className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
-                    >
-                      Generate
-                    </button>
-                  </div>
-                </motion.div>
-
-                {/* API Keys List */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="space-y-4"
-                >
-                  <h4 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                      </svg>
-                    </div>
-                    <span>Your API Keys</span>
-                  </h4>
-                  {apiKeys.length > 0 ? (
-                    apiKeys.map((apiKey) => (
-                      <motion.div
-                        key={apiKey.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-6 bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 hover:border-white/30 transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <h5 className="text-white font-semibold">{apiKey.name}</h5>
-                            <p className="text-white/60 text-sm">
-                              Created: {new Date(apiKey.created).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded text-xs ${
-                              apiKey.isActive 
-                                ? 'bg-green-500/20 text-green-400' 
-                                : 'bg-red-500/20 text-red-400'
-                            }`}>
-                              {apiKey.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                            <button
-                              onClick={() => toggleApiKeyStatus(apiKey.id)}
-                              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              {apiKey.isActive ? 'Deactivate' : 'Activate'}
-                            </button>
-                            <button
-                              onClick={() => deleteApiKey(apiKey.id)}
-                              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-white/60 text-sm">API Key:</span>
-                            <code className="flex-1 px-3 py-1 bg-white/10 rounded text-sm text-white font-mono break-all">
-                              {apiKey.key}
-                            </code>
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(apiKey.key);
-                                addNotification({
-                                  type: 'success',
-                                  title: 'Copied!',
-                                  message: 'API key copied to clipboard'
-                                });
-                              }}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 text-blue-400 rounded-xl text-sm transition-all duration-200 transform hover:scale-105"
-                            >
-                              Copy
-                            </button>
-                          </div>
-                          
-                          <div className="flex items-center gap-4 text-sm text-white/60">
-                            <span>Usage: {apiKey.usageCount} requests</span>
-                            {apiKey.lastUsed && (
-                              <span>Last used: {new Date(apiKey.lastUsed).toLocaleDateString()}</span>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                      className="text-center py-12"
-                    >
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CodeIcon className="w-8 h-8 text-white/40" />
-                      </div>
-                      <p className="text-white/60 text-lg">No API keys generated yet</p>
-                      <p className="text-white/40 text-sm mt-2">Generate your first API key to get started</p>
-                    </motion.div>
-                  )}
-                </motion.div>
-
-                {/* Usage Instructions */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-2xl border border-blue-500/20"
-                >
-
-
-        {/* Contact Submissions Modal */}
-        {showContactSubmissions && (
+      {/* Contact Submissions Modal */}
+      {showContactSubmissions && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          onClick={() => setShowContactSubmissions(false)}
+        >
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
-            onClick={() => setShowContactSubmissions(false)}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-6xl max-h-[85vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/30 rounded-3xl p-8 w-full max-w-6xl max-h-[85vh] overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Animated background elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
-              
-              <div className="relative z-10">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="flex items-center justify-between mb-8"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-                      <MessageSquare className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                        Contact Submissions
-                      </h3>
-                      <p className="text-white/60 text-sm">View and manage customer messages</p>
-                    </div>
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/5 to-blue-500/10 rounded-3xl"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 bg-pink-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+            
+            <div className="relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="flex items-center justify-between mb-8"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <MessageSquare className="w-6 h-6 text-white" />
                   </div>
-                  <button
-                    onClick={() => setShowContactSubmissions(false)}
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
-                  >
-                    ✕
-                  </button>
-                </motion.div>
+                  <div>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                      Contact Submissions
+                    </h3>
+                    <p className="text-white/60 text-sm">View and manage customer messages</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowContactSubmissions(false)}
+                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white/60 hover:text-white transition-all duration-200"
+                >
+                  ✕
+                </button>
+              </motion.div>
 
               {/* Stats */}
               <motion.div
@@ -1081,8 +878,8 @@ const AdminDashboard: React.FC = () => {
               </motion.div>
             </div>
           </motion.div>
-        )}
-      </div>
+        </motion.div>
+      )}
     </div>
   );
 };
