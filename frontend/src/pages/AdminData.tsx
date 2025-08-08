@@ -274,9 +274,9 @@ const AdminData: React.FC = () => {
             <h3 className="text-xl font-semibold text-white mb-6">Contact Messages</h3>
             <div className="space-y-4">
               {contacts.map((contact) => (
-                <div key={contact.id} className="bg-white/5 rounded-xl p-4 border border-white/10">
+                <div key={contact.id} className="relative bg-white/5 rounded-xl p-4 border border-white/10">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 pt-8 sm:pt-0">
                       <div className="flex items-center space-x-3 mb-2">
                         <h4 className="text-white font-medium">{contact.name}</h4>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -302,7 +302,7 @@ const AdminData: React.FC = () => {
                       </div>
                       <p className="text-white/80 text-sm break-words whitespace-pre-wrap">{contact.message}</p>
                     </div>
-                    <div className="flex space-x-2 ml-4">
+                    <div className="absolute right-3 top-3 sm:static sm:ml-4 flex gap-2">
                       <button
                         onClick={() => handleContactAction('view', contact.id)}
                         className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
