@@ -16,9 +16,18 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+ type DemoForm = {
+  initialInvestment: string;
+  additionalCosts: string;
+  countryCode: string;
+  apiKey: string;
+  cashFlows: string;
+};
+
 const ApiPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'docs' | 'sdk' | 'examples' | 'demo'>('overview');
-  const [form, setForm] = useState({ initialInvestment: '10000', additionalCosts: '500', countryCode: 'US', apiKey: '' });
+  const [demoCalc, setDemoCalc] = useState<'roi' | 'irr' | 'payback'>('roi');
+  const [form, setForm] = useState<DemoForm>({ initialInvestment: '10000', additionalCosts: '500', countryCode: 'US', apiKey: '', cashFlows: '3000,4000,5000' });
   const [loading, setLoading] = useState(false);
   const [responseJson, setResponseJson] = useState<any>(null);
 
@@ -27,19 +36,40 @@ const ApiPage: React.FC = () => {
     toast.success('Code copied to clipboard!');
   };
 
-  const callApiOrMock = async () => {
+  const callDemo = async () => {
     setLoading(true);
     setResponseJson(null);
     try {
       const baseUrl = ((import.meta as any)?.env?.VITE_API_BASE_URL as string | undefined) || undefined;
-      const payload = {
-        initialInvestment: Number(form.initialInvestment) || 0,
-        additionalCosts: Number(form.additionalCosts) || 0,
-        countryCode: form.countryCode || 'US',
-      };
+
+      // Build payload based on selected calculator
+      const toNumbers = (csv: string) => csv.split(',').map(v => Number(v.trim())).filter(v => !Number.isNaN(v));
+
+      let path = '';
+      let payload: any = {};
+      if (demoCalc === 'roi') {
+        path = baseUrl ? '/v1/calculator/roi' : '/.netlify/functions/roi';
+        payload = {
+          initialInvestment: Number(form.initialInvestment) || 0,
+          additionalCosts: Number(form.additionalCosts) || 0,
+          countryCode: form.countryCode || 'US',
+        };
+      } else if (demoCalc === 'irr') {
+        path = baseUrl ? '/v1/calculator/irr' : '/.netlify/functions/irr';
+        payload = {
+          initialInvestment: Number(form.initialInvestment) || 0,
+          cashFlows: toNumbers(form.cashFlows),
+        };
+      } else if (demoCalc === 'payback') {
+        path = baseUrl ? '/v1/calculator/payback' : '/.netlify/functions/payback';
+        payload = {
+          initialInvestment: Number(form.initialInvestment) || 0,
+          cashFlows: toNumbers(form.cashFlows),
+        };
+      }
 
       if (baseUrl) {
-        const res = await fetch(`${baseUrl.replace(/\/$/, '')}/v1/calculator/roi`, {
+        const res = await fetch(`${baseUrl.replace(/\/$/, '')}${path}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -52,7 +82,7 @@ const ApiPage: React.FC = () => {
       } else {
         // Try Netlify Function first
         try {
-          const res = await fetch('/.netlify/functions/roi', {
+          const res = await fetch(path, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -63,27 +93,31 @@ const ApiPage: React.FC = () => {
           const json = await res.json();
           setResponseJson({ status: res.status, ok: res.ok, body: json, via: 'netlify-functions' });
         } catch (fnErr) {
-          // Fallback mocked response
-          const totalValue = payload.initialInvestment + payload.additionalCosts + (payload.initialInvestment * 0.25);
-          const roi = 25.0;
-          await new Promise(r => setTimeout(r, 600));
-          setResponseJson({
-            status: 200,
-            ok: true,
-            body: {
-              success: true,
-              data: {
-                totalValue: Math.round(totalValue),
-                roi,
-                breakdown: {
-                  initialInvestment: payload.initialInvestment,
-                  additionalCosts: payload.additionalCosts,
-                  returns: Math.round(payload.initialInvestment * 0.25)
-                }
-              },
-              mocked: true
-            }
-          });
+          // Fallback mocked response only for ROI
+          if (demoCalc === 'roi') {
+            const totalValue = payload.initialInvestment + payload.additionalCosts + (payload.initialInvestment * 0.25);
+            const roi = 25.0;
+            await new Promise(r => setTimeout(r, 600));
+            setResponseJson({
+              status: 200,
+              ok: true,
+              body: {
+                success: true,
+                data: {
+                  totalValue: Math.round(totalValue),
+                  roi,
+                  breakdown: {
+                    initialInvestment: payload.initialInvestment,
+                    additionalCosts: payload.additionalCosts,
+                    returns: Math.round(payload.initialInvestment * 0.25)
+                  }
+                },
+                mocked: true
+              }
+            });
+          } else {
+            setResponseJson({ status: 0, ok: false, error: 'Function not available and no mock for this calculator' });
+          }
         }
       }
     } catch (err: any) {
@@ -165,9 +199,9 @@ function MyComponent() {
   );
 }`,
 
-    curl: `curl -X POST https://api.investwisepro.com/v1/calculator/roi \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer your-api-key" \\
+    curl: `curl -X POST https://api.investwisepro.com/v1/calculator/roi \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
   -d '{
     "initialInvestment": 10000,
     "additionalCosts": 500,
@@ -437,10 +471,26 @@ function MyComponent() {
           {activeTab === 'demo' && (
             <div className="space-y-8">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-4">Try the ROI API</h2>
+                <h2 className="text-2xl font-bold text-white mb-4">Try the API</h2>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {[
+                    { id: 'roi', label: 'ROI' },
+                    { id: 'irr', label: 'IRR' },
+                    { id: 'payback', label: 'Payback' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setDemoCalc(opt.id as any)}
+                      className={`px-3 py-1.5 rounded-lg text-sm border ${demoCalc === opt.id ? 'bg-blue-500 text-white border-blue-500' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-white/10 rounded-lg p-6 border border-white/20">
                     <div className="space-y-4">
+                      {/* Common inputs */}
                       <div>
                         <label className="block text-white/80 text-sm mb-1">Initial Investment</label>
                         <input
@@ -451,25 +501,43 @@ function MyComponent() {
                           placeholder="10000"
                         />
                       </div>
-                      <div>
-                        <label className="block text-white/80 text-sm mb-1">Additional Costs</label>
-                        <input
-                          value={form.additionalCosts}
-                          onChange={(e) => setForm({ ...form, additionalCosts: e.target.value })}
-                          type="number"
-                          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-                          placeholder="500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-white/80 text-sm mb-1">Country Code</label>
-                        <input
-                          value={form.countryCode}
-                          onChange={(e) => setForm({ ...form, countryCode: e.target.value.toUpperCase() })}
-                          className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-                          placeholder="US"
-                        />
-                      </div>
+
+                      {demoCalc === 'roi' && (
+                        <>
+                          <div>
+                            <label className="block text-white/80 text-sm mb-1">Additional Costs</label>
+                            <input
+                              value={form.additionalCosts}
+                              onChange={(e) => setForm({ ...form, additionalCosts: e.target.value })}
+                              type="number"
+                              className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                              placeholder="500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-white/80 text-sm mb-1">Country Code</label>
+                            <input
+                              value={form.countryCode}
+                              onChange={(e) => setForm({ ...form, countryCode: e.target.value.toUpperCase() })}
+                              className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                              placeholder="US"
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {(demoCalc === 'irr' || demoCalc === 'payback') && (
+                        <div>
+                          <label className="block text-white/80 text-sm mb-1">Cash Flows (comma-separated)</label>
+                          <input
+                            value={form.cashFlows}
+                            onChange={(e) => setForm({ ...form, cashFlows: e.target.value })}
+                            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                            placeholder="3000,4000,5000"
+                          />
+                        </div>
+                      )}
+
                       <div>
                         <label className="block text-white/80 text-sm mb-1">API Key (optional for demo)</label>
                         <input
@@ -479,12 +547,13 @@ function MyComponent() {
                           placeholder="iw_..."
                         />
                       </div>
+
                       <button
-                        onClick={callApiOrMock}
+                        onClick={callDemo}
                         disabled={loading}
                         className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg"
                       >
-                        {loading ? 'Calling API...' : 'Calculate ROI'}
+                        {loading ? 'Calling API...' : demoCalc === 'roi' ? 'Calculate ROI' : demoCalc === 'irr' ? 'Calculate IRR' : 'Calculate Payback'}
                       </button>
                     </div>
                   </div>
@@ -500,10 +569,10 @@ function MyComponent() {
                       </button>
                     </div>
                     <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4 min-h-[200px]">
-{responseJson ? JSON.stringify(responseJson, null, 2) : '// Fill the form and click Calculate ROI'}
+{responseJson ? JSON.stringify(responseJson, null, 2) : '// Fill the form and click Calculate'}
                     </pre>
                     {!((import.meta as any)?.env?.VITE_API_BASE_URL) && (
-                      <p className="text-white/50 text-xs mt-2">Note: Using Netlify Function if available, otherwise a mocked response.</p>
+                      <p className="text-white/50 text-xs mt-2">Note: Using Netlify Function if available, otherwise a mocked response (only for ROI).</p>
                     )}
                   </div>
                 </div>
