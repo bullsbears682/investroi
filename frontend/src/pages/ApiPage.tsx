@@ -36,6 +36,36 @@ const ApiPage: React.FC = () => {
     toast.success('Code copied to clipboard!');
   };
 
+  const buildCurlFor = (calc: 'roi' | 'irr' | 'payback'): string => {
+    const envBase = ((import.meta as any)?.env?.VITE_API_BASE_URL as string | undefined) || undefined;
+    const endpoint = calc;
+    const url = envBase
+      ? `${envBase.replace(/\/$/, '')}/v1/calculator/${endpoint}`
+      : `${typeof window !== 'undefined' ? window.location.origin : ''}/.netlify/functions/${endpoint}`;
+
+    const toNumbers = (csv: string) => csv.split(',').map(v => Number(v.trim())).filter(v => !Number.isNaN(v));
+    let payload: any = {};
+    if (calc === 'roi') {
+      payload = {
+        initialInvestment: Number(form.initialInvestment) || 0,
+        additionalCosts: Number(form.additionalCosts) || 0,
+        countryCode: form.countryCode || 'US',
+      };
+    } else if (calc === 'irr' || calc === 'payback') {
+      payload = {
+        initialInvestment: Number(form.initialInvestment) || 0,
+        cashFlows: toNumbers(form.cashFlows),
+      };
+    }
+    const auth = form.apiKey ? `-H "Authorization: Bearer ${form.apiKey}" \\\n` : '';
+    return `curl -X POST ${url} \\\n-H "Content-Type: application/json" \\\n${auth}-d '${JSON.stringify(payload)}'`;
+  };
+
+  const copyCurlFor = (calc: 'roi' | 'irr' | 'payback') => {
+    const snippet = buildCurlFor(calc);
+    copyToClipboard(snippet);
+  };
+
   const callDemo = async () => {
     setLoading(true);
     setResponseJson(null);
@@ -484,7 +514,16 @@ console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
                 <div className="space-y-8">
                   {/* ROI */}
                   <div>
-                    <h3 className="text-white font-semibold mb-3">ROI</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-white font-semibold">ROI</h3>
+                      <button
+                        onClick={() => copyCurlFor('roi')}
+                        className="text-xs px-2 py-1 rounded bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                        title="Copy curl using current inputs"
+                      >
+                        Try in cURL
+                      </button>
+                    </div>
                     <div className="space-y-6">
                       {Object.entries(codeExamples).map(([language, code]) => (
                         <div key={`roi-${language}`} className="bg-white/10 rounded-lg p-4">
@@ -538,7 +577,16 @@ console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
 
                   {/* IRR */}
                   <div>
-                    <h3 className="text-white font-semibold mb-3">IRR</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-white font-semibold">IRR</h3>
+                      <button
+                        onClick={() => copyCurlFor('irr')}
+                        className="text-xs px-2 py-1 rounded bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                        title="Copy curl using current inputs"
+                      >
+                        Try in cURL
+                      </button>
+                    </div>
                     <div className="space-y-6">
                       {Object.entries(codeExamplesIrr).map(([language, code]) => (
                         <div key={`irr-${language}`} className="bg-white/10 rounded-lg p-4">
@@ -586,7 +634,16 @@ console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
 
                   {/* Payback */}
                   <div>
-                    <h3 className="text-white font-semibold mb-3">Payback Period</h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-white font-semibold">Payback Period</h3>
+                      <button
+                        onClick={() => copyCurlFor('payback')}
+                        className="text-xs px-2 py-1 rounded bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                        title="Copy curl using current inputs"
+                      >
+                        Try in cURL
+                      </button>
+                    </div>
                     <div className="space-y-6">
                       {Object.entries(codeExamplesPayback).map(([language, code]) => (
                         <div key={`payback-${language}`} className="bg-white/10 rounded-lg p-4">
