@@ -504,6 +504,36 @@ console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
                         </div>
                       ))}
                     </div>
+                    <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+                        <h5 className="text-white font-medium mb-2">Request schema</h5>
+                        <pre className="text-xs text-white/80 overflow-x-auto bg-black/20 rounded p-3">{`{
+  initialInvestment: number >= 0,
+  additionalCosts: number >= 0,
+  countryCode: string // ISO-2, e.g. "US"
+}`}</pre>
+                        <h6 className="text-white/70 text-xs mt-2 mb-1">Validation</h6>
+                        <ul className="text-white/60 text-xs list-disc ml-4 space-y-1">
+                          <li>initialInvestment and additionalCosts must be non-negative</li>
+                          <li>countryCode is optional in demo; defaults to "US"</li>
+                        </ul>
+                      </div>
+                      <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+                        <h5 className="text-white font-medium mb-2">Response shape</h5>
+                        <pre className="text-xs text-white/80 overflow-x-auto bg-black/20 rounded p-3">{`{
+  success: boolean,
+  data: {
+    totalValue: number,
+    roi: number,
+    breakdown: {
+      initialInvestment: number,
+      additionalCosts: number,
+      returns: number
+    }
+  }
+}`}</pre>
+                      </div>
+                    </div>
                   </div>
 
                   {/* IRR */}
@@ -528,6 +558,30 @@ console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
                         </div>
                       ))}
                     </div>
+                    <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+                        <h5 className="text-white font-medium mb-2">Request schema</h5>
+                        <pre className="text-xs text-white/80 overflow-x-auto bg-black/20 rounded p-3">{`{
+  initialInvestment: number > 0,
+  cashFlows: number[] // non-empty
+}`}</pre>
+                        <h6 className="text-white/70 text-xs mt-2 mb-1">Validation</h6>
+                        <ul className="text-white/60 text-xs list-disc ml-4 space-y-1">
+                          <li>initialInvestment must be greater than 0</li>
+                          <li>cashFlows must be an array of numbers</li>
+                          <li>IRR requires NPV sign change; some inputs may be invalid</li>
+                        </ul>
+                      </div>
+                      <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+                        <h5 className="text-white font-medium mb-2">Response shape</h5>
+                        <pre className="text-xs text-white/80 overflow-x-auto bg-black/20 rounded p-3">{`{
+  success: boolean,
+  data: {
+    irr: number // decimal, e.g. 0.14567
+  }
+}`}</pre>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Payback */}
@@ -551,6 +605,30 @@ console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
                           </pre>
                         </div>
                       ))}
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+                        <h5 className="text-white font-medium mb-2">Request schema</h5>
+                        <pre className="text-xs text-white/80 overflow-x-auto bg-black/20 rounded p-3">{`{
+  initialInvestment: number > 0,
+  cashFlows: number[] // non-empty, positive flows recommended
+}`}</pre>
+                        <h6 className="text-white/70 text-xs mt-2 mb-1">Validation</h6>
+                        <ul className="text-white/60 text-xs list-disc ml-4 space-y-1">
+                          <li>returns paybackPeriodYears or null if never fully recovered</li>
+                          <li>linear interpolation used within the recovery year</li>
+                        </ul>
+                      </div>
+                      <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+                        <h5 className="text-white font-medium mb-2">Response shape</h5>
+                        <pre className="text-xs text-white/80 overflow-x-auto bg-black/20 rounded p-3">{`{
+  success: boolean,
+  data: {
+    paybackPeriodYears: number | null,
+    fullyRecovered: boolean
+  }
+}`}</pre>
+                      </div>
                     </div>
                   </div>
                 </div>
