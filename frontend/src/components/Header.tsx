@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
@@ -13,7 +13,23 @@ import {
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [maintenance, setMaintenance] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const read = () => setMaintenance(localStorage.getItem('maintenance_mode') === 'true');
+    read();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'maintenance_mode') read();
+    };
+    window.addEventListener('storage', onStorage);
+    const onCustom = () => read();
+    window.addEventListener('maintenanceChanged' as any, onCustom as any);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('maintenanceChanged' as any, onCustom as any);
+    };
+  }, []);
 
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },
@@ -32,6 +48,11 @@ const Header: React.FC = () => {
       className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {maintenance && (
+          <div className="text-center text-yellow-200 bg-yellow-500/10 border border-yellow-400/30 rounded-lg px-3 py-2 my-2 text-sm">
+            Maintenance mode is enabled. Some actions may be temporarily limited.
+          </div>
+        )}
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <motion.div

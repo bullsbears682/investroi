@@ -4,7 +4,6 @@ import AdminMenu from '../components/AdminMenu';
 import {
   AnalyticsIcon,
   UsersIcon,
-  HardDriveIcon,
   MessageSquareIcon,
   CodeIcon,
 } from '../components/icons/CustomIcons';
@@ -17,8 +16,6 @@ interface MetricSummary {
   totalCalculations: number;
   totalExports: number;
   contacts: number;
-  backups: number;
-  apiKeys: number;
   openChats: number;
 }
 
@@ -53,13 +50,12 @@ const AdminDashboard: React.FC = () => {
     totalCalculations: 0,
     totalExports: 0,
     contacts: 0,
-    backups: 0,
-    apiKeys: 0,
     openChats: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [activityQuery, setActivityQuery] = useState('');
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
+  const [isMaintenance, setIsMaintenance] = useState<boolean>(false);
 
   const loadSummary = () => {
     try {
@@ -68,8 +64,6 @@ const AdminDashboard: React.FC = () => {
       const totalCalculations = allUsers.reduce((sum: number, u: any) => sum + (u.totalCalculations || 0), 0);
       const totalExports = allUsers.reduce((sum: number, u: any) => sum + (u.totalExports || 0), 0);
       const contacts = JSON.parse(localStorage.getItem('adminContacts') || '[]');
-      const backups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
-      const apiKeys = JSON.parse(localStorage.getItem('api_keys') || '[]');
       const openChats = (chatSystem.getAllSessions?.() || []).filter((s: any) => s.status !== 'closed').length;
 
       setSummary({
@@ -78,8 +72,6 @@ const AdminDashboard: React.FC = () => {
         totalCalculations,
         totalExports,
         contacts: contacts.length,
-        backups: backups.length,
-        apiKeys: Array.isArray(apiKeys) ? apiKeys.length : 0,
         openChats,
       });
     } catch (err) {
@@ -119,20 +111,6 @@ const AdminDashboard: React.FC = () => {
           })
         );
 
-      const backups = JSON.parse(localStorage.getItem('databaseBackups') || '[]');
-      backups
-        .filter((b: any) => b.timestamp > now - 7 * 24 * 60 * 60 * 1000)
-        .slice(0, 3)
-        .forEach((b: any) =>
-          items.push({
-            id: `backup-${b.backupId || b.timestamp}`,
-            type: 'backup',
-            description: 'System backup completed',
-            timestamp: b.timestamp,
-            color: 'bg-purple-400',
-          })
-        );
-
       items.sort((a, b) => b.timestamp - a.timestamp);
       setRecentActivity(items.slice(0, 12));
     } catch (err) {
@@ -145,7 +123,8 @@ const AdminDashboard: React.FC = () => {
     loadSummary();
     loadRecentActivity();
     setLastUpdatedAt(Date.now());
-    // Ensure skeleton is visible briefly
+    setIsMaintenance(localStorage.getItem('maintenance_mode') === 'true');
+    // ensure skeleton visible briefly
     setTimeout(() => setLoading(false), 250);
   };
 
@@ -156,24 +135,21 @@ const AdminDashboard: React.FC = () => {
       if (
         e.key === 'registered_users' ||
         e.key === 'adminContacts' ||
-        e.key === 'databaseBackups' ||
         e.key === 'chatMessages' ||
-        e.key === 'api_keys'
+        e.key === 'maintenance_mode'
       ) {
         loadSummary();
         loadRecentActivity();
+        setIsMaintenance(localStorage.getItem('maintenance_mode') === 'true');
         setLastUpdatedAt(Date.now());
       }
     };
     window.addEventListener('storage', onStorage);
-    const interval = setInterval(() => {
-      loadSummary();
-      loadRecentActivity();
-      setLastUpdatedAt(Date.now());
-    }, 5000);
+    const onCustom = () => setIsMaintenance(localStorage.getItem('maintenance_mode') === 'true');
+    window.addEventListener('maintenanceChanged' as any, onCustom as any);
     return () => {
       window.removeEventListener('storage', onStorage);
-      clearInterval(interval);
+      window.removeEventListener('maintenanceChanged' as any, onCustom as any);
     };
   }, []);
 
@@ -182,6 +158,13 @@ const AdminDashboard: React.FC = () => {
     if (!q) return recentActivity;
     return recentActivity.filter((a) => a.description.toLowerCase().includes(q));
   }, [recentActivity, activityQuery]);
+
+  const toggleMaintenance = () => {
+    const next = !isMaintenance;
+    localStorage.setItem('maintenance_mode', String(next));
+    setIsMaintenance(next);
+    window.dispatchEvent(new Event('maintenanceChanged'));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
@@ -198,7 +181,6 @@ const AdminDashboard: React.FC = () => {
             <div className="flex gap-2">
               <Link to="/admin/analytics" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Analytics</Link>
               <Link to="/admin/data" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Users</Link>
-              <Link to="/admin/backups" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Backups</Link>
               <Link to="/admin/system" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">System</Link>
             </div>
           </div>
@@ -210,14 +192,22 @@ const AdminDashboard: React.FC = () => {
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <div className="text-white/60 text-sm">Last updated <span className="text-white">{formatUpdatedAgo(lastUpdatedAt)}</span></div>
-          <button
-            onClick={refreshAll}
-            className="self-start sm:self-auto inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm"
-            aria-label="Refresh dashboard"
-          >
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleMaintenance}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm border transition-colors ${isMaintenance ? 'bg-yellow-500/20 border-yellow-400/40 text-yellow-200 hover:bg-yellow-500/30' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
+              aria-label="Toggle maintenance mode"
+            >
+              {isMaintenance ? 'Disable Maintenance' : 'Enable Maintenance'}
+            </button>
+            <button
+              onClick={refreshAll}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm"
+              aria-label="Refresh dashboard"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -291,36 +281,22 @@ const AdminDashboard: React.FC = () => {
               <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-xs">Backups</p>
-                    <p className="text-xl font-semibold text-white">{summary.backups}</p>
-                  </div>
-                  <div className="p-2.5 bg-white/10 rounded-xl">
-                    <HardDriveIcon className="text-purple-300" size={18} />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white/60 text-xs">API Keys</p>
-                    <p className="text-xl font-semibold text-white">{summary.apiKeys}</p>
-                  </div>
-                  <div className="p-2.5 bg-white/10 rounded-xl">
-                    <CodeIcon className="text-indigo-300" size={18} />
-                  </div>
-                </div>
-                <div className="mt-3">
-                  {/* Manage keys link removed */}
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
-                <div className="flex items-center justify-between">
-                  <div>
                     <p className="text-white/60 text-xs">Open Chats</p>
                     <p className="text-xl font-semibold text-white">{summary.openChats}</p>
                   </div>
                   <div className="p-2.5 bg-white/10 rounded-xl">
                     <MessageSquareIcon className="text-emerald-300" size={18} />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-xs">Maintenance</p>
+                    <p className="text-xl font-semibold text-white">{isMaintenance ? 'Enabled' : 'Disabled'}</p>
+                  </div>
+                  <div className="p-2.5 bg-white/10 rounded-xl">
+                    <AnalyticsIcon className="text-yellow-300" size={18} />
                   </div>
                 </div>
               </div>
@@ -391,9 +367,8 @@ const AdminDashboard: React.FC = () => {
                     return 'n/a';
                   }
                 })()}</span></div>
+                <div className="flex items-center justify-between text-white/80"><span>Maintenance</span><span className="text-white">{isMaintenance ? 'Enabled' : 'Disabled'}</span></div>
                 <div className="flex items-center justify-between text-white/80"><span>Open Chats</span><span className="text-white">{summary.openChats}</span></div>
-                <div className="flex items-center justify-between text-white/80"><span>Backups</span><span className="text-white">{summary.backups}</span></div>
-                <div className="flex items-center justify-between text-white/80"><span>API Keys</span><span className="text-white">{summary.apiKeys}</span></div>
               </div>
             </div>
 
@@ -402,7 +377,8 @@ const AdminDashboard: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <Link to="/admin/data" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Manage Users</Link>
                 <Link to="/admin/chat" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Open Chat</Link>
-                <Link to="/admin/backups" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Backups</Link>
+                <button onClick={toggleMaintenance} className="px-3 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 rounded-lg text-yellow-200 text-sm text-center border border-yellow-400/40">{isMaintenance ? 'Disable' : 'Enable'} Maintenance</button>
+                <button onClick={refreshAll} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Refresh</button>
               </div>
             </div>
           </div>
