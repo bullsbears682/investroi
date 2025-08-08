@@ -1,1 +1,0 @@
-# InvestWise Pro Backend Application
