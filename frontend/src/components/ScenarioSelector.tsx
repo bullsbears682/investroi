@@ -343,7 +343,7 @@ const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="fixed top-4 left-1/2 -translate-x-1/2 w-[min(900px,calc(100vw-2rem))] bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl rounded-xl overflow-hidden z-[99999999] max-h-[70vh] overflow-y-auto"
+                  className="fixed sm:absolute top-4 sm:top-full sm:mt-2 left-1/2 sm:left-0 sm:right-0 -translate-x-1/2 sm:translate-x-0 w-[min(900px,calc(100vw-2rem))] sm:w-full bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 shadow-2xl rounded-xl overflow-hidden z-[99999999] max-h-[70vh] sm:max-h-[320px] overflow-y-auto"
                   style={{
                     background: 'linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.1) 50%, transparent 100%)',
                     backgroundSize: '200% 100%',
