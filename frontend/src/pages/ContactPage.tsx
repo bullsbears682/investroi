@@ -91,13 +91,13 @@ const ContactPage: React.FC = () => {
   const officeInfo = [
     {
       icon: MapPin,
-      title: 'Headquarters',
-      description: '123 Innovation Drive, Tech Valley, CA 94000'
+      title: 'Global HQ',
+      description: '350 Mission St, San Francisco, CA 94105'
     },
     {
       icon: Clock,
-      title: 'Business Hours',
-      description: 'Monday - Friday: 9:00 AM - 6:00 PM PST'
+      title: 'Support Hours',
+      description: 'Monday - Sunday: 8:00 AM - 8:00 PM (local time)'
     }
   ];
 
