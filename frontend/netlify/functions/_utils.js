@@ -2,6 +2,8 @@ const rateBuckets = new Map();
 const WINDOW_MS = 60 * 1000;
 const LIMIT_PER_WINDOW = 60;
 
+const keyStore = require('./_keyStore.js');
+
 function getClientIp(event) {
   const headers = event.headers || {};
   return (
@@ -12,17 +14,6 @@ function getClientIp(event) {
   );
 }
 
-function allowRate(event) {
-  const ip = getClientIp(event);
-  const now = Date.now();
-  const bucket = rateBuckets.get(ip) || [];
-  const fresh = bucket.filter((ts) => now - ts < WINDOW_MS);
-  if (fresh.length >= LIMIT_PER_WINDOW) return false;
-  fresh.push(now);
-  rateBuckets.set(ip, fresh);
-  return true;
-}
-
 function corsHeaders() {
   return {
     'Access-Control-Allow-Origin': '*',
@@ -30,10 +21,10 @@ function corsHeaders() {
   };
 }
 
-function json(statusCode, body) {
+function json(statusCode, body, extraHeaders) {
   return {
     statusCode,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(), ...(extraHeaders || {}) },
     body: JSON.stringify(body),
   };
 }
@@ -50,12 +41,12 @@ function unauthorized(message) {
   return json(401, { success: false, error: message || 'Unauthorized' });
 }
 
-function tooMany() {
-  return json(429, { success: false, error: 'Rate limit exceeded' });
+function tooMany(remaining) {
+  return json(429, { success: false, error: 'Rate limit exceeded' }, remaining != null ? { 'X-RateLimit-Remaining': String(remaining) } : undefined);
 }
 
-function ok(data) {
-  return json(200, { success: true, data });
+function ok(data, remaining) {
+  return json(200, { success: true, data }, remaining != null ? { 'X-RateLimit-Remaining': String(remaining) } : undefined);
 }
 
 function parseBody(event) {
@@ -76,15 +67,41 @@ function extractApiKey(event) {
   return null;
 }
 
-function validateApiKeyOrAllowDemo(key) {
-  // For demo: accept if not provided; if provided, require iw_ prefix
-  if (!key) return { ok: true, mode: 'demo' };
-  if (/^iw_/.test(key)) return { ok: true, mode: 'key' };
-  return { ok: false, mode: 'invalid' };
+async function validateAndRateLimit(event, defaultLimit = LIMIT_PER_WINDOW) {
+  const key = extractApiKey(event);
+
+  // Demo mode: no key provided, allow but apply IP-based limit
+  if (!key) {
+    const ip = getClientIp(event);
+    const now = Date.now();
+    const bucket = rateBuckets.get(ip) || [];
+    const fresh = bucket.filter((ts) => now - ts < WINDOW_MS);
+    if (fresh.length >= defaultLimit) return { ok: false, status: 429, remaining: 0 };
+    fresh.push(now);
+    rateBuckets.set(ip, fresh);
+    return { ok: true, mode: 'demo', remaining: defaultLimit - fresh.length };
+  }
+
+  // With key: validate against store; if missing in store, accept iw_ prefix in demo mode
+  const record = await keyStore.getKeyRecord(key);
+  if (!record) {
+    if (!/^iw_/.test(key)) return { ok: false, status: 401 };
+    // treat as demo key
+    const rl = await keyStore.rateLimitCheckAndIncr(key, defaultLimit);
+    if (!rl.allowed) return { ok: false, status: 429, remaining: rl.remaining };
+    await keyStore.incrementUsage(key);
+    return { ok: true, mode: 'demo-key', remaining: rl.remaining };
+  }
+
+  if (record.active === false) return { ok: false, status: 401 };
+  const perMinute = typeof record.limitPerMinute === 'number' ? record.limitPerMinute : defaultLimit;
+  const rl = await keyStore.rateLimitCheckAndIncr(key, perMinute);
+  if (!rl.allowed) return { ok: false, status: 429, remaining: rl.remaining };
+  await keyStore.incrementUsage(key);
+  return { ok: true, mode: 'key', remaining: rl.remaining };
 }
 
 exports.utils = {
-  allowRate,
   ok,
   badRequest,
   unauthorized,
@@ -92,6 +109,6 @@ exports.utils = {
   methodNotAllowed,
   parseBody,
   extractApiKey,
-  validateApiKeyOrAllowDemo,
+  validateAndRateLimit,
   corsHeaders,
 };
