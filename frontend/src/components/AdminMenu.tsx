@@ -8,6 +8,7 @@ import {
   HardDriveIcon,
   MessageSquareIcon
 } from './icons/CustomIcons';
+import { CodeIcon } from './icons/CustomIcons';
 
 interface AdminMenuProps {
   isOpen: boolean;
@@ -53,6 +54,12 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onToggle }) => {
       href: '/admin/chat',
       icon: MessageSquareIcon,
       description: 'Real-time chat interface'
+    },
+    {
+      name: 'API Keys',
+      href: '/admin/keys',
+      icon: CodeIcon,
+      description: 'Server-side API key management'
     }
   ];
 
