@@ -209,6 +209,42 @@ function MyComponent() {
   }'`
   };
 
+  const codeExamplesIrr = {
+    javascript: `const res = await fetch('https://api.investwisepro.com/v1/calculator/irr', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer your-api-key' },
+  body: JSON.stringify({ initialInvestment: 10000, cashFlows: [3000, 4000, 5000] })
+});
+const data = await res.json();
+console.log(data.data.irr); // e.g. 0.14567`,
+
+    curl: `curl -X POST https://api.investwisepro.com/v1/calculator/irr \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
+  -d '{
+    "initialInvestment": 10000,
+    "cashFlows": [3000, 4000, 5000]
+  }'`
+  } as const;
+
+  const codeExamplesPayback = {
+    javascript: `const res = await fetch('https://api.investwisepro.com/v1/calculator/payback', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer your-api-key' },
+  body: JSON.stringify({ initialInvestment: 10000, cashFlows: [3000, 3000, 3000, 3000] })
+});
+const data = await res.json();
+console.log(data.data.paybackPeriodYears); // e.g. 3.333`,
+
+    curl: `curl -X POST https://api.investwisepro.com/v1/calculator/payback \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
+  -d '{
+    "initialInvestment": 10000,
+    "cashFlows": [3000, 3000, 3000, 3000]
+  }'`
+  } as const;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
@@ -445,24 +481,78 @@ function MyComponent() {
             <div className="space-y-8">
               <div>
                 <h2 className="text-2xl font-bold text-white mb-4">Code Examples</h2>
-                <div className="space-y-6">
-                  {Object.entries(codeExamples).map(([language, code]) => (
-                    <div key={language} className="bg-white/10 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-white font-semibold capitalize">{language}</h3>
-                        <button
-                          onClick={() => copyToClipboard(code)}
-                          className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors"
-                        >
-                          <Copy size={16} />
-                          <span className="text-sm">Copy</span>
-                        </button>
-                      </div>
-                      <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4">
-                        <code>{code}</code>
-                      </pre>
+                <div className="space-y-8">
+                  {/* ROI */}
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">ROI</h3>
+                    <div className="space-y-6">
+                      {Object.entries(codeExamples).map(([language, code]) => (
+                        <div key={`roi-${language}`} className="bg-white/10 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-white font-semibold capitalize">{language}</h4>
+                            <button
+                              onClick={() => copyToClipboard(code)}
+                              className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors"
+                            >
+                              <Copy size={16} />
+                              <span className="text-sm">Copy</span>
+                            </button>
+                          </div>
+                          <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4">
+                            <code>{code}</code>
+                          </pre>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {/* IRR */}
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">IRR</h3>
+                    <div className="space-y-6">
+                      {Object.entries(codeExamplesIrr).map(([language, code]) => (
+                        <div key={`irr-${language}`} className="bg-white/10 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-white font-semibold uppercase">{language}</h4>
+                            <button
+                              onClick={() => copyToClipboard(code)}
+                              className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors"
+                            >
+                              <Copy size={16} />
+                              <span className="text-sm">Copy</span>
+                            </button>
+                          </div>
+                          <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4">
+                            <code>{code}</code>
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Payback */}
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Payback Period</h3>
+                    <div className="space-y-6">
+                      {Object.entries(codeExamplesPayback).map(([language, code]) => (
+                        <div key={`payback-${language}`} className="bg-white/10 rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-white font-semibold uppercase">{language}</h4>
+                            <button
+                              onClick={() => copyToClipboard(code)}
+                              className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors"
+                            >
+                              <Copy size={16} />
+                              <span className="text-sm">Copy</span>
+                            </button>
+                          </div>
+                          <pre className="text-sm text-white/80 overflow-x-auto bg-black/20 rounded p-4">
+                            <code>{code}</code>
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
