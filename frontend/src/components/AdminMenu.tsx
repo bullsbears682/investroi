@@ -5,7 +5,6 @@ import {
   AnalyticsIcon,
   UsersIcon,
   ShieldIcon,
-  HardDriveIcon,
   MessageSquareIcon
 } from './icons/CustomIcons';
 // API menu link removed
@@ -42,12 +41,6 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onToggle }) => {
       href: '/admin/system',
       icon: ShieldIcon,
       description: 'System performance and monitoring'
-    },
-    {
-      name: 'Backups',
-      href: '/admin/backups',
-      icon: HardDriveIcon,
-      description: 'Database backups and restore'
     },
     {
       name: 'Chat',

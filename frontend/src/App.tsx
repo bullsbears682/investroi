@@ -33,7 +33,6 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
 const AdminData = lazy(() => import('./pages/AdminData'));
 const AdminSystem = lazy(() => import('./pages/AdminSystem'));
-const AdminBackups = lazy(() => import('./pages/AdminBackups'));
 const AdminChat = lazy(() => import('./pages/AdminChat'));
 // API pages removed
 
@@ -116,7 +115,7 @@ function App() {
                         <Route path="/admin/analytics" element={<AdminAnalytics />} />
                         <Route path="/admin/data" element={<AdminData />} />
                         <Route path="/admin/system" element={<AdminSystem />} />
-                        <Route path="/admin/backups" element={<AdminBackups />} />
+                        {/* Backups route removed */}
                         <Route path="/admin/chat" element={<AdminChat />} />
                         {/* API routes removed */}
                       </Routes>
