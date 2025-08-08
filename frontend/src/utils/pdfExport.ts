@@ -735,6 +735,18 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Marketplace-ready add-on for sales assist after basic packaging.',
     ]);
 
+    const monetization = section(
+      'How HubSpot could make money',
+      'Multiple packaging paths across Marketplace, Sales Hub, and services.'
+    ) + list([
+      'Marketplace app subscription: per‑seat or per‑company (e.g., $9–$29/user or $49–$199/company per month).',
+      'Sales Hub add‑on: bundle as a sales‑assist ROI module in tiered plans.',
+      'Lead‑gen: public calculator gated by HubSpot forms to capture MQLs.',
+      'Services upsell: implementation packages (templates, ICP presets, branding).',
+      'Usage‑based pricing: include N PDF exports; sell additional credits.',
+      'Cross‑sell workflows: trigger sequences/tasks from “ROI generated” events to increase tool adoption.'
+    ]);
+
     const plan = section(
       'Minimal implementation plan (2–3 weeks)',
       'Deliver a pilot suitable for internal use and Marketplace submission.'
@@ -768,6 +780,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
         ${potential}
         ${appCouldDo}
         ${hubspot}
+        ${monetization}
         ${plan}
         ${links}
         ${footer}
