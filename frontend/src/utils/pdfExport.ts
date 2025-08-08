@@ -669,15 +669,15 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'What it does today',
       [
         'Fast ROI calculator with guided inputs and scenario presets.',
-        'Polished PDF export (enable Demo in-app to try export).',
+        'Polished PDF export (jsPDF + html2canvas).',
         'Modern, responsive UI with smooth interactions.',
-        'Front-end only: data stored locally (no backend).',
+        'Front-end only (no backend/API) — data stays in-browser.',
         'Tech: React + Vite + TypeScript + Tailwind (Netlify-ready, MIT-licensed).'
       ].join(' ')
     ) + list([
-      'ROI %, Net profit, after-tax figures, investment breakdown',
-      'Contact capture and activity (localStorage)',
-      'Demo mode toggle (7 days) for gated features like PDF export',
+      'ROI %, net profit, after-tax figures, investment breakdown',
+      'Contact capture and recent messages (localStorage)',
+      'Admin panel: Dashboard, Analytics, Data (users/contacts), System, Chat, Backups',
     ]);
 
     const repoDoes = section(
@@ -685,18 +685,17 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Clear, production-leaning front-end codebase designed for fast demos and easy integration.'
     ) + list([
       'Pages: Home, Calculator, Scenarios, Demo, Investment Guide, Tax Info, Market Research, Contact, Terms, Privacy, About.',
-      'Components: ROI calculator, export modal (PDF via jsPDF + html2canvas), chat button, cookie consent, header/footer with maintenance banner.',
-      'State: Zustand app store (loading, session, 7‑day demo mode), localStorage persistence for contacts, chat, maintenance, backups.',
+      'Components: ROI calculator, export modal (PDF), chat button, cookie consent, header/footer with maintenance banner.',
+      'State: Zustand app store (loading/session), localStorage persistence for contacts, chat, maintenance, backups.',
       'Styling: Tailwind CSS + framer-motion animations; responsive and mobile-optimized admin (optional).',
       'Build/Deploy: Vite + TypeScript; Netlify config included; no secrets required.',
       'Legal: MIT LICENSE + THIRD_PARTY_NOTICES included.'
     ]);
 
     const demoAndDeploy = section(
-      'Demo mode & deployment',
-      'Demo unlocks export and Pro UI locally (no accounts). One-click deploy to Netlify.'
+      'Deployment & data',
+      'One‑click deploy to Netlify. App is front‑end only; no server or secrets.'
     ) + list([
-      'Demo: 7-day client-side activation, banner + countdown, no server required.',
       'Local data keys: contact_submissions, registered_users, chatMessages, maintenance_mode, databaseBackups.',
       'Setup: Node 18, cd frontend && npm i && npm run build && npm run preview.',
       'Netlify: base=frontend, build=npm run build, publish=dist.'
@@ -715,11 +714,11 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'What the app could do (end‑to‑end)',
       'Combining current capabilities with light additions enables a full sales-assist flow from lead to closed-won.'
     ) + list([
-      'Lead gen: public calculator + in-browser contact capture (no backend needed to demo).',
+      'Lead gen: public calculator + in-browser contact capture.',
       'Discovery: quantify value with guided inputs and presets; save/share snapshots.',
-      'Deal workflow: push ROI summary + PDF to Deals/Companies (HubSpot integration).',
+      'Deal workflow: push ROI summary + PDF to Deals/Companies (via HubSpot integration).',
       'Reporting: generate executive-ready PDFs for stakeholders in one click.',
-      'Team usage: shared scenario templates and a small snapshot library (minimal backend).',
+      'Team usage: shared scenario templates and a small snapshot library (add minimal backend).',
       'Branding: quickly re-skin/white-label (Tailwind + componentized UI).',
       'Marketplace: package as a HubSpot app for sales assist (OAuth + minimal APIs).',
       'Analytics: basic usage metrics and error logs to improve conversion.',
@@ -750,7 +749,8 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Live demo and repository handover details.'
     ) + list([
       'Live demo: https://bespoke-gumdrop-1b7fc6.netlify.app/',
-      'Repo: transfer on acceptance (MIT, clean of secrets, with release tag).'
+      'Repo: transfer on acceptance (MIT, clean of secrets, with release tag).',
+      'Status: API removed (front‑end only). Admin panel present. MIT license added.'
     ]);
 
     const footer = `
@@ -773,7 +773,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
         ${footer}
       </div>
     `;
-
+ 
     document.body.appendChild(container);
     const canvas = await html2canvas(container, {
       backgroundColor: '#0b1020',
@@ -784,7 +784,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       height: container.scrollHeight,
     });
     document.body.removeChild(container);
-
+ 
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgWidth = 210;
