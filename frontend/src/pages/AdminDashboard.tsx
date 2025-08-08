@@ -193,13 +193,18 @@ const AdminDashboard: React.FC = () => {
 
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-xl border-b border-white/20 lg:ml-64">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center gap-3">
+              <button
+                className="sm:hidden inline-flex items-center px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-sm"
+                onClick={() => setIsMenuOpen(true)}
+                aria-label="Open admin menu"
+              >Menu</button>
               <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-              <p className="text-white/60 text-sm">Overview, insights and admin tools</p>
+              <p className="hidden sm:block text-white/60 text-sm">Overview, insights and admin tools</p>
             </div>
-            <div className="flex gap-2">
+            <div className="hidden sm:flex gap-2">
               <Link to="/admin/analytics" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Analytics</Link>
               <Link to="/admin/data" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">Users</Link>
               <Link to="/admin/system" className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm">System</Link>
@@ -209,9 +214,9 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 lg:ml-64">
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-4 sm:mb-6">
           <div className="text-white/60 text-sm">Last updated <span className="text-white">{formatUpdatedAgo(lastUpdatedAt)}</span></div>
           <div className="flex items-center gap-2">
             <button
@@ -232,10 +237,10 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 animate-pulse">
+              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20 animate-pulse">
                 <div className="h-4 w-24 bg-white/20 rounded mb-3" />
                 <div className="h-8 w-20 bg-white/30 rounded" />
               </div>
@@ -262,7 +267,7 @@ const AdminDashboard: React.FC = () => {
               Icon: CodeIcon,
               color: 'text-yellow-400',
             }].map((c, idx) => (
-              <div key={idx} className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+              <div key={idx} className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm">{c.label}</p>
@@ -278,17 +283,17 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Secondary Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 animate-pulse">
+              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/20 animate-pulse">
                 <div className="h-3 w-20 bg-white/20 rounded mb-2" />
                 <div className="h-6 w-16 bg-white/30 rounded" />
               </div>
             ))
           ) : (
             <>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-xs">Contacts</p>
@@ -299,7 +304,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-xs">Open Chats</p>
@@ -310,7 +315,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-xs">Maintenance</p>
@@ -326,14 +331,14 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Two columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left: Activity */}
-          <div className="lg:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-            <div className="flex items-center justify-between mb-4">
+          <div className="lg:col-span-2 bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 sm:mb-4">
               <h2 className="text-white font-semibold">Recent Activity</h2>
               <Link to="/admin/analytics" className="text-white/70 hover:text-white text-sm underline">View analytics</Link>
             </div>
-            <div className="mb-4">
+            <div className="mb-3 sm:mb-4">
               <input
                 value={activityQuery}
                 onChange={(e) => setActivityQuery(e.target.value)}
@@ -354,10 +359,10 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-white/60 text-sm">No activity matches your search.</p>
               )}
               {!loading && filteredActivity.map((a) => (
-                <div key={a.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                  <div className="flex items-center gap-3">
+                <div key={a.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-2.5 h-2.5 ${a.color} rounded-full`} />
-                    <span className="text-white/80 text-sm">{a.description}</span>
+                    <span className="text-white/80 text-sm truncate">{a.description}</span>
                   </div>
                   <span className="text-white/50 text-xs">{new Date(a.timestamp).toLocaleString()}</span>
                 </div>
@@ -366,8 +371,8 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Right: System & Quick Links */}
-          <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
               <h3 className="text-white font-semibold mb-3">System Status</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between text-white/80"><span>Network</span><span className="text-white">{(() => {
@@ -393,7 +398,7 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
               <h3 className="text-white font-semibold mb-3">Recent Messages</h3>
               <div className="space-y-2">
                 {recentMessages.length === 0 && <p className="text-white/60 text-sm">No recent messages</p>}
@@ -415,7 +420,7 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
               <h3 className="text-white font-semibold mb-3">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-3">
                 <Link to="/admin/data" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Manage Users</Link>
