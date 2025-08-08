@@ -4,6 +4,8 @@ import AdminMenu from '../components/AdminMenu';
 import {
   AnalyticsIcon,
   UsersIcon,
+  HardDriveIcon,
+  MessageSquareIcon,
   CodeIcon,
 } from '../components/icons/CustomIcons';
 import { userManager } from '../utils/userManagement';
@@ -28,6 +30,20 @@ interface ActivityItem {
   color: string;
 }
 
+const formatUpdatedAgo = (lastUpdatedAt: number | null): string => {
+  if (!lastUpdatedAt) return '—';
+  const diff = Date.now() - lastUpdatedAt;
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 5) return 'just now';
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+};
+
 const AdminDashboard: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -42,6 +58,8 @@ const AdminDashboard: React.FC = () => {
     openChats: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [activityQuery, setActivityQuery] = useState('');
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
 
   const loadSummary = () => {
     try {
@@ -116,16 +134,24 @@ const AdminDashboard: React.FC = () => {
         );
 
       items.sort((a, b) => b.timestamp - a.timestamp);
-      setRecentActivity(items.slice(0, 10));
+      setRecentActivity(items.slice(0, 12));
     } catch (err) {
       console.error('Failed to load recent activity:', err);
     }
   };
 
-  useEffect(() => {
+  const refreshAll = () => {
+    setLoading(true);
     loadSummary();
     loadRecentActivity();
-    setLoading(false);
+    setLastUpdatedAt(Date.now());
+    // Ensure skeleton is visible briefly
+    setTimeout(() => setLoading(false), 250);
+  };
+
+  useEffect(() => {
+    refreshAll();
+
     const onStorage = (e: StorageEvent) => {
       if (
         e.key === 'registered_users' ||
@@ -136,12 +162,14 @@ const AdminDashboard: React.FC = () => {
       ) {
         loadSummary();
         loadRecentActivity();
+        setLastUpdatedAt(Date.now());
       }
     };
     window.addEventListener('storage', onStorage);
     const interval = setInterval(() => {
       loadSummary();
       loadRecentActivity();
+      setLastUpdatedAt(Date.now());
     }, 5000);
     return () => {
       window.removeEventListener('storage', onStorage);
@@ -149,18 +177,11 @@ const AdminDashboard: React.FC = () => {
     };
   }, []);
 
-  const systemStatus = useMemo(() => {
-    try {
-      const connection: any = (navigator as any).connection;
-      const effective = connection?.effectiveType || 'unknown';
-      const downlink = connection?.downlink ? `${connection.downlink}Mbps` : 'n/a';
-      const memory: any = (window.performance as any)?.memory;
-      const memUsed = memory ? `${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB` : 'n/a';
-      return { network: effective, downlink, memUsed };
-    } catch {
-      return { network: 'unknown', downlink: 'n/a', memUsed: 'n/a' };
-    }
-  }, [summary]);
+  const filteredActivity = useMemo(() => {
+    const q = activityQuery.trim().toLowerCase();
+    if (!q) return recentActivity;
+    return recentActivity.filter((a) => a.description.toLowerCase().includes(q));
+  }, [recentActivity, activityQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900">
@@ -186,41 +207,125 @@ const AdminDashboard: React.FC = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:ml-64">
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div className="text-white/60 text-sm">Last updated <span className="text-white">{formatUpdatedAgo(lastUpdatedAt)}</span></div>
+          <button
+            onClick={refreshAll}
+            className="self-start sm:self-auto inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm"
+            aria-label="Refresh dashboard"
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            Refresh
+          </button>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[{
-            label: 'Total Users',
-            value: summary.totalUsers,
-            Icon: UsersIcon,
-            color: 'text-blue-400',
-          }, {
-            label: 'Active Users',
-            value: summary.activeUsers,
-            Icon: AnalyticsIcon,
-            color: 'text-green-400',
-          }, {
-            label: 'Calculations',
-            value: summary.totalCalculations,
-            Icon: AnalyticsIcon,
-            color: 'text-purple-400',
-          }, {
-            label: 'Exports',
-            value: summary.totalExports,
-            Icon: CodeIcon,
-            color: 'text-yellow-400',
-          }].map((c, idx) => (
-            <div key={idx} className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white/60 text-sm">{c.label}</p>
-                  <p className="text-3xl font-bold text-white">{loading ? '—' : c.value}</p>
-                </div>
-                <div className="p-3 bg-white/10 rounded-xl">
-                  <c.Icon className={`${c.color}`} size={22} />
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 animate-pulse">
+                <div className="h-4 w-24 bg-white/20 rounded mb-3" />
+                <div className="h-8 w-20 bg-white/30 rounded" />
+              </div>
+            ))
+          ) : (
+            [{
+              label: 'Total Users',
+              value: summary.totalUsers,
+              Icon: UsersIcon,
+              color: 'text-blue-400',
+            }, {
+              label: 'Active Users',
+              value: summary.activeUsers,
+              Icon: AnalyticsIcon,
+              color: 'text-green-400',
+            }, {
+              label: 'Calculations',
+              value: summary.totalCalculations,
+              Icon: AnalyticsIcon,
+              color: 'text-purple-400',
+            }, {
+              label: 'Exports',
+              value: summary.totalExports,
+              Icon: CodeIcon,
+              color: 'text-yellow-400',
+            }].map((c, idx) => (
+              <div key={idx} className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-sm">{c.label}</p>
+                    <p className="text-3xl font-bold text-white">{c.value}</p>
+                  </div>
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <c.Icon className={`${c.color}`} size={22} />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
+        </div>
+
+        {/* Secondary Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20 animate-pulse">
+                <div className="h-3 w-20 bg-white/20 rounded mb-2" />
+                <div className="h-6 w-16 bg-white/30 rounded" />
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-xs">Contacts</p>
+                    <p className="text-xl font-semibold text-white">{summary.contacts}</p>
+                  </div>
+                  <div className="p-2.5 bg-white/10 rounded-xl">
+                    <MessageSquareIcon className="text-pink-300" size={18} />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-xs">Backups</p>
+                    <p className="text-xl font-semibold text-white">{summary.backups}</p>
+                  </div>
+                  <div className="p-2.5 bg-white/10 rounded-xl">
+                    <HardDriveIcon className="text-purple-300" size={18} />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-xs">API Keys</p>
+                    <p className="text-xl font-semibold text-white">{summary.apiKeys}</p>
+                  </div>
+                  <div className="p-2.5 bg-white/10 rounded-xl">
+                    <CodeIcon className="text-indigo-300" size={18} />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Link to="/api-key" className="text-indigo-200/80 hover:text-indigo-100 text-xs underline">Manage keys</Link>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white/60 text-xs">Open Chats</p>
+                    <p className="text-xl font-semibold text-white">{summary.openChats}</p>
+                  </div>
+                  <div className="p-2.5 bg-white/10 rounded-xl">
+                    <MessageSquareIcon className="text-emerald-300" size={18} />
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Two columns */}
@@ -231,14 +336,30 @@ const AdminDashboard: React.FC = () => {
               <h2 className="text-white font-semibold">Recent Activity</h2>
               <Link to="/admin/analytics" className="text-white/70 hover:text-white text-sm underline">View analytics</Link>
             </div>
+            <div className="mb-4">
+              <input
+                value={activityQuery}
+                onChange={(e) => setActivityQuery(e.target.value)}
+                placeholder="Search activity..."
+                aria-label="Search recent activity"
+                className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              />
+            </div>
             <div className="space-y-3">
-              {recentActivity.length === 0 && (
-                <p className="text-white/60 text-sm">No recent activity</p>
+              {loading && (
+                <>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-10 bg-white/10 rounded-lg animate-pulse" />
+                  ))}
+                </>
               )}
-              {recentActivity.map((a) => (
+              {!loading && filteredActivity.length === 0 && (
+                <p className="text-white/60 text-sm">No activity matches your search.</p>
+              )}
+              {!loading && filteredActivity.map((a) => (
                 <div key={a.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2.5 h-2.5 ${a.color} rounded-full`}></div>
+                    <div className={`w-2.5 h-2.5 ${a.color} rounded-full`} />
                     <span className="text-white/80 text-sm">{a.description}</span>
                   </div>
                   <span className="text-white/50 text-xs">{new Date(a.timestamp).toLocaleString()}</span>
@@ -252,8 +373,24 @@ const AdminDashboard: React.FC = () => {
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
               <h3 className="text-white font-semibold mb-3">System Status</h3>
               <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between text-white/80"><span>Network</span><span className="text-white">{systemStatus.network} ({systemStatus.downlink})</span></div>
-                <div className="flex items-center justify-between text-white/80"><span>Memory</span><span className="text-white">{systemStatus.memUsed}</span></div>
+                <div className="flex items-center justify-between text-white/80"><span>Network</span><span className="text-white">{(() => {
+                  try {
+                    const connection: any = (navigator as any).connection;
+                    const effective = connection?.effectiveType || 'unknown';
+                    const downlink = connection?.downlink ? `${connection.downlink}Mbps` : 'n/a';
+                    return `${effective} (${downlink})`;
+                  } catch {
+                    return 'unknown';
+                  }
+                })()}</span></div>
+                <div className="flex items-center justify-between text-white/80"><span>Memory</span><span className="text-white">{(() => {
+                  try {
+                    const memory: any = (window.performance as any)?.memory;
+                    return memory ? `${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB` : 'n/a';
+                  } catch {
+                    return 'n/a';
+                  }
+                })()}</span></div>
                 <div className="flex items-center justify-between text-white/80"><span>Open Chats</span><span className="text-white">{summary.openChats}</span></div>
                 <div className="flex items-center justify-between text-white/80"><span>Backups</span><span className="text-white">{summary.backups}</span></div>
                 <div className="flex items-center justify-between text-white/80"><span>API Keys</span><span className="text-white">{summary.apiKeys}</span></div>
