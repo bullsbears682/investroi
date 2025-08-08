@@ -116,11 +116,6 @@ function App() {
                         <Route path="/admin/system" element={<AdminSystem />} />
                         {/* Backups route removed */}
                         <Route path="/admin/chat" element={<AdminChat />} />
-<<<<<<< HEAD
-
-=======
-                        {/* API routes removed */}
->>>>>>> 1dccbd7d5ec218828c789a6cf5f15cd3c497fce6
                       </Routes>
                       </Suspense>
                     </main>
