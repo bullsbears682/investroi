@@ -71,8 +71,8 @@ const AdminSystem: React.FC = () => {
 
   const [applicationHealth] = useState<ApplicationHealth>({
     frontendStatus: 'Operational',
-    backendAPI: 'Healthy',
-    database: 'Connected',
+    backendAPI: 'Not configured',
+    database: 'Not in use',
     fileStorage: 'Available',
     emailService: 'Active',
     notificationSystem: 'Working',
