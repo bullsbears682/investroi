@@ -310,7 +310,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <Link to="/api-key" className="text-indigo-200/80 hover:text-indigo-100 text-xs underline">Manage keys</Link>
+                  {/* Manage keys link removed */}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
@@ -402,7 +402,6 @@ const AdminDashboard: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <Link to="/admin/data" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Manage Users</Link>
                 <Link to="/admin/chat" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Open Chat</Link>
-                <Link to="/api-key" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">API Keys</Link>
                 <Link to="/admin/backups" className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm text-center">Backups</Link>
               </div>
             </div>

@@ -9,7 +9,6 @@ import {
   MenuIcon,
   TargetIcon,
   ShieldIcon,
-  CodeIcon
 } from './icons/CustomIcons';
 
 const Header: React.FC = () => {
@@ -22,7 +21,6 @@ const Header: React.FC = () => {
     { name: 'Scenarios', href: '/scenarios', icon: AnalyticsIcon },
     { name: 'Demo', href: '/demo', icon: TargetIcon },
     { name: 'Guide', href: '/investment-guide', icon: ShieldIcon },
-    { name: 'API', href: '/api', icon: CodeIcon },
   ];
 
   const isActive = (href: string) => location.pathname === href;
