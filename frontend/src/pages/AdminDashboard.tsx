@@ -15,8 +15,7 @@ import {
   ShieldIcon,
   HardDriveIcon,
   TrendingUpIcon,
-  ActivityIcon,
-  CodeIcon
+  ActivityIcon
 } from '../components/icons/CustomIcons';
 import { MessageSquare } from 'lucide-react';
 
@@ -41,15 +40,7 @@ interface ActivityItem {
   color: string;
 }
 
-interface ApiKey {
-  id: string;
-  key: string;
-  name: string;
-  created: number;
-  lastUsed?: number;
-  isActive: boolean;
-  usageCount: number;
-}
+
 
 const AdminDashboard: React.FC = () => {
   const [adminStats, setAdminStats] = useState<Analytics>({
@@ -64,10 +55,9 @@ const AdminDashboard: React.FC = () => {
     bounceRate: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [newApiKeyName, setNewApiKeyName] = useState('');
+
   const [showContactSubmissions, setShowContactSubmissions] = useState(false);
   const [contactSubmissions, setContactSubmissions] = useState<any[]>([]);
   const { addNotification } = useNotifications();
@@ -193,17 +183,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Load API keys
-  const loadApiKeys = () => {
-    try {
-      const storedKeys = localStorage.getItem('api_keys');
-      if (storedKeys) {
-        setApiKeys(JSON.parse(storedKeys));
-      }
-    } catch (error) {
-      console.error('Error loading API keys:', error);
-    }
-  };
+
 
   // Load contact submissions
   const loadContactSubmissions = () => {
@@ -215,66 +195,9 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // Generate new API key
-  const generateApiKey = () => {
-    if (!newApiKeyName.trim()) {
-      addNotification({
-        type: 'error',
-        title: 'Error',
-        message: 'Please enter a name for the API key'
-      });
-      return;
-    }
 
-    const newKey: ApiKey = {
-      id: `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      key: `iw_${Math.random().toString(36).substr(2, 32)}_${Date.now().toString(36)}`,
-      name: newApiKeyName.trim(),
-      created: Date.now(),
-      isActive: true,
-      usageCount: 0
-    };
 
-    const updatedKeys = [...apiKeys, newKey];
-    setApiKeys(updatedKeys);
-    localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
-    
-    setNewApiKeyName('');
-    setShowApiKeyModal(false);
-    addNotification({
-      type: 'success',
-      title: 'Success',
-      message: 'API key generated successfully'
-    });
-  };
 
-  // Toggle API key status
-  const toggleApiKeyStatus = (keyId: string) => {
-    const updatedKeys = apiKeys.map(key => 
-      key.id === keyId ? { ...key, isActive: !key.isActive } : key
-    );
-    setApiKeys(updatedKeys);
-    localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
-    addNotification({
-      type: 'success',
-      title: 'Success',
-      message: 'API key status updated'
-    });
-  };
-
-  // Delete API key
-  const deleteApiKey = (keyId: string) => {
-    if (window.confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-      const updatedKeys = apiKeys.filter(key => key.id !== keyId);
-      setApiKeys(updatedKeys);
-      localStorage.setItem('api_keys', JSON.stringify(updatedKeys));
-      addNotification({
-        type: 'success',
-        title: 'Success',
-        message: 'API key deleted successfully'
-      });
-    }
-  };
 
   // Update contact submission status
   const updateContactStatus = (id: string, status: 'new' | 'read' | 'replied') => {
@@ -518,7 +441,6 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     loadAdminStats();
     loadRecentActivity();
-    loadApiKeys();
     loadContactSubmissions();
   }, []);
 
@@ -665,24 +587,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowApiKeyModal(true)}
-            className="group relative bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-white/60 text-sm font-medium mb-1">API Keys</p>
-                <p className="text-3xl lg:text-4xl font-bold text-white">{apiKeys.length}</p>
-                <p className="text-purple-400 text-sm font-medium">Manage</p>
-              </div>
-              <div className="p-4 bg-white/10 rounded-2xl">
-                <CodeIcon className="w-8 h-8 text-indigo-400" />
-              </div>
-            </div>
-          </motion.button>
+
 
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -816,14 +721,8 @@ const AdminDashboard: React.FC = () => {
 
       </div>
 
-      {/* API Key Management Modal */}
-        {showApiKeyModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
-            onClick={() => setShowApiKeyModal(false)}
-          >
+
+
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -1000,33 +899,7 @@ const AdminDashboard: React.FC = () => {
                   transition={{ delay: 0.5 }}
                   className="mt-8 p-6 bg-gradient-to-r from-blue-500/10 via-purple-500/5 to-indigo-500/10 rounded-2xl border border-blue-500/20"
                 >
-                  <h4 className="text-xl font-semibold text-blue-400 mb-4 flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <span>How to Use Your API Keys</span>
-                  </h4>
-                  <div className="space-y-3 text-sm text-white/80">
-                    <div className="flex items-start space-x-2">
-                      <span className="text-blue-400 font-semibold">•</span>
-                      <p>Use your API key in the Authorization header: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <span className="text-purple-400 font-semibold">•</span>
-                      <p>Make requests to: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">https://api.investwisepro.com/v1/calculator/roi</code></p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <span className="text-indigo-400 font-semibold">•</span>
-                      <p>Install our SDKs: <code className="bg-white/10 px-2 py-1 rounded-lg font-mono">npm install investwise-calculator-sdk</code></p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+
 
         {/* Contact Submissions Modal */}
         {showContactSubmissions && (
