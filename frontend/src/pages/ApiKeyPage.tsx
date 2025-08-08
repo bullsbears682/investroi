@@ -108,9 +108,9 @@ const ApiKeyPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/" className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors">
+              <Link to="/admin" className="flex items-center space-x-2 text-white/60 hover:text-white transition-colors">
                 <ArrowLeftIcon size={20} />
-                <span>Back to Home</span>
+                <span>Back to Admin</span>
               </Link>
               <div className="w-px h-6 bg-white/20"></div>
               <Logo size="sm" />
