@@ -654,7 +654,7 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
 
     const list = (items: string[]) => `
       <ul style="margin: 8px 0 0 18px; padding:0; color:#cbd5e1; font-size:13px;">
-        ${items.map(i => `<li style="margin:6px 0;">${i}</li>`).join('')}
+        ${items.map(i => `<li style=\"margin:6px 0;\">${i}</li>`).join('')}
       </ul>
     `;
 
@@ -678,6 +678,28 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'ROI %, Net profit, after-tax figures, investment breakdown',
       'Contact capture and activity (localStorage)',
       'Demo mode toggle (7 days) for gated features like PDF export',
+    ]);
+
+    const repoDoes = section(
+      'What the repo does (structure & features)',
+      'Clear, production-leaning front-end codebase designed for fast demos and easy integration.'
+    ) + list([
+      'Pages: Home, Calculator, Scenarios, Demo, Investment Guide, Tax Info, Market Research, Contact, Terms, Privacy, About.',
+      'Components: ROI calculator, export modal (PDF via jsPDF + html2canvas), chat button, cookie consent, header/footer with maintenance banner.',
+      'State: Zustand app store (loading, session, 7‑day demo mode), localStorage persistence for contacts, chat, maintenance, backups.',
+      'Styling: Tailwind CSS + framer-motion animations; responsive and mobile-optimized admin (optional).',
+      'Build/Deploy: Vite + TypeScript; Netlify config included; no secrets required.',
+      'Legal: MIT LICENSE + THIRD_PARTY_NOTICES included.'
+    ]);
+
+    const demoAndDeploy = section(
+      'Demo mode & deployment',
+      'Demo unlocks export and Pro UI locally (no accounts). One-click deploy to Netlify.'
+    ) + list([
+      'Demo: 7-day client-side activation, banner + countdown, no server required.',
+      'Local data keys: contact_submissions, registered_users, chatMessages, maintenance_mode, databaseBackups.',
+      'Setup: Node 18, cd frontend && npm i && npm run build && npm run preview.',
+      'Netlify: base=frontend, build=npm run build, publish=dist.'
     ]);
 
     const potential = section(
@@ -708,6 +730,14 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       'Week 3 (buffer): UI polish, packaging, Marketplace checklist.'
     ]);
 
+    const links = section(
+      'Links',
+      'Live demo and repository handover details.'
+    ) + list([
+      'Live demo: https://bespoke-gumdrop-1b7fc6.netlify.app/',
+      'Repo: transfer on acceptance (MIT, clean of secrets, with release tag).'
+    ]);
+
     const footer = `
       <div style="text-align:center; margin-top:20px; padding-top:12px; border-top:2px solid #6366f1;">
         <p style="margin:0; color:#94a3b8; font-size:12px;">Codebase is MIT-licensed with third‑party notices. Front-end only; easy to integrate.</p>
@@ -718,9 +748,12 @@ export const generateHubspotPitchPDF = async (): Promise<void> => {
       <div style="max-width:800px; margin:0 auto;">
         ${header}
         ${capabilities}
+        ${repoDoes}
+        ${demoAndDeploy}
         ${potential}
         ${hubspot}
         ${plan}
+        ${links}
         ${footer}
       </div>
     `;
