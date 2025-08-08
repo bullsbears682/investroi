@@ -53,7 +53,7 @@ const AdminBackups: React.FC = () => {
       const backupId = `backup-${Date.now()}`;
       const backupDataObj: any = {
         users: JSON.parse(localStorage.getItem('registered_users') || '[]'),
-        contacts: JSON.parse(localStorage.getItem('adminContacts') || '[]'),
+        contacts: JSON.parse(localStorage.getItem('contact_submissions') || '[]'),
         chatMessages: JSON.parse(localStorage.getItem('chatMessages') || '[]'),
         otherData: {}
       };
@@ -127,7 +127,7 @@ const AdminBackups: React.FC = () => {
       
       // Restore contacts
       if (backupData.contacts) {
-        localStorage.setItem('adminContacts', JSON.stringify(backupData.contacts));
+        localStorage.setItem('contact_submissions', JSON.stringify(backupData.contacts));
       }
       
       // Restore chat messages

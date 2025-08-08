@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Database, Users, Mail, Phone, Calendar, Eye, Trash2, X, Send } from 'lucide-react';
+import { ArrowLeft, Database, Users, Mail, Calendar, Eye, Trash2, X, Send } from 'lucide-react';
 import { userManager } from '../utils/userManagement';
 import AdminMenu from '../components/AdminMenu';
+import { contactStorage, type ContactSubmission } from '../utils/contactStorage';
 
 interface User {
   id: string;
@@ -14,15 +15,7 @@ interface User {
   status: 'active' | 'inactive';
 }
 
-interface Contact {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-  date: string;
-  status: 'new' | 'read' | 'replied';
-}
+type Contact = ContactSubmission & { date?: string; phone?: string };
 
 const AdminData: React.FC = () => {
   const navigate = useNavigate();
@@ -41,6 +34,9 @@ const AdminData: React.FC = () => {
 
   useEffect(() => {
     loadData();
+    const onContactsUpdated = () => loadData();
+    window.addEventListener('contact_submissions_updated', onContactsUpdated as EventListener);
+    return () => window.removeEventListener('contact_submissions_updated', onContactsUpdated as EventListener);
   }, []);
 
   const loadData = () => {
@@ -57,8 +53,10 @@ const AdminData: React.FC = () => {
         status: Math.random() > 0.3 ? 'active' : 'inactive'
       }));
 
-      const storedContacts = localStorage.getItem('adminContacts');
-      const realContacts: Contact[] = storedContacts ? JSON.parse(storedContacts) : [];
+      const realContacts: Contact[] = contactStorage.getSubmissions().map(c => ({
+        ...c,
+        date: c.timestamp,
+      }));
 
       setUsers(realUsers);
       setContacts(realContacts);
@@ -122,12 +120,8 @@ const AdminData: React.FC = () => {
   const handleDeleteContact = () => {
     if (!selectedContact) return;
 
-    // Remove contact from localStorage
-    const filteredContacts = contacts.filter(c => c.id !== selectedContact.id);
-    localStorage.setItem('adminContacts', JSON.stringify(filteredContacts));
-    
-    // Update local state
-    setContacts(filteredContacts);
+    contactStorage.deleteSubmission(selectedContact.id);
+    setContacts(prev => prev.filter(c => c.id !== selectedContact.id));
 
     setIsDeleteModalOpen(false);
     setSelectedContact(null);
@@ -136,15 +130,8 @@ const AdminData: React.FC = () => {
   const handleReplyContact = () => {
     if (!selectedContact || !replyMessage.trim()) return;
 
-    // Update contact status to replied
-    const updatedContacts = contacts.map(c => 
-      c.id === selectedContact.id 
-        ? { ...c, status: 'replied' as const }
-        : c
-    );
-    
-    localStorage.setItem('adminContacts', JSON.stringify(updatedContacts));
-    setContacts(updatedContacts);
+    contactStorage.updateSubmissionStatus(selectedContact.id, 'replied');
+    setContacts(prev => prev.map(c => c.id === selectedContact.id ? { ...c, status: 'replied' } : c));
 
     // In a real app, you would send the reply email here
     console.log(`Reply to ${selectedContact.email}: ${replyMessage}`);
@@ -307,13 +294,10 @@ const AdminData: React.FC = () => {
                           <Mail size={14} />
                           <span>{contact.email}</span>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Phone size={14} />
-                          <span>{contact.phone}</span>
-                        </div>
+                        {/* phone not captured in form; omitted intentionally */}
                         <div className="flex items-center space-x-1">
                           <Calendar size={14} />
-                          <span>{new Date(contact.date).toLocaleDateString()}</span>
+                          <span>{new Date(contact.date || contact.timestamp).toLocaleDateString()}</span>
                         </div>
                       </div>
                       <p className="text-white/80 text-sm">{contact.message}</p>
@@ -427,7 +411,7 @@ const AdminData: React.FC = () => {
                     <div>
                       <label className="text-white/60 text-sm">Date</label>
                       <p className="text-white font-medium">
-                        {new Date(selectedContact.date).toLocaleDateString()}
+                        {new Date(selectedContact.date || selectedContact.timestamp).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
