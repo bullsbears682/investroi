@@ -9,6 +9,7 @@ import {
 } from '../components/icons/CustomIcons';
 import { userManager } from '../utils/userManagement';
 import { chatSystem } from '../utils/chatSystem';
+import { contactStorage, type ContactSubmission } from '../utils/contactStorage';
 
 interface MetricSummary {
   totalUsers: number;
@@ -53,6 +54,7 @@ const AdminDashboard: React.FC = () => {
     openChats: 0,
   });
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [recentMessages, setRecentMessages] = useState<ContactSubmission[]>([]);
   const [activityQuery, setActivityQuery] = useState('');
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const [isMaintenance, setIsMaintenance] = useState<boolean>(false);
@@ -63,7 +65,7 @@ const AdminDashboard: React.FC = () => {
       const activeUsers = userManager.getActiveUsers();
       const totalCalculations = allUsers.reduce((sum: number, u: any) => sum + (u.totalCalculations || 0), 0);
       const totalExports = allUsers.reduce((sum: number, u: any) => sum + (u.totalExports || 0), 0);
-      const contacts = JSON.parse(localStorage.getItem('adminContacts') || '[]');
+      const contacts = contactStorage.getSubmissions();
       const openChats = (chatSystem.getAllSessions?.() || []).filter((s: any) => s.status !== 'closed').length;
 
       setSummary({
@@ -76,6 +78,14 @@ const AdminDashboard: React.FC = () => {
       });
     } catch (err) {
       console.error('Failed to load admin summary:', err);
+    }
+  };
+
+  const loadRecentMessages = () => {
+    try {
+      setRecentMessages(contactStorage.getRecentSubmissions(5));
+    } catch (e) {
+      console.error('Failed to load recent messages', e);
     }
   };
 
@@ -122,6 +132,7 @@ const AdminDashboard: React.FC = () => {
     setLoading(true);
     loadSummary();
     loadRecentActivity();
+    loadRecentMessages();
     setLastUpdatedAt(Date.now());
     setIsMaintenance(localStorage.getItem('maintenance_mode') === 'true');
     // ensure skeleton visible briefly
@@ -134,12 +145,13 @@ const AdminDashboard: React.FC = () => {
     const onStorage = (e: StorageEvent) => {
       if (
         e.key === 'registered_users' ||
-        e.key === 'adminContacts' ||
+        e.key === 'contact_submissions' ||
         e.key === 'chatMessages' ||
         e.key === 'maintenance_mode'
       ) {
         loadSummary();
         loadRecentActivity();
+        loadRecentMessages();
         setIsMaintenance(localStorage.getItem('maintenance_mode') === 'true');
         setLastUpdatedAt(Date.now());
       }
@@ -369,6 +381,28 @@ const AdminDashboard: React.FC = () => {
                 })()}</span></div>
                 <div className="flex items-center justify-between text-white/80"><span>Maintenance</span><span className="text-white">{isMaintenance ? 'Enabled' : 'Disabled'}</span></div>
                 <div className="flex items-center justify-between text-white/80"><span>Open Chats</span><span className="text-white">{summary.openChats}</span></div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+              <h3 className="text-white font-semibold mb-3">Recent Messages</h3>
+              <div className="space-y-2">
+                {recentMessages.length === 0 && <p className="text-white/60 text-sm">No recent messages</p>}
+                {recentMessages.map((m) => (
+                  <div key={m.id} className="flex items-start justify-between gap-3 p-3 bg-white/5 rounded-lg">
+                    <div className="min-w-0">
+                      <div className="text-white text-sm truncate">{m.name} • <span className="text-white/70">{m.email}</span></div>
+                      <div className="text-white/80 text-sm truncate">{m.subject}</div>
+                      <div className="text-white/50 text-xs">{new Date(m.timestamp).toLocaleString()}</div>
+                    </div>
+                    {m.status !== 'read' && (
+                      <button
+                        onClick={() => { contactStorage.updateSubmissionStatus(m.id, 'read'); refreshAll(); }}
+                        className="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-white"
+                      >Mark read</button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
