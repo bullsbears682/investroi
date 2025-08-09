@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, FileText, Download, Calendar, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../../utils/apiClient';
 
 interface Export {
   id: number;
@@ -21,7 +20,7 @@ interface ExportHistoryModalProps {
 }
 
 const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [exports, setExports] = useState<Export[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,19 +31,44 @@ const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose
   }, [isOpen, isAuthenticated]);
 
   const loadExports = async () => {
-    if (!user?.id) return;
-    
     setIsLoading(true);
     try {
-      const response = await apiClient.getUserExports(user.id);
+      // TODO: Connect to real API when export tracking is fully implemented
+      // For now, using mock data
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (response.success) {
-        setExports(response.data || []);
-      } else {
-        toast.error(response.error || 'Failed to load export history');
-      }
+      const mockExports: Export[] = [
+        {
+          id: 1,
+          filename: 'ROI_Analysis_E-commerce_2024-01-15.pdf',
+          calculation_scenario: 'E-commerce Store',
+          template_type: 'detailed',
+          created_at: '2024-01-15T10:35:00Z',
+          file_size: 2457600, // 2.4 MB in bytes
+          download_count: 3
+        },
+        {
+          id: 2,
+          filename: 'ROI_Report_SaaS_Executive_2024-01-14.pdf',
+          calculation_scenario: 'SaaS Platform',
+          template_type: 'executive',
+          created_at: '2024-01-14T15:50:00Z',
+          file_size: 1887436, // 1.8 MB in bytes
+          download_count: 1
+        },
+        {
+          id: 3,
+          filename: 'ROI_Standard_Restaurant_2024-01-13.pdf',
+          calculation_scenario: 'Restaurant',
+          template_type: 'standard',
+          created_at: '2024-01-13T09:20:00Z',
+          file_size: 1258291, // 1.2 MB in bytes
+          download_count: 5
+        }
+      ];
+      
+      setExports(mockExports);
     } catch (error) {
-      console.error('Error fetching exports:', error);
       toast.error('Failed to load export history');
     } finally {
       setIsLoading(false);
@@ -197,7 +221,7 @@ const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose
                       <div>
                         <p className="text-purple-600 text-sm font-medium">Storage Used</p>
                         <p className="text-2xl font-bold text-purple-900">
-                          {(exports.reduce((sum, exp) => sum + parseFloat(exp.file_size), 0)).toFixed(1)} MB
+                          {formatFileSize(exports.reduce((sum, exp) => sum + exp.file_size, 0))}
                         </p>
                       </div>
                       <Calendar className="w-8 h-8 text-purple-600" />

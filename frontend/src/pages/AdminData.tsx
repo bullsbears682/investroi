@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Database, Users, Mail, Calendar, Eye, Trash2, X, Send, MoreVertical } from 'lucide-react';
 import AdminMenu from '../components/AdminMenu';
 import { contactStorage, type ContactSubmission } from '../utils/contactStorage';
+import { apiClient } from '../utils/apiClient';
 
 interface User {
   id: string;
