@@ -31,16 +31,20 @@ import MarketAnalysis from '../components/MarketAnalysis';
 
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
+import { useAuth } from '../contexts/AuthContext';
+import AuthModal from '../components/auth/AuthModal';
+import UserMenu from '../components/auth/UserMenu';
 
 const CalculatorPage: React.FC = () => {
   const { addNotification } = useNotifications();
+  const { user, isAuthenticated } = useAuth();
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // Auth state will be handled by new auth context
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Fetch business scenarios with fallback to mock data
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
@@ -240,7 +244,10 @@ const CalculatorPage: React.FC = () => {
     const miniScenarioData = miniScenariosData.find((s: any) => s.id === selectedMiniScenario);
     const scenarioName = scenarioData?.name || 'Unknown';
     
-    // Record calculation will be handled by new auth system
+    // Record calculation for authenticated users
+    if (isAuthenticated && user) {
+      console.log(`Recording calculation for user: ${user.full_name}`);
+    }
     
     setIsCalculating(true);
     
@@ -352,28 +359,13 @@ const CalculatorPage: React.FC = () => {
             </motion.button>
           </Link>
           
-          {currentUser ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center space-x-3 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-2"
-            >
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">
-                  {currentUser.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="text-white">
-                <p className="text-sm font-medium">{currentUser.name}</p>
-                <p className="text-xs text-white/60">{currentUser.totalCalculations} calculations</p>
-              </div>
-              {/* Logout button will be handled by new auth system */}
-            </motion.div>
+          {isAuthenticated ? (
+            <UserMenu />
           ) : (
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAuth(true)}
+              onClick={() => setShowAuthModal(true)}
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center space-x-2"
             >
               <User className="w-4 h-4" />
@@ -545,7 +537,12 @@ const CalculatorPage: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Auth modal will be handled by new auth system */}
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="login"
+      />
     </div>
   );
 };

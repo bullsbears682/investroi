@@ -7,6 +7,7 @@ import { Suspense, lazy } from 'react';
 
 // Contexts
 import { NotificationProvider } from './contexts/NotificationContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Components
 import LoadingScreen from './components/LoadingScreen';
@@ -82,8 +83,9 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
-          <NotificationProvider>
-            <Router>
+          <AuthProvider>
+            <NotificationProvider>
+              <Router>
               <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
                 <div className="relative">
                   {/* Animated background */}
@@ -133,9 +135,10 @@ function App() {
               
               {/* Notification System - Outside main container for proper z-index */}
               <NotificationWrapper />
-            </Router>
-          </NotificationProvider>
-        </CookiesProvider>
+                            </Router>
+              </NotificationProvider>
+            </AuthProvider>
+          </CookiesProvider>
       </QueryClientProvider>
       
       {/* Toast notifications */}

@@ -58,6 +58,19 @@ class ApiClient {
     this.timeout = parseInt(import.meta.env.VITE_API_TIMEOUT || '10000');
   }
 
+  private getAuthHeaders(): HeadersInit {
+    const token = localStorage.getItem('auth_token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+  }
+
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -70,7 +83,7 @@ class ApiClient {
         ...options,
         signal: controller.signal,
         headers: {
-          'Content-Type': 'application/json',
+          ...this.getAuthHeaders(),
           ...options.headers,
         },
       });
