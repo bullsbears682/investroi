@@ -14,6 +14,14 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Dependency to get database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 # Base class for models
 Base = declarative_base()
 
@@ -137,6 +145,7 @@ class ROICalculation(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
+    user = relationship("User", back_populates="calculations")
     business_scenario = relationship("BusinessScenario")
     mini_scenario = relationship("MiniScenario")
     country = relationship("TaxCountry")

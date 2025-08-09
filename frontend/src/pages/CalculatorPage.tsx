@@ -32,9 +32,6 @@ import MarketAnalysis from '../components/MarketAnalysis';
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
-import { userManager } from '../utils/userManagement';
-import UserAuth from '../components/UserAuth';
-
 const CalculatorPage: React.FC = () => {
   const { addNotification } = useNotifications();
 
@@ -43,8 +40,7 @@ const CalculatorPage: React.FC = () => {
   const [selectedMiniScenario, setSelectedMiniScenario] = useState<number | null>(null);
   const [calculationResult, setCalculationResult] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [showAuth, setShowAuth] = useState(false);
+  // Auth state will be handled by new auth context
 
   // Fetch business scenarios with fallback to mock data
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
@@ -244,9 +240,7 @@ const CalculatorPage: React.FC = () => {
     const miniScenarioData = miniScenariosData.find((s: any) => s.id === selectedMiniScenario);
     const scenarioName = scenarioData?.name || 'Unknown';
     
-    if (currentUser) {
-      userManager.recordCalculation(scenarioName);
-    }
+    // Record calculation will be handled by new auth system
     
     setIsCalculating(true);
     
@@ -373,17 +367,7 @@ const CalculatorPage: React.FC = () => {
                 <p className="text-sm font-medium">{currentUser.name}</p>
                 <p className="text-xs text-white/60">{currentUser.totalCalculations} calculations</p>
               </div>
-              <button
-                onClick={() => {
-                  userManager.logoutUser();
-                  setCurrentUser(null);
-                  toast.success('Logged out successfully');
-                }}
-                className="text-white/60 hover:text-white transition-colors"
-                title="Logout"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              {/* Logout button will be handled by new auth system */}
             </motion.div>
           ) : (
             <motion.button
@@ -561,15 +545,7 @@ const CalculatorPage: React.FC = () => {
         </motion.div>
       )}
 
-      {/* User Authentication Modal */}
-      <UserAuth
-        isOpen={showAuth}
-        onClose={() => setShowAuth(false)}
-        onLogin={(user) => {
-          setCurrentUser(user);
-          setShowAuth(false);
-        }}
-      />
+      {/* Auth modal will be handled by new auth system */}
     </div>
   );
 };

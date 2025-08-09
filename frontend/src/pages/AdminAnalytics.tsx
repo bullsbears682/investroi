@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, BarChart3, TrendingUp, Users, Activity, PieChart, Target, User, MessageCircle, HardDrive } from 'lucide-react';
-import { userManager } from '../utils/userManagement';
 import AdminMenu from '../components/AdminMenu';
 
 interface Analytics {
@@ -48,8 +47,9 @@ const AdminAnalytics: React.FC = () => {
 
   const loadAnalyticsData = () => {
     try {
-      const allUsers = userManager.getAllUsers();
-      const activeUsers = userManager.getActiveUsers();
+      // Mock data until new auth system is implemented
+      const allUsers: any[] = [];
+      const activeUsers: any[] = [];
       
       // Calculate real analytics from actual data
       const totalCalculations = allUsers.reduce((sum, user) => sum + user.totalCalculations, 0);
@@ -107,10 +107,8 @@ const AdminAnalytics: React.FC = () => {
       const activities: ActivityItem[] = [];
       const now = Date.now();
       
-      // Get real user registrations (last 7 days)
-      const allUsers = userManager.getAllUsers();
-      const recentRegistrations = allUsers
-        .filter(user => new Date(user.registrationDate) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+      // Get real user registrations (last 7 days) - mock data for now
+      const recentRegistrations: any[] = [];
         .map(user => ({
           id: `reg-${user.id}`,
           type: 'registration' as const,

@@ -10,7 +10,6 @@ import {
 } from './icons/CustomIcons';
 import { toast } from 'react-hot-toast';
 import { chatSystem, ChatSession, ChatMessage } from '../utils/chatSystem';
-import { userManager } from '../utils/userManagement';
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -35,7 +34,8 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
     "General inquiry"
   ];
 
-  const currentUser = userManager.getCurrentUser();
+  // Current user will be handled by new auth system
+  const currentUser = null;
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Database, Users, Mail, Calendar, Eye, Trash2, X, Send, MoreVertical } from 'lucide-react';
-import { userManager } from '../utils/userManagement';
 import AdminMenu from '../components/AdminMenu';
 import { contactStorage, type ContactSubmission } from '../utils/contactStorage';
 
@@ -42,7 +41,8 @@ const AdminData: React.FC = () => {
 
   const loadData = () => {
     try {
-      const allUsers = userManager.getAllUsers();
+      // Mock data until new auth system is implemented
+      const allUsers: any[] = [];
       
       const realUsers: User[] = allUsers.map((user) => ({
         id: user.id,
@@ -106,10 +106,8 @@ const AdminData: React.FC = () => {
   const handleDeleteUser = () => {
     if (!selectedUser) return;
 
-    // Remove user from localStorage
-    const allUsers = userManager.getAllUsers();
-    const filteredUsers = allUsers.filter(u => u.id !== selectedUser.id);
-    localStorage.setItem('registered_users', JSON.stringify(filteredUsers));
+    // User deletion will be handled by new auth system
+    console.log('Delete user:', selectedUser.id);
     
     // Update local state
     setUsers(users.filter(u => u.id !== selectedUser.id));

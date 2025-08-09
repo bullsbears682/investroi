@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useNotifications } from '../contexts/NotificationContext';
-import { userManager } from '../utils/userManagement';
 import { contactStorage } from '../utils/contactStorage';
 import { chatSystem } from '../utils/chatSystem';
 import Logo from '../components/Logo';
@@ -60,7 +59,8 @@ const AdminDashboard: React.FC = () => {
   // Load admin statistics
   const loadAdminStats = () => {
     try {
-      const allUsers = userManager.getAllUsers();
+      // Mock data until new auth system is implemented
+      const allUsers: any[] = [];
       const allContacts = contactStorage.getSubmissions();
 
       const totalUsers = allUsers.length;
@@ -114,10 +114,8 @@ const AdminDashboard: React.FC = () => {
       const activities: ActivityItem[] = [];
       const now = Date.now();
       
-      // Get real user registrations (last 7 days)
-      const allUsers = userManager.getAllUsers();
-      const recentRegistrations = allUsers
-        .filter((user: any) => new Date(user.registrationDate) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+      // Get real user registrations (last 7 days) - mock data for now
+      const recentRegistrations: any[] = [];
         .map((user: any) => ({
           id: `reg-${user.id}`,
           type: 'registration' as const,
@@ -213,7 +211,8 @@ const AdminDashboard: React.FC = () => {
   // Export data function
   const handleExportData = () => {
     try {
-      const allUsers = userManager.getAllUsers();
+      // Mock data until new auth system is implemented
+      const allUsers: any[] = [];
       const allContacts = contactStorage.getSubmissions();
       const allSessions = chatSystem.getAllSessions();
       
@@ -298,7 +297,8 @@ const AdminDashboard: React.FC = () => {
   // Backup database function
   const handleBackupDatabase = () => {
     try {
-      const allUsers = userManager.getAllUsers();
+      // Mock data until new auth system is implemented
+      const allUsers: any[] = [];
       const allContacts = contactStorage.getSubmissions();
       const allSessions = chatSystem.getAllSessions();
       

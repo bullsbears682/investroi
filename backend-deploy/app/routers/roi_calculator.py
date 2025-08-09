@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 from app.cache import cache_manager
 from app.services.calculator import ROICalculatorService
 from app.services.market_data import MarketDataService
-from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROICalculation
+from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROICalculation, User
+from app.auth import get_current_user_optional
 
 router = APIRouter()
 
@@ -79,7 +80,11 @@ async def get_countries(db: Session = Depends(get_db)):
     ]
 
 @router.post("/calculate")
-async def calculate_roi(request: Dict[str, Any], db: Session = Depends(get_db)):
+async def calculate_roi(
+    request: Dict[str, Any], 
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
     """Calculate ROI for a business investment"""
     
     # Extract parameters from request
@@ -128,7 +133,8 @@ async def calculate_roi(request: Dict[str, Any], db: Session = Depends(get_db)):
     # Save calculation to database
     try:
         calculation_record = ROICalculation(
-            user_id=session_id,
+            user_id=current_user.id if current_user else None,
+            session_id=session_id if not current_user else None,
             business_scenario_id=business_scenario_id,
             mini_scenario_id=mini_scenario_id,
             country_id=None,  # We'll need to look this up by country_code

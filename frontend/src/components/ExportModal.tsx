@@ -14,8 +14,6 @@ import { generatePDF, PDFExportData } from '../utils/pdfExport';
 import { apiClient, PDFExportRequest } from '../utils/apiClient';
 import { useNotifications } from '../contexts/NotificationContext';
 
-import { userManager } from '../utils/userManagement';
-
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -147,8 +145,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
         duration: 8000
       });
       
-      // Record export for current user if logged in
-      userManager.recordExport(exportOptions.template);
+      // Export recording will be handled by new auth system
       
       onClose();
     } catch (error) {
