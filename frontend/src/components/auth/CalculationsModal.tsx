@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, BarChart3, DollarSign, TrendingUp, Eye, Trash2, Loader2 } from 'lucide-react';
+import { X, BarChart3, DollarSign, TrendingUp, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../utils/apiClient';
@@ -222,13 +222,6 @@ const CalculationsModal: React.FC<CalculationsModalProps> = ({ isOpen, onClose }
                           </div>
                         </div>
                         <div className="flex items-center space-x-2 ml-4">
-                          <button
-                            onClick={() => setSelectedCalculation(calculation)}
-                            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
                           <button
                             onClick={() => handleDeleteCalculation(calculation.id)}
                             className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
