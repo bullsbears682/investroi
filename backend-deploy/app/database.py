@@ -38,8 +38,9 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Relationship to calculations
+    # Relationships
     calculations = relationship("ROICalculation", back_populates="user")
+    exports = relationship("ExportHistory", back_populates="user")
 
 class BusinessScenario(Base):
     __tablename__ = "business_scenarios"
@@ -149,6 +150,24 @@ class ROICalculation(Base):
     business_scenario = relationship("BusinessScenario")
     mini_scenario = relationship("MiniScenario")
     country = relationship("TaxCountry")
+
+class ExportHistory(Base):
+    __tablename__ = "export_history"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    session_id = Column(String, nullable=True)
+    calculation_id = Column(Integer, ForeignKey("roi_calculations.id"), nullable=True)
+    filename = Column(String, nullable=False)
+    template_type = Column(String, default="standard")  # standard, executive, detailed
+    file_size = Column(Integer, default=0)  # in bytes
+    download_count = Column(Integer, default=1)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    last_downloaded_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
+    user = relationship("User", back_populates="exports")
+    calculation = relationship("ROICalculation")
 
 class MarketData(Base):
     __tablename__ = "market_data"
