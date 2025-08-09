@@ -1,0 +1,12 @@
+[variables]
+PYTHON_VERSION = "3.11"
+NIXPACKS_PYTHON_VERSION = "3.11"
+
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.pip"]
+
+[phases.install]
+cmds = ["cd backend-deploy && pip install -r requirements.txt"]
+
+[start]
+cmd = "cd backend-deploy && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
