@@ -1,19 +1,5 @@
 [variables]
 PYTHON_VERSION = "3.11"
 
-[phases.setup]
-nixPkgs = [
-  "python311",
-  "python311Packages.fastapi", 
-  "python311Packages.uvicorn",
-  "python311Packages.sqlalchemy",
-  "python311Packages.python-dotenv",
-  "python311Packages.python-multipart",
-  "python311Packages.reportlab"
-]
-
-[phases.build]
-cmds = ["echo 'Using Nix packages, no pip install needed'"]
-
 [start]
-cmd = "cd backend-deploy && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+cmd = "python main.py"
