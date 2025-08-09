@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 import os
 from app.routers import roi_calculator, pdf_export
 from app.database import engine, Base
-from app.seed_data import seed_database
+from app.complete_seed_data import seed_complete_database
 
 # Optional dotenv import to prevent deployment failures
 try:
@@ -25,9 +25,9 @@ async def lifespan(app: FastAPI):
     print("📋 Creating database tables...")
     Base.metadata.create_all(bind=engine)
     
-    # Seed database with business scenarios
-    print("🌱 Seeding database with business scenarios...")
-    seed_database()
+    # Seed database with comprehensive business scenarios
+    print("🌱 Seeding database with all 35 business scenarios and mini-scenarios...")
+    seed_complete_database()
     
     print("✅ Database initialized successfully!")
     yield
