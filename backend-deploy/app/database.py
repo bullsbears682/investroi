@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean, ForeignKey, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.sql import func
@@ -22,6 +22,95 @@ def get_db():
     finally:
         db.close()
 
+def seed_subscription_plans():
+    """Seed the database with subscription plans"""
+    db = SessionLocal()
+    try:
+        # Check if plans already exist
+        existing_plans = db.query(SubscriptionPlan).count()
+        if existing_plans > 0:
+            print("Subscription plans already exist")
+            return
+            
+        plans = [
+            SubscriptionPlan(
+                name="free",
+                display_name="Free",
+                price_monthly=0,
+                price_yearly=0,
+                calculations_per_month=3,
+                scenarios_access=5,
+                countries_access=10,
+                team_members_limit=1,
+                api_calls_limit=0,
+                advanced_exports=False,
+                custom_scenarios=False,
+                api_access=False,
+                white_label=False,
+                priority_support=False
+            ),
+            SubscriptionPlan(
+                name="pro",
+                display_name="Pro",
+                price_monthly=19,
+                price_yearly=190,  # 2 months free
+                calculations_per_month=-1,  # unlimited
+                scenarios_access=-1,  # all
+                countries_access=-1,  # all
+                team_members_limit=1,
+                api_calls_limit=0,
+                advanced_exports=True,
+                custom_scenarios=False,
+                api_access=False,
+                white_label=False,
+                priority_support=True
+            ),
+            SubscriptionPlan(
+                name="business",
+                display_name="Business",
+                price_monthly=49,
+                price_yearly=490,  # 2 months free
+                calculations_per_month=-1,  # unlimited
+                scenarios_access=-1,  # all
+                countries_access=-1,  # all
+                team_members_limit=5,
+                api_calls_limit=100,
+                advanced_exports=True,
+                custom_scenarios=True,
+                api_access=True,
+                white_label=True,
+                priority_support=True
+            ),
+            SubscriptionPlan(
+                name="enterprise",
+                display_name="Enterprise",
+                price_monthly=149,
+                price_yearly=1490,  # 2 months free
+                calculations_per_month=-1,  # unlimited
+                scenarios_access=-1,  # all
+                countries_access=-1,  # all
+                team_members_limit=-1,  # unlimited
+                api_calls_limit=-1,  # unlimited
+                advanced_exports=True,
+                custom_scenarios=True,
+                api_access=True,
+                white_label=True,
+                priority_support=True
+            )
+        ]
+        
+        for plan in plans:
+            db.add(plan)
+        
+        db.commit()
+        print("Successfully seeded subscription plans")
+        
+    except Exception as e:
+        print(f"Error seeding subscription plans: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
 # Base class for models
 Base = declarative_base()
 
@@ -41,6 +130,8 @@ class User(Base):
     # Relationships
     calculations = relationship("ROICalculation", back_populates="user")
     exports = relationship("ExportHistory", back_populates="user")
+    subscription = relationship("UserSubscription", back_populates="user", uselist=False)
+    usage = relationship("UsageTracking", back_populates="user", uselist=False)
 
 class BusinessScenario(Base):
     __tablename__ = "business_scenarios"
@@ -181,10 +272,72 @@ class MarketData(Base):
     date = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# Database dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+class SubscriptionPlan(Base):
+    __tablename__ = "subscription_plans"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)  # "free", "pro", "business", "enterprise"
+    display_name = Column(String, nullable=False)  # "Free", "Pro", "Business", "Enterprise"
+    price_monthly = Column(Numeric(10, 2), default=0)
+    price_yearly = Column(Numeric(10, 2), default=0)
+    
+    # Limits
+    calculations_per_month = Column(Integer, default=3)  # -1 for unlimited
+    scenarios_access = Column(Integer, default=5)  # -1 for all
+    countries_access = Column(Integer, default=10)  # -1 for all
+    team_members_limit = Column(Integer, default=1)  # -1 for unlimited
+    api_calls_limit = Column(Integer, default=0)  # -1 for unlimited
+    
+    # Features
+    advanced_exports = Column(Boolean, default=False)
+    custom_scenarios = Column(Boolean, default=False)
+    api_access = Column(Boolean, default=False)
+    white_label = Column(Boolean, default=False)
+    priority_support = Column(Boolean, default=False)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_active = Column(Boolean, default=True)
+
+class UserSubscription(Base):
+    __tablename__ = "user_subscriptions"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    plan_id = Column(Integer, ForeignKey("subscription_plans.id"), nullable=False)
+    
+    # Stripe/Payment info
+    stripe_subscription_id = Column(String, nullable=True)
+    stripe_customer_id = Column(String, nullable=True)
+    payment_method = Column(String, default="stripe")  # stripe, paypal, etc.
+    
+    # Subscription status
+    status = Column(String, default="active")  # active, canceled, past_due, unpaid
+    billing_cycle = Column(String, default="monthly")  # monthly, yearly
+    
+    # Dates
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    current_period_start = Column(DateTime(timezone=True), server_default=func.now())
+    current_period_end = Column(DateTime(timezone=True), nullable=True)
+    canceled_at = Column(DateTime(timezone=True), nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="subscription")
+    plan = relationship("SubscriptionPlan")
+
+class UsageTracking(Base):
+    __tablename__ = "usage_tracking"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    # Usage counters for current billing period
+    calculations_used = Column(Integer, default=0)
+    api_calls_used = Column(Integer, default=0)
+    exports_used = Column(Integer, default=0)
+    
+    # Period tracking
+    period_start = Column(DateTime(timezone=True), server_default=func.now())
+    period_end = Column(DateTime(timezone=True), nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="usage")
