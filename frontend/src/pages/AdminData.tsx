@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Database, Users, Mail, Calendar, Eye, Trash2, X, Send, MoreVertical } from 'lucide-react';
 import AdminMenu from '../components/AdminMenu';
 import { contactStorage, type ContactSubmission } from '../utils/contactStorage';
+import { apiClient } from '../utils/apiClient';
 
 interface User {
-  id: string;
-  name: string;
+  id: number;
   email: string;
-  totalCalculations: number;
-  totalExports: number;
-  lastActive: string;
-  status: 'active' | 'inactive';
+  username: string;
+  full_name: string;
+  is_active: boolean;
+  created_at: string;
+  total_calculations: number;
+  last_activity: string | null;
 }
 
 type Contact = ContactSubmission & { date?: string; phone?: string };
@@ -39,34 +41,34 @@ const AdminData: React.FC = () => {
     return () => window.removeEventListener('contact_submissions_updated', onContactsUpdated as EventListener);
   }, []);
 
-  const loadData = () => {
+  const loadData = async () => {
     try {
-      // Mock data until new auth system is implemented
-      const allUsers: any[] = [];
+      // Load real users from database
+      const usersResponse = await apiClient.getAdminUsers();
       
-      const realUsers: User[] = allUsers.map((user) => ({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        totalCalculations: user.totalCalculations,
-        totalExports: user.totalExports,
-        lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-        status: Math.random() > 0.3 ? 'active' : 'inactive'
-      }));
+      if (usersResponse.success) {
+        setUsers(usersResponse.data || []);
+      } else {
+        console.warn('Failed to load users from API, using empty array');
+        setUsers([]);
+      }
 
+      // Load contacts from local storage (as before)
       const realContacts: Contact[] = contactStorage.getSubmissions().map(c => ({
         ...c,
         date: c.timestamp,
       }));
 
-      setUsers(realUsers);
       setContacts(realContacts);
     } catch (error) {
       console.error('Failed to load data:', error);
+      // Fallback to empty arrays if API fails
+      setUsers([]);
+      setContacts(contactStorage.getSubmissions().map(c => ({ ...c, date: c.timestamp })));
     }
   };
 
-  const handleUserAction = (action: string, userId: string) => {
+  const handleUserAction = (action: string, userId: number) => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
 
@@ -103,14 +105,23 @@ const AdminData: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (!selectedUser) return;
 
-    // User deletion will be handled by new auth system
-    console.log('Delete user:', selectedUser.id);
-    
-    // Update local state
-    setUsers(users.filter(u => u.id !== selectedUser.id));
+    try {
+      const response = await apiClient.deleteUser(selectedUser.id);
+      
+      if (response.success) {
+        // Update local state
+        setUsers(users.filter(u => u.id !== selectedUser.id));
+        console.log('User deleted successfully:', selectedUser.id);
+      } else {
+        console.error('Failed to delete user:', response.error);
+        // You might want to show a toast notification here
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
 
     setIsDeleteModalOpen(false);
     setSelectedUser(null);
@@ -225,20 +236,20 @@ const AdminData: React.FC = () => {
                 <tbody>
                   {users.map((user) => (
                     <tr key={user.id} className="border-b border-white/10 hover:bg-white/5">
-                      <td className="py-3 px-4 text-white">{user.name}</td>
+                      <td className="py-3 px-4 text-white">{user.full_name}</td>
                       <td className="py-3 px-4 text-white/80">{user.email}</td>
-                      <td className="py-3 px-4 text-white/80">{user.totalCalculations}</td>
-                      <td className="py-3 px-4 text-white/80">{user.totalExports}</td>
+                      <td className="py-3 px-4 text-white/80">{user.total_calculations}</td>
+                      <td className="py-3 px-4 text-white/80">0</td>
                       <td className="py-3 px-4 text-white/80">
-                        {new Date(user.lastActive).toLocaleDateString()}
+                        {user.last_activity ? new Date(user.last_activity).toLocaleDateString() : 'Never'}
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          user.status === 'active' 
+                          user.is_active 
                             ? 'bg-green-500/20 text-green-400' 
                             : 'bg-red-500/20 text-red-400'
                         }`}>
-                          {user.status}
+                          {user.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -486,7 +497,7 @@ const AdminData: React.FC = () => {
               <div className="text-white mb-6">
                 <p>Are you sure you want to delete this {selectedUser ? 'user' : 'contact'}?</p>
                 <p className="text-white/60 mt-2">
-                  {selectedUser ? `${selectedUser.name} (${selectedUser.email})` : 
+                  {selectedUser ? `${selectedUser.full_name} (${selectedUser.email})` : 
                    selectedContact ? `${selectedContact.name} (${selectedContact.email})` : ''}
                 </p>
               </div>
