@@ -17,6 +17,22 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Base class for models
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    username = Column(String, unique=True, index=True, nullable=False)
+    full_name = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationship to calculations
+    calculations = relationship("ROICalculation", back_populates="user")
+
 class BusinessScenario(Base):
     __tablename__ = "business_scenarios"
     
@@ -89,7 +105,8 @@ class ROICalculation(Base):
     __tablename__ = "roi_calculations"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String, index=True)  # Session ID or user ID
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Optional for guest users
+    session_id = Column(String, index=True, nullable=True)  # For guest users
     business_scenario_id = Column(Integer, ForeignKey("business_scenarios.id"))
     mini_scenario_id = Column(Integer, ForeignKey("mini_scenarios.id"))
     country_id = Column(Integer, ForeignKey("tax_countries.id"))
