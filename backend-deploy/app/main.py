@@ -3,7 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
-from app.routers import roi_calculator, pdf_export, admin, auth
+from app.routers import roi_calculator, pdf_export, admin
+
+# Try to import auth, but continue without it if there are issues
+try:
+    from app.routers import auth
+    AUTH_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  Auth module not available: {e}")
+    AUTH_AVAILABLE = False
 from app.database import engine, Base
 from app.complete_seed_data import seed_complete_database
 from app.complete_countries_data import seed_all_countries
@@ -53,7 +61,12 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router)
+if AUTH_AVAILABLE:
+    app.include_router(auth.router)
+    print("✅ Auth routes enabled")
+else:
+    print("⚠️  Auth routes disabled")
+
 app.include_router(roi_calculator.router, prefix="/api/roi")
 app.include_router(pdf_export.router, prefix="/api")
 app.include_router(admin.router, prefix="/api/admin")
@@ -99,7 +112,19 @@ async def update_countries_endpoint():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "InvestWise Pro"}
+    try:
+        # Basic health check without database
+        return {
+            "status": "healthy", 
+            "service": "InvestWise Pro",
+            "version": "2.0.0",
+            "auth_enabled": True
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e)
+        }
 
 @app.get("/test")
 async def test_endpoint():

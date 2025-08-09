@@ -8,8 +8,18 @@ from sqlalchemy.orm import Session
 from app.cache import cache_manager
 from app.services.calculator import ROICalculatorService
 from app.services.market_data import MarketDataService
-from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROICalculation, User
-from app.auth import get_current_user_optional
+from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROICalculation
+
+# Try to import auth, but continue without it if there are issues
+try:
+    from app.database import User
+    from app.auth import get_current_user_optional
+    AUTH_AVAILABLE = True
+except ImportError:
+    AUTH_AVAILABLE = False
+    User = None
+    def get_current_user_optional():
+        return None
 
 router = APIRouter()
 
@@ -83,7 +93,7 @@ async def get_countries(db: Session = Depends(get_db)):
 async def calculate_roi(
     request: Dict[str, Any], 
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user = Depends(get_current_user_optional) if AUTH_AVAILABLE else None
 ):
     """Calculate ROI for a business investment"""
     

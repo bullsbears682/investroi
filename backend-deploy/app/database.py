@@ -145,7 +145,7 @@ class ROICalculation(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    user = relationship("User", back_populates="calculations")
+    user = relationship("User", back_populates="calculations", foreign_keys=[user_id])
     business_scenario = relationship("BusinessScenario")
     mini_scenario = relationship("MiniScenario")
     country = relationship("TaxCountry")
