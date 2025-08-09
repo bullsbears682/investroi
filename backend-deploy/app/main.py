@@ -5,13 +5,22 @@ from contextlib import asynccontextmanager
 import os
 from app.routers import roi_calculator, pdf_export, admin
 
-# Try to import auth, but continue without it if there are issues
+# Try to import auth systems
+try:
+    from app.routers import simple_auth
+    SIMPLE_AUTH_AVAILABLE = True
+    print("✅ Simple auth system loaded")
+except ImportError as e:
+    print(f"⚠️  Simple auth not available: {e}")
+    SIMPLE_AUTH_AVAILABLE = False
+
 try:
     from app.routers import auth
-    AUTH_AVAILABLE = True
+    COMPLEX_AUTH_AVAILABLE = True
+    print("✅ Complex auth system loaded")
 except ImportError as e:
-    print(f"⚠️  Auth module not available: {e}")
-    AUTH_AVAILABLE = False
+    print(f"⚠️  Complex auth not available: {e}")
+    COMPLEX_AUTH_AVAILABLE = False
 from app.database import engine, Base
 from app.complete_seed_data import seed_complete_database
 from app.complete_countries_data import seed_all_countries
@@ -61,11 +70,14 @@ app.add_middleware(
 )
 
 # Include routers
-if AUTH_AVAILABLE:
+if SIMPLE_AUTH_AVAILABLE:
+    app.include_router(simple_auth.router)
+    print("✅ Simple auth routes enabled")
+elif COMPLEX_AUTH_AVAILABLE:
     app.include_router(auth.router)
-    print("✅ Auth routes enabled")
+    print("✅ Complex auth routes enabled")
 else:
-    print("⚠️  Auth routes disabled")
+    print("⚠️  No auth routes available")
 
 app.include_router(roi_calculator.router, prefix="/api/roi")
 app.include_router(pdf_export.router, prefix="/api")
@@ -114,11 +126,13 @@ async def update_countries_endpoint():
 async def health_check():
     try:
         # Basic health check without database
+        auth_status = "simple" if SIMPLE_AUTH_AVAILABLE else ("complex" if COMPLEX_AUTH_AVAILABLE else "disabled")
         return {
             "status": "healthy", 
             "service": "InvestWise Pro",
-            "version": "2.0.0",
-            "auth_enabled": True
+            "version": "2.1.0",
+            "auth_system": auth_status,
+            "auth_enabled": SIMPLE_AUTH_AVAILABLE or COMPLEX_AUTH_AVAILABLE
         }
     except Exception as e:
         return {
