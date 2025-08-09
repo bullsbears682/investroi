@@ -60,6 +60,8 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
     setIsLoading(true);
     setError(null);
 
+    console.log('WhiteLabel loadConfig called with:', { clientId, domain });
+
     try {
       let response;
       
@@ -67,18 +69,25 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
         // Load by client ID (for demo or direct access)
         if (clientId === 'smith-financial' || clientId === 'acme-consulting') {
           // Try demo first
+          console.log('Calling getDemoWhiteLabelConfig for:', clientId);
           response = await apiClient.getDemoWhiteLabelConfig(clientId);
+          console.log('Demo API response:', response);
         } else {
           // Try real config
+          console.log('Calling getWhiteLabelConfig for:', clientId);
           response = await apiClient.getWhiteLabelConfig(clientId);
+          console.log('Real API response:', response);
         }
       } else if (domain) {
         // Load by domain
+        console.log('Calling getWhiteLabelByDomain for:', domain);
         response = await apiClient.getWhiteLabelByDomain(domain);
+        console.log('Domain API response:', response);
       } else {
         // Auto-detect from current domain
         const currentDomain = window.location.hostname;
         if (currentDomain !== 'localhost' && currentDomain !== 'investwisepro.netlify.app') {
+          console.log('Auto-detecting domain:', currentDomain);
           response = await apiClient.getWhiteLabelByDomain(currentDomain);
         }
       }
@@ -128,6 +137,12 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
     const urlParams = new URLSearchParams(window.location.search);
     const clientId = urlParams.get('client') || urlParams.get('wl');
     
+    console.log('WhiteLabel Context: URL params check', { 
+      clientId, 
+      fullUrl: window.location.href,
+      search: window.location.search 
+    });
+    
     // Check subdomain
     const hostname = window.location.hostname;
     const isSubdomain = hostname.includes('.') && 
@@ -136,10 +151,13 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
                        hostname !== 'localhost';
 
     if (clientId) {
+      console.log('Loading white label config for client:', clientId);
       loadConfig(clientId);
     } else if (isSubdomain) {
+      console.log('Loading white label config for subdomain:', hostname);
       loadConfig(undefined, hostname);
     } else {
+      console.log('No white label config detected, using default theme');
       // Apply default theme
       applyTheme(DEFAULT_WHITELABEL_CONFIG);
     }

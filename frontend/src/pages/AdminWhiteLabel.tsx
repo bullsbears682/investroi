@@ -253,7 +253,16 @@ const AdminWhiteLabel: React.FC = () => {
 
   const handlePreview = (client: WhiteLabelClient) => {
     const previewUrl = `${window.location.origin}?client=${client.client_id}`;
-    window.open(previewUrl, '_blank');
+    console.log('Opening preview URL:', previewUrl);
+    
+    // Test if the URL works first
+    toast.success(`Opening preview for ${client.company_name}`);
+    
+    // Open in new tab
+    const newWindow = window.open(previewUrl, '_blank');
+    if (!newWindow) {
+      toast.error('Popup blocked! Please allow popups and try again.');
+    }
   };
 
   const handleToggleStatus = async (client: WhiteLabelClient) => {
