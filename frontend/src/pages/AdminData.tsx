@@ -400,7 +400,7 @@ const AdminData: React.FC = () => {
                   <>
                     <div>
                       <label className="text-white/60 text-sm">Name</label>
-                      <p className="text-white font-medium">{selectedUser.name}</p>
+                      <p className="text-white font-medium">{selectedUser.full_name}</p>
                     </div>
                     <div>
                       <label className="text-white/60 text-sm">Email</label>
@@ -408,26 +408,26 @@ const AdminData: React.FC = () => {
                     </div>
                     <div>
                       <label className="text-white/60 text-sm">Calculations</label>
-                      <p className="text-white font-medium">{selectedUser.totalCalculations}</p>
+                      <p className="text-white font-medium">{selectedUser.total_calculations}</p>
                     </div>
                     <div>
                       <label className="text-white/60 text-sm">Exports</label>
-                      <p className="text-white font-medium">{selectedUser.totalExports}</p>
+                      <p className="text-white font-medium">0</p>
                     </div>
                     <div>
                       <label className="text-white/60 text-sm">Last Active</label>
                       <p className="text-white font-medium">
-                        {new Date(selectedUser.lastActive).toLocaleDateString()}
+                        {selectedUser.last_activity ? new Date(selectedUser.last_activity).toLocaleDateString() : 'Never'}
                       </p>
                     </div>
                     <div>
                       <label className="text-white/60 text-sm">Status</label>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedUser.status === 'active' 
+                        selectedUser.is_active 
                           ? 'bg-green-500/20 text-green-400' 
                           : 'bg-red-500/20 text-red-400'
                       }`}>
-                        {selectedUser.status}
+                        {selectedUser.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </div>
                   </>

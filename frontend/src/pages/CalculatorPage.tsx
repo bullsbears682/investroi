@@ -19,8 +19,7 @@ import {
   User
 } from 'lucide-react';
 
-// API client for backend communication
-import { apiClient, ROICalculationRequest } from '../utils/apiClient';
+
 import { getResearchBasedMarketData } from '../utils/marketResearchData';
 
 import CategorySelector from '../components/CategorySelector';
