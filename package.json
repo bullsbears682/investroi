@@ -1,0 +1,15 @@
+{
+  "name": "investwise-pro-root",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "cd frontend && npm ci && npm run build",
+    "start": "serve -s frontend/dist -l ${PORT:-8080}"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}

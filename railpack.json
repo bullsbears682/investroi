@@ -1,0 +1,11 @@
+{
+  "language": "Node",
+  "root": "frontend",
+  "build": "npm ci && npm run build",
+  "start": "npm run preview",
+  "env": {
+    "NIXPACKS_NODE_VERSION": "18",
+    "PORT": "4173"
+  },
+  "static": false
+}
