@@ -6,6 +6,7 @@ import os
 from app.routers import roi_calculator, pdf_export, admin
 from app.database import engine, Base
 from app.complete_seed_data import seed_complete_database
+from app.complete_countries_data import seed_all_countries
 
 # Optional dotenv import to prevent deployment failures
 try:
@@ -77,6 +78,21 @@ async def reset_database_endpoint():
     except Exception as e:
         return {
             "message": f"Failed to reset database: {str(e)}",
+            "status": "error"
+        }
+
+@app.post("/update-countries")
+async def update_countries_endpoint():
+    """Update database with all 25 countries"""
+    try:
+        count = seed_all_countries()
+        return {
+            "message": f"Countries updated successfully with {count} countries",
+            "status": "success"
+        }
+    except Exception as e:
+        return {
+            "message": f"Failed to update countries: {str(e)}",
             "status": "error"
         }
 
