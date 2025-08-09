@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, FileText, Download, Calendar, Eye, Trash2, Loader2 } from 'lucide-react';
+import { X, FileText, Download, Calendar, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
@@ -20,7 +20,7 @@ interface ExportHistoryModalProps {
 }
 
 const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [exports, setExports] = useState<Export[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 

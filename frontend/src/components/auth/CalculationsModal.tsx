@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, BarChart3, Calendar, DollarSign, TrendingUp, Eye, Trash2, Loader2 } from 'lucide-react';
+import { X, BarChart3, DollarSign, TrendingUp, Eye, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import { apiClient } from '../../utils/apiClient';
@@ -25,7 +25,7 @@ const CalculationsModal: React.FC<CalculationsModalProps> = ({ isOpen, onClose }
   const { user, isAuthenticated } = useAuth();
   const [calculations, setCalculations] = useState<Calculation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCalculation, setSelectedCalculation] = useState<Calculation | null>(null);
+
 
   useEffect(() => {
     if (isOpen && isAuthenticated) {
