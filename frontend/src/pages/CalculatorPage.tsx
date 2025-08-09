@@ -19,7 +19,8 @@ import {
   X
 } from 'lucide-react';
 
-// API service removed; using local/mock logic only
+// API service for backend integration
+import api from '../services/api';
 
 import CategorySelector from '../components/CategorySelector';
 import ScenarioSelector from '../components/ScenarioSelector';
@@ -27,7 +28,7 @@ import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
 
-
+// Keep mock data as fallback
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
 
 import { userManager } from '../utils/userManagement';
@@ -44,20 +45,35 @@ const CalculatorPage: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [showAuth, setShowAuth] = useState(false);
 
-  // Fetch business scenarios with fallback to mock data
+  // Fetch business scenarios from API with fallback to mock data
   const { data: scenarios, isLoading: scenariosLoading } = useQuery({
     queryKey: ['scenarios'],
     queryFn: async () => {
-      return { data: mockScenarios };
+      try {
+        const data = await api.getScenarios();
+        return { data };
+      } catch (error) {
+        console.warn('API failed, using mock data:', error);
+        return { data: mockScenarios };
+      }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch mini scenarios when a scenario is selected with fallback to mock data
+  // Fetch mini scenarios from API with fallback to mock data
   const { data: miniScenarios, isLoading: miniScenariosLoading } = useQuery({
     queryKey: ['mini-scenarios', selectedScenario],
     queryFn: async () => {
-      return { data: mockMiniScenarios[selectedScenario!] || [] };
+      try {
+        if (selectedScenario) {
+          const data = await api.getMiniScenarios(selectedScenario);
+          return { data };
+        }
+        return { data: [] };
+      } catch (error) {
+        console.warn('API failed, using mock data:', error);
+        return { data: mockMiniScenarios[selectedScenario!] || [] };
+      }
     },
     enabled: !!selectedScenario,
     staleTime: 5 * 60 * 1000,
@@ -231,19 +247,43 @@ const CalculatorPage: React.FC = () => {
     toast.success('ROI calculation completed!');
   };
 
-  const handleCalculate = (formData: any) => {
+  const handleCalculate = async (formData: any) => {
     if (!selectedScenario || !selectedMiniScenario) {
       toast.error('Please select a business scenario and mini scenario');
       return;
     }
+    
     (window as any).formData = formData;
     const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
     if (currentUser) {
       userManager.recordCalculation(scenarioName);
     }
+    
     setIsCalculating(true);
-    // Perform local calculation synchronously
-    performLocalCalculation(formData);
+    
+    try {
+      // Try API calculation first
+      const apiData = {
+        initial_investment: Number(formData.initial_investment) || 0,
+        additional_costs: Number(formData.additional_costs) || 0,
+        time_period: Number(formData.time_period) || 1,
+        time_unit: formData.time_unit || 'years',
+        business_scenario_id: selectedScenario,
+        mini_scenario_id: selectedMiniScenario,
+        country_code: formData.country_code || 'US'
+      };
+      
+      const result = await api.calculateROI(apiData);
+      setCalculationResult(result);
+      toast.success('ROI calculated successfully!');
+      
+    } catch (error) {
+      console.warn('API calculation failed, using local fallback:', error);
+      // Fallback to local calculation
+      performLocalCalculation(formData);
+      toast.warning('Using offline calculation mode');
+    }
+    
     setIsCalculating(false);
   };
 
