@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend-deploy && pip install -r requirements.txt"
+buildCommand = "echo 'Dependencies managed by Nix'"
 
 [deploy]
-startCommand = "cd backend-deploy && uvicorn app.main:app --host 0.0.0.0 --port $PORT --reload"
+startCommand = "cd backend-deploy && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
