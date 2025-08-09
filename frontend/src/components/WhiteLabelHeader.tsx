@@ -1,6 +1,5 @@
 import React from 'react';
 import { useWhiteLabel } from '../contexts/WhiteLabelContext';
-import { DEFAULT_WHITELABEL_CONFIG } from '../types/whitelabel';
 
 interface WhiteLabelHeaderProps {
   className?: string;

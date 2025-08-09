@@ -7,20 +7,14 @@ import {
   Eye, 
   ExternalLink,
   Building2,
-  Palette,
   Globe,
-  Mail,
-  Phone,
-  MapPin,
   CheckCircle,
   XCircle,
   Search,
   Filter,
-  Download,
-  Settings
+  Download
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { apiClient } from '../utils/apiClient';
 
 interface WhiteLabelClient {
   id: number;
