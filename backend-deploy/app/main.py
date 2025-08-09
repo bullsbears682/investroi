@@ -4,6 +4,8 @@ import uvicorn
 from contextlib import asynccontextmanager
 import os
 from app.routers import roi_calculator, pdf_export
+from app.database import engine, Base
+from app.seed_data import seed_database
 
 # Optional dotenv import to prevent deployment failures
 try:
@@ -18,6 +20,16 @@ except ImportError:
 async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Starting InvestWise Pro ROI Calculator...")
+    
+    # Create database tables
+    print("📋 Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    
+    # Seed database with business scenarios
+    print("🌱 Seeding database with business scenarios...")
+    seed_database()
+    
+    print("✅ Database initialized successfully!")
     yield
     # Shutdown
     print("🛑 Shutting down InvestWise Pro...")

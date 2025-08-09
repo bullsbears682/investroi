@@ -1,41 +1,85 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List, Optional, Dict, Any
 import math
 import uuid
 from datetime import datetime
+from sqlalchemy.orm import Session
 
 from app.cache import cache_manager
 from app.services.calculator import ROICalculatorService
 from app.services.market_data import MarketDataService
+from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROICalculation
 
 router = APIRouter()
 
 @router.get("/scenarios")
-async def get_business_scenarios():
-    """Get all business scenarios"""
+async def get_business_scenarios(db: Session = Depends(get_db)):
+    """Get all business scenarios from database"""
+    scenarios = db.query(BusinessScenario).all()
     return [
-        {"id": 1, "name": "E-commerce", "description": "Online retail business"},
-        {"id": 2, "name": "SaaS", "description": "Software as a Service"},
-        {"id": 3, "name": "Freelancer", "description": "Independent contractor"},
-        {"id": 4, "name": "Agency", "description": "Marketing and creative agency"},
-        {"id": 5, "name": "Startup", "description": "Innovative new business"},
-        {"id": 6, "name": "Restaurant", "description": "Food service business"},
-        {"id": 7, "name": "Consulting", "description": "Business consulting"}
+        {
+            "id": scenario.id,
+            "name": scenario.name,
+            "category": scenario.category,
+            "description": scenario.description,
+            "recommended_investment_min": scenario.recommended_investment_min,
+            "recommended_investment_max": scenario.recommended_investment_max,
+            "typical_roi_min": scenario.typical_roi_min,
+            "typical_roi_max": scenario.typical_roi_max,
+            "risk_level": scenario.risk_level,
+            "time_to_profitability": scenario.time_to_profitability,
+            "market_size": scenario.market_size,
+            "competition_level": scenario.competition_level,
+            "regulatory_complexity": scenario.regulatory_complexity,
+            "scalability": scenario.scalability
+        }
+        for scenario in scenarios
     ]
 
 @router.get("/scenarios/{scenario_id}/mini-scenarios")
-async def get_mini_scenarios(scenario_id: int):
-    """Get mini scenarios for a specific business scenario"""
+async def get_mini_scenarios(scenario_id: int, db: Session = Depends(get_db)):
+    """Get mini scenarios for a specific business scenario from database"""
+    mini_scenarios = db.query(MiniScenario).filter(MiniScenario.business_scenario_id == scenario_id).all()
     return [
-        {"id": 1, "name": "General", "description": "Standard approach"},
-        {"id": 2, "name": "Specialized", "description": "Niche focus"},
-        {"id": 3, "name": "Premium", "description": "High-end service"},
-        {"id": 4, "name": "Budget", "description": "Cost-effective option"},
-        {"id": 5, "name": "Enterprise", "description": "Large-scale solution"}
+        {
+            "id": mini.id,
+            "name": mini.name,
+            "description": mini.description,
+            "recommended_investment_min": mini.recommended_investment_min,
+            "recommended_investment_max": mini.recommended_investment_max,
+            "typical_roi_min": mini.typical_roi_min,
+            "typical_roi_max": mini.typical_roi_max,
+            "risk_level": mini.risk_level,
+            "time_to_profitability": mini.time_to_profitability,
+            "market_size": mini.market_size,
+            "competition_level": mini.competition_level,
+            "regulatory_complexity": mini.regulatory_complexity,
+            "scalability": mini.scalability,
+            "revenue_model": mini.revenue_model,
+            "cost_structure": mini.cost_structure,
+            "key_success_factors": mini.key_success_factors
+        }
+        for mini in mini_scenarios
+          ]
+
+@router.get("/countries")
+async def get_countries(db: Session = Depends(get_db)):
+    """Get all available countries with tax information"""
+    countries = db.query(TaxCountry).all()
+    return [
+        {
+            "country_code": country.country_code,
+            "country_name": country.country_name,
+            "corporate_tax_rate": country.corporate_tax_rate,
+            "currency": country.currency,
+            "gdp_per_capita": country.gdp_per_capita,
+            "ease_of_business_rank": country.ease_of_business_rank
+        }
+        for country in countries
     ]
 
 @router.post("/calculate")
-async def calculate_roi(request: Dict[str, Any]):
+async def calculate_roi(request: Dict[str, Any], db: Session = Depends(get_db)):
     """Calculate ROI for a business investment"""
     
     # Extract parameters from request
@@ -80,6 +124,36 @@ async def calculate_roi(request: Dict[str, Any]):
     # Store calculation in cache
     cache_manager.set_calculation(session_id, result)
     cache_manager.increment_usage_counter(session_id)
+    
+    # Save calculation to database
+    try:
+        calculation_record = ROICalculation(
+            user_id=session_id,
+            business_scenario_id=business_scenario_id,
+            mini_scenario_id=mini_scenario_id,
+            country_id=None,  # We'll need to look this up by country_code
+            initial_investment=initial_investment,
+            additional_costs=additional_costs,
+            time_period=time_period,
+            time_unit=time_unit,
+            final_value=result.get("expected_return", 0),
+            net_profit=result.get("net_profit", 0),
+            roi_percentage=result.get("roi_percentage", 0),
+            annualized_roi=result.get("annual_return", 0),
+            total_investment=result.get("total_investment", 0),
+            tax_amount=result.get("tax_amount", 0),
+            after_tax_profit=result.get("after_tax_profit", 0),
+            after_tax_roi=result.get("after_tax_roi", 0),
+            risk_score=result.get("risk_adjusted_return", 0),
+            market_analysis="",
+            recommendations=""
+        )
+        db.add(calculation_record)
+        db.commit()
+        print(f"✅ Saved calculation to database: {session_id}")
+    except Exception as e:
+        print(f"❌ Failed to save calculation: {e}")
+        db.rollback()
     
     return {
         "data": result,
