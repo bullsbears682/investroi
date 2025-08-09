@@ -247,9 +247,7 @@ const AdminWhiteLabel: React.FC = () => {
 
   const handlePreview = (client: WhiteLabelClient) => {
     const previewUrl = `${window.location.origin}?client=${client.client_id}`;
-    console.log('Opening preview URL:', previewUrl);
     
-    // Test if the URL works first
     toast.success(`Opening preview for ${client.company_name}`);
     
     // Open in new tab
