@@ -65,6 +65,21 @@ async def root():
         "status": "running"
     }
 
+@app.post("/reset-database")
+async def reset_database_endpoint():
+    """Reset and reseed the database with all 35 scenarios"""
+    try:
+        seed_complete_database()
+        return {
+            "message": "Database reset and reseeded successfully with 35 business scenarios",
+            "status": "success"
+        }
+    except Exception as e:
+        return {
+            "message": f"Failed to reset database: {str(e)}",
+            "status": "error"
+        }
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "InvestWise Pro"}
