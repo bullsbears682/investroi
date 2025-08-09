@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Settings, BarChart3, FileText, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import ProfileModal from './ProfileModal';
+import CalculationsModal from './CalculationsModal';
+import ExportHistoryModal from './ExportHistoryModal';
 
 interface UserMenuProps {
   className?: string;
@@ -9,6 +12,9 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showCalculations, setShowCalculations] = useState(false);
+  const [showExports, setShowExports] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
 
@@ -74,7 +80,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
             {/* Menu Items */}
             <div className="py-2">
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowProfile(true);
+                }}
                 className="w-full flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <Settings className="w-4 h-4" />
@@ -82,7 +91,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
               </button>
               
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowCalculations(true);
+                }}
                 className="w-full flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <BarChart3 className="w-4 h-4" />
@@ -90,7 +102,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
               </button>
               
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowExports(true);
+                }}
                 className="w-full flex items-center space-x-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <FileText className="w-4 h-4" />
@@ -112,6 +127,22 @@ const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modals */}
+      <ProfileModal 
+        isOpen={showProfile} 
+        onClose={() => setShowProfile(false)} 
+      />
+      
+      <CalculationsModal 
+        isOpen={showCalculations} 
+        onClose={() => setShowCalculations(false)} 
+      />
+      
+      <ExportHistoryModal 
+        isOpen={showExports} 
+        onClose={() => setShowExports(false)} 
+      />
     </div>
   );
 };
