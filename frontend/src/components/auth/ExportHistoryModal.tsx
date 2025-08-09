@@ -21,7 +21,7 @@ interface ExportHistoryModalProps {
 }
 
 const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose }) => {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [exports, setExports] = useState<Export[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,44 +32,19 @@ const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose
   }, [isOpen, isAuthenticated]);
 
   const loadExports = async () => {
+    if (!user?.id) return;
+    
     setIsLoading(true);
     try {
-      // TODO: Implement API call to fetch user's export history
-      // For now, using mock data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await apiClient.getUserExports(user.id);
       
-      const mockExports: Export[] = [
-        {
-          id: '1',
-          filename: 'ROI_Analysis_E-commerce_2024-01-15.pdf',
-          scenario_name: 'E-commerce Store',
-          template: 'detailed',
-          created_at: '2024-01-15T10:35:00Z',
-          file_size: '2.4 MB',
-          download_count: 3
-        },
-        {
-          id: '2',
-          filename: 'ROI_Report_SaaS_Executive_2024-01-14.pdf',
-          scenario_name: 'SaaS Platform',
-          template: 'executive',
-          created_at: '2024-01-14T15:50:00Z',
-          file_size: '1.8 MB',
-          download_count: 1
-        },
-        {
-          id: '3',
-          filename: 'ROI_Standard_Restaurant_2024-01-13.pdf',
-          scenario_name: 'Restaurant',
-          template: 'standard',
-          created_at: '2024-01-13T09:20:00Z',
-          file_size: '1.2 MB',
-          download_count: 5
-        }
-      ];
-      
-      setExports(mockExports);
+      if (response.success) {
+        setExports(response.data || []);
+      } else {
+        toast.error(response.error || 'Failed to load export history');
+      }
     } catch (error) {
+      console.error('Error fetching exports:', error);
       toast.error('Failed to load export history');
     } finally {
       setIsLoading(false);
@@ -84,6 +59,14 @@ const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const getTemplateColor = (template: string) => {
@@ -113,14 +96,14 @@ const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose
     }
   };
 
-  const handleDelete = async (exportId: string) => {
+  const handleDelete = async (exportId: number) => {
     try {
-      // TODO: Implement delete API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      // TODO: Implement delete export API call when backend endpoint is ready
+      // For now, just remove from local state
       setExports(prev => prev.filter(exp => exp.id !== exportId));
       toast.success('Export deleted successfully');
     } catch (error) {
+      console.error('Error deleting export:', error);
       toast.error('Failed to delete export');
     }
   };
@@ -239,18 +222,18 @@ const ExportHistoryModal: React.FC<ExportHistoryModalProps> = ({ isOpen, onClose
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
                               <h3 className="font-semibold text-gray-900 truncate">{exportItem.filename}</h3>
-                              <span className={`px-2 py-1 text-xs rounded-full ${getTemplateColor(exportItem.template)}`}>
-                                {exportItem.template}
+                              <span className={`px-2 py-1 text-xs rounded-full ${getTemplateColor(exportItem.template_type)}`}>
+                                {exportItem.template_type}
                               </span>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                               <div>
                                 <p className="text-gray-600">Scenario</p>
-                                <p className="font-medium text-gray-900">{exportItem.scenario_name}</p>
+                                <p className="font-medium text-gray-900">{exportItem.calculation_scenario || 'Unknown'}</p>
                               </div>
                               <div>
                                 <p className="text-gray-600">Size</p>
-                                <p className="font-medium text-gray-900">{exportItem.file_size}</p>
+                                <p className="font-medium text-gray-900">{formatFileSize(exportItem.file_size)}</p>
                               </div>
                               <div>
                                 <p className="text-gray-600">Downloads</p>
