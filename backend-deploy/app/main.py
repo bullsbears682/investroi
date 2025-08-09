@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
-from app.routers import roi_calculator, pdf_export
+from app.routers import roi_calculator, pdf_export, admin
 from app.database import engine, Base
 from app.complete_seed_data import seed_complete_database
 
@@ -52,9 +52,9 @@ app.add_middleware(
 )
 
 # Include routers
-
 app.include_router(roi_calculator.router, prefix="/api/roi")
 app.include_router(pdf_export.router, prefix="/api")
+app.include_router(admin.router, prefix="/api/admin")
 
 # Health check endpoint
 @app.get("/")
