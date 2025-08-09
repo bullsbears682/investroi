@@ -109,16 +109,6 @@ const AdminAnalytics: React.FC = () => {
       
       // Get real user registrations (last 7 days) - mock data for now
       const recentRegistrations: any[] = [];
-        .map(user => ({
-          id: `reg-${user.id}`,
-          type: 'registration' as const,
-          description: `New user registration: ${user.name}`,
-          timestamp: new Date(user.registrationDate).getTime(),
-          user: user.name,
-          color: 'bg-green-400'
-        }))
-        .sort((a, b) => b.timestamp - a.timestamp)
-        .slice(0, 3);
 
       activities.push(...recentRegistrations);
 

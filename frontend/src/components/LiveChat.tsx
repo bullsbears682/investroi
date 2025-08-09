@@ -35,7 +35,7 @@ const LiveChat: React.FC<LiveChatProps> = ({ isOpen, onToggle }) => {
   ];
 
   // Current user will be handled by new auth system
-  const currentUser = null;
+  const currentUser: any = null;
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

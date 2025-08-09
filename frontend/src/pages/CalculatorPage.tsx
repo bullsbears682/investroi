@@ -15,8 +15,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Play,
-  User,
-  X
+  User
 } from 'lucide-react';
 
 // API client for backend communication
