@@ -3,14 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, FileText, Download, Calendar, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { apiClient } from '../../utils/apiClient';
 
 interface Export {
-  id: string;
+  id: number;
   filename: string;
-  scenario_name: string;
-  template: 'standard' | 'executive' | 'detailed';
+  calculation_scenario: string;
+  template_type: 'standard' | 'executive' | 'detailed';
   created_at: string;
-  file_size: string;
+  file_size: number;
   download_count: number;
 }
 

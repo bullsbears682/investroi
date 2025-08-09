@@ -4,7 +4,7 @@ from sqlalchemy import func, desc
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
-from app.database import get_db, User, ROICalculation, BusinessScenario, MiniScenario, TaxCountry
+from app.database import get_db, User, ROICalculation, BusinessScenario, MiniScenario, TaxCountry, ExportHistory
 
 router = APIRouter(prefix="/api/user", tags=["user_data"])
 
@@ -29,6 +29,15 @@ class UserStatsResponse(BaseModel):
     average_roi: float
     total_profit: float
     member_since: datetime
+
+class ExportResponse(BaseModel):
+    id: int
+    filename: str
+    template_type: str
+    file_size: int
+    download_count: int
+    created_at: datetime
+    calculation_scenario: Optional[str] = None
 
 # Helper function to get current user (simplified for now)
 def get_current_user_simple(db: Session, user_id: int) -> User:
@@ -202,15 +211,38 @@ async def delete_user_calculation(
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to delete calculation: {str(e)}")
 
-@router.get("/exports/{user_id}")
+@router.get("/exports/{user_id}", response_model=List[ExportResponse])
 async def get_user_exports(user_id: int, db: Session = Depends(get_db)):
-    """Get user's export history - placeholder for now"""
+    """Get user's export history"""
     try:
         user = get_current_user_simple(db, user_id)
         
-        # TODO: Implement export tracking in database
-        # For now, return empty array since we don't have export tracking yet
-        return []
+        # Get user's exports with calculation scenario info
+        exports = db.query(
+            ExportHistory,
+            BusinessScenario.name.label('scenario_name')
+        ).outerjoin(
+            ROICalculation, ExportHistory.calculation_id == ROICalculation.id
+        ).outerjoin(
+            BusinessScenario, ROICalculation.business_scenario_id == BusinessScenario.id
+        ).filter(
+            ExportHistory.user_id == user_id
+        ).order_by(
+            desc(ExportHistory.created_at)
+        ).all()
+        
+        return [
+            ExportResponse(
+                id=export.ExportHistory.id,
+                filename=export.ExportHistory.filename,
+                template_type=export.ExportHistory.template_type,
+                file_size=export.ExportHistory.file_size,
+                download_count=export.ExportHistory.download_count,
+                created_at=export.ExportHistory.created_at,
+                calculation_scenario=export.scenario_name
+            )
+            for export in exports
+        ]
     except HTTPException:
         raise
     except Exception as e:
