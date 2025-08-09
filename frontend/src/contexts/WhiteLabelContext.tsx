@@ -1,0 +1,157 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { WhiteLabelConfig, DEFAULT_WHITELABEL_CONFIG } from '../types/whitelabel';
+import { apiClient } from '../utils/apiClient';
+
+interface WhiteLabelContextType {
+  config: WhiteLabelConfig;
+  isWhiteLabel: boolean;
+  isLoading: boolean;
+  error: string | null;
+  loadConfig: (clientId?: string, domain?: string) => Promise<void>;
+  applyTheme: (config: WhiteLabelConfig) => void;
+}
+
+const WhiteLabelContext = createContext<WhiteLabelContextType | undefined>(undefined);
+
+interface WhiteLabelProviderProps {
+  children: ReactNode;
+}
+
+export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children }) => {
+  const [config, setConfig] = useState<WhiteLabelConfig>(DEFAULT_WHITELABEL_CONFIG);
+  const [isWhiteLabel, setIsWhiteLabel] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const applyTheme = (newConfig: WhiteLabelConfig) => {
+    // Apply CSS custom properties for theming
+    const root = document.documentElement;
+    root.style.setProperty('--wl-primary-color', newConfig.primaryColor);
+    root.style.setProperty('--wl-secondary-color', newConfig.secondaryColor);
+    root.style.setProperty('--wl-accent-color', newConfig.accentColor);
+    
+    // Update page title
+    document.title = `${newConfig.companyName} - ROI Calculator`;
+    
+    // Update favicon if provided
+    if (newConfig.logoUrl) {
+      const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+      if (favicon) {
+        favicon.href = newConfig.logoUrl;
+      }
+    }
+    
+    setConfig(newConfig);
+  };
+
+  const loadConfig = async (clientId?: string, domain?: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      let response;
+      
+      if (clientId) {
+        // Load by client ID (for demo or direct access)
+        if (clientId === 'smith-financial' || clientId === 'acme-consulting') {
+          // Try demo first
+          response = await apiClient.makeRequest(`/api/whitelabel/demo/${clientId}`);
+        } else {
+          // Try real config
+          response = await apiClient.makeRequest(`/api/whitelabel/config/${clientId}`);
+        }
+      } else if (domain) {
+        // Load by domain
+        response = await apiClient.makeRequest(`/api/whitelabel/config?domain=${encodeURIComponent(domain)}`);
+      } else {
+        // Auto-detect from current domain
+        const currentDomain = window.location.hostname;
+        if (currentDomain !== 'localhost' && currentDomain !== 'investwisepro.netlify.app') {
+          response = await apiClient.makeRequest(`/api/whitelabel/config?domain=${encodeURIComponent(currentDomain)}`);
+        }
+      }
+
+      if (response && response.success && response.data) {
+        const whiteLabelConfig: WhiteLabelConfig = {
+          companyName: response.data.company_name,
+          logoUrl: response.data.logo_url,
+          primaryColor: response.data.primary_color,
+          secondaryColor: response.data.secondary_color,
+          accentColor: response.data.accent_color,
+          domain: response.data.custom_domain || response.data.subdomain || window.location.hostname,
+          supportEmail: response.data.support_email,
+          contactUrl: response.data.contact_url,
+          pdfHeaderText: response.data.pdf_header_text,
+          pdfFooterText: response.data.pdf_footer_text,
+          pdfLogoUrl: response.data.pdf_logo_url,
+          showPoweredBy: response.data.show_powered_by,
+          customFooter: response.data.custom_footer,
+          companyAddress: response.data.company_address,
+          phoneNumber: response.data.phone_number,
+          website: response.data.website
+        };
+
+        applyTheme(whiteLabelConfig);
+        setIsWhiteLabel(true);
+      } else {
+        // No white label config found, use default
+        applyTheme(DEFAULT_WHITELABEL_CONFIG);
+        setIsWhiteLabel(false);
+      }
+    } catch (err) {
+      console.warn('Failed to load white label config:', err);
+      // Fall back to default config
+      applyTheme(DEFAULT_WHITELABEL_CONFIG);
+      setIsWhiteLabel(false);
+      setError('Failed to load branding configuration');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Auto-load config on mount
+  useEffect(() => {
+    // Check URL for client ID parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientId = urlParams.get('client') || urlParams.get('wl');
+    
+    // Check subdomain
+    const hostname = window.location.hostname;
+    const isSubdomain = hostname.includes('.') && 
+                       !hostname.startsWith('www.') && 
+                       hostname !== 'investwisepro.netlify.app' &&
+                       hostname !== 'localhost';
+
+    if (clientId) {
+      loadConfig(clientId);
+    } else if (isSubdomain) {
+      loadConfig(undefined, hostname);
+    } else {
+      // Apply default theme
+      applyTheme(DEFAULT_WHITELABEL_CONFIG);
+    }
+  }, []);
+
+  const value: WhiteLabelContextType = {
+    config,
+    isWhiteLabel,
+    isLoading,
+    error,
+    loadConfig,
+    applyTheme
+  };
+
+  return (
+    <WhiteLabelContext.Provider value={value}>
+      {children}
+    </WhiteLabelContext.Provider>
+  );
+};
+
+export const useWhiteLabel = (): WhiteLabelContextType => {
+  const context = useContext(WhiteLabelContext);
+  if (context === undefined) {
+    throw new Error('useWhiteLabel must be used within a WhiteLabelProvider');
+  }
+  return context;
+};

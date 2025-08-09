@@ -8,6 +8,7 @@ import { Suspense, lazy } from 'react';
 // Contexts
 import { NotificationProvider } from './contexts/NotificationContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { WhiteLabelProvider } from './contexts/WhiteLabelContext';
 
 // Components
 import LoadingScreen from './components/LoadingScreen';
@@ -35,6 +36,7 @@ const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
 const AdminData = lazy(() => import('./pages/AdminData'));
 const AdminSystem = lazy(() => import('./pages/AdminSystem'));
 const AdminChat = lazy(() => import('./pages/AdminChat'));
+const WhiteLabelDemo = lazy(() => import('./pages/WhiteLabelDemo'));
 
 
 // Store
@@ -83,9 +85,10 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <Router>
+          <WhiteLabelProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                <Router>
               <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
                 <div className="relative">
                   {/* Animated background */}
@@ -118,6 +121,7 @@ function App() {
                         <Route path="/admin/system" element={<AdminSystem />} />
                         {/* Backups route removed */}
                         <Route path="/admin/chat" element={<AdminChat />} />
+                        <Route path="/whitelabel-demo" element={<WhiteLabelDemo />} />
                       </Routes>
                       </Suspense>
                     </main>
@@ -136,8 +140,9 @@ function App() {
               {/* Notification System - Outside main container for proper z-index */}
               <NotificationWrapper />
                             </Router>
-              </NotificationProvider>
-            </AuthProvider>
+                </NotificationProvider>
+              </AuthProvider>
+            </WhiteLabelProvider>
           </CookiesProvider>
       </QueryClientProvider>
       

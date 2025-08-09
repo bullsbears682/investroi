@@ -341,3 +341,45 @@ class UsageTracking(Base):
     
     # Relationships
     user = relationship("User", back_populates="usage")
+
+class WhiteLabelConfig(Base):
+    __tablename__ = "whitelabel_configs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(String, unique=True, nullable=False, index=True)  # URL-safe identifier
+    subscription_id = Column(Integer, ForeignKey("user_subscriptions.id"), nullable=False)
+    
+    # Branding
+    company_name = Column(String, nullable=False)
+    logo_url = Column(String, nullable=True)
+    primary_color = Column(String, default="#3B82F6")  # Hex color
+    secondary_color = Column(String, default="#1E293B")
+    accent_color = Column(String, default="#10B981")
+    
+    # Domain and URLs
+    custom_domain = Column(String, nullable=True)  # their-company.com
+    subdomain = Column(String, nullable=True)  # client1.investwisepro.com
+    support_email = Column(String, nullable=False)
+    contact_url = Column(String, nullable=True)
+    website = Column(String, nullable=True)
+    
+    # PDF Branding
+    pdf_header_text = Column(String, nullable=False)
+    pdf_footer_text = Column(String, nullable=False)
+    pdf_logo_url = Column(String, nullable=True)
+    
+    # Features and Display
+    show_powered_by = Column(Boolean, default=True)
+    custom_footer = Column(Text, nullable=True)
+    
+    # Contact Information
+    company_address = Column(Text, nullable=True)
+    phone_number = Column(String, nullable=True)
+    
+    # Status
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    subscription = relationship("UserSubscription", backref="whitelabel_config")

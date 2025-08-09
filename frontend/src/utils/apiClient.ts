@@ -202,6 +202,39 @@ class ApiClient {
     return this.makeRequest<any>(`/api/user/exports/${userId}`);
   }
 
+  // White Label Methods
+  async getWhiteLabelConfig(clientId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/whitelabel/config/${clientId}`);
+  }
+
+  async getWhiteLabelByDomain(domain: string): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/whitelabel/config?domain=${encodeURIComponent(domain)}`);
+  }
+
+  async createWhiteLabelConfig(userId: number, configData: any): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/whitelabel/config/${userId}`, {
+      method: 'POST',
+      body: JSON.stringify(configData),
+    });
+  }
+
+  async updateWhiteLabelConfig(clientId: string, configData: any): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/whitelabel/config/${clientId}`, {
+      method: 'PUT',
+      body: JSON.stringify(configData),
+    });
+  }
+
+  async deleteWhiteLabelConfig(clientId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/whitelabel/config/${clientId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getDemoWhiteLabelConfig(clientId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/whitelabel/demo/${clientId}`);
+  }
+
   // Admin Data Methods
   async getAdminStats(): Promise<ApiResponse<any>> {
     return this.makeRequest<any>('/api/admin/stats');
