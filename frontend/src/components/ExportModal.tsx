@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { generatePDF, PDFExportData } from '../utils/pdfExport';
+import { apiClient, PDFExportRequest } from '../utils/apiClient';
 import { useNotifications } from '../contexts/NotificationContext';
 
 import { userManager } from '../utils/userManagement';
@@ -83,23 +84,58 @@ const ExportModal: React.FC<ExportModalProps> = ({
     setIsExporting(true);
     
     try {
-      const exportData: PDFExportData = {
-        result,
-        scenarioName,
-        miniScenarioName,
-        calculationDate: new Date().toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
-        exportOptions,
-        scenarioId,
-        marketResearchData
+      // Try backend PDF generation first
+      const backendRequest: PDFExportRequest = {
+        calculation_data: result.data || result,
+        scenario_name: scenarioName,
+        user_inputs: result.formData,
+        export_options: {
+          template: exportOptions.template,
+          include_charts: exportOptions.includeCharts,
+          include_market_analysis: exportOptions.includeMarketAnalysis,
+          include_recommendations: exportOptions.includeRecommendations
+        }
       };
 
-      await generatePDF(exportData);
+      const backendResponse = await apiClient.exportToPDF(backendRequest);
+
+      if (backendResponse.success && backendResponse.data) {
+        // Download the PDF blob from backend
+        const blob = backendResponse.data;
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `InvestWise-Pro-Report-${scenarioName?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        toast.success('PDF exported successfully using backend service!');
+      } else {
+        // Fallback to local PDF generation
+        console.warn('Backend PDF generation failed, using local fallback:', backendResponse.error);
+        toast.error('Backend unavailable - using local PDF generation');
+        
+        const exportData: PDFExportData = {
+          result,
+          scenarioName,
+          miniScenarioName,
+          calculationDate: new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          exportOptions,
+          scenarioId,
+          marketResearchData
+        };
+
+        await generatePDF(exportData);
+        toast.success('PDF exported successfully using local generation!');
+      }
       
       // Add notification with redirect to scenarios
       addNotification({
@@ -114,11 +150,37 @@ const ExportModal: React.FC<ExportModalProps> = ({
       // Record export for current user if logged in
       userManager.recordExport(exportOptions.template);
       
-      toast.success('PDF exported successfully!');
       onClose();
     } catch (error) {
       console.error('PDF export error:', error);
-      toast.error('Failed to export PDF. Please try again.');
+      
+      // Fallback to local PDF generation on error
+      try {
+        toast.error('Backend unavailable - using local PDF generation');
+        
+        const exportData: PDFExportData = {
+          result,
+          scenarioName,
+          miniScenarioName,
+          calculationDate: new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
+          exportOptions,
+          scenarioId,
+          marketResearchData
+        };
+
+        await generatePDF(exportData);
+        toast.success('PDF exported successfully using local generation!');
+        onClose();
+      } catch (fallbackError) {
+        console.error('Local PDF generation also failed:', fallbackError);
+        toast.error('Failed to export PDF. Please try again.');
+      }
     } finally {
       setIsExporting(false);
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings, Shield, Activity, Database, Server, Cpu } from 'lucide-react';
+import { apiClient } from '../utils/apiClient';
 import AdminMenu from '../components/AdminMenu';
 
 interface SystemMetrics {
@@ -69,9 +70,9 @@ const AdminSystem: React.FC = () => {
     sessionTimeout: '30 minutes'
   });
 
-  const [applicationHealth] = useState<ApplicationHealth>({
+  const [applicationHealth, setApplicationHealth] = useState<ApplicationHealth>({
     frontendStatus: 'Operational',
-    backendAPI: 'Not configured',
+    backendAPI: 'Checking...',
     database: 'Not in use',
     fileStorage: 'Available',
     emailService: 'Active',
@@ -79,6 +80,33 @@ const AdminSystem: React.FC = () => {
     chatSystem: 'Online',
     exportSystem: 'Ready'
   });
+
+  useEffect(() => {
+    // Check backend API health
+    const checkBackendHealth = async () => {
+      try {
+        const response = await apiClient.healthCheck();
+        if (response.success) {
+          setApplicationHealth(prev => ({
+            ...prev,
+            backendAPI: 'Connected'
+          }));
+        } else {
+          setApplicationHealth(prev => ({
+            ...prev,
+            backendAPI: 'Disconnected'
+          }));
+        }
+      } catch (error) {
+        setApplicationHealth(prev => ({
+          ...prev,
+          backendAPI: 'Error'
+        }));
+      }
+    };
+
+    checkBackendHealth();
+  }, []);
 
   const [performanceMetrics, setPerformanceMetrics] = useState({
     pageLoadTime: 0,

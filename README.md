@@ -34,24 +34,52 @@ A comprehensive ROI calculator with real-world business scenarios, market analys
 
 ### Prerequisites
 - Python 3.8+
-- Node.js 16+
-- PostgreSQL
-- Redis (optional, for caching)
+- Node.js 18+
+- Backend API (FastAPI) running or deployed
+- Frontend build tools (Vite)
 
-### Automated Setup
+### Frontend-Backend Connection
 
-1. **Clone and Setup**
+The application consists of two main parts:
+- **Frontend**: React + TypeScript + Vite (deployed on Netlify)
+- **Backend**: FastAPI + Python (deployed on Railway)
+
+### Environment Configuration
+
+1. **Frontend Environment Variables**
 ```bash
-git clone <repository-url>
-cd investwise-pro
-python setup.py
+# .env (production)
+VITE_API_BASE_URL=https://your-backend-api.railway.app
+VITE_API_TIMEOUT=10000
+VITE_NODE_ENV=production
+
+# .env.development (local development)
+VITE_API_BASE_URL=http://localhost:8000
+VITE_API_TIMEOUT=10000
+VITE_NODE_ENV=development
 ```
 
-2. **Configure Environment**
+2. **Backend Configuration**
 ```bash
-cd backend
-# Edit .env file with your database and API keys
+cd backend-deploy
+# Backend runs on Railway with CORS configured
+# No additional configuration needed for basic setup
 ```
+
+### API Integration Features
+
+The frontend automatically connects to the backend with these features:
+- **Automatic Fallback**: If backend is unavailable, uses local calculations
+- **Smart Error Handling**: Graceful degradation with user notifications  
+- **Real-time Health Checks**: Backend status monitoring in admin panel
+- **Optimized Performance**: API caching and timeout management
+
+### API Endpoints
+
+- `POST /api/roi/calculate` - Advanced ROI calculations
+- `POST /api/export/pdf` - Professional PDF report generation
+- `GET /api/roi/scenarios/{id}` - Business scenario data
+- `GET /api/roi/market-insights` - Market analysis data
 
 3. **Start the Application**
 ```bash

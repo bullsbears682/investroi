@@ -19,7 +19,9 @@ import {
   X
 } from 'lucide-react';
 
-// API service removed; using local/mock logic only
+// API client for backend communication
+import { apiClient, ROICalculationRequest } from '../utils/apiClient';
+import { getResearchBasedMarketData } from '../utils/marketResearchData';
 
 import CategorySelector from '../components/CategorySelector';
 import ScenarioSelector from '../components/ScenarioSelector';
@@ -231,20 +233,69 @@ const CalculatorPage: React.FC = () => {
     toast.success('ROI calculation completed!');
   };
 
-  const handleCalculate = (formData: any) => {
+  const handleCalculate = async (formData: any) => {
     if (!selectedScenario || !selectedMiniScenario) {
       toast.error('Please select a business scenario and mini scenario');
       return;
     }
+    
     (window as any).formData = formData;
-    const scenarioName = scenariosData.find((s: any) => s.id === selectedScenario)?.name || 'Unknown';
+    const scenarioData = scenariosData.find((s: any) => s.id === selectedScenario);
+    const miniScenarioData = miniScenariosData.find((s: any) => s.id === selectedMiniScenario);
+    const scenarioName = scenarioData?.name || 'Unknown';
+    
     if (currentUser) {
       userManager.recordCalculation(scenarioName);
     }
+    
     setIsCalculating(true);
-    // Perform local calculation synchronously
-    performLocalCalculation(formData);
-    setIsCalculating(false);
+    
+    try {
+      // Calculate time period in years
+      const startDate = new Date(formData.investment_start_date);
+      const endDate = new Date(formData.investment_end_date);
+      const timePeriodYears = Math.max(1, (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365));
+      
+      // Prepare API request
+      const apiRequest: ROICalculationRequest = {
+        initial_investment: Number(formData.initial_investment),
+        additional_costs: Number(formData.additional_costs),
+        expected_return: miniScenarioData?.typical_roi_max || 15, // Use scenario expected return
+        time_period: timePeriodYears,
+        business_scenario: scenarioName,
+        country_code: formData.country_code,
+        risk_level: miniScenarioData?.risk_level || 'medium'
+      };
+      
+      // Try API call first
+      const apiResponse = await apiClient.calculateROI(apiRequest);
+      
+      if (apiResponse.success && apiResponse.data) {
+        // Use API response
+        const apiResult = apiResponse.data;
+        setCalculationResult({
+          data: apiResult,
+          scenario: scenarioName,
+          miniScenario: miniScenarioData?.name,
+          timestamp: new Date().toISOString(),
+          formData: formData,
+          marketData: getResearchBasedMarketData(selectedScenario!)
+        });
+        toast.success('ROI calculation completed using advanced backend analysis!');
+      } else {
+        // Fallback to local calculation
+        console.warn('API calculation failed, using local fallback:', apiResponse.error);
+        toast.error('Backend unavailable - using local calculation');
+        performLocalCalculation(formData);
+      }
+    } catch (error) {
+      // Fallback to local calculation on any error
+      console.warn('API error, using local fallback:', error);
+      toast.error('Backend unavailable - using local calculation');
+      performLocalCalculation(formData);
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   // Use scenarios data with fallback
