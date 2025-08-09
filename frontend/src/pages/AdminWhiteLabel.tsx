@@ -38,6 +38,22 @@ interface WhiteLabelClient {
   phone_number?: string;
   is_active: boolean;
   created_at: string;
+  
+  // Enhanced Personalization
+  welcome_message?: string;
+  tagline?: string;
+  hero_title?: string;
+  hero_subtitle?: string;
+  cta_button_text?: string;
+  about_text?: string;
+  features_text?: string;
+  font_family?: string;
+  background_gradient?: string;
+  card_style?: string;
+  button_style?: string;
+  calculator_title?: string;
+  calculator_description?: string;
+  social_links?: string; // JSON string
 }
 
 const AdminWhiteLabel: React.FC = () => {
@@ -69,7 +85,23 @@ const AdminWhiteLabel: React.FC = () => {
     show_powered_by: true,
     custom_footer: '',
     company_address: '',
-    phone_number: ''
+    phone_number: '',
+    
+    // Enhanced Personalization
+    welcome_message: '',
+    tagline: '',
+    hero_title: '',
+    hero_subtitle: '',
+    cta_button_text: '',
+    about_text: '',
+    features_text: '',
+    font_family: '',
+    background_gradient: '',
+    card_style: 'modern',
+    button_style: 'rounded',
+    calculator_title: '',
+    calculator_description: '',
+    social_links: ''
   });
 
   useEffect(() => {
@@ -104,7 +136,23 @@ const AdminWhiteLabel: React.FC = () => {
           company_address: '123 Finance Street, New York, NY 10001',
           phone_number: '(555) 123-4567',
           is_active: true,
-          created_at: '2024-01-15T10:00:00Z'
+          created_at: '2024-01-15T10:00:00Z',
+          
+          // Enhanced Personalization
+          welcome_message: "Welcome to Smith Financial's Investment Calculator",
+          tagline: "Your trusted partner in financial growth",
+          hero_title: "Calculate Your Investment Returns",
+          hero_subtitle: "Make informed investment decisions with our professional ROI calculator",
+          cta_button_text: "Start Your Analysis",
+          about_text: "Smith Financial Advisors has been helping clients achieve their financial goals for over 20 years.",
+          features_text: "Professional-grade investment analysis tools trusted by thousands of investors.",
+          font_family: "Inter, system-ui, sans-serif",
+          background_gradient: "from-emerald-900 via-green-900 to-teal-900",
+          card_style: "modern",
+          button_style: "rounded",
+          calculator_title: "Investment ROI Calculator",
+          calculator_description: "Analyze your investment opportunities with our comprehensive ROI calculator",
+          social_links: '{"linkedin": "https://linkedin.com/company/smith-financial", "twitter": "https://twitter.com/smithfinancial"}'
         },
         {
           id: 2,
@@ -127,7 +175,23 @@ const AdminWhiteLabel: React.FC = () => {
           company_address: '456 Business Ave, Chicago, IL 60601',
           phone_number: '(555) 987-6543',
           is_active: true,
-          created_at: '2024-01-10T14:30:00Z'
+          created_at: '2024-01-10T14:30:00Z',
+          
+          // Enhanced Personalization
+          welcome_message: "Welcome to ACME's Business ROI Calculator",
+          tagline: "Strategic solutions for business growth",
+          hero_title: "Maximize Your Business Returns",
+          hero_subtitle: "Strategic ROI analysis for smart business decisions",
+          cta_button_text: "Calculate ROI",
+          about_text: "ACME Business Consulting provides strategic solutions to help businesses optimize their investments and maximize returns.",
+          features_text: "Enterprise-grade ROI analysis tools for strategic business planning.",
+          font_family: "Roboto, system-ui, sans-serif",
+          background_gradient: "from-red-900 via-orange-900 to-amber-900",
+          card_style: "classic",
+          button_style: "square",
+          calculator_title: "Business ROI Calculator",
+          calculator_description: "Evaluate business investment opportunities with professional-grade analysis",
+          social_links: '{"linkedin": "https://linkedin.com/company/acme-consulting", "twitter": "https://twitter.com/acmeconsulting"}'
         }
       ];
       
@@ -712,6 +776,213 @@ const AdminWhiteLabel: React.FC = () => {
                         placeholder="https://smithfinancial.com/contact"
                         className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       />
+                    </div>
+                  </div>
+
+                  {/* Personalization */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-white mb-4">Personalization & Messaging</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Welcome Message
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.welcome_message || ''}
+                          onChange={(e) => setFormData({...formData, welcome_message: e.target.value})}
+                          placeholder="Welcome to Smith Financial's Investment Calculator"
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Tagline
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.tagline || ''}
+                          onChange={(e) => setFormData({...formData, tagline: e.target.value})}
+                          placeholder="Your trusted partner in financial growth"
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Hero Title
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.hero_title || ''}
+                          onChange={(e) => setFormData({...formData, hero_title: e.target.value})}
+                          placeholder="Calculate Your Investment Returns"
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          CTA Button Text
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.cta_button_text || ''}
+                          onChange={(e) => setFormData({...formData, cta_button_text: e.target.value})}
+                          placeholder="Start Your Analysis"
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Hero Subtitle
+                      </label>
+                      <textarea
+                        value={formData.hero_subtitle || ''}
+                        onChange={(e) => setFormData({...formData, hero_subtitle: e.target.value})}
+                        placeholder="Make informed investment decisions with our professional ROI calculator"
+                        rows={2}
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        About Text
+                      </label>
+                      <textarea
+                        value={formData.about_text || ''}
+                        onChange={(e) => setFormData({...formData, about_text: e.target.value})}
+                        placeholder="Smith Financial Advisors has been helping clients achieve their financial goals for over 20 years."
+                        rows={3}
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Features Text
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.features_text || ''}
+                        onChange={(e) => setFormData({...formData, features_text: e.target.value})}
+                        placeholder="Professional-grade investment analysis tools trusted by thousands of investors."
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Calculator Title
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.calculator_title || ''}
+                          onChange={(e) => setFormData({...formData, calculator_title: e.target.value})}
+                          placeholder="Investment ROI Calculator"
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Font Family
+                        </label>
+                        <select
+                          value={formData.font_family || ''}
+                          onChange={(e) => setFormData({...formData, font_family: e.target.value})}
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="">Default</option>
+                          <option value="Inter, system-ui, sans-serif">Inter</option>
+                          <option value="Roboto, system-ui, sans-serif">Roboto</option>
+                          <option value="Open Sans, system-ui, sans-serif">Open Sans</option>
+                          <option value="Poppins, system-ui, sans-serif">Poppins</option>
+                          <option value="Montserrat, system-ui, sans-serif">Montserrat</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Calculator Description
+                      </label>
+                      <textarea
+                        value={formData.calculator_description || ''}
+                        onChange={(e) => setFormData({...formData, calculator_description: e.target.value})}
+                        placeholder="Analyze your investment opportunities with our comprehensive ROI calculator"
+                        rows={2}
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Card Style
+                        </label>
+                        <select
+                          value={formData.card_style || 'modern'}
+                          onChange={(e) => setFormData({...formData, card_style: e.target.value})}
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="modern">Modern</option>
+                          <option value="classic">Classic</option>
+                          <option value="minimal">Minimal</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Button Style
+                        </label>
+                        <select
+                          value={formData.button_style || 'rounded'}
+                          onChange={(e) => setFormData({...formData, button_style: e.target.value})}
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="rounded">Rounded</option>
+                          <option value="square">Square</option>
+                          <option value="pill">Pill</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Background Gradient
+                        </label>
+                        <select
+                          value={formData.background_gradient || ''}
+                          onChange={(e) => setFormData({...formData, background_gradient: e.target.value})}
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                          <option value="">Default</option>
+                          <option value="from-emerald-900 via-green-900 to-teal-900">Green Theme</option>
+                          <option value="from-red-900 via-orange-900 to-amber-900">Red Theme</option>
+                          <option value="from-blue-900 via-indigo-900 to-purple-900">Blue Theme</option>
+                          <option value="from-purple-900 via-pink-900 to-rose-900">Purple Theme</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Social Media Links (JSON)
+                      </label>
+                      <textarea
+                        value={formData.social_links || ''}
+                        onChange={(e) => setFormData({...formData, social_links: e.target.value})}
+                        placeholder='{"linkedin": "https://linkedin.com/company/smith-financial", "twitter": "https://twitter.com/smithfinancial"}'
+                        rows={3}
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-4 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-sm"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Valid JSON format required</p>
                     </div>
                   </div>
                 </div>

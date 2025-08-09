@@ -30,8 +30,21 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
     root.style.setProperty('--wl-secondary-color', newConfig.secondaryColor);
     root.style.setProperty('--wl-accent-color', newConfig.accentColor);
     
-    // Update page title
-    document.title = `${newConfig.companyName} - ROI Calculator`;
+    // Apply advanced styling options
+    if (newConfig.fontFamily) {
+      root.style.setProperty('--wl-font-family', newConfig.fontFamily);
+      document.body.style.fontFamily = newConfig.fontFamily;
+    }
+    
+    // Update page title with personalized text
+    const titleText = newConfig.calculatorTitle || 'ROI Calculator';
+    document.title = `${newConfig.companyName} - ${titleText}`;
+    
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]') as HTMLMetaElement;
+    if (metaDescription && newConfig.calculatorDescription) {
+      metaDescription.content = newConfig.calculatorDescription;
+    }
     
     // Update favicon if provided
     if (newConfig.logoUrl) {
@@ -51,6 +64,17 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
         document.head.appendChild(shortcutIcon);
       }
       shortcutIcon.href = newConfig.logoUrl;
+    }
+    
+    // Apply custom CSS if provided
+    if (newConfig.customCss) {
+      let customStyleElement = document.querySelector('#white-label-custom-css') as HTMLStyleElement;
+      if (!customStyleElement) {
+        customStyleElement = document.createElement('style');
+        customStyleElement.id = 'white-label-custom-css';
+        document.head.appendChild(customStyleElement);
+      }
+      customStyleElement.textContent = newConfig.customCss;
     }
     
     setConfig(newConfig);
@@ -96,7 +120,23 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
           customFooter: data.custom_footer || data.customFooter,
           companyAddress: data.company_address || data.companyAddress,
           phoneNumber: data.phone_number || data.phoneNumber,
-          website: data.website
+          website: data.website,
+          
+          // Enhanced Personalization
+          welcomeMessage: data.welcome_message || data.welcomeMessage,
+          tagline: data.tagline,
+          heroTitle: data.hero_title || data.heroTitle,
+          heroSubtitle: data.hero_subtitle || data.heroSubtitle,
+          ctaButtonText: data.cta_button_text || data.ctaButtonText,
+          aboutText: data.about_text || data.aboutText,
+          featuresText: data.features_text || data.featuresText,
+          fontFamily: data.font_family || data.fontFamily,
+          backgroundGradient: data.background_gradient || data.backgroundGradient,
+          cardStyle: data.card_style || data.cardStyle || 'modern',
+          buttonStyle: data.button_style || data.buttonStyle || 'rounded',
+          calculatorTitle: data.calculator_title || data.calculatorTitle,
+          calculatorDescription: data.calculator_description || data.calculatorDescription,
+          socialLinks: data.social_links ? (typeof data.social_links === 'string' ? JSON.parse(data.social_links) : data.social_links) : undefined
         };
 
         applyTheme(whiteLabelConfig);

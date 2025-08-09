@@ -376,6 +376,34 @@ class WhiteLabelConfig(Base):
     company_address = Column(Text, nullable=True)
     phone_number = Column(String, nullable=True)
     
+    # Enhanced Personalization
+    welcome_message = Column(Text, nullable=True)
+    tagline = Column(String, nullable=True)
+    hero_title = Column(String, nullable=True)
+    hero_subtitle = Column(Text, nullable=True)
+    cta_button_text = Column(String, nullable=True)
+    about_text = Column(Text, nullable=True)
+    features_text = Column(Text, nullable=True)
+    testimonial_text = Column(Text, nullable=True)
+    custom_css = Column(Text, nullable=True)
+    social_links = Column(Text, nullable=True)  # JSON string
+    
+    # Advanced Styling
+    font_family = Column(String, nullable=True)
+    background_gradient = Column(String, nullable=True)
+    card_style = Column(String, default="modern")  # modern, classic, minimal
+    button_style = Column(String, default="rounded")  # rounded, square, pill
+    
+    # Personalized Content
+    calculator_title = Column(String, nullable=True)
+    calculator_description = Column(Text, nullable=True)
+    result_message_template = Column(Text, nullable=True)
+    export_email_subject = Column(String, nullable=True)
+    
+    # Client Features
+    hide_features = Column(Text, nullable=True)  # JSON array of feature IDs
+    custom_pages = Column(Text, nullable=True)  # JSON array of custom pages
+    
     # Status
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -52,6 +52,34 @@ class WhiteLabelConfigCreate(BaseModel):
     custom_footer: Optional[str] = None
     company_address: Optional[str] = None
     phone_number: Optional[str] = None
+    
+    # Enhanced Personalization
+    welcome_message: Optional[str] = None
+    tagline: Optional[str] = None
+    hero_title: Optional[str] = None
+    hero_subtitle: Optional[str] = None
+    cta_button_text: Optional[str] = None
+    about_text: Optional[str] = None
+    features_text: Optional[str] = None
+    testimonial_text: Optional[str] = None
+    custom_css: Optional[str] = None
+    social_links: Optional[str] = None  # JSON string
+    
+    # Advanced Styling
+    font_family: Optional[str] = None
+    background_gradient: Optional[str] = None
+    card_style: Optional[str] = "modern"
+    button_style: Optional[str] = "rounded"
+    
+    # Personalized Content
+    calculator_title: Optional[str] = None
+    calculator_description: Optional[str] = None
+    result_message_template: Optional[str] = None
+    export_email_subject: Optional[str] = None
+    
+    # Client Features
+    hide_features: Optional[str] = None  # JSON array
+    custom_pages: Optional[str] = None  # JSON array
 
 class WhiteLabelConfigUpdate(BaseModel):
     company_name: Optional[str] = None
@@ -72,6 +100,34 @@ class WhiteLabelConfigUpdate(BaseModel):
     company_address: Optional[str] = None
     phone_number: Optional[str] = None
     is_active: Optional[bool] = None
+    
+    # Enhanced Personalization
+    welcome_message: Optional[str] = None
+    tagline: Optional[str] = None
+    hero_title: Optional[str] = None
+    hero_subtitle: Optional[str] = None
+    cta_button_text: Optional[str] = None
+    about_text: Optional[str] = None
+    features_text: Optional[str] = None
+    testimonial_text: Optional[str] = None
+    custom_css: Optional[str] = None
+    social_links: Optional[str] = None
+    
+    # Advanced Styling
+    font_family: Optional[str] = None
+    background_gradient: Optional[str] = None
+    card_style: Optional[str] = None
+    button_style: Optional[str] = None
+    
+    # Personalized Content
+    calculator_title: Optional[str] = None
+    calculator_description: Optional[str] = None
+    result_message_template: Optional[str] = None
+    export_email_subject: Optional[str] = None
+    
+    # Client Features
+    hide_features: Optional[str] = None
+    custom_pages: Optional[str] = None
 
 # Helper functions
 def validate_client_id(client_id: str) -> bool:
@@ -345,7 +401,7 @@ async def delete_whitelabel_config(client_id: str, db: Session = Depends(get_db)
 async def get_demo_config(client_id: str, db: Session = Depends(get_db)):
     """Get demo white label configuration for testing"""
     try:
-        # Return demo configuration for testing
+        # Return demo configuration for testing with enhanced personalization
         demo_configs = {
             "smith-financial": {
                 "company_name": "Smith Financial Advisors",
@@ -356,7 +412,25 @@ async def get_demo_config(client_id: str, db: Session = Depends(get_db)):
                 "pdf_header_text": "Smith Financial Advisors - Investment ROI Analysis",
                 "pdf_footer_text": "Smith Financial Advisors | Licensed Investment Advisor",
                 "show_powered_by": True,
-                "website": "https://smithfinancial.com"
+                "website": "https://smithfinancial.com",
+                
+                # Enhanced Personalization
+                "welcome_message": "Welcome to Smith Financial's Investment Calculator",
+                "tagline": "Your trusted partner in financial growth",
+                "hero_title": "Calculate Your Investment Returns",
+                "hero_subtitle": "Make informed investment decisions with our professional ROI calculator",
+                "cta_button_text": "Start Your Analysis",
+                "about_text": "Smith Financial Advisors has been helping clients achieve their financial goals for over 20 years.",
+                "features_text": "Professional-grade investment analysis tools trusted by thousands of investors.",
+                "font_family": "Inter, system-ui, sans-serif",
+                "background_gradient": "from-emerald-900 via-green-900 to-teal-900",
+                "card_style": "modern",
+                "button_style": "rounded",
+                "calculator_title": "Investment ROI Calculator",
+                "calculator_description": "Analyze your investment opportunities with our comprehensive ROI calculator",
+                "result_message_template": "Based on our analysis, your investment shows strong potential for returns.",
+                "export_email_subject": "Your Investment Analysis from Smith Financial",
+                "social_links": "{\"linkedin\": \"https://linkedin.com/company/smith-financial\", \"twitter\": \"https://twitter.com/smithfinancial\"}"
             },
             "acme-consulting": {
                 "company_name": "ACME Business Consulting",
@@ -367,7 +441,25 @@ async def get_demo_config(client_id: str, db: Session = Depends(get_db)):
                 "pdf_header_text": "ACME Business Consulting - ROI Calculator",
                 "pdf_footer_text": "ACME Business Consulting | Strategic Business Solutions",
                 "show_powered_by": True,
-                "website": "https://acmeconsulting.com"
+                "website": "https://acmeconsulting.com",
+                
+                # Enhanced Personalization
+                "welcome_message": "Welcome to ACME's Business ROI Calculator",
+                "tagline": "Strategic solutions for business growth",
+                "hero_title": "Maximize Your Business Returns",
+                "hero_subtitle": "Strategic ROI analysis for smart business decisions",
+                "cta_button_text": "Calculate ROI",
+                "about_text": "ACME Business Consulting provides strategic solutions to help businesses optimize their investments and maximize returns.",
+                "features_text": "Enterprise-grade ROI analysis tools for strategic business planning.",
+                "font_family": "Roboto, system-ui, sans-serif",
+                "background_gradient": "from-red-900 via-orange-900 to-amber-900",
+                "card_style": "classic",
+                "button_style": "square",
+                "calculator_title": "Business ROI Calculator",
+                "calculator_description": "Evaluate business investment opportunities with professional-grade analysis",
+                "result_message_template": "Our strategic analysis indicates significant ROI potential for your business investment.",
+                "export_email_subject": "Business ROI Analysis from ACME Consulting",
+                "social_links": "{\"linkedin\": \"https://linkedin.com/company/acme-consulting\", \"twitter\": \"https://twitter.com/acmeconsulting\"}"
             }
         }
         

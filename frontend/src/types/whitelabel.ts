@@ -24,6 +24,43 @@ export interface WhiteLabelConfig {
   companyAddress?: string;
   phoneNumber?: string;
   website?: string;
+  
+  // Enhanced Personalization
+  welcomeMessage?: string;
+  tagline?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  ctaButtonText?: string;
+  aboutText?: string;
+  featuresText?: string;
+  testimonialText?: string;
+  customCss?: string;
+  socialLinks?: {
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+  };
+  
+  // Advanced Styling
+  fontFamily?: string;
+  backgroundGradient?: string;
+  cardStyle?: 'modern' | 'classic' | 'minimal';
+  buttonStyle?: 'rounded' | 'square' | 'pill';
+  
+  // Personalized Content
+  calculatorTitle?: string;
+  calculatorDescription?: string;
+  resultMessageTemplate?: string;
+  exportEmailSubject?: string;
+  
+  // Client Features
+  hideFeatures?: string[];
+  customPages?: Array<{
+    title: string;
+    url: string;
+    content?: string;
+  }>;
 }
 
 export const DEFAULT_WHITELABEL_CONFIG: WhiteLabelConfig = {
@@ -38,7 +75,7 @@ export const DEFAULT_WHITELABEL_CONFIG: WhiteLabelConfig = {
   showPoweredBy: false
 };
 
-// Example white label configs
+// Example white label configs with enhanced personalization
 export const EXAMPLE_WHITELABEL_CONFIGS: Record<string, WhiteLabelConfig> = {
   "smith-financial": {
     companyName: "Smith Financial Advisors",
@@ -55,7 +92,28 @@ export const EXAMPLE_WHITELABEL_CONFIGS: Record<string, WhiteLabelConfig> = {
     showPoweredBy: true,
     companyAddress: "123 Finance Street, New York, NY 10001",
     phoneNumber: "(555) 123-4567",
-    website: "https://smithfinancial.com"
+    website: "https://smithfinancial.com",
+    
+    // Enhanced Personalization
+    welcomeMessage: "Welcome to Smith Financial's Investment Calculator",
+    tagline: "Your trusted partner in financial growth",
+    heroTitle: "Calculate Your Investment Returns",
+    heroSubtitle: "Make informed investment decisions with our professional ROI calculator",
+    ctaButtonText: "Start Your Analysis",
+    aboutText: "Smith Financial Advisors has been helping clients achieve their financial goals for over 20 years.",
+    featuresText: "Professional-grade investment analysis tools trusted by thousands of investors.",
+    fontFamily: "Inter, system-ui, sans-serif",
+    backgroundGradient: "from-emerald-900 via-green-900 to-teal-900",
+    cardStyle: "modern",
+    buttonStyle: "rounded",
+    calculatorTitle: "Investment ROI Calculator",
+    calculatorDescription: "Analyze your investment opportunities with our comprehensive ROI calculator",
+    resultMessageTemplate: "Based on our analysis, your investment shows strong potential for returns.",
+    exportEmailSubject: "Your Investment Analysis from Smith Financial",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/smith-financial",
+      twitter: "https://twitter.com/smithfinancial"
+    }
   },
   
   "acme-consulting": {
@@ -69,6 +127,27 @@ export const EXAMPLE_WHITELABEL_CONFIGS: Record<string, WhiteLabelConfig> = {
     pdfHeaderText: "ACME Business Consulting - ROI Calculator",
     pdfFooterText: "ACME Business Consulting | Strategic Business Solutions",
     showPoweredBy: true,
-    website: "https://acmeconsulting.com"
+    website: "https://acmeconsulting.com",
+    
+    // Enhanced Personalization
+    welcomeMessage: "Welcome to ACME's Business ROI Calculator",
+    tagline: "Strategic solutions for business growth",
+    heroTitle: "Maximize Your Business Returns",
+    heroSubtitle: "Strategic ROI analysis for smart business decisions",
+    ctaButtonText: "Calculate ROI",
+    aboutText: "ACME Business Consulting provides strategic solutions to help businesses optimize their investments and maximize returns.",
+    featuresText: "Enterprise-grade ROI analysis tools for strategic business planning.",
+    fontFamily: "Roboto, system-ui, sans-serif",
+    backgroundGradient: "from-red-900 via-orange-900 to-amber-900",
+    cardStyle: "classic",
+    buttonStyle: "square",
+    calculatorTitle: "Business ROI Calculator",
+    calculatorDescription: "Evaluate business investment opportunities with professional-grade analysis",
+    resultMessageTemplate: "Our strategic analysis indicates significant ROI potential for your business investment.",
+    exportEmailSubject: "Business ROI Analysis from ACME Consulting",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/acme-consulting",
+      twitter: "https://twitter.com/acmeconsulting"
+    }
   }
 };

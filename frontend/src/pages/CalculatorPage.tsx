@@ -27,6 +27,9 @@ import ScenarioSelector from '../components/ScenarioSelector';
 import ResultsDisplay from '../components/ResultsDisplay';
 import RiskAssessment from '../components/RiskAssessment';
 import MarketAnalysis from '../components/MarketAnalysis';
+import PersonalizedHero from '../components/PersonalizedHero';
+import PersonalizedCalculatorForm from '../components/PersonalizedCalculatorForm';
+import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 
 
 import { mockScenarios, mockMiniScenarios } from '../data/mockScenarios';
@@ -37,6 +40,7 @@ import UserMenu from '../components/auth/UserMenu';
 const CalculatorPage: React.FC = () => {
   const { addNotification } = useNotifications();
   const { user, isAuthenticated } = useAuth();
+  const { config } = useWhiteLabel();
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
@@ -324,57 +328,51 @@ const CalculatorPage: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20 px-4 sm:px-0">
-      {/* Header Section */}
+      {/* Personalized Hero Section */}
+      <PersonalizedHero 
+        onGetStarted={() => {
+          // Scroll to calculator form
+          const calculatorSection = document.getElementById('calculator-form');
+          if (calculatorSection) {
+            calculatorSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      />
+
+      {/* Auth and Demo Actions */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8 pt-20"
+        transition={{ delay: 0.3 }}
+        className="flex justify-center space-x-4 mb-8"
       >
-        <div className="inline-flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white/20">
-            <Calculator className="w-6 h-6 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">ROI Calculator</h1>
-        </div>
-        <p className="text-white/70 text-lg max-w-2xl mx-auto mb-6">
-          Analyze your business investment with our comprehensive ROI calculator featuring 
-          35 business scenarios and real-world market data.
-        </p>
+        <Link to="/demo">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold border border-white/20 transition-all flex items-center space-x-2"
+          >
+            <Play className="w-4 h-4" />
+            <span>Watch Demo</span>
+          </motion.button>
+        </Link>
         
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex justify-center space-x-4"
-        >
-          <Link to="/demo">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold border border-white/20 transition-all flex items-center space-x-2"
-            >
-              <Play className="w-4 h-4" />
-              <span>Watch Demo</span>
-            </motion.button>
-          </Link>
-          
-          {isAuthenticated ? (
-            <UserMenu />
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAuthModal(true)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center space-x-2"
-            >
-              <User className="w-4 h-4" />
-              <span>Login</span>
-            </motion.button>
-          )}
-        </motion.div>
+        {isAuthenticated ? (
+          <UserMenu />
+        ) : (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowAuthModal(true)}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all flex items-center space-x-2"
+          >
+            <User className="w-4 h-4" />
+            <span>Login</span>
+          </motion.button>
+        )}
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-8 relative">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-8 relative" id="calculator-form">
         {/* Left Column - Calculator */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
