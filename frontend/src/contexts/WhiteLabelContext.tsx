@@ -35,10 +35,22 @@ export const WhiteLabelProvider: React.FC<WhiteLabelProviderProps> = ({ children
     
     // Update favicon if provided
     if (newConfig.logoUrl) {
-      const favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-      if (favicon) {
-        favicon.href = newConfig.logoUrl;
+      let favicon = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+      if (!favicon) {
+        favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        document.head.appendChild(favicon);
       }
+      favicon.href = newConfig.logoUrl;
+      
+      // Also update shortcut icon
+      let shortcutIcon = document.querySelector('link[rel="shortcut icon"]') as HTMLLinkElement;
+      if (!shortcutIcon) {
+        shortcutIcon = document.createElement('link');
+        shortcutIcon.rel = 'shortcut icon';
+        document.head.appendChild(shortcutIcon);
+      }
+      shortcutIcon.href = newConfig.logoUrl;
     }
     
     setConfig(newConfig);

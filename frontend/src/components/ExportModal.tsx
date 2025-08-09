@@ -14,6 +14,7 @@ import { generatePDF, PDFExportData } from '../utils/pdfExport';
 import { apiClient, PDFExportRequest } from '../utils/apiClient';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   const { addNotification } = useNotifications();
   const { user } = useAuth();
+  const { config, isWhiteLabel } = useWhiteLabel();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     template: 'standard',
     includeCharts: true,
@@ -97,7 +99,21 @@ const ExportModal: React.FC<ExportModalProps> = ({
           include_charts: exportOptions.includeCharts,
           include_market_analysis: exportOptions.includeMarketAnalysis,
           include_recommendations: exportOptions.includeRecommendations
-        }
+        },
+        // White label branding information
+        white_label_config: isWhiteLabel ? {
+          company_name: config.companyName,
+          logo_url: config.logoUrl,
+          pdf_header_text: config.pdfHeaderText,
+          pdf_footer_text: config.pdfFooterText,
+          pdf_logo_url: config.pdfLogoUrl || config.logoUrl,
+          primary_color: config.primaryColor,
+          website: config.website,
+          contact_url: config.contactUrl,
+          support_email: config.supportEmail,
+          company_address: config.companyAddress,
+          phone_number: config.phoneNumber
+        } : undefined
       };
 
       const backendResponse = await apiClient.exportToPDF(backendRequest);

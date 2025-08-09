@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
+import WhiteLabelHeader from './WhiteLabelHeader';
+import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 import { 
   HomeIcon, 
   CalculatorIcon, 
@@ -17,6 +19,7 @@ const Header: React.FC = () => {
   const [maintenance, setMaintenance] = useState(false);
   const location = useLocation();
   const {} = useAppStore();
+  const { isWhiteLabel } = useWhiteLabel();
 
   useEffect(() => {
     const read = () => setMaintenance(localStorage.getItem('maintenance_mode') === 'true');
@@ -55,7 +58,11 @@ const Header: React.FC = () => {
             className="flex items-center space-x-2"
           >
             <Link to="/" className="flex items-center space-x-2">
-              <Logo size="md" showText={true} />
+              {isWhiteLabel ? (
+                <WhiteLabelHeader showTagline={false} />
+              ) : (
+                <Logo size="md" showText={true} />
+              )}
             </Link>
           </motion.div>
 

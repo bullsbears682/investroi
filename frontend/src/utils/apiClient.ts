@@ -50,6 +50,19 @@ interface PDFExportRequest {
     include_market_analysis: boolean;
     include_recommendations: boolean;
   };
+  white_label_config?: {
+    company_name: string;
+    logo_url?: string;
+    pdf_header_text: string;
+    pdf_footer_text: string;
+    pdf_logo_url?: string;
+    primary_color: string;
+    website?: string;
+    contact_url?: string;
+    support_email: string;
+    company_address?: string;
+    phone_number?: string;
+  };
 }
 
 class ApiClient {
