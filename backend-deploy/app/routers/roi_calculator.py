@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, HTTPException, Query, Depends, Header
 from typing import List, Optional, Dict, Any
 import math
 import uuid
@@ -13,15 +13,51 @@ from app.database import get_db, BusinessScenario, MiniScenario, TaxCountry, ROI
 # Try to import auth, but continue without it if there are issues
 try:
     from app.database import User
-    from app.auth import get_current_user_optional
     AUTH_AVAILABLE = True
+    # Try simple auth first, then complex auth
+    try:
+        from app.simple_auth import verify_simple_token
+        AUTH_TYPE = "simple"
+        def get_current_user_optional():
+            return None
+    except ImportError:
+        from app.auth import get_current_user_optional
+        AUTH_TYPE = "complex"
 except ImportError:
     AUTH_AVAILABLE = False
+    AUTH_TYPE = None
     User = None
     def get_current_user_optional():
         return None
 
 router = APIRouter()
+
+def get_current_user_from_token(authorization: Optional[str] = Header(None), db: Session = Depends(get_db)):
+    """Get current user from Authorization header"""
+    if not authorization or not AUTH_AVAILABLE:
+        return None
+    
+    try:
+        # Extract token from "Bearer <token>" format
+        if not authorization.startswith("Bearer "):
+            return None
+        
+        token = authorization.replace("Bearer ", "")
+        
+        if AUTH_TYPE == "simple":
+            # For simple auth, we need to find the user by token
+            # This is a simplified approach - in production you'd want better token management
+            users = db.query(User).all()
+            for user in users:
+                if verify_simple_token(token, user.email):
+                    return user
+            return None
+        else:
+            # For complex auth, use the existing function
+            return get_current_user_optional()
+    except Exception as e:
+        print(f"Error getting user from token: {e}")
+        return None
 
 @router.get("/scenarios")
 async def get_business_scenarios(db: Session = Depends(get_db)):
@@ -93,7 +129,7 @@ async def get_countries(db: Session = Depends(get_db)):
 async def calculate_roi(
     request: Dict[str, Any], 
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user_optional) if AUTH_AVAILABLE else None
+    current_user = Depends(get_current_user_from_token)
 ):
     """Calculate ROI for a business investment"""
     
