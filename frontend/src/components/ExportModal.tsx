@@ -13,6 +13,7 @@ import { toast } from 'react-hot-toast';
 import { generatePDF, PDFExportData } from '../utils/pdfExport';
 import { apiClient, PDFExportRequest } from '../utils/apiClient';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -41,6 +42,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
   marketResearchData
 }) => {
   const { addNotification } = useNotifications();
+  const { user } = useAuth();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     template: 'standard',
     includeCharts: true,
@@ -85,6 +87,9 @@ const ExportModal: React.FC<ExportModalProps> = ({
       // Try backend PDF generation first
       const backendRequest: PDFExportRequest = {
         calculation_data: result.data || result,
+        user_id: user?.id,
+        calculation_id: result.calculation_id, // If available from the calculation result
+        template_type: exportOptions.template,
         scenario_name: scenarioName,
         user_inputs: result.formData,
         export_options: {

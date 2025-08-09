@@ -39,6 +39,9 @@ interface ROICalculationResponse {
 
 interface PDFExportRequest {
   calculation_data: ROICalculationResponse;
+  user_id?: number;
+  calculation_id?: number;
+  template_type: 'standard' | 'executive' | 'detailed';
   scenario_name?: string;
   user_inputs?: any;
   export_options?: {
