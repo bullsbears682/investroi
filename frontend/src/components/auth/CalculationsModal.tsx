@@ -3,16 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, BarChart3, Calendar, DollarSign, TrendingUp, Eye, Trash2, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { apiClient } from '../../utils/apiClient';
 
 interface Calculation {
-  id: string;
+  id: number;
   scenario_name: string;
   mini_scenario_name: string;
+  country_name: string;
   initial_investment: number;
   roi_percentage: number;
   net_profit: number;
   created_at: string;
-  country: string;
 }
 
 interface CalculationsModalProps {
@@ -33,47 +34,19 @@ const CalculationsModal: React.FC<CalculationsModalProps> = ({ isOpen, onClose }
   }, [isOpen, isAuthenticated]);
 
   const loadCalculations = async () => {
+    if (!user?.id) return;
+    
     setIsLoading(true);
     try {
-      // TODO: Implement API call to fetch user's calculations
-      // For now, using mock data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await apiClient.getUserCalculations(user.id);
       
-      const mockCalculations: Calculation[] = [
-        {
-          id: '1',
-          scenario_name: 'E-commerce Store',
-          mini_scenario_name: 'Premium Setup',
-          initial_investment: 50000,
-          roi_percentage: 35.5,
-          net_profit: 17750,
-          created_at: '2024-01-15T10:30:00Z',
-          country: 'United States'
-        },
-        {
-          id: '2',
-          scenario_name: 'SaaS Platform',
-          mini_scenario_name: 'Scalable Growth',
-          initial_investment: 100000,
-          roi_percentage: 85.2,
-          net_profit: 85200,
-          created_at: '2024-01-14T15:45:00Z',
-          country: 'Canada'
-        },
-        {
-          id: '3',
-          scenario_name: 'Restaurant',
-          mini_scenario_name: 'Basic Setup',
-          initial_investment: 75000,
-          roi_percentage: 22.8,
-          net_profit: 17100,
-          created_at: '2024-01-13T09:15:00Z',
-          country: 'United Kingdom'
-        }
-      ];
-      
-      setCalculations(mockCalculations);
+      if (response.success) {
+        setCalculations(response.data || []);
+      } else {
+        toast.error(response.error || 'Failed to load calculations');
+      }
     } catch (error) {
+      console.error('Error fetching calculations:', error);
       toast.error('Failed to load calculations');
     } finally {
       setIsLoading(false);
@@ -97,14 +70,20 @@ const CalculationsModal: React.FC<CalculationsModalProps> = ({ isOpen, onClose }
     });
   };
 
-  const handleDeleteCalculation = async (calculationId: string) => {
+  const handleDeleteCalculation = async (calculationId: number) => {
+    if (!user?.id) return;
+    
     try {
-      // TODO: Implement delete API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const response = await apiClient.deleteUserCalculation(user.id, calculationId);
       
-      setCalculations(prev => prev.filter(calc => calc.id !== calculationId));
-      toast.success('Calculation deleted successfully');
+      if (response.success) {
+        setCalculations(prev => prev.filter(calc => calc.id !== calculationId));
+        toast.success('Calculation deleted successfully');
+      } else {
+        toast.error(response.error || 'Failed to delete calculation');
+      }
     } catch (error) {
+      console.error('Error deleting calculation:', error);
       toast.error('Failed to delete calculation');
     }
   };

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useNotifications } from '../contexts/NotificationContext';
 import { contactStorage } from '../utils/contactStorage';
 import { chatSystem } from '../utils/chatSystem';
+import { apiClient } from '../utils/apiClient';
 import Logo from '../components/Logo';
 import AdminMenu from '../components/AdminMenu';
 import { 
@@ -57,9 +58,32 @@ const AdminDashboard: React.FC = () => {
   const { addNotification } = useNotifications();
 
   // Load admin statistics
-  const loadAdminStats = () => {
+  const loadAdminStats = async () => {
     try {
-      // Mock data until new auth system is implemented
+      // Get real admin stats from database
+      const response = await apiClient.getAdminStats();
+      
+      if (response.success) {
+        const stats = response.data;
+        const allContacts = contactStorage.getSubmissions();
+        
+        setAdminStats({
+          totalUsers: stats.total_users,
+          activeUsers: stats.active_users,
+          totalCalculations: stats.total_calculations,
+          totalExports: allContacts.length, // Keep using local contact data for now
+          growthRate: stats.new_users_this_week > 0 ? (stats.new_users_this_week / Math.max(stats.total_users - stats.new_users_this_week, 1)) * 100 : 0,
+          monthlyGrowth: stats.calculations_today > 0 ? 15.2 : 8.7, // Mock monthly growth for now
+          conversionRate: stats.total_users > 0 ? (stats.active_users / stats.total_users) * 100 : 0,
+          averageSessionTime: 4.2, // Mock data - would need session tracking
+          bounceRate: 23.1 // Mock data - would need analytics integration
+        });
+        
+        return;
+      }
+      
+      // Fallback to mock data if API fails
+      console.warn('Admin stats API failed, using fallback data');
       const allUsers: any[] = [];
       const allContacts = contactStorage.getSubmissions();
 
@@ -109,15 +133,23 @@ const AdminDashboard: React.FC = () => {
   };
 
   // Load recent activity
-  const loadRecentActivity = () => {
+  const loadRecentActivity = async () => {
     try {
-      const activities: ActivityItem[] = [];
-      const now = Date.now();
+      // Get real recent activity from database
+      const response = await apiClient.getRecentActivity();
       
-      // Get real user registrations (last 7 days) - mock data for now
-      const recentRegistrations: any[] = [];
-
-      activities.push(...recentRegistrations);
+      if (response.success) {
+        const dbActivities = response.data.map((item: any) => ({
+          id: item.id,
+          type: item.type,
+          description: item.description,
+          timestamp: new Date(item.timestamp).getTime(),
+          user: item.user_name,
+          color: item.type === 'calculation' ? 'bg-green-400' : 'bg-blue-400'
+        }));
+        
+        const activities: ActivityItem[] = [...dbActivities];
+        const now = Date.now();
 
       // Get real ticket creation activity (last 7 days)
       const allSessions = chatSystem.getAllSessions();
@@ -159,6 +191,31 @@ const AdminDashboard: React.FC = () => {
       // Sort all activities by timestamp
       activities.sort((a, b) => b.timestamp - a.timestamp);
       setRecentActivity(activities.slice(0, 10));
+      
+      } else {
+        // Fallback to local data if API fails
+        console.warn('Recent activity API failed, using local data only');
+        const activities: ActivityItem[] = [];
+        const now = Date.now();
+
+        // Get real ticket creation activity (last 7 days)
+        const allSessions = chatSystem.getAllSessions();
+        const recentTickets = allSessions
+          .filter((session: any) => new Date(session.createdAt) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+          .map((session: any) => ({
+            id: `ticket-${session.id}`,
+            type: 'ticket' as const,
+            description: `New ticket created: ${session.ticketNumber}`,
+            timestamp: new Date(session.createdAt).getTime(),
+            user: session.userName,
+            color: 'bg-blue-400'
+          }))
+          .sort((a: ActivityItem, b: ActivityItem) => b.timestamp - a.timestamp)
+          .slice(0, 5);
+
+        activities.push(...recentTickets);
+        setRecentActivity(activities);
+      }
     } catch (error) {
       console.error('Failed to load recent activity:', error);
     }

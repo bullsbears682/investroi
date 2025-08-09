@@ -168,6 +168,63 @@ class ApiClient {
   async getMarketInsights(businessType: string, countryCode: string): Promise<ApiResponse<any>> {
     return this.makeRequest<any>(`/api/roi/market-insights?business_type=${businessType}&country_code=${countryCode}`);
   }
+
+  // User Data Methods
+  async getUserProfile(userId: number): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/user/profile/${userId}`);
+  }
+
+  async updateUserProfile(userId: number, profileData: any): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/user/profile/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+  }
+
+  async getUserCalculations(userId: number): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/user/calculations/${userId}`);
+  }
+
+  async getUserStats(userId: number): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/user/stats/${userId}`);
+  }
+
+  async deleteUserCalculation(userId: number, calculationId: number): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/user/calculations/${userId}/${calculationId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getUserExports(userId: number): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/user/exports/${userId}`);
+  }
+
+  // Admin Data Methods
+  async getAdminStats(): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>('/api/admin/stats');
+  }
+
+  async getAdminUsers(): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>('/api/admin/users');
+  }
+
+  async getCalculationAnalytics(): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>('/api/admin/calculations/analytics');
+  }
+
+  async getRecentActivity(): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>('/api/admin/activity');
+  }
+
+  async getDatabaseStatus(): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>('/api/admin/database/status');
+  }
+
+  async deleteUser(userId: number): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>(`/api/admin/users/${userId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 // Export singleton instance

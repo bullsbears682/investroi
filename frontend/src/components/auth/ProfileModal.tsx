@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, Edit3, Save, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { apiClient } from '../../utils/apiClient';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -37,14 +38,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleSave = async () => {
+    if (!user?.id) return;
+    
     setIsLoading(true);
     try {
-      // TODO: Implement profile update API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      const response = await apiClient.updateUserProfile(user.id, formData);
       
-      toast.success('Profile updated successfully!');
-      setIsEditing(false);
+      if (response.success) {
+        toast.success('Profile updated successfully!');
+        setIsEditing(false);
+        // Note: In a real app, you'd want to refresh the user context here
+        // to reflect the changes throughout the app
+      } else {
+        toast.error(response.error || 'Failed to update profile');
+      }
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast.error('Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
