@@ -37,6 +37,7 @@ const AdminData = lazy(() => import('./pages/AdminData'));
 const AdminSystem = lazy(() => import('./pages/AdminSystem'));
 const AdminChat = lazy(() => import('./pages/AdminChat'));
 const WhiteLabelDemo = lazy(() => import('./pages/WhiteLabelDemo'));
+const AdminWhiteLabel = lazy(() => import('./pages/AdminWhiteLabel'));
 
 
 // Store
@@ -121,6 +122,7 @@ function App() {
                         <Route path="/admin/system" element={<AdminSystem />} />
                         {/* Backups route removed */}
                         <Route path="/admin/chat" element={<AdminChat />} />
+                        <Route path="/admin/whitelabel" element={<AdminWhiteLabel />} />
                         <Route path="/whitelabel-demo" element={<WhiteLabelDemo />} />
                       </Routes>
                       </Suspense>
