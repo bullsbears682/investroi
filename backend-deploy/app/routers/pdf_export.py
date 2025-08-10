@@ -9,39 +9,22 @@ from ..database import get_db, ExportHistory
 
 router = APIRouter(prefix="/pdf", tags=["PDF Export"])
 
-class WhiteLabelConfig(BaseModel):
-    company_name: str
-    logo_url: Optional[str] = None
-    pdf_header_text: str
-    pdf_footer_text: str
-    pdf_logo_url: Optional[str] = None
-    primary_color: str
-    website: Optional[str] = None
-    contact_url: Optional[str] = None
-    support_email: str
-    company_address: Optional[str] = None
-    phone_number: Optional[str] = None
+
 
 class PDFExportRequest(BaseModel):
     calculation_data: Dict[str, Any]
     user_id: Optional[int] = None
     calculation_id: Optional[int] = None
     template_type: str = "standard"
-    white_label_config: Optional[WhiteLabelConfig] = None
+
 
 @router.post("/export")
 async def export_pdf(request: PDFExportRequest, db: Session = Depends(get_db)):
     """Export ROI calculation as PDF"""
     try:
-        # Convert white label config to dict if provided
-        white_label_dict = None
-        if request.white_label_config:
-            white_label_dict = request.white_label_config.dict()
-        
         # Generate PDF using the service
         pdf_file_path = pdf_generator_service.generate_simple_report(
-            request.calculation_data,
-            white_label_dict
+            request.calculation_data
         )
         
         # Get file size

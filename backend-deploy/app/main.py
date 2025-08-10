@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
 import os
-from app.routers import roi_calculator, pdf_export, admin, user_data, admin_data, whitelabel
+from app.routers import roi_calculator, pdf_export, admin, user_data, admin_data
 
 # Try to import auth systems
 try:
@@ -84,7 +84,7 @@ app.include_router(pdf_export.router, prefix="/api")
 app.include_router(admin.router, prefix="/api/admin")
 app.include_router(user_data.router)
 app.include_router(admin_data.router)
-app.include_router(whitelabel.router)
+
 
 # Health check endpoint
 @app.get("/")
