@@ -13,6 +13,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import LoadingScreen from './components/LoadingScreen';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 // Pages (lazy)
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -113,12 +114,11 @@ function App() {
                         <Route path="/privacy" element={<PrivacyPage />} />
                         <Route path="/contact" element={<ContactPage />} />
                         <Route path="/terms" element={<TermsPage />} />
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        <Route path="/admin/analytics" element={<AdminAnalytics />} />
-                        <Route path="/admin/data" element={<AdminData />} />
-                        <Route path="/admin/system" element={<AdminSystem />} />
-                        {/* Backups route removed */}
-                                                    <Route path="/admin/chat" element={<AdminChat />} />
+                        <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+                        <Route path="/admin/analytics" element={<ProtectedAdminRoute><AdminAnalytics /></ProtectedAdminRoute>} />
+                        <Route path="/admin/data" element={<ProtectedAdminRoute><AdminData /></ProtectedAdminRoute>} />
+                        <Route path="/admin/system" element={<ProtectedAdminRoute><AdminSystem /></ProtectedAdminRoute>} />
+                        <Route path="/admin/chat" element={<ProtectedAdminRoute><AdminChat /></ProtectedAdminRoute>} />
                       </Routes>
                       </Suspense>
                     </main>
